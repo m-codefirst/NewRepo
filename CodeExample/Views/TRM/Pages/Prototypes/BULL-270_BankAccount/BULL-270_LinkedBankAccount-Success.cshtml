@@ -1,0 +1,186 @@
+﻿
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer linked-bank-accounts">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+
+	<div class="container">
+		@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	</div>
+
+	@if (Model.CurrentPage.DisplayPageHeading)
+	{
+		<div class="page-header">
+			@Html.PropertyFor(m => m.CurrentPage.Heading)
+		</div>
+	}
+	@Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+	<div class="container mb-3x">
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-md-4">
+					<a class="btn btn-default btn-block sidenav-trigger mb-2x hidden-md hidden-lg mt-xs-2x" data-target="#catFilters">Account Menu</a>
+				</div>
+			</div>
+		</div>
+
+		<aside class="mobile-sidenav col-md-3" id="catFilters">
+			<a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+			<div class="row">
+				<div class="account navigationBlock col-xs-12" id="account-menu">
+					<div class="blockContent">
+						<ul class="level0 contentNav">
+							<li class="">
+								<a href="#" title="My Account">My Account</a>
+							</li>
+							<li class="has-children">
+								<a class="btn-collapse" data-target="#page-menu-1" data-toggle="collapse" title="Show/Hide More">Your Orders</a>
+								<ul class="level1 collapse in" id="page-menu-1">
+									<li><a href="/my-account/your-orders/how-to-return-an-item/" title="How to Return an item">How to Return an item</a></li>
+									<li><a href="/my-account/your-orders/view-closed-orders/" title="View Closed Orders">View Closed Orders</a></li>
+									<li><a href="/my-account/your-orders/view-open-orders/" title="View Open Orders">View Open Orders</a></li>
+								</ul>
+							</li>
+							<li class=" has-children">
+								<a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+								<ul class="level1 collapse in" id="your-orders1">
+									<li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+									<li><a href="#" title="View Statement History">View Statement History</a></li>
+									<li><a href="#" title="View Transaction History">View Transaction History</a></li>
+									<li><a href="#" title="Manage Your Bank Account Details">Manage Your Bank Account Details</a></li>
+									<li><a href="#" title="Withdraw Funds from Wallet">Withdraw Funds from Wallet</a></li>
+									<li><a href="#" title="Add Funds To Wallet">Add Funds To Wallet</a></li>
+								</ul>
+							</li>
+							<li class="has-children">
+								<a class="btn-collapse" data-target="#page-menu-2" data-toggle="collapse" title="Show/Hide More">Contact and Delivery</a>
+								<ul class="level1 collapse in" id="page-menu-2">
+									<li><a href="#" title="Change Password">Change Password</a></li>
+									<li><a href="#" title="Contact Preferences">Contact Preferences</a></li>
+									<li><a href="#" title="Manage Addresses">Manage Addresses</a></li>
+									<li><a href="#" title="Edit personal Details">Edit personal Details</a></li>
+								</ul>
+							</li>
+							<li class="has-children">
+								<a class="" title="Show/Hide More">Wishlist</a>
+								<ul class="level1 collapse in" id="page-menu-1"></ul>
+							</li>
+						</ul>
+					</div><!-- /.blockContent -->
+				</div><!-- /. navigation block -->
+			</div>
+		</aside>
+
+		<div class="col-xs-12 col-md-9 mb-xs-2x">
+			<div class="header-wrapper">
+				<div class="page-header">
+					<h1>Your Linked Bank Accounts</h1>
+				</div>
+			</div>
+			<div class="row">
+				@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+			</div>
+			<div class="panel panel-default panel-secondary">
+				<div class="panel-body item-row">
+					<div class="row">
+						<div class="col-xs-12">
+							<p>This page allows you to see the bank account that’s linked to your <a href="#">royalmintbullion.com</a> account. Once an account has been added you will be able to withdraw from your royalmintbullion.com account.</p>
+							<p>Transfers to UK bank accounts are free of charge; however transfers to international bank accounts will attract a £10.00 charge.</p>
+						</div>
+					</div>
+
+					<div class="alert alert-success text-center mb-1x mt-1x">
+						Your Bank Account has been added!
+					</div>
+
+					<div class="panel panel-order">
+						<!-- Panel Heading -->
+						<div class="panel-heading hidden-xs">
+							<div class="row">
+								<div class="col-xs-12 col-sm-4">
+									Account Holder
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									Account Nickname
+								</div>
+								<div class="col-xs-12 col-sm-2 text-right">
+									Actions
+								</div>
+							</div>
+						</div>
+
+						<div class="panel-body item-row">
+							<div class="row mb-xs-1x">
+								<div class="col-xs-12 col-sm-4">
+									<span class="visible-xs-inline strong">Account Holder:</span>
+									<span class="linked-mobile-block">Mr Steve Benson</span>
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									<span class="visible-xs-inline strong"> Account Nickname:</span>
+									<span class="linked-mobile-block">Benson-Main</span>
+								</div>
+								<div class="col-xs-12 col-sm-2 text-left-xs text-right-sm">
+									<span class="visible-xs-inline strong"> Actions:</span> <a href="#" class="text-danger pl-xs-1x pr-2x">Delete</a><a href="#">Edit</a></span>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body item-row">
+							<div class="row mb-xs-1x">
+								<div class="col-xs-12 col-sm-4">
+									<span class="visible-xs-inline strong">Account Holder:</span>
+									<span class="linked-mobile-block">Mr Steve Benson</span>
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									<span class="visible-xs-inline strong"> Account Nickname:</span>
+									<span class="linked-mobile-block">Steves-Second-Account</span>
+								</div>
+								<div class="col-xs-12 col-sm-2 text-left-xs text-right-sm">
+									<span class="visible-xs-inline strong"> Actions:</span> <a href="#" class="text-danger pr-2x pl-xs-1x">Delete</a><a href="#">Edit</a></span>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body item-row">
+							<div class="row mb-xs-1x">
+								<div class="col-xs-12 col-sm-4">
+									<span class="visible-xs-inline strong">Account Holder:</span>
+									<span class="linked-mobile-block">Mr Steve Benson</span>
+								</div>
+								<div class="col-xs-12 col-sm-6">
+									<span class="visible-xs-inline strong"> Account Nickname:</span>
+									<span class="linked-mobile-block">Steves-Third-Account</span>
+								</div>
+								<div class="col-xs-12 col-sm-2 text-left-xs text-right-sm">
+									<span class="visible-xs-inline strong"> Actions:</span> <a href="#" class="text-danger pl-xs-1x pr-2x">Delete</a><a href="#">Edit</a></span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12 text-right">
+								<button class="btn btn-secondary mt-2x">Add New Bank Account</button>
+							</div>
+						</div>
+						<div class="row mt-1x">
+							@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

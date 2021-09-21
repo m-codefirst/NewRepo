@@ -1,0 +1,30 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep5ViewModel>
+
+
+
+@if (Model.ViewModel.PurchaseOrder != null && Model.ViewModel.PurchaseOrder.Shipments.Any())
+{
+    foreach (var shipment in Model.ViewModel.PurchaseOrder.Shipments)
+    {
+        foreach (var item in shipment.CartItems)
+        {
+            Html.RenderPartial("RoyalMint2020/_ProductSummaryCard", new ProductSummaryCardViewModel { Item = item });
+        }
+    }
+}
+
+@if (Model.ViewModel.PurchaseOrder.Promotions.Any())
+{
+    <div class="product-summary-card p-1 p-sm-2">
+        <div class="info">
+            @foreach (var promo in Model.ViewModel.PurchaseOrder.Promotions)
+            {
+                <p>@Html.Raw(string.IsNullOrEmpty(promo.Code) ? promo.Description : promo.Code)</p>
+            }
+        </div>
+    </div>
+}
+
+@{Html.RenderPartial("RoyalMint2020/_OrderTotals", new OrderTotalsViewModel { PurchaseOrder = Model.ViewModel.PurchaseOrder }); }

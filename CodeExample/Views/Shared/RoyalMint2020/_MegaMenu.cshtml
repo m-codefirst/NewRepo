@@ -1,0 +1,38 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{ 
+    var hideOnClasses = Model?.MegaMenu?.MegaMenuDto?.HideOnClasses;
+}
+
+<div id="global-navigation" class="order-3 navigation-wrapper js-expandable">
+    <div class="navigation-wrapper-inner">
+        <nav class="navigation container">
+            <div class="root @hideOnClasses">
+                <ul class="navigation-menu" data-label="The Royal Mint">
+                    <li class="d-md-none"><a href="/" class="overview"><span>Home</span></a></li>
+
+                    @if (Model.MegaMenu != null && Model.MegaMenu.MegaMenuDto != null)
+                    {
+                        @Html.Partial("RoyalMint2020/_Navigation", Model.MegaMenu)
+                    }
+                </ul>
+            </div>
+        </nav>
+        @if (!Model.IsSippContact)
+        {
+            <div class="menu-search d-md-none">
+                @Html.Partial("RoyalMint2020/_GlobalSearch", Model,
+                new ViewDataDictionary {
+                    { "placeholder", Html.TranslateFallback(StringResources.SearchPlaceholder, "Search for a product, service or article") },
+                    { "buttonName", Html.TranslateFallback(StringResources.SearchButtonName, "Search") },
+                    { "includingResultsFor", Html.TranslateFallback(StringResources.SearchIncludingResultsFor, "Including Results For") },
+                    { "viewMoreResults", Html.TranslateFallback(StringResources.SearchViewMoreResults, "View More Results") },
+                    { "seeFullSearchResults", Html.TranslateFallback(StringResources.SearchSeeFullSearchResults, "See Full Search Results") },
+                    { "noresultsFound", Html.TranslateFallback(StringResources.SearchNoresultsFound, "No results found") },
+                })
+            </div>
+        }
+    </div>
+</div>
+

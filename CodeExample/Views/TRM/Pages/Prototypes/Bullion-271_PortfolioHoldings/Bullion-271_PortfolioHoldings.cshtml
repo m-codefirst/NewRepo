@@ -1,0 +1,360 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var targetId = Guid.NewGuid();
+
+}
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	<div class="container vault-holding">
+		<div class="page-header">
+			<div class="row center-items">
+				<div class="col-xs-12 col-md-6">
+					<h1 class="h1 mt-0">@Html.TranslateFallback(StringResources.PortfolioBackToAccountDashboard, "Your Vault Holdings")</h1>
+				</div>
+				<div class="col-xs-12 col-md-6">
+					<div class="pull-right">
+						<a href="">@Html.TranslateFallback(StringResources.PortfolioBackToAccountDashboard, "Back to Account Dashboard")</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+		</div>
+		<div class="row mb-2x">
+			<div class="col-xs-12">
+				<h2 class="h3 mb-2x">@Html.TranslateFallback(StringResources.PortfolioVaultContentsHeader, "Your Vault Contents")</h2>
+				<div class="filter-dropdown flex-two-column-items">
+					<label for="filterType" class="mr-1x">@Html.TranslateFallback(StringResources.PortfolioFilterByLabel, "Filter by")</label>
+					<div class="select-form">
+						<select class="form-control" id="filterType">
+							<option value="" selected="">All</option>
+							<option value="01" disabled>Category</option>
+							<option value="02">- Coins</option>
+							<option value="03">- Bars</option>
+							<option value="04">- Signature</option>
+							<option value="05" disabled>Metal</option>
+							<option value="06">- Gold</option>
+							<option value="07">- Silver</option>
+							<option value="08">- Platinum</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<div class="product-table">
+					<div class="product-table-header hidden-xs">
+						<div class="row">
+							<div class="col-xs-5">
+								<p class="h6 mb-0 strong">@Html.TranslateFallback(StringResources.PortfolioColumnHeader1Label, "Item")</p>
+							</div>
+							<div class="col-xs-1">
+								<p class="h6 mb-0 strong text-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader2Label, "Qty")</p>
+							</div>
+							<div class="col-xs-2">
+								<p class="h6 mb-0 strong text-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader3Label, "Valuation")</p>
+							</div>
+							<div class="col-xs-1 center-items">
+
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group has-two-children">
+							</div>
+						</div>
+					</div>
+					<hr />
+					<div class="product-item">
+						<div class="row stretch-items-sm-up">
+							<div class="col-xs-6 col-sm-2">
+								<div class="image-bg" style="background-image: url(Static/img/catalogue/coin-img-alt.jpg);"></div>
+							</div>
+							<div class="col-xs-6 col-sm-3 center-items">
+								<div class="product-name-wrapper flex-align-center-sm-down">
+									<p class="h6 strong mb-0">
+										Bullion Coin or Bar Title may well wrap over two lines
+									</p>
+									<p class="text-silver">
+										Second titile line of populated
+									</p>
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs"></div>
+							<div class="col-xs-12 col-sm-1 center-items">
+								<p class="h6 strong flex-align-center-sm-up">
+									<label class="title-xs">Qty: </label><span>3</span>
+								</p>
+							</div>
+							<div class="col-xs-12 col-sm-2 center-items">
+								<div class="product-price-wrapper flex-align-center-sm-up text-center">
+									<label class="title-xs">Valuation: </label>
+									<p class="h4 strong">£9999.99</p>
+									<p class="strong text-success">+£22.25</p>
+								</div>
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group has-two-children">
+								<button class="btn btn-block btn-default">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</button>
+								<button class="btn btn-block btn-secondary">@Html.TranslateFallback(StringResources.PortfolioDeliveryToMeButtonLabel, "Deliver to me")</button>
+							</div>
+						</div>
+					</div>
+					<div class="product-item">
+						<div class="row stretch-items-sm-up">
+							<div class="col-xs-6 col-sm-2">
+								<div class="image-bg" style="background-image: url(Static/img/bullion/sig-gold.png);"></div>
+							</div>
+							<div class="col-xs-6 col-sm-3 center-items">
+								<div class="product-name-wrapper flex-align-center-sm-down">
+									<p class="h6 strong mb-0">
+										Signature Gold
+									</p>
+									<p class="text-silver">
+										Second titile line of populated
+									</p>
+									<p class="h6 strong">0.33oz</p>									
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs"></div>
+							<div class="col-xs-12 col-sm-1 center-items">
+								<p class="h6 strong flex-align-center-sm-up">
+									
+								</p>
+							</div>
+							<div class="col-xs-12 col-sm-2 center-items">
+								<div class="product-price-wrapper flex-align-center text-center">
+									<label class="title-xs">Valuation: </label>
+									<p class="h4 strong">£9999.70</p>
+									<p class="strong text-danger">-£5.00</p>
+								</div>
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group">
+								<button class="btn btn-block btn-default">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</button>
+							</div>
+						</div>
+					</div>
+					<div class="product-item">
+						<div class="row stretch-items-sm-up">
+							<div class="col-xs-6 col-sm-2">
+								<div class="image-bg" style="background-image: url(Static/img/bullion/sig-silver.png);"></div>
+							</div>
+							<div class="col-xs-6 col-sm-3 center-items">
+								<div class="product-name-wrapper flex-align-center-sm-down">
+									<p class="h6 strong mb-0">
+										Signature Silver
+									</p>
+									<p class="text-silver">
+										Second titile line of populated
+									</p>
+									<p class="h6 strong">0.56oz</p>		
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs"></div>
+							<div class="col-xs-12 col-sm-1 center-items">
+								<p class="h6 strong flex-align-center-sm-up"></p>
+							</div>
+							<div class="col-xs-12 col-sm-2 center-items">
+								<div class="product-price-wrapper flex-align-center text-center">
+									<label class="title-xs">Valuation: </label>
+									<p class="h4 strong">£9999.99</p>
+									<p class="strong text-success">+£22.25</p>
+								</div>
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group has-two-children">
+								<button class="btn btn-block btn-default">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</button>
+								<button class="btn btn-block btn-secondary">@Html.TranslateFallback(StringResources.PortfolioDeliveryToMeButtonLabel, "Deliver to me")</button>
+							</div>
+						</div>
+					</div>
+					<div class="product-item">
+						<div class="row stretch-items-sm-up">
+							<div class="col-xs-6 col-sm-2">
+								<div class="image-bg" style="background-image: url(Static/img/bullion/sig-platinum.png);"></div>
+							</div>
+							<div class="col-xs-6 col-sm-3 center-items">
+								<div class="product-name-wrapper flex-align-center-sm-down">
+									<p class="h6 strong mb-0">
+										Signature Platinum
+									</p>
+									<p class="h6 strong">0.77oz</p>		
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs"></div>
+							<div class="col-xs-12 col-sm-1 center-items">
+								<p class="h6 strong flex-align-center-sm-up"></p>
+							</div>
+							<div class="col-xs-12 col-sm-2 center-items">
+								<div class="product-price-wrapper flex-align-center text-center">
+									<label class="title-xs">Valuation: </label>
+									<p class="h4 strong">£9999.99</p>
+									<p class="strong text-success">+£22.25</p>
+								</div>
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group">
+								<button class="btn btn-block btn-default">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</button>
+							</div>
+						</div>
+					</div>
+					<div class="product-item">
+						<div class="row stretch-items-sm-up">
+							<div class="col-xs-6 col-sm-2">
+								<div class="image-bg" style="background-image: url(Static/img/catalogue/coin-img-alt.jpg);"></div>
+							</div>
+							<div class="col-xs-6 col-sm-3 center-items">
+								<div class="product-name-wrapper flex-align-center-sm-down">
+									<p class="h6 strong mb-0">
+										Bullion Coin or Bar title may well
+									</p>
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs"></div>
+							<div class="col-xs-12 col-sm-1 center-items">
+								<p class="h6 strong flex-align-center-sm-up">
+									<label class="title-xs">Qty: </label><span>6</span>
+								</p>
+							</div>
+							<div class="col-xs-12 col-sm-2 center-items">
+								<div class="product-price-wrapper flex-align-center text-center">
+									<label class="title-xs">Valuation: </label>
+									<p class="h4 strong">£9999.99</p>
+									<p class="strong text-success">+£22.25</p>
+								</div>
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group has-two-children">
+								<button class="btn btn-block btn-default">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</button>
+								<button class="btn btn-block btn-secondary">@Html.TranslateFallback(StringResources.PortfolioDeliveryToMeButtonLabel, "Deliver to me")</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>
+@section JustBeforeBodyTag{
+	<script type="text/javascript">
+		$(document).ready(function () {
+			google.charts.load("current", { packages: ["corechart"] });
+			google.charts.setOnLoadCallback(drawChart);
+			var isSMDown = window.innerWidth <= 767;
+			function drawChart() {
+				var metalData = google.visualization.arrayToDataTable([
+					['Task', 'Metal type'],
+					['Gold', 248],
+					['Silver', 464],
+					['Platinum', 289],
+				]);
+				var productData = google.visualization.arrayToDataTable([
+					['Task', 'Product type'],
+					['Coins', 409],
+					['Bars', 200],
+					['Signature', 392],
+				]);
+				var summaryData = google.visualization.arrayToDataTable([
+					['Task', 'Metal and Product'],
+					['Gold coins', 100],
+					['Gold Bars', 53],
+					['Signature Gold', 95],
+					['Silver coins', 126],
+					['Silver Bars', 64],
+					['Signature Silver', 274],
+					['Platinum coins', 183],
+					['Platinum Bars', 83],
+					['Signature Platinum', 23],
+				]);
+
+				var options = {
+					chartArea: {
+						//top: isMDDown ? 10 : 55,
+						height: isSMDown ? '85%' : '100%'
+					},
+					legend: {
+						position: isSMDown ? 'bottom' : 'right',
+						alignment: 'center'
+					},
+					backgroundColor: {
+						fill: 'transparent'
+					},
+					enableInteractivity: false,
+					slices: {
+						0: { color: '#B59D5F' },
+						1: { color: '#ed7d31' },
+						2: { color: '#a5a5a5' },
+						3: { color: '#ffc000' },
+						4: { color: '#4472c4' },
+						5: { color: '#70ad47' },
+						6: { color: '#255e91' },
+						7: { color: '#9e480e' },
+						8: { color: '#636363' },
+					},
+				};
+
+				var metalSlices = {
+					slices: {
+						0: { color: '#B59D5F' },
+						1: { color: '#808083' },
+						2: { color: '#D6D6D6' },
+					}
+				};
+
+				var productSlices = {
+					slices: {
+						0: { color: '#5D285F' },
+						1: { color: '#009681' },
+						2: { color: '#0085AD' },
+					}
+				};
+
+				var summarySlices = {
+					slices: {
+						0: { color: '#5D285F' },
+						1: { color: '#253746' },
+						2: { color: '#B59D5F' },
+						3: { color: '#0085AD' },
+						4: { color: '#5B7F95' },
+						5: { color: '#808083' },
+						6: { color: '#006F62' },
+						7: { color: '#009681' },
+						8: { color: '#D6D6D6' },
+					}
+				};
+
+				var metalOptions = Object.assign({}, options, metalSlices);
+				var productOptions = Object.assign({}, options, productSlices);
+				var summaryOptions = Object.assign({}, options, summarySlices);
+
+				var chartMetal = new google.visualization.PieChart(document.getElementById('metalChart'));
+				var chartProduct = new google.visualization.PieChart(document.getElementById('productChart'));
+				var chartSummary = new google.visualization.PieChart(document.getElementById('summaryChart'));
+
+				$('#chartWrapper').find('.chart-item').removeClass('collapse');
+				chartMetal.draw(metalData, metalOptions);
+				chartProduct.draw(productData, productOptions);
+				chartSummary.draw(summaryData, summaryOptions);
+				$('#chartWrapper').find('.chart-item').addClass('collapse');
+			}
+
+			$(window).resize(function () {
+				drawChart();
+			})
+		})
+	</script>
+}

@@ -1,0 +1,149 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions;
+@using Newtonsoft.Json
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep1ViewModel>
+
+@functions
+{
+
+    public string ErrorMessage(string fieldName)
+    {
+        var fieldKey = string.Format("{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return @Html.ValidationMessage(fieldKey).ToString();
+
+        }
+        else
+        {
+            return "";
+
+        }
+
+    }
+}
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem {
+                Heading = "Account",
+                Number = "1",
+                IsCurrent = true,
+            },
+            new ProgressBarItem {
+                Heading = "Personal",
+                Number = "2",
+                Url = string.Format("{0}Step2", currentUrl),
+            },
+            new ProgressBarItem {
+                Heading = "Verify",
+                Number = "3",
+                Url = string.Format("{0}Step3", currentUrl),
+            },
+            new ProgressBarItem {
+                Heading = "Security",
+                Number = "4",
+                Url = string.Format("{0}Step4", currentUrl)
+            },
+            new ProgressBarItem {
+                Heading = "Complete",
+                Number = "5",
+                Url = string.Format("{0}Step4", currentUrl)
+            }
+        }
+    };
+
+    var FormViewModel = new
+    {
+        actionUrl = Url.Action(Html.TranslateFallback(StringResources.Step1, "Step1")),
+        EmailAddressErrorMessage = ErrorMessage(Html.TranslateFallback(StringResources.EmailAddressErrorMessage, "EmailAddress")),
+        UsernameErrorMessage = ErrorMessage("Username"),
+        PasswordErrorMessage = ErrorMessage("Password"),
+        AcceptTnCErrorMessage = ErrorMessage("AcceptTnC"),
+        Step1Heading = Model.CurrentPage.Step1Heading,
+        MiddleContentStep1 = @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep1).ToString(),
+        Step1ContinueButtonText = Model.CurrentPage.Step1ContinueButtonText,
+        EmailLabel = Model.CurrentPage.EmailLabel,
+        EmailMessage = Model.CurrentPage.EmailMessage,
+        EmailPlaceholder = Model.CurrentPage.EmailPlaceholder,
+        EmailAddressRequired = Html.TranslateFallback(StringResources.EmailRequiredMessage, "Email Address is required"),
+        emailMaxLength = 256,
+        EmailAddressMaxLength = string.Format(Html.TranslateFallback(StringResources.EmailAddressMaxLengthError, "Email Address cannot be longer than {0} characters"), 256),
+        EmailAddressInvalid = Html.TranslateFallback(StringResources.EmailAddressMaxLengthError, "Please enter a valid email address"),
+        UsernameLabel = Model.CurrentPage.UsernameLabel,
+        UsernameMessage = Model.CurrentPage.UsernameMessage,
+        UsernamePlaceholder = Model.CurrentPage.UsernamePlaceholder,
+        UsernameToolTip = Model.CurrentPage.UsernameToolTip,
+        UsernameRequired = Html.TranslateFallback(StringResources.UsernameRequired, "Username is required"),
+        userNameMinlength = 5,
+        userNameMinlengthError = string.Format(Html.TranslateFallback(StringResources.UserNameMinlengthError, "Username must have min {0} signs"), 5),
+        userNameMaxlength = 30,
+        userNameMaxlengthError = string.Format(Html.TranslateFallback(StringResources.UserNameMaxlengthError, "Username must have max {0} signs"), 30),
+        UsernameInvalid = Html.TranslateFallback(StringResources.UserNameInValid, StringConstants.TranslationFallback.InValidUserName),
+        UsernameExisting = Html.TranslateFallback(StringResources.ExistUserName, StringConstants.TranslationFallback.ExistUserName),
+        PasswordLabel = Model.CurrentPage.PasswordLabel,
+        PasswordMessage = Model.CurrentPage.PasswordMessage,
+        PasswordPlaceholder = Model.CurrentPage.PasswordPlaceholder,
+        PasswordRequired = Html.TranslateFallback(StringResources.PasswordRequired, "Password is required"),
+        passwordNotMatch = Html.TranslateFallback(StringResources.PasswordNotMatch, "The passwords provided do not match"),
+        passwordMin = 7,
+        PasswordMinLength = Html.TranslateFallback(StringResources.PasswordMinLength, "Password too weak"),
+        passwordMax = 256,
+        PasswordMaxLength = string.Format(Html.TranslateFallback(StringResources.PasswordMaxLength, "Password cannot be longer than {0} characters"), 256),
+        PasswordSuggestion = Html.TranslateFallback(StringResources.PasswordSuggestion, "Password should be a min of XYZ etc..."),
+        passwordInvalid = Html.TranslateFallback(StringResources.PasswordInvalid, StringConstants.TranslationFallback.PasswordInvalid),
+        AcceptTnCRequired = Html.TranslateFallback(StringResources.AcceptTnCRequired, "You must accept the Terms and Conditions"),
+        ReadTermsAndConditionsLabel = Model.CurrentPage.ReadTermsAndConditionsLabel,
+        ByEmailLabel = Model.CurrentPage.ByEmailLabel,
+        ByPostLabel = Model.CurrentPage.ByPostLabel,
+        ByTelephoneLabel = Model.CurrentPage.ByTelephoneLabel,
+        TermsAndConditionsContent = Model.CurrentPage.TermsAndConditionsContent,
+        AllOptionsUntickPopupTitle = Model.CurrentPage.AllOptionsUntickPopupTitle,
+        AllOptionsUntickPopupMessage = Model.CurrentPage.AllOptionsUntickPopupMessage,
+        submitButtonText = Html.TranslateFallback(StringResources.SubmitButtonText, "Proceed with registration"),
+    };
+}
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="mod-section">
+    @if (!Model.CurrentPage.HideStepProgressBar)
+    {
+        Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel);
+    }
+
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <h1>@Html.DisplayFor(x => x.CurrentPage.Heading)</h1>
+    }
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    </div>
+
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <div data-module="bullion-registration-step1" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+

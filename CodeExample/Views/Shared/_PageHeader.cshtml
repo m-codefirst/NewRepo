@@ -1,0 +1,7 @@
+﻿@model TRM.Web.Models.Interfaces.ITrmLayoutModel
+ @if (Model.DisplayPageHeading)
+ {
+     <div class="page-header">
+         <h1 @Html.EditAttributes("Heading")>@Model.PageHeading</h1>
+     </div>
+ }

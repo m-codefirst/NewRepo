@@ -1,0 +1,60 @@
+﻿@using EPiServer.ServiceLocation
+@using TRM.Web.Helpers;
+
+@{
+    var recaptchaHelper = ServiceLocator.Current.GetInstance<IGoogleRecaptchaHelper>();
+}
+
+@if (recaptchaHelper.IsEnabled())
+{
+    <script type="text/javascript">
+        var registrationRecaptcha;
+        var forgotPasswordRecaptcha;
+        var forgotUserNameOrPasswordRecaptcha;
+        var recaptchaForgotPasswordOnCheckoutPage;
+        var onloadRecaptchaCallback = function() {
+            if ($('#registrationRecaptcha').length > 0) {
+                registrationRecaptcha = grecaptcha.render('registrationRecaptcha',
+                    {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+            }
+
+            // All pages
+            if ($('#recaptchaForgotPasswordDiv').length > 0) {
+                forgotPasswordRecaptcha = grecaptcha.render('recaptchaForgotPasswordDiv',
+                    {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+            }
+
+            // Forgot username or password
+            if ($('#recaptchaForgotUserNameOrPasswordDiv').length > 0) {
+                forgotUserNameOrPasswordRecaptcha = grecaptcha.render('recaptchaForgotUserNameOrPasswordDiv',
+                    {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+            }
+
+            // On checkoutpage
+            if ($('#recaptchaForgotPasswordOnCheckoutPageDiv').length > 0) {
+                recaptchaForgotPasswordOnCheckoutPage = grecaptcha.render('recaptchaForgotPasswordOnCheckoutPageDiv',
+                    {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+            }
+        };
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit"
+            async defer>
+    </script>
+}
+
+<script>
+    window.addEventListener("load", function () {
+        var analyticsProducts = document.getElementsByClassName("analytic-data-attribute");
+        for (i = 0; i < analyticsProducts.length; i++) {
+            analyticsProducts[i].dataset.productListPosition = i + 1;
+        }
+    });
+</script>

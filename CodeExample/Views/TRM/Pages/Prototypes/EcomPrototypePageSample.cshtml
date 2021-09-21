@@ -1,0 +1,31 @@
+﻿
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    <div class="container">
+        @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    </div>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+           @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+    
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    @Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+
+
+</div>

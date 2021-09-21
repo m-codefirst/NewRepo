@@ -1,0 +1,298 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using NuGet
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Extentions
+@using EPiServer.Web
+@using System.Web.Optimization
+@using TRM.Shared.Extensions
+@using System.Text.RegularExpressions;
+@using TRM.Web.Helpers
+
+@using StringExtensions = EPiServer.Find.Helpers.Text.StringExtensions
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    var BreadcrumbViewModel = myLayout.Breadcrumb;
+    BreadcrumbViewModel.IsWide = true;
+
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+
+    var isPensionProvider = false;
+    var impertionatedByPensionProvider = false;
+
+    if (Request.IsAuthenticated)
+    {
+        var currentContact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+        if (currentContact != null)
+        {
+            isPensionProvider = myLayout.IsPensionProviderContact;
+            impertionatedByPensionProvider = myLayout.IsImpertionatedByPensionProvider;
+        }
+    }
+
+
+    //------------------------------------------------- NEW----------------------------------//
+
+
+    var quantityBreaks = Model.ViewModel.BullionVariant.BuyPremiumQuantityBreaks.ToList();
+
+    var showAbout = (Model.CurrentPage.Description != null && !Model.CurrentPage.Description.IsEmpty);
+
+
+    var Specification = !Model.CurrentPage.HideSpecificationOnProductDetailPage && Model.ViewModel.EntrySpecificationViewModel != null && !Model.ViewModel.EntrySpecificationViewModel.SpecificationItems.IsEmpty() ? Model.ViewModel.EntrySpecificationViewModel.SpecificationItems : null;
+
+    //------------------------------------------------- NEW----------------------------------//
+}
+
+@if (Model.ViewModel != null && Model.ViewModel.AnalyticsDigitalDataModel != null)
+{
+    <!--SEO Analytics Digital Data-->
+    @Html.Partial("RoyalMint2020/_SeoAnalyticsDigitalData", Model.ViewModel.AnalyticsDigitalDataModel)
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "shopCss")
+}
+
+@{
+    var recommendedProducts = new List<object>
+    ();
+    if (Model.ViewModel.RecommendedEntries != null && Model.ViewModel.RecommendedEntries.Any())
+    {
+        foreach (var recommendedProduct in Model.ViewModel.RecommendedEntries)
+        {
+            var productCard = new
+            {
+                link = recommendedProduct.EntryUrl,
+                image = recommendedProduct.DefaultImageUrl,
+                altText = recommendedProduct.DisplayName,
+                standardText = recommendedProduct.Standard,
+                standardClass = recommendedProduct.StandardClass,
+                tagMessage = recommendedProduct.TagMessage,
+                productName = recommendedProduct.DisplayName,
+                productAuxText = recommendedProduct.SubDisplayName,
+                price = recommendedProduct.PriceString,
+                priceText = Html.TranslateFallback(StringResources.Price, "Price:"),
+                originalPrice = recommendedProduct.OriginalPriceString,
+                originalPriceText = Html.TranslateFallback(StringResources.OriginalPrice, "Original price:"),
+                fromPriceText = Html.TranslateFallback(StringResources.FromPrice, "From"),
+                isInvest = recommendedProduct.IsPreciousMetalsVariant,
+                isAvailable = !string.IsNullOrEmpty(recommendedProduct.PriceString),
+                stockSummaryStatusMessage = recommendedProduct.StockSummary != null ? recommendedProduct.StockSummary.StatusMessage : "",
+            };
+
+            recommendedProducts.Add(productCard);
+        };
+    }
+
+    var restrictedCountriesHelper = ServiceLocator.Current.GetInstance<IRestrictedCountriesHelper>();
+    var isCountryRestricted = Model.CurrentPage.IsCountryRestricted(restrictedCountriesHelper.GetVisitorLocation(this.Request));
+    var gold = (PricingAndTradingService.Models.Constants.MetalType)PricingAndTradingService.Models.Constants.MetalType.Gold;
+    var badgeUrl = Model.CurrentPage.Badge != null ? Url.ContentUrl(Model.CurrentPage.Badge) : string.Empty;
+    var standardProductViewModel = new ViewDataDictionary(ViewData) {
+    {"showExcludeVat",  !(Model.ViewModel.PureMetalType?.Equals(gold.ToString()))},
+    {"exVat" , @Html.TranslateFallback(StringResources.ExVat, "ex VAT") },
+    {"exVatIfApplicable", @Html.TranslateFallback(StringResources.ExVatIfApplicable, "Ex. VAT, if applicable")  },
+    {"isInvest", true },
+    {"productName", Html.StripHtmlTagsAndSpecialChars(Model.ViewModel.DisplayName).ToString() },
+    {"productAlternateName", Model.CurrentPage.SubDisplayName },
+    {"productCodeLabel", Html.TranslateFallback(StringResources.ProductCode, @StringConstants.TranslationFallback.ProductCode) },
+    {"sku", Model.CurrentPage.Code },
+    {"brand", "The Royal Mint" },
+    {"priceCurrency" , Model.ViewModel.CurrencyCode },
+    {"currencySymbol", myLayout.DefaultCurrencySymbol  },
+    {"price", Model.ViewModel.PriceString.Substring(1).Replace(",", "") },
+    {"currentPrice", Model.ViewModel.PriceString },
+    {"description", Model.ViewModel.BulletPoints.ToList() },
+    {"isFullDescription", showAbout },
+    {"readFullDescriptionText", Html.TranslateFallback(StringResources.ReadFullDescription,"Read full product description" )  },
+    {"priceText", Html.TranslateFallback(StringResources.Price, "Price:" )  },
+    {"fromPriceText", Html.TranslateFallback(StringResources.FromPrice, "From")},
+    {"pricing",quantityBreaks },
+    {"pricingTitle", Html.TranslateFallback(StringResources.QuantityBreakTitle, "Our pricing") },
+    {"estimatedText", Html.TranslateFallback(StringResources.Estimated, "estimated") },
+    {"estimatedTooltipText", Html.TranslateFallback(StringResources.EstimatedTooltip,  "Prices shown on this page are estimated and are based on the live metal price.Final prices are displayed during the checkout.") },
+    {"quantityText", Html.TranslateFallback(StringResources.QuantityBreakQuantity, "Quantity") },
+    {"unitPriceText", @Html.TranslateFallback(StringResources.QuantityBreakUnitPrice, "Unit Price") },
+    {"productDefaultPicture", Model.ViewModel.DefaultImageUrl},
+    {"productPictures", Model.ViewModel.Images},
+    {"minQuantity", Model.CurrentPage.MinQuantity },
+    {"maxQuantity", Model.CurrentPage.MaxQuantity },
+    {"basketPageUrl" , Model.GetBasketUrl()},
+    {"titleAddBasket", @Html.TranslateFallback(StringResources.BullionTitleAddToBasket, "Add to basket") },
+    {"alertWarningAddToBasket", @Html.TranslateFallback(StringResources.BullionAlertWarningAddToBasket, "Unable to add product to basket") },
+    {"viewBasket", @Html.TranslateFallback(StringResources.BullionViewBasket, "View basket") },
+    {"continueCheckOut", @Html.TranslateFallback(StringResources.BullionContinueCheckOut, "Continue to checkout") },
+     {"continueShopping", @Html.TranslateFallback(StringResources.BullionContinueShopping, "Continue shopping") },
+    {"recommendedProducts", @Html.TranslateFallback(StringResources.BullionRecommendedProducts, "Recommended products") },
+    {"relatedProducts", recommendedProducts},
+    {"checkoutPageUrl" , myLayout.CheckoutPage.GetExternalUrl_V2() },
+    {"bullionOnlyCheckoutUrl", myLayout.BullionOnlyCheckoutPage.GetExternalUrl_V2()},
+    {"mixedCheckoutUrl",  myLayout.MixedCheckoutPage.GetExternalUrl_V2() },
+    {"quickCheckoutUrl", myLayout.QuickCheckoutPage.GetExternalUrl_V2()},
+    {"buyNowErrorText", @Html.TranslateFallback(StringResources.BuyNowErrorText, "Unable to buy now") }  ,
+    {"canAddToBasket", Model.ViewModel.StockSummary.CanAddToBasket && !isCountryRestricted },
+    {"addToBasketLabel",  @Html.TranslateFallback(StringResources.AddToBasket, @StringConstants.TranslationFallback.AddToBasket) },
+    {"maxQuantityMessage",  @Html.TranslateFallback(StringResources.MaxQuantityMessage, "You added to your basket the maximum amount of items available in stock") },
+    {"stockSummary", Model.ViewModel.StockSummary },
+    {"bullionVariant", Model.ViewModel.BullionVariant},
+    {"standardText", Model.ViewModel.Standard},
+    {"standardClass", Model.ViewModel.StandardClass},
+    {"tagMessage", Model.ViewModel.TagMessage},
+    {"limitedEdition",  @Html.TranslateFallback(StringResources.LimitedEdition, @StringConstants.TranslationFallback.LimitedEdition) },
+    {"productStatusLabel",  @Html.TranslateFallback(StringResources.ProductStatusLabel, @StringConstants.TranslationFallback.ProductStatusLabel) },
+    {"addToWishList",  @Html.TranslateFallback(StringResources.AddToWishList, @StringConstants.TranslationFallback.AddToWishList) },
+    {"shareVia",  @Html.TranslateFallback(StringResources.ShareVia, @StringConstants.TranslationFallback.ShareVia) },
+    {"preOrderOrBackOrderStatusMessage", @Model.CurrentPage.PreOrderOrBackOrderStatusMessage},
+    {"isAgeRestricted", Model.CurrentPage.IsAgeRestricted },
+    {"ageRestrictedMessageString", myLayout.AgeRestrictedMessageString},
+    {"shareViaTwitter",  @Html.TranslateFallback(StringResources.ShareViaTwitter, @StringConstants.TranslationFallback.ShareViaTwitter) },
+    {"shareViaFacebook",  @Html.TranslateFallback(StringResources.ShareViaFacebook, @StringConstants.TranslationFallback.ShareViaFacebook) },
+    {"shareViaPinterest",  @Html.TranslateFallback(StringResources.ShareViaPinterest, @StringConstants.TranslationFallback.ShareViaPinterest) },
+    {"copyDirectLink",  @Html.TranslateFallback(StringResources.CopyDirectLink, @StringConstants.TranslationFallback.CopyDirectLink) },
+    {"copyDirectLinkError",  @Html.TranslateFallback(StringResources.CopyDirectLinkError, @StringConstants.TranslationFallback.CopyDirectLinkError) },
+    {"readReviews",  @Html.TranslateFallback(StringResources.ReadReviews, @StringConstants.TranslationFallback.ReadReviews) },
+    {"buyNowLabel",  @Html.TranslateFallback(StringResources.BuyNow, @StringConstants.TranslationFallback.BuyNow) },
+    {"isNonRefundable", Model.CurrentPage.IsNonRefundable},
+    {"nonRefundableMessage", Html.PropertyFor(x => myLayout.NonRefundableMessage).ToString()},
+    {"stopTrading", startPage.StopTrading},
+    {"stopTradingMessage", @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage) },
+    {"showUnableToPurchasePreciousMetals", Model.ViewModel.BullionVariant.ShowUnableToPurchasePreciousMetals },
+    {"unableToPurchasePreciousMetals", @Html.TranslateFallback(StringResources.UnableToPurchasePreciousMetals, "Customer flagged as unable to purchase precious metals")},
+    {"showCanNotPensionMessage", Model.ViewModel.BullionVariant.ShowCanNotPensionMessage},
+    {"itemNotAvailableForSIPPCustomer", @Html.TranslateFallback(StringResources.ItemNotAvailableForSIPPCustomer, "This product cannot be bought within a pension")},
+    {"showCannotHaveVariantsDelivered", Model.ViewModel.BullionVariant.ShowCannotHaveVariantsDelivered},
+    {"cannotHaveVariantsDelivered", @Html.TranslateFallback(StringResources.CannotHaveVariantsDelivered, "SIPP/SSAS customers can't have variants delivered")},
+    {"isRecurringDetailsMessage", !string.IsNullOrWhiteSpace(Model.CurrentPage.RecurringDetailsMessage) && (int)Model.CurrentPage.RecurrenceType > 0},
+    {"isRecurrenceMandatory", Model.CurrentPage.RecurrenceType == TRM.Shared.Constants.Enums.eRecurrenceType.Mandatory },
+    {"recurringDetailsMessage", Model.CurrentPage.RecurringDetailsMessage},
+    {"showActivateYourBullionAccount", Model.ViewModel.BullionVariant.ShowActiveYourBullionAccount},
+    {"activateYourBullionAccountLabel", @Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your Bullion account")},
+    {"activateYourBullionAccountUrl", @Url.ContentUrlExtension(Model.ViewModel.BullionVariant.BullionRegistrationPageUrl)},
+    {"shouldShowEmailBackInStockButton", @Model.ViewModel.ShouldShowEmailBackInStockButton},
+    {"productCallToOrder", @Html.PropertyFor(m => m.CurrentPage.AvailabilityMessages).ToString() },
+    {"backInStock", new ViewDataDictionary(ViewData) {
+    {"emailMeWhenInStockButtonText", @Model.ViewModel.EmailMeWhenInStockButtonText},
+    {"isAuthenticated", Request.IsAuthenticated},
+    {"emailAddressEntryHeading", Model.ViewModel.EmailAddressEntryHeading},
+    {"emailAddressEntryContent", Model.ViewModel.EmailAddressEntryContent},
+    {"cancelButtonText", Model.ViewModel.CancelButtonText},
+    {"continueButtonText", Model.ViewModel.ContinueButtonText},
+    {"productCode", Model.CurrentPage.Code},
+    {"formRequiredText", Html.TranslateFallback(StringResources.FormRequiredText, "This field is required")},
+    {"formInvalidEmailText", Html.TranslateFallback(StringResources.FormInvalidEmailText, "Please enter a valid email address")},
+    }},
+    {"badgeUrl", badgeUrl}
+    };
+    }
+
+
+@{
+    var noFeefoReviewsMessage = Html.PropertyFor(m => m.ViewModel.NoFeefoReviewsMessage).ToString();
+    var standardProductReviewsViewModel = new ViewDataDictionary(ViewData) {
+        {"showFeefo" , Model.ViewModel.ShowFeefo},
+        {"productCode", Model.CurrentPage.Code },
+        {"productName", Html.StripHtmlTagsAndSpecialChars(Model.ViewModel.DisplayName).ToString()},
+        {"reviewTitle",  @Html.TranslateFallback(StringResources.ReviewsTab, "Reviews") },
+        {"noFeefoReviewsMessage", !string.IsNullOrWhiteSpace(noFeefoReviewsMessage) && noFeefoReviewsMessage != "<p></p>" ? noFeefoReviewsMessage : "This product has not yet been reviewed" },
+        {"readAllReviews", @Html.TranslateFallback(StringResources.ReadAllReviews, "Read all reviews on feefo") }
+    };
+}
+
+@{
+
+    var taxes = new List<object>
+        ();
+    if (Model.ViewModel.TaxIconList != null && Model.ViewModel.TaxIconList.Any())
+    {
+        foreach (var element in Model.ViewModel.TaxIconList)
+        {
+            var tax = new
+            {
+                title = element.Title,
+                subtitle = element.SubTitle,
+                description = element.Description
+            };
+
+            taxes.Add(tax);
+        };
+    }
+
+
+    var productFeaturesViewModel = new ViewDataDictionary(ViewData)
+{
+        {"taxIconList", taxes }
+        };
+}
+
+<div itemscope itemtype="http://schema.org/Product">
+
+    @Html.Partial("RoyalMint2020/_Breadcrumb", BreadcrumbViewModel)
+    @if (Model.CurrentPage.OptionalContentAreas.TopContent != null)
+    {
+        <div class="mod-section">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.TopContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.TopContent)
+            </div>
+        </div>
+    }
+    @Html.Partial("RoyalMint2020/PagePartials/StandardProduct", myLayout, standardProductViewModel)
+
+    @if (Model.CurrentPage.OptionalContentAreas.MiddleContent != null)
+    {
+        <div class="mod-section">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.MiddleContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.MiddleContent)
+            </div>
+        </div>
+    }
+
+    @if (taxes.Count > 0)
+    {
+        @Html.Partial("RoyalMint2020/PagePartials/StandardProductFeatures", myLayout, productFeaturesViewModel)
+    }
+
+    @if (showAbout)
+    {<div class="mod-copy" id="full-description">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-left"> @Html.PropertyFor(x => x.CurrentPage.Description)</div>
+            </div>
+        </div>}
+    @Html.Partial("RoyalMint2020/_SpecificationTableList", Model)
+
+    @Html.Partial("RoyalMint2020/PagePartials/StandardProductReviews", myLayout, standardProductReviewsViewModel)
+
+    @if (Model.ViewModel.RelatedEntries != null && Model.ViewModel.RelatedEntries.Any())
+    {
+        Html.RenderPartial("RoyalMint2020/_RelatedEntries", Model);
+    }
+
+    @if (Model.CurrentPage.OptionalContentAreas.BottomContent != null)
+    {
+        <div class="mod-section further">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.BottomContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.BottomContent)
+            </div>
+        </div>
+    }
+
+</div>
+
+@section JustBeforeBodyTag {
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "zoom")
+}
+
+@section HeaderScripts{
+    @{ Html.RenderPartial("RoyalMint2020/_SeoDataLayerProductDetail", Model); }
+}

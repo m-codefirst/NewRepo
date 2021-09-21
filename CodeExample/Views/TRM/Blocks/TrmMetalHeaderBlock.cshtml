@@ -1,0 +1,157 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Helpers
+@model TRM.Web.Models.Blocks.Bullion.TrmMetalBlock
+
+@{
+    var elementId = Guid.NewGuid();
+    var tooltipFormatId = string.Format("{0}_Tooltip_Format", elementId);
+    var tooltip = string.Format("{0}_Tooltip", elementId);
+    var isLoggedIn = Request.IsAuthenticated;
+
+    var currentContact = CustomerContext.Current.CurrentContact;
+
+    var isPensionProviderContact = false;
+    var isConsumerAccountOnly = false;
+    
+    var bullionContactHelper = ServiceLocator.Current.GetInstance<IAmBullionContactHelper>();
+    if (bullionContactHelper != null)
+    {
+        isPensionProviderContact = bullionContactHelper.IsPensionProvider(currentContact);
+        isConsumerAccountOnly = bullionContactHelper.IsConsumerAccountOnly(currentContact);
+    }
+}
+
+@if (Model.TrmMetalBlockPartial != null && Model.ShouldDisplay)
+{
+	<input type="hidden" id="@elementId" value="@Model.IntervalUpdateTime" />
+	<div class="header-live-price-container bg-pearl hidden">
+		<div class="container">
+			<div class="header-live-price-wrapper">
+				<div class="live-price-wrapper">
+					<ul>
+						<li class="info">
+							<a href="@Model.TrmMetalBlockPartial.InfoUrl" name="info-link">
+								<input id="@tooltipFormatId" type="hidden" value="@Model.Tooltip" />
+								@if (Model.Tooltip != null)
+								{
+									<i id="@tooltip" class="trmi trmi-info" data-toggle="tooltip" data-placement="right" data-original-title="@Model.Tooltip.Replace("#datetime#", Model.TrmMetalBlockPartial.UpdatedTime)"></i>
+								}
+							</a>
+						</li>
+
+						@foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.PampMetalPriceItems)
+						{
+							var diffBuyPercentId = string.Format("{0}_{1}_DiffBuyPercent", elementId, item.Metal.Name);
+							var currentBuyPriceId = string.Format("{0}_{1}_CurrentBuyPrice", elementId, item.Metal.Name);
+							<li>
+								<span class="strong">@Html.TranslateFallback(string.Format("{0}/{1}", StringResources.TrmMetalBlockMetalName, item.Metal.Name), item.Metal.Name)</span>
+								<span id="@currentBuyPriceId">@item.BuyPriceChange.CurrentPrice.ToString()</span>
+
+								@if (item.BuyPriceChange.UpOrDown > 0)
+								{
+									<span class="text-success live-price">
+										<i class="trmi trmi-angle-up"></i>
+										<span id="@diffBuyPercentId"> @item.BuyPriceChange.Percent%</span>
+									</span>
+								}
+								else if (item.BuyPriceChange.UpOrDown < 0)
+								{
+									<span class="text-danger live-price">
+										<i class="trmi trmi-angle-down"></i>
+										<span id="@diffBuyPercentId"> @item.BuyPriceChange.Percent%</span>
+									</span>
+								}
+								else
+								{
+									<span class="text-success live-price">
+										<i class="trmi"></i>
+										<span id="@diffBuyPercentId"> @item.BuyPriceChange.Percent%</span>
+									</span>
+								}
+							</li>
+						}
+						<li class="cta-header">
+							<div class="cta-action hidden-xs">
+								@if (Model.TrmMetalBlockPartial.ShowPriceAlertIcon)
+								{
+									<a href="@Model.TrmMetalBlockPartial.AlertPageUrl">
+										<i class="trmi trmi-bell"></i>
+										<span class="">Alerts</span>
+									</a>
+								}
+
+								<a href="@Model.TrmMetalBlockPartial.MetalChartPageUrl">
+									<i class="trmi trmi-bar-chart"></i>
+									<span class="">Live Charts</span>
+								</a>
+							</div>
+							<div class="remove-live-price hidden-md hidden-lg">
+								<a id="hide-live-price" name="hide-live-price" class="btn-round-gray">
+									<i class="trmi trmi-close"></i>
+								</a>
+							</div>
+								@if (Request.IsAuthenticated && !isPensionProviderContact)
+								{
+									if (isConsumerAccountOnly)
+									{
+										if (!string.IsNullOrEmpty(Model.TrmMetalBlockPartial.ConsumerInvestingCopy))
+										{
+											<a href="@Model.TrmMetalBlockPartial.ConsumerInvestingUrl" name="investment-navigation" class="invest-balance hidden-xs hidden-sm">@Model.TrmMetalBlockPartial.ConsumerInvestingCopy</a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (Model.TrmMetalBlockPartial.HideBullionBalance)
+                                        {
+                                            if (!string.IsNullOrEmpty(Model.TrmMetalBlockPartial.BullionBalanceHiddenInvestingCopy))
+                                            {
+                                                <a href="@Model.TrmMetalBlockPartial.BullionBalanceHiddenInvestingLink" name="investment-navigation" class="invest-balance hidden-xs hidden-sm">@Model.TrmMetalBlockPartial.BullionBalanceHiddenInvestingCopy</a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a href="@Model.TrmMetalBlockPartial.BalanceUrl" name="balance-navigation" class="invest-balance hidden-xs hidden-sm">@Model.TrmMetalBlockPartial.BalanceCopy:&nbsp;<span class="strong wallet-balance-amount">@Model.TrmMetalBlockPartial.AvailableToInvest.ToString()</span></a>
+                                        }
+									}
+								}
+								else
+								{
+									if (!string.IsNullOrEmpty(Model.TrmMetalBlockPartial.AnonymousInvestingCopy))
+									{
+										<a href="@Model.TrmMetalBlockPartial.AnonymousInvestingUrl" name="investment-navigation" class="invest-balance hidden-xs hidden-sm">@Model.TrmMetalBlockPartial.AnonymousInvestingCopy</a>
+									}
+								}
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	{
+		EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"window.addEventListener('load', function () {TrmMetalPriceBlock.addBlockId('" + elementId + "')})").AtFooter();
+	}
+
+
+	@Html.Script(
+	@<script type="text/javascript">
+         $(function () {
+             var livePriceCookie = Cookie.getCookie("liveprice");
+             if (!!livePriceCookie && livePriceCookie == "hidden") {
+                 $(".header-live-price-container").addClass("hidden");
+             } else {
+                 $(".header-live-price-container").removeClass("hidden");
+             }
+
+             $('#hide-live-price').on('click', function (e) {
+                 e.preventDefault();
+                 Cookie.setCookie("liveprice", "hidden", @Model.TrmMetalBlockPartial.CookieExpiredTime);
+                 $(".header-live-price-container").addClass("hidden");
+             });
+
+         });
+	</script>
+				  )
+}

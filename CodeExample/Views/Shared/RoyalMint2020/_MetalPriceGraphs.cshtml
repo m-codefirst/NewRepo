@@ -1,0 +1,39 @@
+﻿@using TRM.Web.Models.ViewModels.MetalPrice;
+@model TRM.Web.Models.Blocks.Bullion.TrmMetalBlock
+
+@if (Model.TrmMetalBlockPartial != null && Model.ShouldDisplay)
+{
+    foreach (PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.PampMetalPriceItems)
+    {
+        string metalNameClass = item.Metal.Name.ToLower();
+
+        <div class="modal modal-price-graph fade" id="@metalNameClass-price-graph" tabindex="-1" role="dialog" aria-labelledby="@metalNameClass-price-graph" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="@metalNameClass-price-graph-label">@item.Metal.Name Price</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" class="icon"><svg><use xlink:href="#close" /></svg></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <small class="last-updated">Last updated <span class="day">dd/mm/yyyy</span> at <span class="time">hh:mm:ss</span></small>
+
+                        <p>Lorem ipsum Morbi consectetur lacus vel lobortis metus ornare. Cras vehicula. Volutpat, sed, lectus commodo non ullamcorper ipsum semper. Ac, Aliquam vehicula eget nec.</p>
+
+                        <canvas id="@metalNameClass" class="price-graph" width="400" height="400"></canvas>
+
+                        <div class="row btns m-0">
+                            <div class="col-12 col-md-6">
+                                <a href="#" class="btn btn-secondary">Set price alerts</a>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <a href="/" class="btn btn-primary">View full details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

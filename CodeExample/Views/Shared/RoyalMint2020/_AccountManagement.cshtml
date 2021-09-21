@@ -1,0 +1,43 @@
+﻿@using Newtonsoft.Json
+@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Extentions
+@using TRM.Web.Helpers
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+@using StringResources = TRM.Web.Constants.StringResources
+
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : CustomerContact.CreateInstance();
+    var availableToInvest = ServiceLocator.Current.GetInstance<IAmBullionContactHelper>().GetMoneyAvailableToInvest(contact);
+    var startpage = Model.GetAppropriateStartPageForSiteSpecificProperties();
+
+}
+
+@{
+    var viewModel = new
+    {
+        isLoggedIn = isLoggedIn,
+        contactInfo = isLoggedIn ? new { name = contact.FullName, availableToInvest = availableToInvest.ToString(), email = contact.Email } : null,
+        menuUrls = new Dictionary<string, object>()
+        {
+            { "manageAccount", new { name = Html.TranslateFallback(StringResources.ManageAccount,"Manage account"), url=startpage.GetMyAccountPageUrl() } },
+            { "viewOrders", new { name = Html.TranslateFallback(StringResources.ViewOrders, "View orders"), url=startpage.GetViewOrdersPageUrl() } },
+            { "investments", new { name = Html.TranslateFallback(StringResources.Investments, "Investments"), url=startpage.GetInvestmentsPageUrl() } },
+            { "purchases", new { name = Html.TranslateFallback(StringResources.Purchases,"Purchases"), url =startpage.GetPurchasesPageUrl() } },
+            { "manageFunds", new { name = Html.TranslateFallback(StringResources.ManageFunds, "Manage Funds" ), url=startpage.GetManageFundsPageUrl() } },
+            { "viewVaultedInvestements", new { name = Html.TranslateFallback(StringResources.ViewVaultedInvestements,"View vaulted investments"), url = startpage.GetVaultedInvestementsUrl() } },
+        },
+        loginUrls = new Dictionary<string, object>()
+        {
+            { "login" , new { name = Html.TranslateFallback(StringResources.GoToLogin, "Login" ), url=startpage.GetLoginPageUrl() } },
+            { "register" , new { name = Html.TranslateFallback(StringResources.Register, "Register" ), url=startpage.GetBullionRegistrationPage() } },
+        }
+    };
+}
+
+<div data-module="account-management" data-account-management-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+
+
+

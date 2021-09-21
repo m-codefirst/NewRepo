@@ -1,0 +1,44 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycPassportBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycPassportViewModel>
+
+@{
+    var viewModel = new {
+        currentBlock = new {
+            countryOfIssueTitle = Model.CurrentBlock.CountryOfIssueTitle,
+            passportTitle = Model.CurrentBlock.PassportTitle,
+            passportPlaceholder = Model.CurrentBlock.PassportPlaceholder,
+            expiryDateTitle = Model.CurrentBlock.ExpiryDateTitle,
+            confirmDetailsButtonText = Model.CurrentBlock.ConfirmDetailsButtonText,
+            passportNumberHelperText = Model.CurrentBlock.PassportNumberHelperText
+        },
+        formSettings = new {
+            countries = Model.ViewModel.Countries,
+            dayList = Model.ViewModel.DayList,
+            monthList = Model.ViewModel.MonthList,
+            yearList = Model.ViewModel.YearList
+        },
+        texts = new {
+            invalidPassportCode = @Html.TranslateFallback(StringResources.InvalidPassportCode, "Invalid Passport Code"),
+            formRequiredText = @Html.TranslateFallback(StringResources.FormRequiredText, "This field is required"),
+        },
+    };
+}
+
+
+<div class="form-spacing text-right">
+    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="btn btn-default pl-0 pr-0 mb-0">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+</div>
+@if (Model.CurrentBlock.MiddleTopContent != null)
+{
+    <div class="form-spacing">
+        @Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+    </div>
+}
+<div data-module="kyc-verification-passport" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+ 
+<div class="form-spacing">
+    @Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+</div>

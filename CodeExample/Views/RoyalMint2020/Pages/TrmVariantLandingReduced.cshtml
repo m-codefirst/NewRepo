@@ -1,0 +1,165 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@using EPiServer.Web
+@using System.Web.Optimization
+@using TRM.Web.Extentions
+@using StringExtensions = EPiServer.Find.Helpers.Text.StringExtensions
+
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var nonSellableUrl = Url.ContentUrlExtension(Model.CurrentPage.NonSellableUrl);
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+    var urlTarget = Model.CurrentPage.OpenNonSellableInNewTab ? "_blank" : "_self";
+}
+
+@if (Model.ViewModel != null && Model.ViewModel.AnalyticsDigitalDataModel != null)
+{
+    <!--SEO Analytics Digital Data-->
+    @Html.Partial("RoyalMint2020/_SeoAnalyticsDigitalData", Model.ViewModel.AnalyticsDigitalDataModel)
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "shopCss")
+}
+
+@{
+    var showAbout = (Model.CurrentPage.Description != null && !Model.CurrentPage.Description.IsEmpty);
+
+    var recommendedProducts = new List<object>();
+
+    if (Model.ViewModel.RecommendedEntries != null && Model.ViewModel.RecommendedEntries.Any())
+    {
+        foreach (var recommendedProduct in Model.ViewModel.RecommendedEntries)
+        {
+            var productCard = new
+            {
+                link = recommendedProduct.EntryUrl,
+                image = recommendedProduct.DefaultImageUrl,
+                altText = recommendedProduct.DisplayName,
+                standardText = recommendedProduct.Standard,
+                standardClass = recommendedProduct.StandardClass,
+                tagMessage = recommendedProduct.TagMessage,
+                productName = recommendedProduct.DisplayName,
+                productAuxText = recommendedProduct.SubDisplayName,
+                price = recommendedProduct.PriceString,
+                isInvest = recommendedProduct.IsPreciousMetalsVariant,
+                isAvailable = !string.IsNullOrEmpty(recommendedProduct.PriceString),
+                stockSummary = recommendedProduct.StockSummary != null ? recommendedProduct.StockSummary.StatusMessage : "",
+            };
+
+            recommendedProducts.Add(productCard);
+        };
+    }
+
+
+    var standardProductViewModel = new ViewDataDictionary(ViewData) {
+        {"productName",  Html.StripHtmlTagsAndSpecialChars(Model.ViewModel.DisplayName).ToString()},
+        {"productAlternateName", Model.CurrentPage.SubDisplayName},
+        {"productCodeLabel", Html.TranslateFallback(StringResources.ProductCode, @StringConstants.TranslationFallback.ProductCode) },
+        {"sku", Model.CurrentPage.Code},
+        {"brand", "The Royal Mint"},
+        {"currentPrice", Model.ViewModel.PriceString},
+        {"description", Model.ViewModel.BulletPoints.ToList()},
+        {"isFullDescription", showAbout },
+        {"readFullDescriptionText", Html.TranslateFallback(StringResources.ReadFullDescription,"Read full product description" )  },
+        {"productDefaultPicture", Model.ViewModel.DefaultImageUrl},
+        {"productPictures", Model.ViewModel.Images},
+        {"recommendedProducts", @Html.TranslateFallback(StringResources.BullionRecommendedProducts, "Recommended products") },
+        {"metaDescription", Model.CurrentPage.MetaDescription},
+        {"standardText", Model.ViewModel.Standard},
+        {"standardClass", Model.ViewModel.StandardClass},
+        {"tagMessage", Model.ViewModel.TagMessage},
+        {"addToWishList",  @Html.TranslateFallback(StringResources.AddToWishList, @StringConstants.TranslationFallback.AddToWishList) },
+        {"shareVia",  @Html.TranslateFallback(StringResources.ShareVia, @StringConstants.TranslationFallback.ShareVia) },
+         {"isAgeRestricted", Model.CurrentPage.IsAgeRestricted },
+        {"ageRestrictedMessageString", myLayout.AgeRestrictedMessageString},
+        {"shareViaTwitter",  @Html.TranslateFallback(StringResources.ShareViaTwitter, @StringConstants.TranslationFallback.ShareViaTwitter) },
+        {"shareViaFacebook",  @Html.TranslateFallback(StringResources.ShareViaFacebook, @StringConstants.TranslationFallback.ShareViaFacebook) },
+        {"shareViaPinterest",  @Html.TranslateFallback(StringResources.ShareViaPinterest, @StringConstants.TranslationFallback.ShareViaPinterest) },
+        {"copyDirectLink",  @Html.TranslateFallback(StringResources.CopyDirectLink, @StringConstants.TranslationFallback.CopyDirectLink) },
+        {"copyDirectLinkError",  @Html.TranslateFallback(StringResources.CopyDirectLinkError, @StringConstants.TranslationFallback.CopyDirectLinkError) },
+        {"readReviews",  @Html.TranslateFallback(StringResources.ReadReviews, @StringConstants.TranslationFallback.ReadReviews) },
+        {"isNonRefundable", Model.CurrentPage.IsNonRefundable},
+        {"nonRefundableMessage", Html.PropertyFor(x => myLayout.NonRefundableMessage).ToString()},
+        {"nonSellableButtonText", Model.CurrentPage.NonSellableButtonText },
+        {"nonSellableUrl", nonSellableUrl },
+        {"nonSellableHint",Model.CurrentPage.NonSellableHint},
+        {"urlTarget", urlTarget }
+    };
+
+    var noFeefoReviewsMessage = Html.PropertyFor(m => m.ViewModel.NoFeefoReviewsMessage).ToString();
+    var standardProductReviewsViewModel = new ViewDataDictionary(ViewData) {
+        {"showFeefo", Model.ViewModel.ShowFeefo},
+        {"productCode", Model.CurrentPage.Code},
+        {"productName", Html.StripHtmlTagsAndSpecialChars(Model.ViewModel.DisplayName).ToString()},
+        {"reviewTitle",  @Html.TranslateFallback(StringResources.ReviewsTab, "Reviews") },
+        {"noFeefoReviewsMessage", !string.IsNullOrWhiteSpace(noFeefoReviewsMessage) && noFeefoReviewsMessage != "<p></p>" ? noFeefoReviewsMessage : "This product has not yet been reviewed" },
+        {"readAllReviews", @Html.TranslateFallback(StringResources.ReadAllReviews, "Read all reviews on feefo") }
+    };
+}
+
+
+
+<div itemscope itemtype="http://schema.org/Product">
+
+    @Html.Partial("RoyalMint2020/_Breadcrumb", myLayout.Breadcrumb)
+    @if (Model.CurrentPage.OptionalContentAreas.TopContent != null)
+    {
+        <div class="mod-section">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.TopContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.TopContent)
+            </div>
+        </div>
+    }
+    @Html.Partial("RoyalMint2020/PagePartials/StandardProduct", myLayout, standardProductViewModel)
+
+    @if (Model.CurrentPage.OptionalContentAreas.MiddleContent != null)
+    {
+        <div class="mod-section">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.MiddleContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.MiddleContent)
+            </div>
+        </div>
+    }
+
+    @if (showAbout)
+    {<div class="mod-copy" id="full-description">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-left"> @Html.PropertyFor(x => x.CurrentPage.Description)</div>
+            </div>
+        </div>}
+
+    @Html.Partial("RoyalMint2020/_SpecificationTableList", Model)
+    @Html.Partial("RoyalMint2020/PagePartials/StandardProductReviews", myLayout, standardProductReviewsViewModel)
+
+
+    @if (Model.ViewModel.RelatedEntries != null && Model.ViewModel.RelatedEntries.Any())
+    {
+        Html.RenderPartial("RoyalMint2020/_RelatedEntries", Model);
+    }
+
+    @if (Model.CurrentPage.OptionalContentAreas.BottomContent != null)
+    {
+        <div class="mod-section further">
+            <div class="mod-hero mod-hero-grid row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.BottomContent)>
+                @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.BottomContent)
+            </div>
+        </div>
+    }
+</div>
+
+@section JustBeforeBodyTag {
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "zoom")
+}
+
+@section HeaderScripts{
+    @{ Html.RenderPartial("RoyalMint2020/_SeoDataLayerProductDetail", Model); }
+}

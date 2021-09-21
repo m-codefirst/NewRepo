@@ -1,0 +1,33 @@
+﻿@using Hephaestus.CMS
+@using Hephaestus.CMS.Extensions
+@model TRM.Web.Models.ViewModels.TeaserViewModel
+@if (Model == null) { return; }
+
+
+@{
+    string buttonText = !string.IsNullOrWhiteSpace(Model.Teaser.ButtonText) ? Model.Teaser.ButtonText : "Read more";
+    string buttonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.Teaser.ButtonStyle, TRM.Web.Constants.Enums.eButtonColour2020.Primary);
+}
+
+<div class="content-card">
+    @if (!string.IsNullOrWhiteSpace(Model.Teaser.TeaserImageUrl))
+    {
+        <a href="@Model.PageUrl" title="@Model.Teaser.TeaserTitle" class="asset fluid-image">
+            <img src="@Model.Teaser.TeaserImageUrl?width=800" alt="@Model.Teaser.TeaserTitle">
+        </a>
+    }
+
+    <div class="copy">
+        <p class="title">
+            <a href="@Model.PageUrl" title="@Model.Teaser.TeaserTitle">
+                @Model.Teaser.TeaserTitle
+            </a>
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.Teaser.TeaserDescription))
+        {
+            <p>@Model.Teaser.TeaserDescription</p>
+        }
+        <a title="@Model.Teaser.TeaserTitle" class="btn @buttonClass" href="@Model.PageUrl">@Html.TranslateFallBack(StringResources.ReadMore, buttonText)</a>
+    </div>
+</div>
+

@@ -1,0 +1,36 @@
+﻿@using TRM.Web.Models.ViewModels
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.ViewModels.OrderTotalsViewModel
+
+<div class="order-totals page-break-print">
+    <div>
+        @Html.TranslateFallback(StringResources.BasketSubTotal, StringConstants.TranslationFallback.BasketSubTotal)
+        <span> @Model.PurchaseOrder.SubTotal</span>
+    </div>
+    @if (Model.PurchaseOrder.IsFreeDelivery)
+    {
+        <div class="order-free-delivery">
+            <span>@Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery)</span>
+        </div>
+    }
+    else
+    {
+        <div>
+            @Html.TranslateFallback(StringResources.BasketDelivery, StringConstants.TranslationFallback.BasketDelivery)
+            <span>@Model.PurchaseOrder.TotalDeliveryWithoutDiscount</span>
+        </div>
+    }
+    @if (Model.PurchaseOrder.TotalDiscountDecimal > 0)
+    {
+        <div>
+            @Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)
+            <span>@Model.PurchaseOrder.TotalDiscount</span>
+        </div>
+    }
+    <div class="order-total border-top-thick-print font-weight-bold-print">
+        <span>
+            @Html.TranslateFallback(StringResources.BasketTotal, StringConstants.TranslationFallback.BasketTotal)
+        </span> @Model.PurchaseOrder.Total
+    </div>
+</div>

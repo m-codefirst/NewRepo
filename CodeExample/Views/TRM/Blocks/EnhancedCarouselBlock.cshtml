@@ -1,0 +1,5 @@
+﻿@using Hephaestus.ContentTypes.Business.Enums
+@model TRM.Web.Models.Blocks.EnhancedCarouselBlock
+@{
+    Html.RenderPartial(Model.Orientation == Enumerators.eOrientation.Horizontal ? "_EnhancedCarouselTabbed" : "_EnhancedCarouselAccordion", Model);
+}

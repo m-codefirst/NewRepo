@@ -1,0 +1,135 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    
+    <div class="container clear hidden-xs">
+        @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    </div>
+    
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+            @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    @Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+
+
+    <div class="container">
+
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="col-sm-4">
+                    <a class="btn btn-default btn-block sidenav-trigger mb-2x hidden-md hidden-lg mt-xs-2x" data-target="#catFilters">Account Menu</a>
+                </div>
+            </div>
+        </div>
+
+
+        <aside class="mobile-sidenav col-md-3" id="catFilters">
+            <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+            <div class="row">
+                <div class="account navigationBlock col-xs-12" id="account-menu">
+                    <div class="blockContent">
+                        <ul class="level0 contentNav">
+                            <li class="">
+                                <a href="#" title="My Account">My Account</a>
+                            </li>
+                            <li class=" has-children">
+                                <a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+                                <ul class="level1 collapse in" id="your-orders1">
+                                    <li><a href="#" title="Change Password">Change Password</a></li>
+                                    <li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+                                    <li><a href="#" title="View Statement History">View Statement History</a></li>
+                                    <li><a href="#" title="Manage Your Bank Account details">Manage Your Bank Account details</a></li>
+                                    <li><a href="#" title="Withdraw Funds From Wallet">Withdraw Funds From Wallet</a></li>
+                                    <li><a href="#" title="Add Funds to Wallet">Add Funds to Wallet</a></li>
+                                </ul>
+                            </li>
+                            <li class=" has-children">
+                                <a class="btn-collapse" data-target="#credit-account2" data-toggle="collapse" title="Show/Hide More">Credit Account</a>
+                                <ul class="level1 collapse in" id="credit-account2">
+                                    <li><a href="/my-account/contact-and-delivery-details/change-password/" title="Change Password">Change Password</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/contact-preferences/" title="Contact Preferences">Contact Preferences</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/manage-addresses/" title="Manage Addresses">Manage Addresses</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/edit-personal-details/" title="Edit personal details">Edit personal details</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.blockContent -->
+                </div><!-- /. navigation block -->
+            </div>
+        </aside>
+
+        <div class="col-xs-12 col-md-9 mb-xs-2x">
+            <div class="header-wrapper">
+                <div class="page-header">
+                    <h1>Edit Personal details</h1>
+                </div>
+            </div>
+            <p class="mb-2x">"You are unable to amend information that was used in your ‘know your identity’ check. If you would like to update your personal details please contact our customer service team."</p>
+
+            <div class="panel panel-default panel-secondary mb-2x">
+                <div class="panel-body">
+                    <form action="/" method="post" class="">
+                        <div class="col-xs-12 col-md-8 pl-0">
+                            <div class="form-group">
+                                <label class="pl-0 control-label" for="formGroupInputLarge">Title <span class="text-danger ">*</span></label>
+                                <div class="form-group">
+                                    <p>Mr.</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="pl-0 control-label" for="formGroupInputLarge">First Name <span class="text-danger ">*</span></label>
+                                <p>John</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="pl-0 control-label" for="formGroupInputLarge">Last Name <span class="text-danger ">*</span></label>
+                                <p>Smith</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="pl-0 control-label" for="formGroupInputLarge">Second Last Name <span class="text-danger ">*</span></label>
+                                <p>Williams</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="dob" class="pl-0 control-label">Date Of Birth  <span class="text-danger ">*</span></label>
+                                <p>25/12/1950</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="pl-0 control-label" for="formGroupInputLarge">Gender <span class="text-danger ">*</span></label>
+                                <p>Male</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="pl-0 control-label">Email <span class="text-danger ">*</span></label>
+                                <input type="email" class="form-control " id="email" placeholder="info@royalmint.com" tabindex="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="daytime-tel" class="pl-0 control-label">Telephone <span class="text-danger ">*</span></label>
+                                <p>0161 556 7876</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="dob" class="pl-0 control-label">Confirm Password  <span class="text-danger ">*</span></label>
+                                <input type="password" class="form-control width-auto" id="password" placeholder="qwertyuiop" tabindex="4">
+                            </div>
+                            <button class="btn btn-secondary pull-left mb-2x">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

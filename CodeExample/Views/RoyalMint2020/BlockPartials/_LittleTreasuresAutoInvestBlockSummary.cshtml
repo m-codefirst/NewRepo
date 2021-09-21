@@ -1,0 +1,69 @@
+﻿@using TRM.Web.Controllers.Blocks.LittleTreasures
+@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels.LittleTreasures.AutoInvest
+@model TRM.Web.Models.ViewModels.LittleTreasures.AutoInvest.LittleTreasuresAutoInvestBlockSummaryViewModel
+
+@Html.PropertyFor(m => m.CurrentBlock.ExistingUserContent)
+
+<div class="form-container little-treasures">
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8">
+            <h2 class="section-head"><span>@Model.CurrentBlock.SummaryHeading</span></h2>
+            <div class="form-spacing">
+                <p class="text-center">               
+                    @Html.PropertyFor(m => m.CurrentBlock.SummaryDescription)
+                </p>
+            </div>
+
+            @foreach (var item in Model.Products)
+            {
+                string activeString = item.Active ?
+                    Html.TranslateFallback(TRM.Web.Constants.StringResources.Active, "Active")
+                    : Html.TranslateFallback(TRM.Web.Constants.StringResources.Inactive, "Inactive");
+
+                string tick = item.Active ? "tick--active" : "tick--inactive";
+                string activeText = item.Active ? "active-text--active" : "active-text--inactive";
+
+                <div class="mb-3 wrapper-border dashboard-product">
+                    <div class="heading">
+                        <div class="heading__title">
+                            <span class="icon icon-lg"><svg><use xlink:href="#minty-gold" /></svg></span>
+                            <span class="ml-1">@item.ProductName</span>
+                        </div>
+                    </div>
+
+                    <div class="details form-spacing">
+                        <div class="details__item">
+                            <span class="icon icon-md"><svg><use xlink:href="#calendar" /></svg></span>
+                            <span><span class="font-weight-bold">@Model.CurrentBlock.SummaryDateOfPaymentLabel</span> @item.PaymentDay@item.PaymentDay.GetOrdinalSuffix()</span>
+                        </div>
+                        <div class="details__item">
+                            <span class="icon icon-md"><svg><use xlink:href="#coins-alt" /></svg></span>
+                            <span><span class="font-weight-bold">@Model.CurrentBlock.SummaryMonthlyInvestmentLabel</span> @item.Amount.ToString(item.Amount.Currency.Format) @Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryPerMonthLabel</span>
+                        </div>
+                        <div class="details__item">
+                            <span class="icon icon-md tick @tick"><svg><use xlink:href="#tick" /></svg></span>
+                            <span>
+                                <span class="font-weight-bold">@Model.CurrentBlock.SummaryInvestmentIsLabel</span>
+                                <span class="font-weight-bold active-text @activeText ">@activeString</span> 
+                            </span>
+                        </div>
+                    </div>
+
+                    <form action="@Request.RawUrl" method="post">
+                        <input type="hidden" value="@LtAutoInvestAction.InvestmentOptions" name="@LittleTreasuresAutoInvestBlockController.ActionVar">
+                        <input type="hidden" value="@item.ProductName" name="ProductName">
+                        <input type="hidden" value="@item.ProductCode" name="ProductCode">
+                        <input type="hidden" value="@item.Amount.Amount" name="Amount">
+                        <input type="hidden" value="@item.PaymentDay" name="PaymentDay">
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-primary" value="@Model.CurrentBlock.SummaryUpdateInvestmentButtonText">
+                        </div>
+                    </form>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+

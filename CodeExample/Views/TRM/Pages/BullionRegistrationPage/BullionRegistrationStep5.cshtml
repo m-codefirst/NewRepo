@@ -1,0 +1,103 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep5ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+<div class="pageContainer">
+    <div class="row contentArea">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <div class="container  bull-registration mb-4x mt-2x">
+        <!-- page header -->
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        <!-- / page header -->
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <h3 class="h3 mt-0 mb-2x">@(Model.ViewModel.IsSuccess ? Html.PropertyFor(m => m.CurrentPage.Step5SuccessfullyHeading) : Html.PropertyFor(m => m.CurrentPage.Step5FailHeading))</h3>
+                <main class="row">
+                    @if (Model.ViewModel.IsSuccess && Model.ViewModel.RegisterSuccessfullyMessage != null)
+                    {
+                        <div class="col-xs-12">
+                            <div class="alert alert-success p-2x" role="alert">
+                                @Html.Raw(Model.ViewModel.RegisterSuccessfullyMessage)
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.CurrentPage.RegisterFailMessage != null && !Model.ViewModel.IsSuccess)
+                    {
+                        <div class="alert alert-info p-2x" role="alert">
+                            @Html.PropertyFor(m => m.CurrentPage.RegisterFailMessage)
+                        </div>
+                    }
+
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    }
+
+                    @if (Model.CurrentPage.MiddleContentStep5 != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep5)
+                    }
+                    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+                    @if (Model.ViewModel.IsSuccess)
+                    {
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-7">
+                                    <a href="@Url.ContentUrlExtension(Model.CurrentPage.BrowseTheSiteButtonLink)" type="" class="btn btn-default btn-block pb-1x pt-1x pl-0 pr-0">@Html.PropertyFor(x => x.CurrentPage.BrowseTheSiteButtonText)</a>
+
+                                </div>
+                                <div class="col-xs-12 col-sm-5 mt-1x mt-sm-0x mt-md-0x mt-lg-0x">
+                                    <a href="@Url.ContentUrlExtension(myLayout.BullionAccountPaymentPage)" type="" class="btn btn-secondary btn-block p-1x">@Html.PropertyFor(x => x.CurrentPage.FundYourWalletNowButtonText)</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 text-center mt-1x mb-2x">
+                            <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" type="" class="btn btn-link text-britannia mb-1x">@Html.PropertyFor(x => x.CurrentPage.OpenYourAccountDashboardText)</a>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-7">
+                                    <a href="@Url.ContentUrlExtension(Model.CurrentPage.BrowseTheSiteButtonLink)" type="" class="btn btn-default btn-block pb-1x pt-1x pl-0 pr-0">@Html.PropertyFor(x => x.CurrentPage.BrowseTheSiteButtonText)</a>
+
+                                </div>
+                                <div class="col-xs-12 col-sm-5 mt-1x mt-sm-0x mt-md-0x mt-lg-0x">
+                                    <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" type="" class="btn btn-link text-britannia mb-1x">@Html.PropertyFor(x => x.CurrentPage.OpenYourAccountDashboardText)</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    }
+
+                    <!-- / toolbar -->
+                </main>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="row contentArea">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

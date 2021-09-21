@@ -1,0 +1,210 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer bull-registration">
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <!-- BULL-151 - Bullion Registration Step 5 - Application Successful -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                    <!-- Step bar -->
+                    <ol class="nav nav-bar nav-progress-bar row">
+                        <li class="active col-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/AccountDetails_01a-01/"><span>1.</span></a></li>
+                        <li class="col-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/"><span>2.</span></a></li>
+                        <li class="col-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/VerifyYourIdentity_03a-01/"><span>3.</span></a></li>
+                    </ol>
+                    <!-- / Step bar -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h1 class="h3 mt-0 mb-2x">We just need to confirm your details</h1>
+                        <p class="mt-1x">
+                            To ensure the data that you've provided is correct, we just need you to provide a little more information that will confirm your
+                            identity
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+                <div class="row">
+                    <div class="spacerBlock col-xs-12 border-solid border-gray mt-1x">
+                        <div class="blockContent">
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="col-xs-1 mt-1x">
+                            <div class="radio radio-checked small fancy">
+                                <input type="radio" name="radioExample" value="" checked id="radioOne" data-original-title="" title="">
+                                <label class="" for="radioOne">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-10">
+                            <h4>UK Driving Licence</h4>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="col-xs-1 pt-1x">
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="form-group has-feedback clearfix">
+                                <label class="control-label" for="">
+                                    Licence ID Number
+                                    <span class="text-danger">*</span>
+                                    <small class="text-midblue text-nowrap">(You'll find this X digit number on your photo Id)</small>
+                                </label>
+                                <div class="no-padding col-lg-6">
+                                    <input type="text" class=" form-control" id="" data-original-title="" title="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-1 pt-1x"></div>
+                                <div class="col-xs-11">
+                                    <label class="control-label" for="">
+                                        Expiry Date
+                                        <span class="text-danger">*</span>
+                                        <small class="text-midblue">Tell us when your licence expires</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-xs-12 col-sm-1 pt-1x"></div>
+                                <div class="col-xs-6 col-sm-3">
+                                    <div class="select-form expiryMonth" id="expiryMonth">
+
+                                        <select class="form-control" id="expiry-month" onchange="PaymentSession.updateSessionFromForm('card');">
+                                            <option value="" selected="">MM</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                        <div class="cardExpiryMonthErrorMessage form-group has-error mb-0 hidden" id="cardExpiryMonthErrorMessage">
+                                            <span class="help-block"><i class="trmi trmi-times"></i> "Please enter the expiry month on your card."</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-3">
+                                    <div class="select-form expiryYear" id="expiryYear">
+                                        <select class="form-control " id="expiry-year" onchange="PaymentSession.updateSessionFromForm('card');">
+                                            <option value="" selected="">YYYY</option>
+                                            <option value="2019">2019</option>
+                                            <option value="2020">2020</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2029">2029</option>
+                                            <option value="2030">2030</option>
+                                            <option value="2031">2031</option>
+                                            <option value="2032">2032</option>
+                                            <option value="2033">2033</option>
+                                            <option value="2034">2034</option>
+                                            <option value="2035">2035</option>
+                                            <option value="2036">2036</option>
+                                            <option value="2037">2037</option>
+                                            <option value="2038">2038</option>
+                                            <option value="2039">2039</option>
+                                        </select>
+                                        <div class="cardExpiryYearErrorMessage form-group has-error mb-0 hidden" id="cardExpiryYearErrorMessage">
+                                            <span class="help-block"><i class="trmi trmi-times"></i>"Please enter the expiry year on your card."</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="spacerBlock col-xs-12 border-solid border-gray mt-1x">
+                        <div class="blockContent">
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="col-xs-1 mt-1x">
+                            <div class="radio radio-checked small fancy">
+                                <input type="radio" name="radioExample" value="" id="radioTwo" data-original-title="" title="">
+                                <label class="" for="radioTwo">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-10">
+                            <h4>UK Passport Number</h4>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="col-xs-1 pt-1x">
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="row form-group has-feedback">
+                                <div class="col-xs-12">
+                                     <label class="control-label" for="">
+                                        X Digit Passport Number
+                                        <span class="text-danger">*</span>
+                                        <small class="text-midblue text-nowrap">(You'll find this X digit number)</small>
+                                    </label>
+                                    <div class="no-padding col-lg-6">
+                                        <input type="text" class="form-control" id="" data-original-title="" title="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="spacerBlock col-xs-12 border-solid border-gray mt-1x">
+                        <div class="blockContent">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 mt-1x">
+                        <p>Can't find the details on your documents? <a href="#">Upload a scan or photograph of them here.</a></p>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-5 mt-1x">
+                        <button type="button" class="btn btn-default btn-block">I'll update later</button>
+                    </div>
+                    <div class="col-xs-12 col-sm-5 mt-1x">
+                        <button type="button" class="btn btn-secondary btn-block">Confirm Details</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

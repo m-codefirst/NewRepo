@@ -1,0 +1,23 @@
+﻿@using Hephaestus.CMS
+@using Hephaestus.CMS.Extensions
+@model TRM.Web.Models.ViewModels.TeaserViewModel
+@if (Model == null) {return;}
+ 
+
+@if (!string.IsNullOrWhiteSpace(Model.Teaser.TeaserImageUrl))
+{
+    <figure>
+        <a href="@Model.PageUrl" title="@Model.Teaser.TeaserTitle)">
+            <img class="img-responsive" src="@Model.Teaser.TeaserImageUrl?width=800" alt="@Model.Teaser.TeaserTitle">
+        </a>
+    </figure>}
+    <h3 class="h5 item-title">
+        <a href="@Model.PageUrl" title="@Model.Teaser.TeaserTitle">
+            @Model.Teaser.TeaserTitle</a> 
+    </h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Teaser.TeaserDescription))
+{
+    <p class="item-subtitle">@Model.Teaser.TeaserDescription</p>
+    <p><a href="@Model.PageUrl" title="@Model.Teaser.TeaserTitle">@Html.TranslateFallBack(StringResources.ReadMore, "Read more")</a></p>
+      
+}

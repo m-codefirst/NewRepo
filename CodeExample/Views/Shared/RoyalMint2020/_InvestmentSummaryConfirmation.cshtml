@@ -1,0 +1,175 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Core
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.Bullion.MixedCheckout.InvestmentPurchaseOrder
+@{
+    var isBullionOnly = ViewData["IsBullionOnly"] != null ? (bool)ViewData["IsBullionOnly"] : false;
+    bool hasDeliveredItems = Model.DeliveredItems != null && Model.DeliveredItems.Any();
+}
+
+@if (hasDeliveredItems)
+{
+
+    <div class="order-ref p-1 p-sm-2  padding-left-none-print">
+        @Html.TranslateFallback(StringResources.BullionCheckOutDeliverHeader, "Items being Delivered")
+    </div>
+    foreach (var deliveredItem in Model.DeliveredItems)
+    {
+        var price = !string.IsNullOrEmpty(deliveredItem.DiscountedPrice) ? deliveredItem.DiscountedPrice : deliveredItem.PlacedPrice;
+        <div class="product-summary-card p-1 p-sm-2 border-bottom-print padding-left-none-print page-break-print">
+            <div class="row">
+                <div class="col-12 col-md-4 col-4-print">
+                    <div class="asset fluid-image">
+                        <img src="@Url.ContentUrlExtension(deliveredItem.ImageUrl)" alt="@deliveredItem.DisplayName" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-8 col-8-print ">
+                    <div class="info">
+                        <h3 class="title mb-1">@deliveredItem.DisplayName</h3>
+                        @if (!string.IsNullOrWhiteSpace(deliveredItem.StockSummary.StatusMessage))
+                        {
+                            <p>@deliveredItem.StockSummary.StatusMessage</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(deliveredItem.SupplierMessage))
+                        {
+                            <p>@deliveredItem.SupplierMessage</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(deliveredItem.StockSummary.ShippingMessage))
+                        {
+                            <p>@deliveredItem.StockSummary.ShippingMessage</p>
+                        }
+                        <div class="price d-block">
+                            <div class="text-uppercase">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Quantity"): @((int)deliveredItem.Quantity)</div>
+                            <div class="item-price">
+                                @Html.TranslateFallback(StringResources.ExVat, "ex VAT")
+                                <strong class="item-price-total">@price</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+@if (Model.VaultItems != null && Model.VaultItems.Any())
+{
+    <div class="order-ref p-1 p-sm-2">
+        @Html.TranslateFallback(StringResources.BullionCheckOutVaultedHeader, "Items to be stored in The Royal Mint Vault")
+    </div>
+    foreach (var vaultItem in Model.VaultItems)
+    {
+        if (vaultItem.BullionCartItem.IsSignatureVariant)
+        {
+            var price = !string.IsNullOrEmpty(vaultItem.DiscountedPrice) ? vaultItem.DiscountedPrice : vaultItem.PlacedPrice;
+
+            <div class="product-summary-card p-1 p-sm-2">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-4-print">
+                        <div class="asset fluid-image">
+                            <img src="@Url.ContentUrlExtension(vaultItem.ImageUrl)" alt="@vaultItem.DisplayName" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8 col-8-print">
+                        <div class="info">
+                            <h3 class="title mb-1">@vaultItem.DisplayName</h3>
+                            @if (!string.IsNullOrWhiteSpace(vaultItem.StockSummary.StatusMessage))
+                            {
+                                <p>@vaultItem.StockSummary.StatusMessage</p>
+                            }
+                            <div class="price d-block">
+                                <div class="text-uppercase">@Html.TranslateFallback(StringResources.ApproxWeight, "Weight"): @vaultItem.BullionCartItem.Weight oz</div>
+                                <div class="item-price">
+                                    @Html.TranslateFallback(StringResources.ExVat, "ex VAT")
+                                    <strong class="item-price-total">@price</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            var price = !string.IsNullOrEmpty(vaultItem.DiscountedPrice) ? vaultItem.DiscountedPrice : vaultItem.PlacedPrice;
+            <div class="product-summary-card p-1 p-sm-2">
+                <div class="row">
+                    <div class="col-12 col-md-4 col-4-print">
+                        <div class="asset fluid-image">
+                            <img src="@Url.ContentUrlExtension(vaultItem.ImageUrl)" alt="@vaultItem.DisplayName" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8 col-8-print">
+                        <div class="info">
+                            <h3 class="title mb-1">@vaultItem.DisplayName</h3>
+                            
+                            @if (!string.IsNullOrWhiteSpace(vaultItem.StockSummary.StatusMessage))
+                            {
+                                <p>@vaultItem.StockSummary.StatusMessage</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(vaultItem.SupplierMessage))
+                            {
+                                <p>@vaultItem.SupplierMessage</p>
+                            }
+
+                            <div class="price d-block">
+                                <div class="text-uppercase">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Quantity"): @((int)vaultItem.Quantity)</div>
+                                <div class="item-price">
+                                    @Html.TranslateFallback(StringResources.ExVat, "ex VAT")
+                                    <strong class="item-price-total" style="font-size: 1.25rem; display: block; color: rgb(33, 28, 53);">@price</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+@if (Model.Promotions.Any())
+{
+    <div class="product-summary-card p-1 p-sm-2">
+        <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+        <div class="info">
+            @foreach (var promo in Model.Promotions)
+            {
+                <p>@Html.Raw(string.IsNullOrEmpty(promo.Code) ? promo.Description : promo.Code)</p>
+            }
+        </div>
+    </div>
+}
+
+<div class="order-totals page-break-print">
+    <div>
+        @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutBasketTotalLabel, "Basket Total") : Html.TranslateFallback(StringResources.InvestmentBasketTotal, "Investment Basket Total"))
+        <span>@Model.SubTotal</span>
+    </div>
+    @if (Model.IsFreeDelivery)
+    {
+        if (hasDeliveredItems)
+        {
+            <div class="order-free-delivery">
+                <span>@Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery)</span>
+            </div>
+        }
+    }
+    else
+    {
+        <div>
+            @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutDeliveryLabel, "Delivery") : Html.TranslateFallback(StringResources.MixedCheckoutDelivery, "Delivery"))
+            <span>@Model.DeliveryCost</span>
+        </div>
+    }
+    <div>
+        @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutVATLabel, "VAT") : Html.TranslateFallback(StringResources.InvestmentVat, "Investment VAT"))
+        <span>@Model.InvestmentVat</span>
+    </div>
+    <div class="order-total border-top-thick-print font-weight-bold-print">
+        <span>
+            @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutTotalLabel, "Total") : Html.TranslateFallback(StringResources.InvestmentTotal, "Investments Total"))
+        </span>
+        @Model.Total
+    </div>
+</div>

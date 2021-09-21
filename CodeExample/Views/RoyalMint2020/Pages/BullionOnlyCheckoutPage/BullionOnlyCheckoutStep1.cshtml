@@ -1,0 +1,187 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using Newtonsoft.Json
+@using TRM.Web.Models.ViewModels
+@using TRM.Shared.Extensions;
+@using EPiServer.Framework.Localization
+@using EPiServer.Globalization
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionOnlyCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionOnlyCheckout.BullionOnlyCheckoutStep1ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step1TabHeading,
+                    Number = "1",
+                    IsCurrent = true,
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step2TabHeading,
+                    Number = "2"
+                }
+            }
+    };
+    var ViewModel = new object();
+    if (Model?.ViewModel?.DeliveryAddress != null)
+    {
+        ViewModel = new
+        {
+            deliveryAddress = new
+            {
+                line1 = Model.ViewModel.DeliveryAddress.Line1,
+                line2 = Model.ViewModel.DeliveryAddress.Line2,
+                city = Model.ViewModel.DeliveryAddress.City,
+                postalCode = Model.ViewModel.DeliveryAddress.PostalCode,
+            },
+            currentPage = new
+            {
+                itemsForDeliveryHeading = Model.CurrentPage.ItemsForDeliveryHeading,
+                pricesAreNowLiveTitle = Model.CurrentPage.PricesAreNowLiveTitle,
+                pricesAreNowLiveToothTip = Model.CurrentPage.PricesAreNowLiveToothTip,
+                deliveryCostTitle = Model.CurrentPage.DeliveryCostTitle,
+                itemsForVaultedHeading = Model.CurrentPage.ItemsForVaultedHeading,
+                itemsForVaultedDescription = Model.CurrentPage.ItemsForVaultedDescription,
+                insufficientFundsDescription = Model.CurrentPage.InsufficientFundsDescription,
+                insufficientFundsHeading = Model.CurrentPage.InsufficientFundsHeading,
+                fixPriceAndBuyInvestmentsButtonText = Model.CurrentPage.FixPriceAndBuyInvestmentsButtonText,
+                externalUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2(),
+                availableToInvestTitle = Model.CurrentPage.AvailableToInvestTitle,
+                availableToInvestTooltip = Model.CurrentPage.AvailableToInvestTooltip,
+                livePriceValidTimeTitle = Model.CurrentPage.LivePriceValidTimeTitle,
+                livePriceValidTime = Model.CurrentPage.LivePriceValidTime,
+                livePriceTitle = Model.CurrentPage.LivePriceTitle,
+                orderSummary = Html.TranslateFallback(StringResources.BullionOrderSummary, "Order summary"),
+                payment = Html.TranslateFallback(StringResources.BullionPayment, "Payment"),
+                savedAmountLabel = Html.TranslateFallback(StringResources.SavedTotal, "Saved Amount"),
+                subTotalLabel = Html.TranslateFallback(StringResources.SubTotal, "Sub Total"),
+                deliveryLabel = Html.TranslateFallback(StringResources.DeliveryFee, "Delivery"),
+                freeDeliveryLabel = Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery),
+                vatLabel = Html.TranslateFallback(StringResources.InvestmentVat, "VAT"),
+                investTotalLabel = Html.TranslateFallback(StringResources.InvestmentTotal, "Investment Total"),
+            },
+            ui = new
+            {
+                bullionQuickCheckOutAddFundsButton = Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds"),
+                availableToInvest = Model.ViewModel.AvailableToInvest.ToString(),
+                isSippContact = myLayout.IsSippContact,
+                showInsufficientFunds = Model.ViewModel.ShowInsufficientFunds,
+                hideFixPriceButton = Model.ViewModel.HideFixPriceButton,
+                validForPayment = Model.ViewModel.ValidForPayment,
+            },
+            syncModal = new
+            {
+                title = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorTitle, "Pamp Error", ContentLanguage.PreferredCulture),
+                message = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorMessage, "Pamp Error!!!", ContentLanguage.PreferredCulture),
+                notEnoughMoney = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampNotEnoughMoney, "Pamp Not Enough Money!!!", ContentLanguage.PreferredCulture),
+                confirmation = Html.TranslateFallback(StringResources.BullionCheckoutSyncWithPampErrorConfirmButtonLabel, "Ok")
+            }
+        };
+    }
+    else
+    {
+        ViewModel = new
+        {
+            currentPage = new
+            {
+                itemsForDeliveryHeading = Model.CurrentPage.ItemsForDeliveryHeading,
+                pricesAreNowLiveTitle = Model.CurrentPage.PricesAreNowLiveTitle,
+                pricesAreNowLiveToothTip = Model.CurrentPage.PricesAreNowLiveToothTip,
+                deliveryCostTitle = Model.CurrentPage.DeliveryCostTitle,
+                itemsForVaultedHeading = Model.CurrentPage.ItemsForVaultedHeading,
+                itemsForVaultedDescription = Model.CurrentPage.ItemsForVaultedDescription,
+                insufficientFundsDescription = Model.CurrentPage.InsufficientFundsDescription,
+                insufficientFundsHeading = Model.CurrentPage.InsufficientFundsHeading,
+                fixPriceAndBuyInvestmentsButtonText = Model.CurrentPage.FixPriceAndBuyInvestmentsButtonText,
+                externalUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2(),
+                availableToInvestTitle = Model.CurrentPage.AvailableToInvestTitle,
+                availableToInvestTooltip = Model.CurrentPage.AvailableToInvestTooltip,
+                livePriceValidTimeTitle = Model.CurrentPage.LivePriceValidTimeTitle,
+                livePriceValidTime = Model.CurrentPage.LivePriceValidTime,
+                livePriceTitle = Model.CurrentPage.LivePriceTitle,
+                orderSummary = Html.TranslateFallback(StringResources.BullionOrderSummary, "Order summary"),
+                payment = Html.TranslateFallback(StringResources.BullionPayment, "Payment"),
+                savedAmountLabel = Html.TranslateFallback(StringResources.SavedTotal, "Saved Amount"),
+                subTotalLabel = Html.TranslateFallback(StringResources.SubTotal, "Sub Total"),
+                deliveryLabel = Html.TranslateFallback(StringResources.DeliveryFee, "Delivery"),
+                freeDeliveryLabel = Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery),
+                vatLabel = Html.TranslateFallback(StringResources.InvestmentVat, "VAT"),
+                investTotalLabel = Html.TranslateFallback(StringResources.InvestmentTotal, "Investment Total"),
+            },
+            ui = new
+            {
+                bullionQuickCheckOutAddFundsButton = Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds"),
+                availableToInvest = Model.ViewModel.AvailableToInvest.ToString(),
+                isSippContact = myLayout.IsSippContact,
+                showInsufficientFunds = Model.ViewModel.ShowInsufficientFunds,
+                hideFixPriceButton = Model.ViewModel.HideFixPriceButton,
+                validForPayment = Model.ViewModel.ValidForPayment,
+            },
+            syncModal = new
+            {
+                title = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorTitle, "Pamp Error", ContentLanguage.PreferredCulture),
+                message = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorMessage, "Pamp Error!!!", ContentLanguage.PreferredCulture),
+                notEnoughMoney = LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampNotEnoughMoney, "Pamp Not Enough Money!!!", ContentLanguage.PreferredCulture),
+                confirmation = Html.TranslateFallback(StringResources.BullionCheckoutSyncWithPampErrorConfirmButtonLabel, "Ok")
+            }
+        };
+    }
+}
+
+
+<div class="mod-section">
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+    <div class="row justify-content-center text-center">
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="col-12 form-spacing">
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>
+            </div>
+        }
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container">
+                <div class="form-spacing">
+                    @Html.ValidationSummary(false)
+                    @if (Model.CurrentPage.Step1Heading != null)
+                    {
+                        <h1>@Html.PropertyFor(x => x.CurrentPage.Step1Heading)</h1>
+                    }
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.Step1SubHeading))
+                {
+                    <h2 class="section-head"><span>@Html.PropertyFor(x => x.CurrentPage.Step1SubHeading)</span></h2>
+                }
+                <div data-module="bullion-checkout-step1" data-settings="@JsonConvert.SerializeObject(ViewModel)"></div>
+                <div class="form-spacing mt-5 pb-0">
+                    @Html.PropertyFor(x => x.CurrentPage.Step1RightColumnContentArea)
+                </div>
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="col-12 form-spacing">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Five })
+@section HeaderScripts{
+    @Html.Partial("_RedirectOutsideTheIframe")
+}

@@ -1,0 +1,75 @@
+﻿@using TRM.Web.Models.Layouts
+@using TRM.Web.Constants
+
+@model  TrmLayoutModel
+@{
+    var showMessage = Model.TrmHeaderMessageBlock != null;
+    var showLivePrice = Model.TrmMetalBlockHeader != null && Model.TrmMetalBlockHeader.IsInHeader && !showMessage;
+    var headerClass = showMessage ? "show-message" : (showLivePrice ? "show-live-price" : "");
+}
+<div class="header-container d-flex flex-column d-print-none @headerClass">
+    <!-- HeaderMessage -->
+    @if (showMessage)
+    {
+        Html.RenderContentData(Model.TrmHeaderMessageBlock, false);
+    }
+
+    <header id="header" class="order-2">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col col-lg-10">
+                    <div class="row align-items-center">
+                        @if (Model.SiteLogoBlock != null)
+                        {
+                            <div class="col col-xs-3">
+                                @{
+                                    Html.RenderContentData(Model.SiteLogoBlock, false);
+                                }
+                            </div>
+                        }
+                        @if (Model.DisplayCheckoutHeader)
+                        {
+                            <div class="col checkout-notifier">
+                                <span class="icon"><svg><use xlink:href="#lock"></use></svg></span>
+                                Checkout
+                            </div>
+                        }
+                        else if (!Model.HideMegaMenuAndSearch && !Model.IsSippContact)
+                        {
+                            <div class="col d-none d-lg-block search-container">
+                                @Html.Partial("RoyalMint2020/_GlobalSearch", Model,
+                                    new ViewDataDictionary {
+                                        { "placeholder", Html.TranslateFallback(StringResources.SearchPlaceholder, "Search for a product, service or article") },
+                                        { "buttonName", Html.TranslateFallback(StringResources.SearchButtonName, "Search") },
+                                        { "includingResultsFor", Html.TranslateFallback(StringResources.SearchIncludingResultsFor, "Including Results For") },
+                                        { "viewMoreResults", Html.TranslateFallback(StringResources.SearchViewMoreResults, "View More Results") },
+                                        { "seeFullSearchResults", Html.TranslateFallback(StringResources.SearchSeeFullSearchResults, "See Full Search Results") },
+                                        { "noresultsFound", Html.TranslateFallback(StringResources.SearchNoresultsFound, "No results found") },
+                                    })
+                            </div>
+                        }
+                        <div class="col col-xs-9">
+                            @Html.Partial("RoyalMint2020/_Utilities", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    @if (!Model.HideMegaMenuAndSearch && !Model.DisplayCheckoutHeader)
+    {
+        @Html.Partial("RoyalMint2020/_MegaMenu", Model)
+    }
+
+    <!-- Metal Prices -->
+    @if (showLivePrice)
+    {
+        Html.RenderContentData(Model.TrmMetalBlockHeader, false);
+    }
+</div>
+
+@if (!Model.HideAnnouncement)
+{
+    Html.RenderPartial("RoyalMint2020/_AnnouncementBanner", Model);
+}

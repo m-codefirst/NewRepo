@@ -1,0 +1,330 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions 
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.BasketPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var checkoutPageUrl = myLayout.CheckoutPage.GetExternalUrl_V2();
+    var bullionOnlyCheckoutUrl = myLayout.BullionOnlyCheckoutPage.GetExternalUrl_V2();
+    var mixedCheckoutUrl = myLayout.MixedCheckoutPage.GetExternalUrl_V2();
+    var stopTrading = myLayout.StoppedTrading;
+}
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+
+
+<div class="pageContainer">
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        <div class="container">
+            @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+</div>
+
+<div class="container bullion-basket">
+    <main ng-init="getBasketSummary()" ng-if="getBasketQty() >= 1" class="col-xs-12 mb-2x">
+        <div class="header-wrapper">
+            @Html.Partial("_PageHeader", myLayout)
+        </div>
+        <div class="spinner-icon-loading" ng-if="basketLoading()"></div>
+
+        <div ng-if="someAgeRestricted();ageRestricted" class="row">
+            <div class="alert alert-info alert__age-restriction bg-white">
+                <span class="badge--age-restriction">
+                    <small class="ng-binding">+18</small>
+                </span> @Html.PropertyFor(x => x.CurrentPage.SomeAgeRestrictedMessage)
+            </div>
+        </div>
+
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+
+        <div class="row">
+            <div class="col-xs-2 hidden-xs"></div>
+            <div class="col-xs-10 hidden-xs">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-3">
+                    <strong>@Html.PropertyFor(m => m.CurrentPage.ProductQuantityLabel)</strong>
+                </div>
+                <div class="col-sm-2">
+                    <strong>@Html.PropertyFor(m => m.CurrentPage.ProductPriceLabel)</strong>
+                </div>
+                <div class="col-sm-2">
+                    <strong>@Html.PropertyFor(m => m.CurrentPage.ProductSubTotalLabel)</strong>
+                </div>
+            </div>
+        </div>
+        <div ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)" class="row">
+            <div class="col-xs-12">
+                <h3 class="h3 mt-0">@Html.TranslateFallback(StringResources.ItemsToBeDelivered, "Items to be delivered")</h3>
+                <p class="strong header-font-color">@Html.TranslateFallback(StringResources.DeliveredToSpecifiedAddress, "Delivered to specified address")</p>
+                <p class="text-silver">@Html.TranslateFallback(StringResources.SelectDeliveryAddressAtCheckout, "You can select a delivery address at the checkout")</p>
+            </div>
+        </div>
+
+        <!-- row starts here -->
+        <div ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress" ng-repeat="variant in rmCommerce.defaultShipment[0].CartItems" class="row mb-xs-2x mt-1x">
+            @Html.Partial("_BullionMixedBasketItem", Model)
+            <div class="clearfix"></div>
+            <div class="col-xs-12"><hr></div>
+        </div>
+        <div ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress" class="row">
+            <div class="col-xs-12 mt-1x">
+                <h3 ng-if="!rmCommerce.hasItemDeliveredToSpecifiedAddress" class="h3 mt-0">@Html.TranslateFallback(StringResources.ItemsToBeDelivered, "Items to be delivered")</h3>
+                <p class="text-silver">
+                    <span class="strong header-font-color">
+                        @Html.TranslateFallback(StringResources.DeliveredToYourInvestmentAccountAddress, "Delivered to your investment account address")
+                    </span>-
+                    @Html.TranslateFallback(StringResources.DeliveredToYourInvestmentAccountAddressInfo, "Investment purchases will only be delivered to your registered account address. Any amendments are to be requested via customer services on ")
+                    <a href="@Html.TranslateFallback(StringResources.CustomerServiceNumber, "0161 946 0000")">@Html.TranslateFallback(StringResources.CustomerServiceNumber, "0161 946 0000")</a>
+                    @Html.TranslateFallback(StringResources.BeforeCheckout, "before checkout")
+                </p>
+            </div>
+        </div>
+
+        <div ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress" ng-repeat="variant in rmCommerce.deliveryBullionShipment[0].CartItems" class="row mb-xs-2x mt-1x">
+            @Html.Partial("_BullionMixedBasketItem", Model, new ViewDataDictionary { { "CanDeliverCanVault", "Deliver" } })
+            <div class="clearfix"></div>
+            <div class="col-xs-12"><hr></div>
+        </div>
+
+        <div ng-if="rmCommerce.hasItemToBeStored" class="row">
+            <div class="col-xs-12 mt-1x">
+                <h3 class="h3">@Html.TranslateFallback(StringResources.BasketItemsForStorageTitle, "Items for storage at the royal mint")</h3>
+                <p>@Html.TranslateFallback(StringResources.BasketItemsForStorageSubtitle, "Metal prices are subject to fluctuation. The live price and weights will be calculated in the next step, as applicable")</p>
+                <p class="text-silver">
+                    <span class="strong header-font-color">@Html.TranslateFallback(StringResources.BasketItemsStoreInVault, "Store in Vault")</span> - @Html.TranslateFallback(StringResources.BasketItemsStorageFeesApplied, "Storage fees applied, to be paid quarterly!")
+                    <i class="trmi trmi-question text-slateblue" data-toggle="tooltip" title="" data-original-title="@Html.TranslateFallback(StringResources.BasketItemsForStorageTooltip, "We charge a monthly storage fee that is invoiced and debited from your wallet")"></i>
+                </p>
+                <p ng-if="getEstimatedStorageFee()">@Html.TranslateFallback(StringResources.EstimatedStorageFee, "Estimated storage fee"): {{getEstimatedStorageFee()}} @Html.TranslateFallBack(StringResources.PerAnnum, "p.a.") (@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+            </div>
+        </div>
+
+        <div ng-if="rmCommerce.hasItemToBeStored" ng-repeat="variant in rmCommerce.vaultBullionShipment[0].CartItems" class="row mb-xs-2x mt-1x">
+            @Html.Partial("_BullionMixedBasketItem", Model, new ViewDataDictionary { { "CanDeliverCanVault", "Vault" } })
+            <div class="clearfix"></div>
+            <div class="col-xs-12"><hr></div>
+        </div>
+
+        @if (stopTrading)
+        {
+            <div class="row" ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)">
+                <div class="col-xs-12 mb-2x text-center">
+                    <div class="alert-danger p-1x">
+                        <h6 class="h6 text-center">
+                            @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div ng-init="checkBalance()">
+            <div class="row mb-2x" ng-if="showAddFund">
+                <div class="col-xs-12">
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-xs-12 ">
+                                <h4 class="h2 mt-2x">@Html.PropertyFor(x => x.CurrentPage.InsufficientFundsHeading)</h4>
+                                <p>@Html.PropertyFor(x => x.CurrentPage.InsufficientFundsDescription)</p>
+                            </div>
+                            <div class="col-xs-12 col-sm-8 pt-1x">
+                                <h4 class="h3 mt-1x">
+                                    @Html.TranslateFallback(StringResources.AvailableFunds, "Available Funds"): <span class="text-danger" ng-bind="accountBalance"></span>
+                                    @if (!string.IsNullOrEmpty(Model.CurrentPage.AvailableToInvestTooltip))
+                                    {
+                                        <i class="trmi trmi-question info-fa h6 text-blue" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.AvailableToInvestTooltip)"></i>
+                                    }
+                                </h4>
+                            </div>
+                            @if (!myLayout.IsSippContact)
+                            {
+                                <div class="col-xs-12 col-sm-4 pt-1x">
+                                    <a class="btn btn-secondary btn-block" href="@Url.ContentUrlExtension(Model.CurrentPage.GetBullionAccountAddCreditPage())">@Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds")</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-5 col-lg-4 mb-2x">
+                <div>
+                    @Html.Partial("_Promotions", Model.CurrentPage)
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-7 col-lg-8">
+                <div class="row">
+                    <div ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && !rmCommerce.hasItemDeliveredToInvestmentAddress && !rmCommerce.hasItemToBeStored" class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.AvailableFundsBasketTotal, "Available FundsBasket Total")</strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                {{getRetailSubTotal()}}
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="!rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)" class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.BasketTotal, "Basket Total")</strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                {{getInvestmentSubTotal()}}
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)" class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.RetailBasket, "Retail Basket")<span class="mini-basket-vat mobile-basket-vat">&nbsp; (@Html.TranslateFallback(StringResources.IncludeVat, "Inc VAT")):</span></strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                {{getRetailSubTotal()}}
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)" class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.InvestmentBasket, "Investments Basket")<span class="mini-basket-vat mobile-basket-vat">&nbsp; (@Html.TranslateFallback(StringResources.ExVat, "exc VAT")):</span> </strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right">
+                                {{getInvestmentSubTotal()}}
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored" class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.InvestmentVat, "Investment VAT")</strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                {{getInvestmentVatWithoutDeliveryFeeVat()}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.PropertyFor(m => m.CurrentPage.DeliveryLabel)</strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                <span>@Html.TranslateFallback(StringResources.BasketDeliveryCostStatus, "calculated at checkout")</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                <strong>@Html.TranslateFallback(StringResources.Total, "Total")</strong>
+                            </div>
+                            <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                {{getTotalWithoutDeliveryFeeVat()}}
+                                <p class="basket-total-vat">(@Html.TranslateFallback(StringResources.IncludeVat, "Inc VAT"))</p>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Request.IsLocal)
+                    {
+                        <div class="col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-8 col-md-9 col-lg-10 text-right">
+                                    <strong>@Html.TranslateFallback(StringResources.PayToday, "Pay Today"):</strong>
+                                </div>
+                                <div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+                                    {{getTotalWithoutRecuring()}}
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <footer class="col-xs-12 mb-4x mt-2x">
+                        <div class="row">
+                            <div class="col-xs-6 pull-right">
+                                <a ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && !rmCommerce.hasItemDeliveredToInvestmentAddress && !rmCommerce.hasItemToBeStored"
+                                   class="btn btn-primary btn-block"
+                                   href="@checkoutPageUrl">@Html.PropertyFor(m => m.CurrentPage.CheckoutButtonText)</a>
+                                @if (!stopTrading)
+                                {
+                                    <a ng-if="!rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)"
+                                       class="btn btn-primary btn-block"
+                                       href="@bullionOnlyCheckoutUrl">@Html.PropertyFor(m => m.CurrentPage.CheckoutButtonText)</a>
+
+                                    <a ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)"
+                                       class="btn btn-primary btn-block"
+                                       href="@mixedCheckoutUrl">@Html.PropertyFor(m => m.CurrentPage.CheckoutButtonText)</a>
+                                }
+
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        @if (Request.IsLocal)
+        {
+            <table class="table" ng-if="rmCommerce.validation.length >= 1">
+                <thead>
+                    <tr>
+                        <th width="50%">@Html.TranslateFallback(StringResources.BasketValidationRemovedItems, "Removed Items")</th>
+                        <th width="50%">@Html.TranslateFallback(StringResources.BasketValidationResonTitle, "Reason")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="variant in rmCommerce.validation" class="headerBasketItem" ng-fade>
+                        <td>
+                            <h6 class="mb-0 mt-0 ">
+                                <a ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-href="#" ng-bind="variant.DisplayName" ng-cloak></a>
+                                <p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>
+                            </h6>
+                        </td>
+                        <td>
+                            <p class="text-warning">{{variant.Reasons}}</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+    </main>
+
+    <main ng-if="getBasketQty() == 0" ng-cloak class="col-xs-12 mb-2x">
+        <div class="header-wrapper">
+            @Html.Partial("_PageHeader", myLayout)
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-4">
+                <a class="btn btn-default btn-block" href="@Url.ContentUrlExtension(Model.CurrentPage.ContinueShoppingUrl)">@Html.PropertyFor(m => m.CurrentPage.ContinueShoppingButtonText)</a>
+            </div>
+        </div>
+    </main>
+
+    <main ng-if="getBasketQty() == -1" ng-cloak class="col-xs-12 mb-2x">
+        <div class="header-wrapper">
+            @Html.Partial("_PageHeader", myLayout)
+        </div>
+        @Html.DisplayFor(m => m.CurrentPage.LoadingBasketContentArea)
+    </main>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+</div>

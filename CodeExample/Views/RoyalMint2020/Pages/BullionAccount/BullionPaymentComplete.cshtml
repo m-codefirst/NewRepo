@@ -1,0 +1,18 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionAccountAddCreditPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionAccountAddCreditViewModel>
+<div class="pageContainer">
+    <div class="content-area"></div>
+    <div class="container mb-4x mt-2x">
+        <div class="page-header">
+            <h1 class="h2">Payment @(Model.ViewModel.Successfully ? "Sucessful" : "Error")</h1>
+        </div>
+        <div>
+            @Html.Raw(Model.ViewModel.Message)
+            @if (!string.IsNullOrEmpty(Model.ViewModel.OrderNumber))
+            {
+                <strong>Order Number:</strong><br />
+                @Model.ViewModel.OrderNumber.ToUpper()
+            }
+        </div>
+    </div>
+</div>
+

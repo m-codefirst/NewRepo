@@ -1,0 +1,22 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+<div class="variantRating mb-1x" ng-controller="rmFeefo" ng-cloak ng-init="GetFeefoSummaryRatings('@Model.CurrentPage.Code')">
+    <reviewstars class="ng-isolate-scope" ng-cloak rating="{{roundRatingNum}}" ng-model="StarRating" reviewcount="{{reviewCount}}">
+        <meta content="{{roundRatingNum}}" />
+        <meta content="{{reviewCount}}" />
+        <span class="reviewStars" ng-class="reviewCount === 0 ? 'text-gray-lighter': 'text-ochre'">
+            <span class="trmi trmi-star-full" ng-repeat="n in roundRating track by $index"></span><span ng-show="plusHalf === true" class="trmi trmi-star-half ng-hide" ng-cloak></span><span class="trmi trmi-star-empty" ng-repeat="x in remainder track by $index"></span>
+        </span>
+        <a href="" id="feefoLinkToTab" data-target="#tab3" data-tablink="#detailTabs" data-scrollto="#detailTabs" ng-model="reviewCount" ng-if="reviewCount > 0" title="Read reviews" class="text-slateblue hidden-xs">({{reviewCount}})</a>
+        <a href="" data-target="#tab3-collapse" data-accordionlink="#tab3-collapse" data-scrollto="#detailTabs" ng-model="reviewCount" ng-if="reviewCount > 0" title="Read reviews" class="text-slateblue visible-xs-inline-block">({{reviewCount}})</a>
+    </reviewstars>
+</div>
+
+@if (Model.ViewModel.AutoScrollToFeefoReviews)
+{
+    <script>
+        $(document).ready(function() {
+            $('#feefoLinkToTab').click();
+        });
+    </script>
+}

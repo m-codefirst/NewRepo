@@ -1,0 +1,73 @@
+﻿@using Castle.Core.Internal
+@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Bullion
+@model TRM.Web.Models.ViewModels.TransactionHistoryViewModel
+
+@helper renderAmountWithColor(TransactionHistoryItemViewModel item)
+{
+    if (item.TransactionType == Enums.TransactionHistoryType.Purchase || item.TransactionType == Enums.TransactionHistoryType.StorageFee)
+    {
+        <span class="h6 text-sovereign">@item.Amount.ToString()</span>
+    }
+    else if (item.TransactionType == Enums.TransactionHistoryType.FundsAddedCard)
+    {
+        <span class="h6 text-success">@item.Amount.ToString()</span>
+    }
+    else
+    {
+        <span class="h6">@item.Amount.ToString()</span>
+    }
+}
+
+<div class="table-wrapper">
+    <div class="row">
+        <div class="col-xs-12">
+            @if (!Model.TransactionItems.IsNullOrEmpty())
+            {
+                var idx = 0;
+                foreach (var transactionItem in Model.TransactionItems)
+                {
+                    idx++;
+                    <div class="card card__transaction-history">
+                        <div class="card-header collapsed" id="">
+                            <div class="row align-items-center">
+                                <div class="col-xs-6 col-sm-2 mb-xs-1x">
+                                    <span class="h6">@transactionItem.CreatedDate.ToString("MMM d yyyy")</span>
+                                </div>
+                                <div class="col-xs-6 col-sm-3 mb-xs-1x">
+                                    <span class="h6">@transactionItem.TransactionTypeString</span>
+                                </div>
+                                <div class="col-xs-6 col-sm-2 mb-xs-1x">
+                                    <p class="mb-0 text-uppercase">Amount</p>
+                                    @renderAmountWithColor(transactionItem)
+                                    @*<span class="h6">@transactionItem.Amount.ToString()</span>*@
+                                </div>
+                                <div class="col-xs-6 col-sm-2 mb-xs-1x">
+                                    <p class="mb-0 text-uppercase">Effective Balance</p>
+                                    <span class="h6">@transactionItem.Balance.ToString()</span>
+                                </div>
+                                <div class="col-xs-6 col-sm-2">
+                                    <span class="h6">@transactionItem.TransactionStatus</span>
+                                </div>
+                                @if (!transactionItem.MoreDetailCollection.IsNullOrEmpty())
+                                {
+                                    <div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+                                        <a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-@idx" aria-controls="collapse0" aria-expanded="false">
+                                            <span class="show-label">View</span>
+                                            <span class="hide-label">Close</span>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @Html.Partial("TransactionHistoryItemDetail", new KeyValuePair<int, TransactionHistoryItemViewModel>(idx, transactionItem))
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center">@Html.TranslateFallback(StringResources.NoItemData, "There is no item.")</p>
+            }
+        </div>
+    </div>
+</div>

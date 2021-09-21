@@ -1,0 +1,70 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer bull-registration">
+
+    <!-- BULL-146 - Introductory Step if Email has been recognised -->
+    <div class="container mb-4x mt-2x">
+
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+
+                <!-- Sub Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+                }
+                <!-- / Sub Headline -->
+
+                <!-- Content Area -->
+                @*<div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>*@
+                <!-- / Content Area -->
+
+                <!-- Form -->
+                <main class="row">
+                    <div class="col-xs-12">
+                        <h3 class="text-white p-2x bg-purple">
+                            Before we start, we noticed this email has an existing login
+                        </h3>
+                        <p class="mt-3x mb-2x">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sapien ex, 
+                            luctus quis odio sed, tincidunt maximus turpis.
+                        </p>
+                    </div>
+                    
+
+                    <!-- toolbar -->
+                    <div class="col-xs-12 mt-1x mb-2x">
+                        <a href="/prototypes/bullion/registration/populated/AccountDetails_01a-01/" type="" class="btn btn-secondary mb-1x p-1x pl-2x pr-2x ">Login and Continue</a>
+                        <a href="/prototypes/bullion/registration/populated/AccountDetails_01a-01/" type="" class="btn mb-1x ml-xs-0 ml-sm-1x ml-md-1x ml-lg-1x p-1x pl-2x pr-2x text-white p-1x bg-aquamarine text-center">Create an account</a>
+                    </div>
+                    <!-- / toolbar -->
+
+
+                </main>
+                <!-- / Form -->
+
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        @*<div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>*@
+        <!-- / Content Area -->
+
+        <!-- / BULL-146 - Introductory Step if Email has been recognised -->
+
+    </div>
+
+</div>

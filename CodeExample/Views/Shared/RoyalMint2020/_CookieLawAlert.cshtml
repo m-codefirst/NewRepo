@@ -1,0 +1,11 @@
+﻿@using Newtonsoft.Json
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{ 
+    var viewModel = new {
+        cookieTitle = Model.CookieTitle,
+        cookieButtonText = Model.CookieButtonText,
+        cookieWarningMessage = Model.CookieWarningMessage };
+}
+
+<div data-module="cookies" data-cookies-settings="@JsonConvert.SerializeObject(viewModel)"></div>

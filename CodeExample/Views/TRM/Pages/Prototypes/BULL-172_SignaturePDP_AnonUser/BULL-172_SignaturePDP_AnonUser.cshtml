@@ -1,0 +1,107 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var isAuthenticated = false;	
+}
+<div class="pageContainer signature-page">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+
+	<div class="container">
+		<div class="page-header">
+			<div class="row">
+				<div class="col-xs-12 col-md-6">
+					<h1 class="h1 mt-0">Signature</h1>
+				</div>
+				<div class="col-xs-12 col-md-6">
+					<div class="social-items pull-right">
+						@Html.Partial("BullionPDPSocialShare")
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="panel-box bg-gray annotation-box investment-block">
+					<div class="investment-price">
+						<h5 class="mb-xs-1x mb-0 mt-0 investment-title">I'd like to invest</h5>
+						<div class="price-input">
+							<div class="input-group subtle">
+								<div class="input-group-addon">£</div>
+								<input type="number" class="form-control form-group invest-price" id="investPrice" value="20.00" placeholder="Amount" data-original-title="" title="">
+							</div>
+						</div>
+						<a href="" class="btn btn-default">Update Investment Options</a>
+					</div>
+					<div class="quick-investment">
+						<label>Select Quick Investment:</label>
+						<a class="quick-invest-number" data-invest-number="50">£50</a>
+						<a class="quick-invest-number" data-invest-number="100">£100</a>
+						<a class="quick-invest-number" data-invest-number="500">£500</a>
+						<a class="quick-invest-number" data-invest-number="1000">£1000</a>
+					</div>
+					<p>Please note the your investment amount may be rounded when calculating your investment options</p>
+				</div>
+			</div>
+		</div>
+		<h2 class="h2 text-center">Investing <span class="bold">£20.00</span> today will allow you to purchase and vault:</h2>
+		<div class="row variant-section">
+			<div class="variant-wrapper">
+				<div class="variant-image" style="background-image:url(Static/img/bullion/sig-gold.png)"></div>
+				<div class="variant-info">
+					<h3 class="mt-0 mb-2x">Signature Gold</h3>
+					<h2 class="mt-0 mb-0">0.9oz</h2>
+					<p class="h4 mt-0 price-unit">£0.00 per oz</p>
+					<span class="estimated">estimated</span>
+				</div>
+			</div>
+			<div class="variant-wrapper">
+				<div class="variant-image" style="background-image:url(Static/img/bullion/sig-silver.png)"></div>
+				<div class="variant-info">
+					<h3 class="mt-0 mb-2x">Signature Silver</h3>
+					<h2 class="mt-0 mb-0">2.7oz</h2>
+					<p class="h4 mt-0 price-unit">£0.00 per oz</p>
+					<span class="estimated">estimated</span>
+				</div>
+			</div>
+			<div class="variant-wrapper">
+				<div class="variant-image" style="background-image:url(Static/img/bullion/sig-platinum.png)"></div>
+				<div class="variant-info">
+					<h3 class="mt-0 mb-2x">Signature Platinum</h3>
+					<h2 class="mt-0 mb-0">2.9oz</h2>
+					<p class="h4 mt-0 price-unit">£0.00 per oz</p>
+					<span class="estimated">estimated</span>
+				</div>
+			</div>
+		</div>
+		@if (!isAuthenticated)
+		{
+			<div class="row">
+				<div class="col-xs-12 text-center">
+					<div class="cta-action mb-2x">
+						<a href="" class="btn btn-secondary mr-1x">Log in</a>
+						<label class="">or</label>
+						<a href="" class="btn btn-default ml-1x mr-1x">Sign up</a>
+						<label class="mt-xs-1x">To begin investing in signature</label>
+					</div>
+				</div>
+			</div>
+		}		
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

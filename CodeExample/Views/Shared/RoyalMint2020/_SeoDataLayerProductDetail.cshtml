@@ -1,0 +1,45 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Extentions;
+@using Hephaestus.CMS.ViewModels;
+@using ILayoutModel = Hephaestus.CMS.ViewModels.ILayoutModel
+@using TrmVariant = TRM.Web.Models.Catalog.TrmVariant;
+@using VariantViewModel = TRM.Web.Models.ViewModels.VariantViewModel;
+
+@model IPageViewModel<TrmVariant, ILayoutModel, VariantViewModel>
+
+@if (!PageEditing.PageIsInEditMode && Model != null)
+{
+
+     <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org/",
+            "@@type": "@Html.TranslateFallback(StringResources.TypeProductLabel, "Product")",
+            "name": "@Html.Raw(HttpUtility.JavaScriptStringEncode(!string.IsNullOrWhiteSpace(Model.CurrentPage.DisplayName) ?
+                    @Html.StripHtmlTagsAndSpecialChars(Model.CurrentPage.DisplayName).ToString() : Model.CurrentPage.MetaTitle))",
+            "image": [@Html.Raw(Model.GetImages())],
+            "description": "@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.GetDescription()))",
+            "sku": "@Model.CurrentPage.Code",
+            "mpn": null,
+            "brand": {
+            "@@type": "@Html.TranslateFallback(StringResources.TypeBrandLabel, "Brand")",
+                "name": "@Html.Raw(Model.CurrentPage.BrandDisplayName)"
+            },
+            "review": null,
+            "aggregateRating": null,
+            "offers": {
+            "@@type": "@Html.TranslateFallback(StringResources.TypeOfferLabel, "Offer")",
+                "url": "@Model.ViewModel.EntryUrl",
+                "priceCurrency": "@Model.ViewModel.CurrencyCode",
+                "price": "@Html.Raw(Model.ViewModel.PriceString)",
+                "priceValidUntil": null,
+                "itemCondition": "@Model.GetItemCondition()",
+                "availability": "@Model.GetIsInStock()",
+                "seller": {
+                "@@type": "@Html.TranslateFallback(StringResources.TypeOrganizationLabel, "Organization")",
+                    "name": "@Model.CurrentPage.BrandForProductFeed"
+                }
+        }
+    }
+    </script>
+}

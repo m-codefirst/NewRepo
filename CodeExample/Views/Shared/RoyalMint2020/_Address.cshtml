@@ -1,0 +1,24 @@
+﻿@using TRM.Web.Models.ViewModels
+@model TRM.Web.Models.ViewModels.AddressViewModel
+<address>
+    @if (!string.IsNullOrWhiteSpace(Model.Name))
+    {
+        @Model.Name<br />
+    }
+    @Model.Address.Line1<br />
+    @if (!string.IsNullOrWhiteSpace(Model.Address.Line2))
+    {
+        @Model.Address.Line2<br />
+    }
+    @Model.Address.City<br />
+    @if (!string.IsNullOrWhiteSpace(Model.Address.CountryRegion.Region))
+    {
+        @Model.Address.CountryRegion.Region<br />
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Address.PostalCode))
+    {
+        <span class="text-uppercase">@Model.Address.PostalCode</span> <br />
+    }
+
+    @Model.Address.CountryName
+</address>

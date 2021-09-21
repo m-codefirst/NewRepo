@@ -1,0 +1,234 @@
+﻿@using TRM.Web.Constants
+
+@model TRM.Web.Models.ViewModels.Cart.PurchaseOrderViewModel
+
+@{
+    var shipment = Model.Shipments.FirstOrDefault();
+    var payment = Model.Payments.FirstOrDefault();
+}
+
+@if (Model.OrderFound)
+{
+    <div class="panel panel-default panel-secondary mb-2x">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+
+                </div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-item">
+                        <div class="panel-body">
+                            <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderDate, "Order Date")</h5>
+                            @Model.CreatedDate.ToString("dd MMMM yyyy")
+                        </div>
+                    </div>
+                </div>
+
+                @{
+                    var first = true;
+                    var orderNumbers = string.Empty;
+                    foreach (var number in Model.OrderNumbers)
+                    {
+                        if (first)
+                        {
+                            orderNumbers = number;
+
+                            first = false;
+                        }
+                        else
+                        {
+                            orderNumbers = string.Format("{0}, {1}", orderNumbers, number);
+                        }
+                    }
+                }
+
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-item">
+                        <div class="panel-body">
+                            <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderNumber, "Order Number")</h5>
+                            @orderNumbers
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-item">
+                            <div class="panel-body">
+                                <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderStatusLabel, "Status")</h5>
+                                <span class="text-gold">@Model.Status</span>
+                            </div>
+                        </div>
+                    </div>*@
+
+                @*<div class="col-xs-12 col-sm-6">
+                        <div class="panel panel-item">
+                            <div class="panel-body">
+                                <h5>&nbsp;</h5>
+                                &nbsp;
+                                <h5>Payment Details</h5>
+                                    Card Type: @Model.Payments.FirstOrDefault().CardType
+                            </div>
+                        </div>
+                    </div>*@
+                <div class="col-xs-12">
+                    <div class="panel panel-item">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DeliveryTo, "Delivery To")</h5>
+                                    <p>
+                                        @if (shipment != null)
+                                        {
+                                            @shipment.Address.FirstName
+                                            @shipment.Address.LastName<br />
+                                            @shipment.Address.Line1<br />
+                                            @shipment.Address.City<br />
+                                            if (shipment.Address.CountryRegion != null)
+                                            {
+                                                @shipment.Address.CountryRegion.Region<br />
+                                            }
+                                            @shipment.Address.PostalCode<br/>
+                                            @shipment.Address.CountryCode
+                                        }
+                                    </p>
+                                    <hr class="visible-xs">
+                                </div>
+
+                                <div class="col-xs-12 col-sm-6">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.BillingAddress, "Billing Address")</h5>
+                                    <p>
+                                        @if (payment != null)
+                                        {
+                                            @payment.Address.FirstName
+                                            @payment.Address.LastName<br />
+                                            @payment.Address.Line1<br />
+                                            @payment.Address.City<br />
+                                            if (shipment.Address.CountryRegion != null)
+                                            {
+                                                @shipment.Address.CountryRegion.Region<br />
+                                            }
+                                            @payment.Address.PostalCode<br />
+                                            @payment.Address.CountryCode
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <h4 class="h4-xs h4-sm">Products</h4>
+
+                    <div class="bb-dotted-blue pb-1x mb-2x hidden-sm">
+                        <div class="row table-heading hidden-xs">
+                            <div class="col-sm-8">
+                                <span class="h4">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Item, "Item")</span>
+                            </div>
+
+                            <div class="col-sm-2 pl-0 pr-0 text-center">
+                                <span class="h4">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Quantity, "Qty")</span>
+                            </div>
+
+                            <div class="col-sm-2 pl-0 text-right">
+                                <span class="h4">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Price, "Price")</span>
+                            </div>
+                        </div>
+                    </div>
+                    @if (shipment != null)
+                    {
+                        foreach (var product in shipment.CartItems)
+                        {
+                            var className = !string.IsNullOrEmpty(product.SubTitle) ? "mb-0" : string.Empty;
+
+                            <div class="bb-solid-gray mb-2x">
+                                <div class="row table-row">
+                                    <div class="col-xs-12 col-md-8 @className">
+                                        <p class="mt-0 strong">@product.DisplayName</p>
+                                        <p class="">@product.SubTitle</p>
+                                        @if (product.HasbeenPersonalised)
+                                        {
+                                            <!-- message personalize -->
+                                            <div class="mb-5 ng-scope">
+                                                <span class="bg-white p-1xs mt-1xa ng-binding">
+                                                    @Html.TranslateFallback(StringResources.HasBeenPersonalised, StringConstants.TranslationFallback.HasBeenPersonalised)
+                                                </span>
+                                            </div>
+                                            <!-- / message personalize -->
+                                        }
+                                    </div>
+
+                                    <div class="col-xs-6 col-md-2 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                                        <span class="visible-xs-inline visible-sm-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Quantity, "Qty") </span>@product.Quantity.ToString("0.#")
+                                    </div>
+
+                                    <div class="col-xs-6 col-md-2 pl-0 text-right">
+                                        @((product.PlacedPriceDecimal * product.Quantity).ToString("C2"))
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <p class="">
+                                            <span class="strong">@product.SalesStatus</span><br>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    <div class="row table-footer" ng-cloak>
+                        <div class="col-xs-8 col-sm-10 col-md-4 col-md-offset-6 text-right">
+                            <strong>@Html.TranslateFallback(TRM.Web.Constants.StringResources.BasketTotal, "Basket total:")</strong>
+                        </div>
+                        <div class="col-xs-4 col-sm-2 col-md-2 text-right">
+                            @Model.SubTotal
+                        </div>
+
+                        <div class="col-xs-8 col-sm-10 col-md-4 col-md-offset-6 text-right">
+                            <strong>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Delivery, "Delivery")</strong>
+                        </div>
+                        <div class="col-xs-4 col-sm-2 col-md-2 text-right">
+                            <span>
+                                @Model.TotalDelivery
+                            </span>
+                        </div>
+
+                        @if (Model.TotalDiscount != "£0.00")
+                        {
+                            <div class="col-xs-8 col-sm-10 col-md-4 col-md-offset-6 text-right">
+                                <strong>@Html.TranslateFallback(TRM.Web.Constants.StringResources.BasketSavings, "Savings")</strong>
+                            </div>
+                            <div class="col-xs-4 col-sm-2 col-md-2 text-right">
+                                @Model.TotalDiscount
+                            </div>
+                        }
+
+                        <div class="col-xs-8 col-sm-10 col-md-4 col-md-offset-6 text-right">
+                            <strong>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Total, "Total:")</strong>
+                        </div>
+                        <div class="col-xs-4 col-sm-2 col-md-2 text-right">
+                            <span>
+                                @Model.Total
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="panel panel-default panel-secondary mb-2x">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="wysiwyg">
+                        @Html.DisplayFor(a => a.ThisBlock.NoOrderFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

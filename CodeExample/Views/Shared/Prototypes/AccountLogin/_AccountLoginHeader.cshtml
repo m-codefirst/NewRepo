@@ -1,0 +1,16 @@
+﻿@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@model  TrmLayoutModel
+
+<div class="header-container">
+    <div class="container">
+        <header class="brand-header">
+            <figure class="site-logo-container pull-left">
+                <a href="@(Url.ContentUrlExtension(Model.BaseUri))" title="dean lol">
+                    <img class="img-responsive" src="@Url.ContentUrlExtension(Model.SiteLogo)" alt="RoyalMint">
+                </a>
+            </figure>
+            @Html.Partial("/AccountLogin/_AccountLoginMegaMenu", Model)
+        </header>
+    </div>
+</div>

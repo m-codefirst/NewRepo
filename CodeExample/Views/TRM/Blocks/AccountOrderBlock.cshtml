@@ -1,0 +1,133 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.AccountOrderViewModel
+<div class="wysiwyg">
+    @Html.DisplayFor(a => a.ThisBlock.IntroductionText)
+</div>
+@if (Model.Orders.Count > 0)
+{
+    var orderPage = string.Empty;
+    if (Model.ThisBlock.OrderDetailsPage != null)
+    {
+        orderPage = Model.ThisBlock.OrderDetailsPage.GetExternalUrl_V2();
+    }
+
+    <div class="panel panel-default panel-secondary open-orders">
+        <div class="panel-body item-row">
+            <div class="panel panel-order">
+                <div class="panel-heading hidden-xs">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-3">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderDate, "Order Date")
+                        </div>
+                        <div class="col-xs-12 col-sm-3">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderNumber, "Order Number")
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderValue, "Value")
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderStatusLabel, "Status")
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+
+                @foreach (var order in Model.Orders)
+                {
+                    var orderNumbers = string.Empty;
+
+                    var first = true;
+                    foreach (var number in order.OrderNumbers)
+                    {
+                        if (first)
+                        {
+                            orderNumbers = number;
+
+                            first = false;
+                        }
+                        else
+                        {
+                            orderNumbers = string.Format("{0}, {1}", orderNumbers, number);
+                        }
+                    }
+
+                    <div class="panel-body item-row">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-3">
+                                <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderDate, "Order Date"):</span> @order.OrderDate.ToString("dd MMMM yyyy")
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderNumber, "Order Number"):</span> @orderNumbers
+                            </div>
+                            <div class="col-xs-12 col-sm-2">
+                                <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderValue, "Value"):</span> @order.SalesTotal.ToString("C2")
+                            </div>
+                            @*<div class="col-xs-12 col-sm-2">
+                                <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.OrderStatusLabel, "Status"):</span> @order.OrderStatus
+                            </div>*@
+                            <div class="col-xs-12 col-sm-2 text-right">
+                                <a class="mr-xs-1x" href="@(string.Format("{0}?oid={1}", orderPage, Html.Encode(order.OrderNumber)))">@Html.TranslateFallback(TRM.Web.Constants.StringResources.ViewOrder, "View Order")</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+    if (Model.TotalPages > 1)
+    {
+        var uri = new Uri(HttpContext.Current.Request.Url.ToString());
+        var newQueryString = uri.GetLeftPart(UriPartial.Path);
+
+        <div class="text-center-xs">
+            <ul class="pagination pull-right-sm-up">
+                @if (Model.CurrentPage > 1)
+                    {
+                    <li>
+                        <a href="@(string.Format("{0}?pg={1}", newQueryString, Model.CurrentPage - 1))" aria-label="@Html.TranslateFallback(TRM.Web.Constants.StringResources.Previous, "Previous")">
+                            <span aria-hidden="true"><i class="trmi trmi-angle-left" aria-hidden="true"></i></span>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = Model.PageRangeStart; i <= Model.PageRangeEnd; i++)
+                    {
+                        if (i == Model.CurrentPage)
+                        {
+                        <li class="active">
+                            <span>@i <span class="sr-only">(@Html.TranslateFallback(TRM.Web.Constants.StringResources.Current, "current"))</span></span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><a href="@(string.Format("{0}?pg={1}", newQueryString, i))">@i</a></li>
+                    }
+                }
+
+                @if (Model.CurrentPage != Model.TotalPages)
+                    {
+                    <li>
+                        <a href="@(string.Format("{0}?pg={1}", newQueryString, Model.CurrentPage + 1))" aria-label="@Html.TranslateFallback(TRM.Web.Constants.StringResources.Next, "Next")">
+                            <span aria-hidden="true"><i class="trmi trmi-angle-right" aria-hidden="true"></i></span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}
+else
+{
+    <div class="wysiwyg clear">
+        @Html.DisplayFor(a => a.ThisBlock.NoOrdersText)
+    </div>
+}
+<div class="wysiwyg clear">
+    @Html.DisplayFor(a => a.ThisBlock.BottomText)
+</div>
+@Html.DisplayFor(a => a.ThisBlock.BottomContentArea)

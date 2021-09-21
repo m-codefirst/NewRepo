@@ -1,0 +1,138 @@
+﻿@using Hephaestus.CMS.ViewModels
+@using System.Web.Optimization
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using System.Web.Optimization
+@using Hephaestus.ContentTypes.Business.Extensions
+@using EPiServer.ServiceLocation
+@using EPiServer.Core
+@using TRM.Shared.Extensions
+@using TRM.Web.Models.Pages
+@model IPageViewModel<TRM.Web.Models.Pages.StandardPage, ILayoutModel>
+@{
+    var trmLayoutModel = Model.Layout as TrmLayoutModel;
+    
+    if (trmLayoutModel == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "accountCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "helpPageCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "searchCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "vaultedHoldingsCss")
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    <!-- Breadcrumbs -->
+    @if (!trmLayoutModel.HideSiteBreadcrumb)
+    {
+        if (Html.IsValidToShowMenu(Model))
+        {
+            trmLayoutModel.Breadcrumb.IsWide = true;
+        }
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", trmLayoutModel.Breadcrumb);
+    }
+</div>
+<div class="row">
+    <!-- Left Menu -->
+    @if (Html.IsValidToShowManualMenu(Model))
+    {
+        Html.RenderPartial("RoyalMint2020/_ManualLeftMenu", trmLayoutModel, new ViewDataDictionary { { "DisplayCustomerServiceButton",Model.CurrentPage.DisplayCustomerServiceButton} });
+    }
+
+    @if (Html.IsValidToShowAutomaticMenu(Model))
+    {
+        Html.RenderPartial("RoyalMint2020/_AutomaticLeftMenu", trmLayoutModel, new ViewDataDictionary { { "DisplayCustomerServiceButton",Model.CurrentPage.DisplayCustomerServiceButton} });
+    }
+
+    <!-- Main Content -->
+    <div class="col-12 @Html.CssMainContentClass(Model)">
+        @* TODO: Add legacy code for CustomerServicePage  *@
+
+        @if (trmLayoutModel.HasMessage)
+        {
+            Html.RenderPartial("_MessageBox", trmLayoutModel.Message);
+        }
+
+        <!-- Main Body -->
+        @if (Model.CurrentPage.MainBody != null || Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="mod-section mod-section-copy @Html.CssMainBodySectionClass(Model)">
+                <div class="row justify-content-center">
+                    <div class="@Html.CssTextAlignmentClass(Model) @Html.CssCopyColumnClass(Model)" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                        @if (Model.CurrentPage.DisplayPageHeading)
+                        {
+                            @Html.Partial("_PageHeader", trmLayoutModel)
+                        }
+                        @Html.DisplayFor(m => m.CurrentPage.MainBody)
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Middle Content -->
+        <div class="mod-section mod-section-copy @Html.CssMiddleContentSectionClass(Model)">
+            <div class="row justify-content-center">
+                <div class="@Html.CssTextAlignmentClass(Model) @Html.CssCopyColumnClass(Model)">
+                    <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+
+                        @if (Model.CurrentPage is ArticlePage)
+                        {
+                            var commentModel = ((ArticlePage)Model.CurrentPage).LoadComments(!Request.IsAuthenticated);
+                            if (null != commentModel)
+                            {
+                                @Html.Partial("ArticleCommentPatrial", commentModel)
+                            }
+                        }
+                    </div>
+                    @if (Model.CurrentPage.DisplaySearchBox && !trmLayoutModel.IsSippContact)
+                    {
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-sm-6 col-md-4 pt-5">
+                                @Html.Partial("RoyalMint2020/_GlobalSearch", Model, new ViewDataDictionary {
+                                    { "buttonClass", "btn-light" },
+                                    { "placeholder", "Search our help topics" },
+                                    { "endpoint", "/mvcApi/search/suggestions" }, // TODO: Modify endpoint
+                                    { "name", Model.CurrentPage.Name },
+                                    { "buttonName", Html.TranslateFallback(StringResources.SearchButtonName, "Search") },
+                                    { "includingResultsFor", Html.TranslateFallback(StringResources.SearchIncludingResultsFor, "Including Results For") },
+                                    { "viewMoreResults", Html.TranslateFallback(StringResources.SearchViewMoreResults, "View More Results") },
+                                    { "seeFullSearchResults", Html.TranslateFallback(StringResources.SearchSeeFullSearchResults, "See Full Search Results") },
+                                    { "noresultsFound", Html.TranslateFallback(StringResources.SearchNoresultsFound, "No results found") },
+                                })
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bottom Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div class="@Html.CssTextAlignmentClass(Model) @Html.CssCopyColumnClass(Model)">
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section JustBeforeBodyTag
+{
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "charts")
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "helpPage")
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "filters")
+}

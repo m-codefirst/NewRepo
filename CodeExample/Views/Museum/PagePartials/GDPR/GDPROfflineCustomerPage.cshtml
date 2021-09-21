@@ -1,0 +1,42 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.GdprConsentPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.GdprConsentPageViewModel>
+
+@functions
+{
+    public bool FieldHasErrors(string fieldName)
+    {
+        return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+    }
+}
+
+@helper ErrorMessage(MvcHtmlString error)
+{
+    <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+    <span class="help-block">
+        @error
+    </span>
+}
+
+@{ var feedbackClass = "has-error has-feedback"; }
+
+@{
+    //Customer Code field
+    var thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.CustomerCode"))
+    {
+        thisFeedbackClass = feedbackClass;
+    }
+    <div class="form-group @thisFeedbackClass">
+        <label class="col-sm-4 col-md-3 control-label" for="formGroupInputLarge">@Html.PropertyFor(a => a.CurrentPage.CustomerCodeLabel) <span class="text-danger">*</span></label>
+        <div class="col-sm-8 col-md-7">
+            @Html.TextBoxFor(x => x.ViewModel.CustomerCode, new { @class = "form-control", @id = "customerCode"})
+            @if (!string.IsNullOrEmpty(thisFeedbackClass))
+            {
+                @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.CustomerCode))
+            }
+        </div>
+    </div>
+
+    Html.RenderPartial("GDPRKnownCustomerPage", Model); 
+}

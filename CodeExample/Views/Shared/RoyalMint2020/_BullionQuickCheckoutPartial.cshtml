@@ -1,0 +1,34 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Bullion.QuickCheckout
+@using TRM.Web.Extentions
+@using Newtonsoft.Json
+@using TRM.Shared.Extensions
+
+@model QuickCheckoutViewModel
+@{
+    var items = Model.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems);
+    var isExistsItem = items.Any(x => x != null);
+    var shouldShowAddFund = Model.ShowInsufficientFunds;
+    var data = new {
+        pamp = new {
+            isSyncWithPampError = Model.IsSyncWithPampError,
+            shouldShowAddFund = shouldShowAddFund, // isShowInsufficientFunds in legacy js
+            validForPayment = Model.ValidForPayment, // isValidForPayment in legacy js
+            isNotEnoughMoney = Model.IsNotEnoughMoney,
+            showFixedPriceButton = Model.Shipping != null && isExistsItem && !Model.ShowInsufficientFunds,
+        },
+        item = new {
+            pricePerUnit = items.First().BullionCartItem.PricePerUnit.ToString()
+        }
+    };
+}
+
+<div class="hidden validation-errors-update">
+    @Html.ValidationSummary(false)
+</div>
+
+<span id="htmlData"></span>
+
+<script type="text/javascript">
+    var data = @JsonConvert.SerializeObject(data); var end;
+</script>

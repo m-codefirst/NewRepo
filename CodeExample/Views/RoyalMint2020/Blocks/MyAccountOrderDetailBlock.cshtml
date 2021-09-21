@@ -1,0 +1,92 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels
+@using Hephaestus.Commerce.Shared.Models
+@using Resources = TRM.Web.Constants.StringResources
+
+@model TRM.Web.Models.ViewModels.Cart.PurchaseOrderViewModel
+
+@if (Model.OrderFound)
+{
+    var shipment = Model.Shipments.FirstOrDefault();
+    var payment = Model.Payments.FirstOrDefault();
+
+    <!--New Code-->
+    <div class="mod-copy order-overview">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <h2 class="section-head"><span>@Html.TranslateFallback(Resources.OrderDetails, "Order details")</span></h2>
+                <p>@Html.TranslateFallback(Resources.OrderPlaced, "Order placed") @Model.Order.OrderDate.ToString("dd MMMM yyyy")</p>
+                <p>@Model.Order.OrderNumbers.ToCommaSeparatedString()</p>
+            </div>
+        </div>
+    </div>
+    <div class="mod-section order-details">
+        <div class="row">
+            <div class="col-6 col-md-4 d-flex">
+                <div class="details">
+                    <h3 class="section-head"><span>@Html.TranslateFallback(Resources.DeliveryAddress, "Delivery address")</span></h3>
+                    <p>@AddressStyle(shipment.Address)</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 d-flex">
+                <div class="details">
+                    <h3 class="section-head"><span>@Html.TranslateFallback(Resources.Payment, "Payment")</span></h3>
+                    <ul>
+                        @*<li>Mastercard ending: ***8888</li>*@ <!-- This no such information regarding card in orders -->
+                        <li>@Html.TranslateFallback(Resources.Payment, "Payment:") @Model.Total</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 d-flex">
+                <div class="details">
+                    <h3 class="section-head"><span>Summary</span></h3>
+                    <ul>
+                        <li>@Html.TranslateFallback(Resources.BasketTotal, "Basket total:") @Model.SubTotal</li>
+                        @if (Model.TotalDiscount != "£0.00")
+                        {
+                            <li>@Html.TranslateFallback(Resources.Discount, "Discount:") @Model.TotalDiscount</li>
+                        }
+                        <li>@Html.TranslateFallback(Resources.DeliveryCharge, "Delivery charge:") @Model.TotalDelivery</li>
+                        <li>@Html.TranslateFallback(Resources.OrderTotal, "Order total:") @Model.Total</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_AccountOrderItems", new List<OrderListViewModel> { Model.Order })
+
+    <!--End - New Code-->
+    @helper AddressStyle(AddressModel addressModel)
+    {
+        var formattedAddress = addressModel.FirstName;
+        if (!string.IsNullOrWhiteSpace(addressModel.LastName))
+        { formattedAddress += " " + addressModel.LastName; }
+        if (!string.IsNullOrWhiteSpace(addressModel.Line1))
+        { formattedAddress += ", " + addressModel.Line1; }
+        if (!string.IsNullOrWhiteSpace(addressModel.Line2))
+        { formattedAddress += ", " + addressModel.Line2; }
+        if (!string.IsNullOrWhiteSpace(addressModel.City))
+        { formattedAddress += ", " + addressModel.City; }
+        if (!string.IsNullOrWhiteSpace(addressModel.CountryName))
+        { formattedAddress += ", " + addressModel.CountryName; }
+        if (!string.IsNullOrWhiteSpace(addressModel.PostalCode))
+        { formattedAddress += ", " + addressModel.PostalCode; }
+
+        @(formattedAddress);
+    }
+}
+else
+{
+    <div class="panel panel-default panel-secondary mb-2x">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="wysiwyg">
+                        @Html.DisplayFor(a => a.ThisBlock.NoOrderFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,122 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Newtonsoft.Json
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.Bullion.BullionAccountAddCreditBlockViewModel
+@{
+    var message = JsonConvert.SerializeObject(Model.Message);
+}
+
+@if (Model.Message != null && !string.IsNullOrEmpty(Model.Message.Title))
+{
+    <main>
+        <h2 class="mt-0">@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulTitle, "Payment Sucessful")</h2>
+        <hr>
+        <p>@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulSubTitle, "")</p>
+        <h5>@Html.TranslateFallback(StringResources.BullionAddFundsReferenceNumber, "Reference Number")</h5>
+        <span>@Model.Message.Title</span>
+    </main>
+}
+else
+{
+    <div ng-controller="rmCheckoutController as rmAddInfo">
+        @if (Model.Message != null)
+        {
+            <p class="hidden" ng-init="updatePaymentStatus(@message, '#addfunds-block')"></p>
+        }
+        <div id="addfunds-block-form">
+            @if (Model.BullionAccountAddCreditBlock.MainContent != null)
+            {
+                <div class="xhtmlArea clear mb-2x">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-8">
+                            @{ var content = Html.ParseXhtmlString(Model.BullionAccountAddCreditBlock.MainContent); }
+                            @Html.PropertyFor(x => content)
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="adding-funds">
+                @if (!Model.IsSippContact)
+                {
+                    <div class="add-funds-dropdown debit-dd cta-action bb-none">
+                        <a class="h6 @(Model.BullionAccountAddCreditBlock.Accordion1CollapseAsDefault ? "collapsed" : "")" data-toggle="collapse" href="#add-with-debit" role="button" aria-expanded="@(Model.BullionAccountAddCreditBlock.Accordion1CollapseAsDefault ? "false" : "true")" aria-controls="collapseExample">
+                            <span class="pr-1x" href="">
+                                <i class="trmi trmi-credit-card" aria-hidden="true"></i>
+                            </span>
+                            <span>
+                                @Html.PropertyFor(x => x.BullionAccountAddCreditBlock.AccordionTitle1)
+                            </span>
+                            <span class="right">
+                                <i class="trmi trmi-angle-up"></i>
+                                <i class="trmi trmi-angle-down"></i>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="add-with-debit collapse @(Model.BullionAccountAddCreditBlock.Accordion1CollapseAsDefault ? "" : "in")" id="add-with-debit">
+                        <div class="row mt-1x" ng-if="accPayErrorMessage">
+                            <div class="col-xs-12">
+                                <label class="text-danger" ng-bind="accPayErrorMessage"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-8 mt-1x">
+                                <p>@Html.PropertyFor(x => x.BullionAccountAddCreditBlock.FundWithCardDescription)</p>
+                                <form name="checkoutForm" id="addFunds" novalidate>
+                                    <div class="row mb-1x">
+                                        <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                            <label class="control-label">@Html.TranslateFallback(StringResources.BullionAddFundsAmountFund, "Amount of funds") (@Model.CurrencyCode.ToCurrencySymbol())<span class="text-danger">&nbsp;@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardMandatoryFieldAsterix, "*")</span></label>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6">
+                                            <div class="input-group subtle mb-0">
+                                                <div class="input-group-addon">@Model.CurrencyCode.ToCurrencySymbol()</div>
+                                                <input type="text" floating-number-only class="form-control" name="paymentAmount" id="paymentAmount" ng-model="fund.paymentAmount" placeholder="Amount" data-original-title="" title="" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @{
+                                        Html.RenderPartial("AddFundMasterCard", Model);
+                                    }
+                                    <div class="row mt-1x mb-1x">
+                                        <div class="col-xs-6 ssl-secure"></div>
+                                        <div class="col-xs-12 col-sm-5 pt-xs-2x">
+                                            <button type="button" class="button btn btn-block btn-secondary" data-is-call="true" ng-click="amlCheck($event, null, ['', ''], scope.checkoutForm)" ng-disabled="inprogessPayment">@Html.TranslateFallback(StringResources.BullionAddFundsSubmitButton, "Fund Account")</button>
+                                        </div>
+                                        <div class="col-xs-12 mobile-ssl-img mt-1x">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-xs-12 col-sm-4">
+                                @Html.PropertyFor(x => x.BullionAccountAddCreditBlock.MiddleContentArea)
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @Html.Partial("_BankTransferDetailsBlock", Model)
+                <div class="row mt-2x">
+                    @if (Model.Address != null)
+                    {
+                        <div class="col-xs-12">
+                            <p class="strong">@Html.TranslateFallback(StringResources.CustomerCurrentAddress, "Your current address is"): @(!string.IsNullOrEmpty(Model.Address.Line1) ? Model.Address.Line1 + "," : "") @(!string.IsNullOrEmpty(Model.Address.Line2) ? Model.Address.Line2 + "," : "") @Model.Address.City, @Model.Address.PostalCode, @Model.Address.CountryCode </p>
+                        </div>
+                    }
+                    @Html.PropertyFor(x => x.BullionAccountAddCreditBlock.Accordion2BottomContentArea)
+                </div>
+            </div>
+        </div>
+        <a id="addfunds-block" class="hidden" data-show="#addfunds-block-success" data-hide="#addfunds-block-form"></a>
+        <main class="hidden" id="addfunds-block-success">
+            <h2 class="mt-0">@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulTitle, "Payment Sucessful")</h2>
+            <hr>
+            <p>@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulSubTitle, "")</p>
+            <h5>@Html.TranslateFallback(StringResources.BullionAddFundsReferenceNumber, "Reference Number")</h5>
+            <span ng-bind="accPayOrderNumber"></span>
+        </main>
+        @Html.Partial("_AmlReapplyKycModal")
+    </div>
+}
+

@@ -1,0 +1,25 @@
+﻿@using EPiServer.Core
+@using Newtonsoft.Json
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.Blocks.SovereignCertificateSignUpBlock
+@{
+    var contentId = (Model as IContent).ContentLink.ID;
+    var ViewModel = new {
+        contentId = contentId,
+        heading = Model.Heading,
+        firstNameHeading = Model.FirstNameHeading,
+        firstNameValidationMessage = Model.FirstNameValidationMessage,
+        surnameHeading = Model.SurnameHeading,
+        emailHeading = Model.EmailHeading,
+        telephoneHeading = Model.TelephoneHeading,
+        certificateCodeHeading = Model.CertificateCodeHeading,
+        certificateNumberHeading = Model.CertificateNumberHeading,
+        contactPreferencesHeading = @Html.TranslateFallback(StringResources.CustomerContactPreferences, @Model.ContactPreferenceHeading),
+        byEmailLabel = Model.ByEmailLabel,
+        byTelephoneLabel = Model.ByTelephoneLabel,
+        registerButtonText = Model.RegisterButtonText,
+        successfulConfirmationMessage = Model.SuccessfulConfirmationMessage,
+    };
+}
+<div data-module="sovereign-certificate" data-content="@JsonConvert.SerializeObject(ViewModel)"></div>

@@ -1,0 +1,39 @@
+﻿@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@functions
+{
+    string InlineStyles()
+    {
+        var bgColourString = Model.AmlSettingsPageContent.KycMessageBgColour != ""
+            ? string.Format("background-color:#{0};", Model.AmlSettingsPageContent.KycMessageBgColour)
+            : string.Empty;
+        var txtColourString = Model.AmlSettingsPageContent.KycMessageTextColour != ""
+            ? string.Format("color:#{0};", Model.AmlSettingsPageContent.KycMessageTextColour)
+            : string.Empty;
+
+        var colours = new[] { bgColourString, txtColourString };
+
+        return string.Join(string.Empty, colours);
+    }
+}
+
+@if (!Model.HideAMLStatus)
+{
+    var message = Model.KycStatusMessage;
+    if (message != null && (Request.Cookies["hide-kyc-status"] == null))
+    {
+        <div class="pageContainer" style="@Html.Raw(InlineStyles())">
+            <div class="container">
+                <div class="row">
+                    <div class="alert alert-dismissible in col-xs-12 p-0 mb-0" role="alert">
+                        <button id="kyc-dismiss-button" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Dismiss, "Dismiss")</span>
+                        </button>
+                        @Html.PropertyFor(m => m.KycStatusMessage)
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

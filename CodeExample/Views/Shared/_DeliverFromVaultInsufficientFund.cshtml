@@ -1,0 +1,25 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.DeliverBullionLandingViewModel
+
+
+@if (Model.AvailableWalletBalance.Amount < Model.DeliveryTotal.Amount)
+{
+    using (Html.BeginForm("Index", null, FormMethod.Post, new { @id = "addFunds-deliver-bullion-form" }))
+     {
+         <div class="alert alert-info">
+             <h3 class="mt-0">@Html.TranslateFallback(StringResources.InsufficientFundsTitle, "You have Insufficient Funds in your Wallet")</h3>
+             <span class="mb-1x inline">@Html.TranslateFallback(StringResources.InsufficientFundsDescription, "If you would like to checkout with this investment item today please top up wallet.")</span>
+             <div class="">
+                 <button type="submit" class="btn btn-secondary pull-right-sm-up mb-1x">@Html.TranslateFallback(StringResources.AddFunds, "Add Funds")</button>
+                 <p class="mb-0"><span class="h4 strong">@Html.TranslateFallback(StringResources.DeliveryTotal, "Delivery Total"): </span><span class="h4">@Model.DeliveryTotal.ToString()</span></p>
+                 <p class="mb-0">
+                     <span class="h4 strong">@Html.TranslateFallback(StringResources.AvailableFunds, "Available Funds"): </span><span class="h4 text-danger">@Model.AvailableWalletBalance.ToString()</span>
+                     <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+                 </p>
+             </div>
+         </div>
+         <input type="hidden" name="InsufficientFunds" value="true" />
+         <input type="hidden" name="DeliveryTotal" value="@Model.DeliveryTotal.Amount" />
+         <input type="hidden" name="VariantCode" value="@Model.DeliverVariant.Code" />
+     }
+}

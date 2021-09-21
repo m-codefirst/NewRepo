@@ -1,0 +1,61 @@
+﻿@using Mediachase.Commerce
+@using TRM.Web.Constants
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+@{
+    var orderLineViewModels = Model.Value.OrderDetailViewModel.OrderLineViewModels.ToList();
+}
+
+<div class="col-lg-3">
+    <span class="title w-100">
+        <strong>@Html.TranslateFallback(StringResources.TransactionHistorySubmittedBy, StringConstants.TranslationFallback.TransactionHistorySubmittedBy)</strong>
+    </span>
+    <span class="mb-2">
+        @Model.Value.SubmittedBy
+    </span>
+</div>
+
+<div class="col-lg-3">
+    <div class="p-0 mb-2">
+        <span class="title"><strong>@Html.TranslateFallback(StringResources.TransactionHistoryOrderNumber, StringConstants.TranslationFallback.TransactionHistoryOrderNumber)</strong></span>
+        @Model.Value.TransactionRecord.OrderNumber
+    </div>
+    @if (orderLineViewModels.Any(x => !x.IsSignatureVariant))
+    {
+        <span class="title">
+            <strong>@Html.TranslateFallback(StringResources.TransactionHistoryOrderDelivery, StringConstants.TranslationFallback.TransactionHistoryOrderDelivery)</strong>
+        </span>
+        @Model.Value.DeliveryFee.ToString()
+    }
+</div>
+
+<div class="col-lg-6">
+    <span class="title"><strong>@Html.TranslateFallback(StringResources.TransactionHistoryOrderDetail, StringConstants.TranslationFallback.TransactionHistoryOrderDetail)</strong></span>
+    @for (var i = 0; i < orderLineViewModels.Count; i++)
+    {
+        var prod = orderLineViewModels[i];
+
+        <ul class="summary @(i+1 < orderLineViewModels.Count ? "border-bottom border-white" : "")">
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderProduct, StringConstants.TranslationFallback.TransactionHistoryOrderProduct): @prod.Name</li>
+            @if (prod.IsSignatureVariant)
+            {
+                <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderWeight, StringConstants.TranslationFallback.TransactionHistoryOrderWeight): @prod.QuantityInOz<text>oz @@ </text>@prod.MetalPrice.ToString() per oz</li>
+            }
+            else
+            {
+                <li>@Html.TranslateFallback(StringResources.TransactionHistoryQuantity, StringConstants.TranslationFallback.TransactionHistoryQuantity): @prod.Quantity</li>
+                <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderWeight, StringConstants.TranslationFallback.TransactionHistoryOrderWeight): @prod.QuantityInOz<text>oz @@ </text>@prod.MetalPrice.ToString() per oz</li>
+            }
+            @if (prod.MetalSpotPrice.HasValue)
+            {
+                <li>@Html.TranslateFallback(StringResources.TransactionHistoryMetalSpotPrice, StringConstants.TranslationFallback.TransactionHistoryMetalSpotPrice): @prod.MetalSpotPrice.ToString() per oz</li>
+            }
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderProductPrice, StringConstants.TranslationFallback.TransactionHistoryOrderProductPrice): @prod.ProductPrice.ToString()</li>
+            @if (prod.VatCost.HasValue)
+            {
+                <li>@Html.TranslateFallback(StringResources.TransactionHistoryTotalVatPaid, StringConstants.TranslationFallback.TransactionHistoryTotalVatPaid):  @prod.VatCost.ToString()</li>
+            }
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderDeliveryMethod, StringConstants.TranslationFallback.TransactionHistoryOrderDeliveryMethod): @prod.DeliveryType</li>
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderStatus, StringConstants.TranslationFallback.TransactionHistoryOrderStatus): @prod.Status</li>
+        </ul>
+    }
+</div>

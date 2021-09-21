@@ -1,0 +1,206 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+
+<div class="modal fade ng-scope" id="rmKycReapplicationModal" tabindex="-1" role="dialog" aria-labelledby="rmKycReapplicationModalLabel" ng-controller="rmCheckoutController">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title">@Html.TranslateFallback(StringResources.AmlReapplicationModalTitle, "Please confirm your details")</h5>
+            </div>
+            <div class="modal-body ng-binding" id="rmKycReapplicationModalContent">
+                <div class="kyc-reapplication" id="kyc-reapplication">
+                    <div class="row" ng-style="{'display':!kycReapplication.ReapplyKyc ? 'none' : '' }">
+                        <div class="col-xs-12">
+                            @Html.TranslateFallback(StringResources.AmlReapplicationTopParagraph, "In order to comply with anti-money laundering regulations, we are required to periodically confirm the details which you have provided us are correct. Please review the details shown below, and amend them if required. Once you are happy that the details are correct, please click ‘Continue’.")
+                        </div>
+                        <div class="col-xs-12 mt-1x">
+                            <form name="reapplyKycForm" id="reapplyKycForm" ng-submit="reapplyKyc('#reapplyKyc-block','')" novalidate>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-12">
+                                        <h3 class="">@Html.TranslateFallback(StringResources.AmlReapplicationTitle, "Personal information")</h3>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationFirstName, "First Name")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="firstName" id="firstName" ng-model="kycReapplication.UserFirstName" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.lastName.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrFirstNameRequired, "Your first name is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">@Html.TranslateFallback(StringResources.AmlReapplicationMiddleName, "Middle Name")</label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="middleName" id="middleName" ng-model="kycReapplication.UserMiddleName" placeholder="" data-original-title="" title="">
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationLastName, "Last Name")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="lastName" id="lastName" ng-model="kycReapplication.UserLastName" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.lastName.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrLastNameRequired, "Your last name is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">@Html.TranslateFallback(StringResources.AmlReapplicationLastName, "Second Last Name")</label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="secondLastName" id="secondLastName" ng-model="kycReapplication.UserSecondLastName" placeholder="" data-original-title="" title="">
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationGender, "Gender")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <select class="form-control form-select" name="gender" id="gender" ng-model="kycReapplication.UserGender" required>
+                                            <option value="" selected=""></option>
+                                            <option value="@Html.TranslateFallback(StringResources.AmlReapplicationMaleText, "Male")">@Html.TranslateFallback(StringResources.AmlReapplicationMaleText, "Male")</option>
+                                            <option value="@Html.TranslateFallback(StringResources.AmlReapplicationFemaleText, "Female")">@Html.TranslateFallback(StringResources.AmlReapplicationFemaleText, "Female")</option>
+                                        </select>
+                                        <span class="text-danger" ng-show="reapplyKycForm.gender.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrGenderRequired, "Your gender is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationDateOfBirth, "Date of Birth")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="date" class="form-control" name="dateOfBirth" id="dateOfBirth" ng-model="kycReapplication.UserDateOfBirth" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.dateOfBirth.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrDateOfBirthRequired, "Your date of birth is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-12">
+                                        <h3 class="">@Html.TranslateFallback(StringResources.AmlReapplicationAddressTitle, "Your address details")</h3>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationAddressFirstLineLabel, "First Line")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="line1" id="line1" ng-model="kycReapplication.AddressLine1" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.line1.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrFirstAddressLineRequired, "Your first line of address is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">@Html.TranslateFallback(StringResources.AmlReapplicationAddressSecondLineLabel, "Second Line")</label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="line2" id="line2" ng-model="kycReapplication.AddressLine2" placeholder="" data-original-title="" title="">
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationAddressCityLabel, "City")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="city" id="city" ng-model="kycReapplication.AddressCity" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.city.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrCityRequired, "Your city is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationAddressStateLabel, "State/County")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="state" id="state" ng-model="kycReapplication.AddressState" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.state.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrStateRequired, "Your state/county is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationAddressCountryLabel, "Country")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="countryName" id="countryName" ng-model="kycReapplication.AddressCountryName" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.countryName.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrCountryRequired, "Your country is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mb-1x">
+                                    <div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+                                        <label class="control-label pt-1x">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationAddressPostcodeLabel, "Post/Zip code!")
+                                            <span class="text-danger">&nbsp;*</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <input type="text" class="form-control" name="postcode" id="postCode" ng-model="kycReapplication.AddressPostcode" ng-pattern="/^[a-z]{1,2}[0-9][a-z0-9]?\s?[0-9][a-z]{2}$/i" ng-minlength="5" ng-maxlength="8" placeholder="" data-original-title="" title="" required>
+                                        <span class="text-danger" ng-show="reapplyKycForm.postcode.$error.required">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationErrPostcodeRequired, "Postcode is required!")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row mt-1x">
+                                    <div class="col-xs-6 ssl-secure"></div>
+                                    <div class="col-xs-12 col-sm-5 pt-xs-2x">
+                                        <button type="submit" class="button btn btn-block btn-secondary" ng-disabled="inprogessPayment">
+                                            @Html.TranslateFallback(StringResources.AmlReapplicationButtonText, "Continue")
+                                        </button>
+                                    </div>
+                                    <div class="col-xs-12 mobile-ssl-img mt-1x">
+                                    </div>
+                                </div>
+                                <div class="row mt-1x mb-1x" ng-if="kycReapplication.Message">
+                                    <div class="col-xs-12 text-danger" ng-bind-html="kycReapplication.Message">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

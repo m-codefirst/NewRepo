@@ -1,0 +1,75 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.DeliverBullionLandingViewModel
+
+<input type="hidden" name="QuantityToSell" value="@Model.DeliverVariant.QuantityToSellOrDeliver" />
+<div class="checkout-total">
+    <div class="row">
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallback(StringResources.DeliverInvestment, "Investment")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            @Model.InvestmentVat.ToString()
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallback(StringResources.DeliveryFee, "Delivery")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            @Model.DeliverCost.ToString()
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallback(StringResources.DeliveryVat, "Delivery VAT")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            @Model.DeliverVat.ToString()
+        </div>
+        <div class="clearfix"></div>
+        <hr>
+    </div>
+    <div class="row center-items-sm-up">
+        <div class="col-xs-12 col-sm-6 col-sm-offset-6">
+            <div class="row">
+                <div class="col-xs-6">
+                    <p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">@Html.TranslateFallback(StringResources.DeliveryTotal, "Delivery Total")</p>
+                </div>
+                <div class="col-xs-6 text-right-sm-up">
+                    <p class="h4 h3-lg-down strong mt-0 mb-0">@Model.DeliveryTotal.ToString()</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h6 class="h6 mt-20 wallet-balance text-right-sm-up">@Html.TranslateFallback(StringResources.AvailableWalletBalance, "Available Wallet Balance ")<span class="@(Model.AvailableWalletBalance >= Model.DeliveryTotal ? "text-success" : "text-danger")">@Model.AvailableWalletBalance.ToString()</span></h6>
+<hr>
+
+@if (Model.UnableToDeliver)
+{
+    <div class="col-xs-12">
+        <div class="alert no-margins-v mb-0">
+            @Html.TranslateFallback(StringResources.UnableToSellOrDeliverFromVault, "Customer flagged as unable to sell from vault or deliver from vault")
+        </div>
+    </div>
+}
+else if (Model.AvailableWalletBalance.Amount >= Model.DeliveryTotal.Amount)
+{
+    if (Model.DeliverVariant.AvailableToSell > 0 && Model.ShippingMethod != null)
+    {
+        <div class="row">
+            <div class="col-xs-10 col-md-5 pull-right-sm-up">
+                <button type="submit" id="confirmDeliveryAndPayNowBtn" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.ConfirmDeliveryAndPayNow, "Confirm Delivery and Pay Now")</button>
+            </div>
+        </div>
+        <input type="hidden" name="InsufficientFunds" value="false" />
+    }
+}
+else
+{
+    <div class="row">
+        <div class="col-xs-10 col-md-5 pull-right-sm-up">
+            <button type="submit" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.AddFunds, "Add Funds")</button>
+        </div>
+    </div>
+    <input type="hidden" name="InsufficientFunds" value="true" />
+    <input type="hidden" name="DeliveryTotal" value="@Model.DeliveryTotal.Amount" />
+}

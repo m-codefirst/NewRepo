@@ -1,0 +1,11 @@
+﻿<script type="text/javascript">
+    if (top.location.href !== self.location.href) {
+        var newLocation = self.location.href || '';
+
+        if (newLocation.indexOf('i=true') !== -1) {
+            newLocation = newLocation.replace('i=true', 'i=false');
+        }
+
+        parent.location = newLocation;
+    }
+</script>

@@ -1,0 +1,374 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	<div class="container mb-4x mt-2x">
+		<div class="page-header">
+			<h1 class="h1">Step 3: Checkout Investments - Add Funds</h1>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+					<li><a href="">1.<span>Delivery</span></a></li>
+					<li><a href="">2. <span>Payment</span></a> </li>
+					<li class="active"><a href="">3. <span>Delivery and Payment</span></a></li>
+					<li>4. <span>Confirmation</span> </li>
+				</ol>
+			</div>
+		</div>
+		<div class="row price-section">
+			<div class="main-content col-xs-12 col-md-9 mb-2x">
+				<h3 class="h3 mt-0">Confirm and pay for your investments</h3>
+				<h3 class="h3">Items for storage in the Royal Mint Vault</h3>
+				<div class="vaulted-header">
+					<div class="intro-text">
+						<p class="mb-0"><i>We will contact you separately about associated storage fees. All storage fees are billed in arrears and paid quarterly. <a href="">Find out more</a></i></p>
+					</div>
+					<div class="price-notify-text">
+						<p class="alert alert-info text-slateblue mb-0 text-center">
+							Prices are now LIVE
+							<i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+						</p>
+					</div>
+				</div>
+
+				<form id="checkoutForm" method="post" name="checkoutForm">
+					<div class="checkout-item-block">
+						<div class="checkout-item-wrapper">
+							<div class="item-image hidden-xs">
+								<img src="~/Static/img/catalogue/coin-img.jpg" />
+							</div>
+							<div class="item-info">
+								<h6 class="h6 mt-0 mb-0">Bullion Coin or Bar Title may well wrap over two lines</h6>
+								<p class="text-graylight">Second title line if populated</p>
+								<div class="row">
+									<div class="col-xs-8">
+										<strong>Price per Unit, including premium:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£99.70
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>Quantity:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										1
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>VAT:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£19.94
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="item-price flex-align-left-sm-up bg-white">
+							</div>
+							<div class="item-price primary-price">
+								<div class="price-info">
+									<p class="h6 mt-0 mb-0 text-uppercase">Live Price</p>
+									<p class="h5 mt-0 mb-0">
+										£99.70
+									</p>
+									<p class="mt-0 mb-0">ex Vat</p>
+								</div>
+							</div>
+						</div>
+						<div class="checkout-item-wrapper">
+							<div class="item-image hidden-xs">
+								<img src="~/Static/img/catalogue/coin-img.jpg" />
+							</div>
+							<div class="item-info">
+								<h6 class="h6 mt-0 mb-0">Signature Gold</h6>
+								<p class="text-graylight">Second title line if populated</p>
+								<div class="row">
+									<div class="col-xs-8">
+										<strong>Price per Oz including premium:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£99.70
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>Weight <span>(oz)</span>:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										0.533
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>VAT:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£0.00
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="item-price flex-align-left-sm-up">
+								<div class="price-info">
+									<p class="h6 mt-0">Requested Investment</p>
+									<h5 class="h5 mt-0 mb-0">
+										<span>£100000.00</span>
+									</h5>
+								</div>
+							</div>
+							<div class="item-price primary-price">
+								<div class="price-info">
+									<p class="h6 mt-0 mb-0 text-uppercase">Live Price</p>
+									<p class="h5 mt-0 mb-0">
+										£99999.99
+									</p>
+									<p class="mt-0 mb-0">ex Vat</p>
+								</div>
+							</div>
+						</div>
+						<div class="checkout-item-wrapper">
+							<div class="item-image hidden-xs">
+								<img src="~/Static/img/catalogue/coin-img.jpg" />
+							</div>
+							<div class="item-info">
+								<h6 class="h6 mt-0 mb-0">Signature Silver</h6>
+								<p class="text-graylight">Second title line if populated</p>
+								<div class="row">
+									<div class="col-xs-8">
+										<strong>Price per Oz including premium:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£100.00
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>Weight <span>(oz)</span>:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										0.533
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>VAT:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£15.73
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="item-price flex-align-left-sm-up">
+								<div class="price-info">
+									<p class="h6 mt-0">Requested Investment</p>
+									<h5 class="h5 mt-0 mb-0">
+										<span>£100.00</span>
+									</h5>
+								</div>
+							</div>
+							<div class="item-price primary-price">
+								<div class="price-info">
+									<p class="h6 mt-0 mb-0 text-uppercase">Live Price</p>
+									<p class="h5 mt-0 mb-0">
+										£92.53
+									</p>
+									<p class="mt-0 mb-0">ex Vat</p>
+								</div>
+							</div>
+						</div>
+						<div class="checkout-item-wrapper">
+							<div class="item-image hidden-xs">
+								<img src="~/Static/img/catalogue/coin-img.jpg" />
+							</div>
+							<div class="item-info">
+								<h6 class="h6 mt-0 mb-0">Signature Platinum</h6>
+								<p class="text-graylight">Second title line if pop who knows length</p>
+								<div class="row">
+									<div class="col-xs-8">
+										<strong>Price per Oz including premium:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£100.00
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>Weight <span>(oz)</span>:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										0.533
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>VAT:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£9.46
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="item-price flex-align-left-sm-up">
+								<div class="price-info">
+									<p class="h6 mt-0">Requested Investment</p>
+									<h5 class="h5 mt-0 mb-0">
+										<span>£100.00</span>
+									</h5>
+								</div>
+							</div>
+							<div class="item-price primary-price">
+								<div class="price-info">
+									<p class="h6 mt-0 mb-0 text-uppercase">Live Price</p>
+									<p class="h5 mt-0 mb-0">
+										£94.58
+									</p>
+									<p class="mt-0 mb-0">ex Vat</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<h3 class="h3">Items for Delivery to Registered Address</h3>
+					<p class="mb-0">123 Floats Road, Manchester, M23 9PL</p>
+					<p>Delivery Cost: <strong>Free UK</strong></p>
+					<div class="checkout-item-block">
+						<div class="checkout-item-wrapper">
+							<div class="item-image hidden-xs">
+								<img src="~/Static/img/catalogue/coin-img.jpg" />
+							</div>
+							<div class="item-info">
+								<h6 class="h6 mt-0 mb-0">Bullion Coin or Bar Title may well wrap over two lines</h6>
+								<p class="text-graylight">Second title line if pop who knows length</p>
+								<div class="row">
+									<div class="col-xs-8">
+										<strong>Price per Unit, including premium:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£45.00
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>Quantity:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										1
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-8">
+										<strong>VAT:</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£9.00
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="item-price primary-price flex-align-left-sm-up">
+								<div class="price-info">
+									<p class="h6 mt-0 mb-0 text-uppercase">Live Price</p>
+									<p class="h5 mt-0 mb-0">
+										£45.00
+									</p>
+									<p class="mt-0 mb-0">ex Vat</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="checkout-total">
+						<div class="row">
+							<div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+								<strong>Sub Total</strong>
+							</div>
+							<div class="col-xs-6 col-sm-3 text-right-sm-up">
+								£100,331.18
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+								<strong>VAT</strong>
+							</div>
+							<div class="col-xs-6 col-sm-3 text-right-sm-up">
+								£54.13
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+								<strong>Bullion Delivery</strong>
+							</div>
+							<div class="col-xs-6 col-sm-3 text-right-sm-up">
+								<span class="strong">
+									FREE
+								</span>
+							</div>
+							<div class="clearfix"></div>
+							<hr>
+						</div>
+						<div class="row center-items-sm-up reorder-sm">
+							<div class="col-xs-12 col-sm-6">
+								<span class="h6 mt-0 mb-0 coundown-timer inline alert alert-info text-slateblue">
+									LIVE Prices valid for <span class="h5" id="coundown-timer">0</span> seconds
+								</span>
+							</div>
+							<div class="col-xs-12 col-sm-6">
+								<div class="row">
+									<div class="col-xs-6">
+										<p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">Investment Total</p>
+									</div>
+									<div class="col-xs-6 text-right-sm-up">
+										<p class="h4 h3-lg-down strong mt-0 mb-0">£100,385.31</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<h6 class="h6 mt-20 wallet-balance text-right-sm-up">Available Wallet Balance <span class="text-danger">£2034.00</span></h6>
+					<hr />
+					<div class="checkout-funds-insufficient alert alert-info text-slateblue">
+						<h3 class="h3 mt-0">Insufficient funds</h3>
+						<p>You have unsufficient funds for this investment - Please top up your wallet with a credit or debit card</p>
+						<div class="row">
+							<div class="col-xs-12 col-sm-6">
+								<h5 class="h5">Investment Order Total: £2034.00</h5>
+							</div>
+							<div class="col-xs-12 col-sm-6">
+								<h5 class="h5 wallet-balance text-right-sm">
+									Available to invest:<span class="text-danger">£2034.00</span>
+									<i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+								</h5>
+							</div>
+						</div>
+					</div>
+					<button type="button" class="btn btn-secondary mb-1x">Add Funds</button>
+				</form>
+			</div>
+			<div class="right-content col-xs-12 col-md-3 mb-1x">
+				@Html.Partial("RetailOrderSummaryComplete")
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Set the date we're counting down to
+	var today = new Date();
+	var nextDay = new Date();
+	nextDay.setDate(today.getDate() + 1);
+	var countDownDate = nextDay.getTime();
+
+	var totalSeconds = 180;
+	document.getElementById("coundown-timer").innerHTML = totalSeconds;
+	// Update the count down every 1 second
+	var x = setInterval(function () {
+		document.getElementById("coundown-timer").innerHTML = totalSeconds--;
+		if (totalSeconds < 0)
+			clearInterval(x);
+	}, 1000);
+</script>

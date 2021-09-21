@@ -1,0 +1,26 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep4ViewModel>
+
+@if (Model != null)
+{
+    <div class="modal fade" id="optionsOutModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="rmAddInfo.closeOptionsOutPopup();" aria-label="Close" id="jsCloseModal"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">@Html.PropertyFor(x => x.CurrentPage.AllOptionsUntickPopupTitle)</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="wysiwyg">
+                        @Html.PropertyFor(x=>x.CurrentPage.AllOptionsUntickPopupMessage)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-action btn-mobile-full-width" ng-click="rmAddInfo.closeOptionsOutPopup();">Change preferences</button>
+                    <button type="button" class="btn btn-primary btn-action btn-mobile-full-width" onclick="this.disabled=true;" ng-click="proceedWithOrder('@Model.ViewModel.MastercardPaymentMethodId', '@Model.ViewModel.CreditPaymentMethodId')">Proceed with Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

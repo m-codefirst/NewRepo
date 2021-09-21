@@ -1,0 +1,696 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	<div class="container transaction-history">
+		<div class="page-header">
+			<div class="row center-items">
+				<div class="col-xs-12 col-md-6">
+					<h1 class="h1 mt-0">Transaction History</h1>
+				</div>
+				<div class="col-xs-12 col-md-6">
+					<div class="pull-right">
+						<a href="">Back to Account Dashboard</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div class="row">
+			<div class="col-xs-12 col-sm-5 mb-xs-1x">
+				<div class="filter-transaction">
+					<label for="filterType" class="mr-1x">Filter by</label>
+					<div class="select-form">
+						<select class="form-control" id="filterType">
+							<option value="" selected>Show All</option>
+							<option value="01">Deposits</option>
+							<option value="02">Withdrawals</option>
+							<option value="03">Purchases</option>
+							<option value="04">Credit</option>
+							<option value="05">Storage Fees</option>
+							<option value="06">Management Fees</option>
+							<option value="07">Sale from Vault</option>
+							<option value="08">Delivered from Vault</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-7 text-right-sm-up">
+				<ul class="pagination pull-right-sm-up">
+					<li>
+						<a href="" aria-label="Previous">
+							<span aria-hidden="true"><i class="trmi trmi-angle-left" aria-hidden="true"></i></span>
+						</a>
+					</li>
+					<li class="active">
+						<span>1 <span class="sr-only">(current)</span></span>
+					</li>
+					<li><a href="">2</a></li>
+					<li><a href="">3</a></li>
+					<li><a href="">4</a></li>
+					<li><a href="">5</a></li>
+					<li>
+						<a href="" aria-label="Next">
+							<span aria-hidden="true"><i class="trmi trmi-angle-right" aria-hidden="true"></i></span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="table-wrapper">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">05 Jan 2019</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Withdrawal</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6">£600.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£3695.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">In Progress</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-0" aria-controls="collapse0" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-0" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">Submitted By</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase">BANK ACCOUNT</p>
+										<p class="mt-0 mb-0">Account Nickname</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase">Payment Type</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Faster</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6 mb-0">07 July 2018</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6 mb-0">Funds Added</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-success">£100.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4695.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6 mb-0">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-1" aria-controls="collapse1" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-1" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">Submitted By</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase">REFERENCE NUMBER</p>
+										<p class="mt-0 mb-0">QB-8A0824</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase">FUNDED BY</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Debit / Credit Card</p>
+											<p class="col-xs-6 col-sm-4 mt-0"></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6 mb-0">05 May 2018</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6 mb-0">Purchase</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-sovereign">£500.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4195.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-2" aria-controls="collapse2" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-2" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0">SUMITTED BY</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0">ORDER NUMBER</p>
+										<p class="mt-0 mb-0">QB-8A0823</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0">SUMMARY</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Standard Delivery</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												1 x <a href="">Britannia 2018 1 oz Gold Coin</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												3 x <a href="">Britannia 2018 50 oz Gold Bar</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												<a href="">Signature Gold</a> - 0.358oz
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Vault
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6 mb-0">07 April 2018</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6 mb-0">Funds Added</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-success">£100.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4695.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-3" aria-controls="collapse3" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-3" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">Submitted By</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase">Reference number</p>
+										<p class="mt-0 mb-0">QB-8A0826</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase">Funded by</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Debit / Credit card</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6 mb-0">04 Jan 2018</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6 mb-0">Sell from Vault</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6">£100.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4595.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6 mb-0">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-4" aria-controls="collapse4" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-4" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">Submitted By</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase">Order Number</p>
+										<p class="mt-0 mb-0">QB-8A0823</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase">Summary</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												<a>Signature Gold</a> - 0.358oz
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Sold
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">07 Now 2017</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Delivered from Vault</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6">£100.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4495.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-5" aria-controls="collapse5" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-5" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">Submitted By</p>
+										<p class="mt-0 mb-0">Royal Mint</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase">Reference Number</p>
+										<p class="mt-0 mb-0">QB-8A0823</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase">Summary</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Standard Delivery</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0">
+												1 x <a href="">Britannia 2018 oz Gold Coin</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0">
+												Despatched
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">31 Oct 2017</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Storage Fee</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-sovereign">£991.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4500.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-6" aria-controls="collapse6" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-6" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">For Period</p>
+										<p class="mt-0 mb-0">01/10/2017 to 31/10/2017</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0 text-uppercase"></p>
+										<p class="mt-0 mb-0"></p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0 text-uppercase"></p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0">
+
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0">
+												Sold
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">15 June 2017</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Account Activity</span>
+									<p class="mt-0 mb-0 h6">Credit</p>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6">£991.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£5491.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-7" aria-controls="collapse7" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-7" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0 text-uppercase">ADDJUSTMENT COMMENT</p>
+										<p class="mt-0 mb-0">Good will gesture</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0"></p>
+										<p class="mt-0 mb-0"></p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0"></p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x"></p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x">
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-1x">
+
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x">
+
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-1x">
+
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x">
+
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-1x">
+
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">05 Feb 2017</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Purchase</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-sovereign">£500.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4195.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-8" aria-controls="collapse8" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-8" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0">SUMITTED BY</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0">ORDER NUMBER</p>
+										<p class="mt-0 mb-0">QB-8A0823</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0">SUMMARY</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Standard Delivery</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												1 x <a href="">Britannia 2018 1 oz Gold Coin</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												3 x <a href="">Britannia 2018 50 oz Gold Bar</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												<a href="">Signature Gold</a> - 0.358oz
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Vault
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card card__transaction-history">
+						<div class="card-header collapsed" id="">
+							<div class="row align-items-center">
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<span class="h6">05 Jan 2017</span>
+								</div>
+								<div class="col-xs-6 col-sm-3 mb-xs-1x">
+									<span class="h6">Purchase</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Amount</p>
+									<span class="h6 text-sovereign">£500.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2 mb-xs-1x">
+									<p class="mb-0 text-uppercase">Effective Balance</p>
+									<span class="h6">£4195.00</span>
+								</div>
+								<div class="col-xs-6 col-sm-2">
+									<span class="h6">Complete</span>
+								</div>
+								<div class="col-xs-6 col-sm-1 cta-action text-center text-left-xs">
+									<a class="collapse-toggle collapsed" href="" data-toggle="collapse" data-target="#collapse-9" aria-controls="collapse9" aria-expanded="false">
+										<span class="show-label">View</span>
+										<span class="hide-label">Close</span>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div id="collapse-9" class="collapse" aria-labelledby="headingOne" style="">
+							<div class="card-body">
+								<div class="row justify-content-center">
+									<div class="col-xs-6 col-sm-2">
+										<p class="mt-0 mb-0">SUMITTED BY</p>
+										<p class="mt-0 mb-0">Account Holder</p>
+									</div>
+									<div class="col-xs-6 col-sm-3">
+										<p class="mt-0 mb-0">ORDER NUMBER</p>
+										<p class="mt-0 mb-0">QB-8A0823</p>
+									</div>
+									<div class="col-xs-12 col-sm-6">
+										<div class="row">
+											<p class="col-xs-12 mt-0 mb-0">SUMMARY</p>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">Standard Delivery</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												1 x <a href="">Britannia 2018 1 oz Gold Coin</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												3 x <a href="">Britannia 2018 50 oz Gold Bar</a>
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Despatched
+											</p>
+											<div class="clearfix"></div>
+											<p class="col-xs-6 col-sm-8 mt-0 mb-0">
+												<a href="">Signature Gold</a> - 0.358oz
+											</p>
+											<p class="col-xs-6 col-sm-4 mt-0 mb-0">
+												Vault
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 mt-2x text-right-sm-up">
+					<ul class="pagination pull-right-sm-up">
+						<li>
+							<a href="" aria-label="Previous">
+								<span aria-hidden="true"><i class="trmi trmi-angle-left" aria-hidden="true"></i></span>
+							</a>
+						</li>
+						<li class="active">
+							<span>1 <span class="sr-only">(current)</span></span>
+						</li>
+						<li><a href="">2</a></li>
+						<li><a href="">3</a></li>
+						<li><a href="">4</a></li>
+						<li><a href="">5</a></li>
+						<li>
+							<a href="" aria-label="Next">
+								<span aria-hidden="true"><i class="trmi trmi-angle-right" aria-hidden="true"></i></span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

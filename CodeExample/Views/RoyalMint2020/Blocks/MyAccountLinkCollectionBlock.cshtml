@@ -1,0 +1,14 @@
+﻿@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.MyAccountLinkCollectionBlockViewModel
+
+<div class="quick-links bg-beige-light">
+    <h3 class="title">
+        @Html.Raw(Model.CurrentBlock.HeaderTitle)
+    </h3>
+    <ul>
+        @foreach (var item in Model.CurrentBlock.LinkCollection)
+        {
+            <li><a href="@Url.ContentUrlExtension(item.Href)" target="@item.Target">@item.Text <span class="icon sr-none" aria-hidden="true"><svg><use xlink:href="#chevron-right"></use></svg></span></a></li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,65 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer kyc-verification">
+	<div class="row contentArea">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	<div class="container mb-4x mt-2x">
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-md-offset-3 mb-1x">
+				<h1 class="h3 mt-0 mb-2x">We just need to confirm your details</h1>
+				@if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+				{
+					<div class="row contentArea">
+						@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+					</div>
+				}
+				<p class="strong mb-2x">
+					To ensure that the data you've provided is correct, we just need you to provide a little more information that will confirm your identity.
+					ID confirmation is required before you can trade with us. <a>Click here</a> to learn more about our compliance requirements
+				</p>
+				<h4 class="mb-1x">Select ID type</h4>
+				<div class="landing-links mb-2x">
+					<div class="link-item">
+						<a href="">
+							<i class="trm trmi-passport"></i>
+							<p>Passport</p>
+						</a>
+					</div>
+					<div class="link-item">
+						<a href="">
+							<i class="trm trmi-id-card"></i>
+							<p>Driving Licence</p>
+						</a>
+					</div>
+					<div class="link-item">
+						<a href="">
+							<i class="trm trmi-id-card"></i>
+							<p>Photo ID</p>
+						</a>
+					</div>
+				</div>
+				<p class="strong mb-2x">Don't have your ID to hand?</p>
+				<div>
+					<button class="btn btn-default mr-2x">Save Details and Complete Later</button>
+					<a class="display-block-xs display-inline-block mt-xs-2x">I don't have an ID</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Content Area -->
+	<div class="row contentArea">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+	<!-- / Content Area -->
+</div>
+

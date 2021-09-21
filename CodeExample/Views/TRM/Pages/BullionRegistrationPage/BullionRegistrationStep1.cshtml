@@ -1,0 +1,257 @@
+﻿@using EPiServer.Editor
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep1ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+}
+
+@functions
+{
+    public string GetFeedbackClass(string fieldName, string classes = null)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return string.IsNullOrEmpty(classes) ? "has-feedback ValidationFail" : classes;
+        }
+        return "has-feedback";
+    }
+
+}
+
+@helper ErrorMessage(string fieldName, bool isShowFeedbackIcon = true)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            <span id="bull-email__helpBlock2" class="help-block">@Html.ValidationMessage(fieldKey)</span>
+            if (isShowFeedbackIcon)
+            {
+                <span class="trmi form-control-feedback" aria-hidden="true"></span>
+            }
+        }
+}
+
+<div class="container-fluid no-padding">
+    <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+</div>
+<div class="container bull-registration">
+    <!-- Content Area -->
+    @*@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)*@
+    <!-- / Content Area -->
+    <!-- BULL-147 - Bullion Registration Step 1b - Account Details -->
+    <div class="container mb-4x mt-2x">
+        <!-- page header -->
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        <!-- / page header -->
+        @if (!Model.CurrentPage.HideStepProgressBar)
+        {
+            <!-- Step bar -->
+            <div class="row">
+                <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                    <!-- Step bar -->
+                    <ol class="nav nav-bar nav-progress-bar">
+                        <li class="active"><a href="javascript:void(0);"><span>1</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step2", currentUrl)"><span>2</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step3", currentUrl)"><span>3</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step4", currentUrl)"><span>4</span></a></li>
+                    </ol>
+
+                    <!-- / Step bar -->
+                </div>
+            </div>
+        }
+
+        <!-- / Step bar -->
+        <!-- Form -->
+        <main class="row">
+            @using (Html.BeginForm("Step1", null, FormMethod.Post, new { name = "formAccountDetails", id = "formAccountDetails", @ng_controller = "rmRegistration" }))
+            {
+                <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 mb-2x">
+                    <!-- Sub Headline -->
+                    <h1 class="h3 mt-0">@Html.PropertyFor(m => m.CurrentPage.Step1Heading)</h1>
+                    <!-- / Sub Headline -->
+                    <!-- Content Area -->
+                    @*@Html.PropertyFor(m => m.CurrentPage.MainBody)*@
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                        </div>
+                    }
+
+                    @if (Model.CurrentPage.MiddleContentStep1 != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep1)
+                        </div>
+                    }
+
+                    <div class="form-group @GetFeedbackClass("EmailAddress") @(Model.ViewModel.IsExistingEmail && string.IsNullOrEmpty(GetFeedbackClass("EmailAddress"))  ? "has-feedback ValidationSuccess" : string.Empty)" ng-class="{'ValidationFail': (formAccountDetails['ViewModel.EmailAddress'].$touched && !formAccountDetails['ViewModel.EmailAddress'].$valid), 'ValidationSuccess': (formAccountDetails['ViewModel.EmailAddress'].$touched && formAccountDetails['ViewModel.EmailAddress'].$valid)}">
+                        <label class="control-label" for="">
+                            @Html.PropertyFor(x => x.CurrentPage.EmailLabel)
+                            <span class="text-danger">*</span>
+                            <small class="text-greyblue">@Model.CurrentPage.EmailMessage</small>
+                        </label>
+                        <div class="has-feedback">
+                            <input type="email" class="form-control" id="ViewModel.EmailAddress" name="ViewModel.EmailAddress"
+                                   placeholder="@Html.DisplayFor(m => m.CurrentPage.EmailPlaceholder)"
+                                   ng-model="EmailAddress"
+                                   required
+                                   ng-blur="CheckExistingEmail(formAccountDetails['ViewModel.EmailAddress'].$valid)"
+                                   ng-init='EmailAddress = "@(!string.IsNullOrEmpty(Model.ViewModel.EmailAddress) ? Html.Raw(Model.ViewModel.EmailAddress).ToString() : "")"'>
+
+                            <span ng-if="!formAccountDetails['ViewModel.EmailAddress'].$touched">
+                                @ErrorMessage("EmailAddress", false)
+                            </span>
+                            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div ng-init="IsExistingEmail('@Model.ViewModel.IsExistingEmail.ToString()')" class="form-group @GetFeedbackClass("Username")" ng-class="{'ValidationFail': (formAccountDetails['ViewModel.Username'].$touched && (!formAccountDetails['ViewModel.Username'].$valid || !UsernameValid)), 'ValidationSuccess': (formAccountDetails['ViewModel.Username'].$touched && formAccountDetails['ViewModel.Username'].$valid && UsernameValid)}">
+						<div ng-show="IsExistingEmail">
+							<label class="control-label" for="">
+								@Model.CurrentPage.UsernameLabel
+								<span class="text-danger">*</span>
+								<small class="text-greyblue">@Model.CurrentPage.UsernameMessage</small>
+							</label>
+							@if (!string.IsNullOrEmpty(Model.CurrentPage.UsernameToolTip))
+							{
+								<i class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="@Html.PropertyFor(x => x.CurrentPage.UsernameToolTip)"></i>
+							}
+						
+							<div ng-if="IsExistingEmail" class="has-feedback">
+								<input type="text" class="form-control" id="bullRegUsername" name="ViewModel.Username"
+									   placeholder="@Html.DisplayFor(m => m.CurrentPage.UsernamePlaceholder)"
+									   ng-model="Username"
+									   auto-focus="{{IsExistingEmail && Username == ''}}"
+									   required
+									   ng-minlength="5"
+									   ng-maxlength="30"
+									   ng-pattern="/^(?!.*__.*)(?!.*\.\..*)[A-Za-z0-9_.]+$/"
+									   ng-blur="ValidateUserName(formAccountDetails['ViewModel.Username'].$valid, Username)"
+									   ng-init="Username = '@(!string.IsNullOrEmpty(Model.ViewModel.Username) ? Model.ViewModel.Username.Replace("'", " ") : string.Empty)'"
+									   >
+								<span class="help-block" ng-show="formAccountDetails['ViewModel.Username'].$touched && (formAccountDetails['ViewModel.Username'].$error.minlength || formAccountDetails['ViewModel.Username'].$error.maxlength || formAccountDetails['ViewModel.Username'].$error.pattern)">
+									@Html.TranslateFallback(StringResources.UserNameInValid, StringConstants.TranslationFallback.InValidUserName)
+								</span>
+
+								<span class="help-block" ng-show="formAccountDetails['ViewModel.Username'].$touched && formAccountDetails['ViewModel.Username'].$valid && !UsernameValid">
+									@Html.TranslateFallback(StringResources.ExistUserName, StringConstants.TranslationFallback.ExistUserName)
+								</span>
+
+								<span ng-if="!formAccountDetails['ViewModel.Username'].$touched">
+									@ErrorMessage("Username", false)
+								</span>
+								<span class="trmi form-control-feedback" aria-hidden="true"></span>
+							</div>
+						</div>
+                    </div>
+
+                    <div class="form-group @GetFeedbackClass("Password")" ng-class="{'ValidationFail': (formAccountDetails['ViewModel.Password'].$touched && !formAccountDetails['ViewModel.Password'].$valid), 'ValidationSuccess': (formAccountDetails['ViewModel.Password'].$touched && formAccountDetails['ViewModel.Password'].$valid)}">
+                        <label class="control-label" for="registerBullPW">
+                            @Model.CurrentPage.PasswordLabel
+                            <span class="text-danger">*</span>
+                            <small class="text-greyblue">@Model.CurrentPage.PasswordMessage</small>
+                        </label>
+                        <div class="has-feedback">
+                            <input type="password" class="form-control ok-password" id="registerBullPW" name="ViewModel.Password"
+                                   placeholder="@Html.DisplayFor(m => m.CurrentPage.PasswordPlaceholder)"
+                                   ng-model="password"
+                                   required
+                                   ng-focus="pwFocus = true"
+                                   ng-blur="pwFocus = false">
+                            <div class="label password-count" ng-class="password.length > 7 ? 'label-success' : 'label-danger'" ng-show="password.length > 0" ng-cloak>{{pwStrengthLabel}} ({{ password | passwordCount:7 }})</div>
+                            <div class="strength-meter" ng-show="password.length > 0" ng-cloak>
+                                <div class="strength-meter-fill" data-strength="{{passwordStrength}}"></div>
+                            </div>
+                            <span ng-if="!formAccountDetails['ViewModel.Password'].$touched">
+                                @ErrorMessage("Password", false)
+                            </span>
+                            <p ng-if="pwFocus" class="alert alert-info text-slateblue mt-1x mb-0 text-left">
+                                @Html.TranslateFallback(StringResources.PasswordSuggestion, "Password should be a min of XYZ etc...")
+                            </p>
+                        </div>
+                    </div>
+
+                    @Html.PropertyFor(x => x.CurrentPage.ReadTermsAndConditionsLabel)
+                    <div class="mt-2x">
+                        <div class="pull-left">
+                            <!-- Due to from the second child checkbox gets a -5px margin I cannot override -->
+                            <div class="checkbox small fancy">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByEmail, new { @id = "registerContactEmail" })
+                                <label class="" for="registerContactEmail">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByEmailLabel)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByPost, new { @id = "registerContactPost" })
+                                <label class="" for="registerContactPost">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByPostLabel)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByTelephone, new { @id = "registerContactPhone" })
+                                <label class="" for="registerContactPhone">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByTelephoneLabel)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="checkbox small fancy" style="display: inline-block">
+                            @Html.CheckBoxFor(a => a.ViewModel.AcceptTnC, new { @id = "tandcs", data_required = "true", data_notequal = "true", @class = GetFeedbackClass("AcceptTnC", "input-validation-error") })
+                            <label class="" for="tandcs">
+                                @Html.PropertyFor(a => a.CurrentPage.TermsAndConditionsContent)
+                            </label>
+                        </div>
+                        <div class="@GetFeedbackClass("AcceptTnC", "has-error")">
+                            @ErrorMessage("AcceptTnC", false)
+                        </div>
+                    </div>
+                    @Html.Partial("_AccountOptionsOutWarning", Model.CurrentPage)
+                </div>
+
+
+                <!-- toolbar -->
+                <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 mb-2x">
+                    <input type="submit" onclick="return RegistrationPage.gdprFieldsValidation('formAccountDetails');" class="btn btn-secondary mb-1x" value="@Model.CurrentPage.Step1ContinueButtonText" />
+                </div>
+            }
+            <!-- / toolbar -->
+        </main>
+        <!-- / Form -->
+
+    </div>
+
+</div>
+<div class="container-fluid no-padding">
+    <div class="contentArea row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <!-- Content Area -->
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        <!-- / Content Area -->
+    </div>
+</div>

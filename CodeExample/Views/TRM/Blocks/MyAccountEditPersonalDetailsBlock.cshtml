@@ -1,0 +1,130 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.EditPersonalDetailsViewModel
+
+@{
+    var firstName = string.IsNullOrWhiteSpace(Model.FirstName) ? string.Empty : Model.FirstName.Replace("'", "\\'");
+    var lastName = string.IsNullOrWhiteSpace(Model.LastName) ? string.Empty : Model.LastName.Replace("'", "\\'");
+    var email = string.IsNullOrWhiteSpace(Model.Email) ? string.Empty : Model.Email.Replace("'", "\\'");
+    var primaryAddressLine1 = string.IsNullOrWhiteSpace(Model.PrimaryAddress.Line1) ? string.Empty : Model.PrimaryAddress.Line1.Replace("'", "\\'");
+    var primaryAddressLine2 = string.IsNullOrWhiteSpace(Model.PrimaryAddress.Line2) ? string.Empty : Model.PrimaryAddress.Line2.Replace("'", "\\'");
+    var primaryAddressCity = string.IsNullOrWhiteSpace(Model.PrimaryAddress.City) ? string.Empty : Model.PrimaryAddress.City.Replace("'", "\\'");
+    var primaryAddressPostcode = string.IsNullOrWhiteSpace(Model.PrimaryAddress.PostalCode) ? string.Empty : Model.PrimaryAddress.PostalCode;
+    var primaryAddressCountryCode = string.IsNullOrWhiteSpace(Model.PrimaryAddress.CountryCode) ? string.Empty : Model.PrimaryAddress.CountryCode;
+    var primaryAddressCounty = "";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.PostcodeAnywhereLicense))
+{
+	<link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@Model.PostcodeAnywhereLicense" />
+	<script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@Model.PostcodeAnywhereLicense"></script>
+}
+
+<div class="panel panel-default panel-secondary" ng-controller="rmCheckoutController as rmAddInfo">
+	<div class="panel-body" ng-init="initialiseEditPersonalDetails('@(String.IsNullOrEmpty(Model.Title) ? "Select" : Model.Title )','@firstName', '@lastName', '@(String.IsNullOrEmpty(Model.DateOfBirthDay) ? "Day" : Model.DateOfBirthDay)', '@(String.IsNullOrEmpty(Model.DateOfBirthMonth) ? "Month" : Model.DateOfBirthMonth)', '@(String.IsNullOrEmpty(Model.DateOfBirthYear) ? "Year" : Model.DateOfBirthYear)', '@email','@(Model.Telephone)', '@primaryAddressLine1', '@primaryAddressLine2', '@primaryAddressCity', '@primaryAddressCounty', '@primaryAddressPostcode','@primaryAddressCountryCode' )">
+		<form name="editPersonalDetails" id="editPersonalDetails" ng-submit="updatePersonalDetails()">
+			<div class="row">
+				<div class="col-xs-12 col-sm-8">
+					@Html.AntiForgeryToken()
+					<div ng-class="(erroredFields.indexOf('Title') >= 0) ? 'form-group has-error has-feedback' :  hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label class="control-label" for="formGroupInputLarge">
+						    @Html.TranslateFallback(StringResources.Title, "Title") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+						<div ng-class="(erroredFields.indexOf('Title') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+							@Html.DropDownListFor(x => x.Title, new SelectList(Model.TitleList), new { @class = "form-control", name = "Title", ng_model = "Title" })
+							<span ng-show="(erroredFields.indexOf('Title') >= 0)" class="help-block">
+							    @Html.TranslateFallback(StringResources.RequiredTitle, "Title is required")
+							</span>
+						</div>
+					</div>
+					<div ng-class="(erroredFields.indexOf('Firstname') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label class="control-label" for="registerFName">
+						    @Html.TranslateFallback(StringResources.FirstName, "First Name") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+						@Html.TextBoxFor(x => x.FirstName, new { @class = "form-control", name = "editFName", id = "editFName", ng_model = "FirstName", maxlength = "64" })
+						<span ng-show="hasEditFeedback" ng-class="{'trmi trmi-check form-control-feedback':(erroredFields.indexOf('Firstname') === -1), 'trmi trmi-close form-control-feedback':(erroredFields.indexOf('Firstname') >= 0)}" aria-hidden="true"></span>
+						<span ng-show="(erroredFields.indexOf('Firstname') >= 0)" class="help-block">
+						    @Html.TranslateFallback(StringResources.RequiredFirstname, "First name is required")
+						</span>
+					</div>
+
+					<div ng-class="(erroredFields.indexOf('Lastname') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label class="control-label" for="registerSurname">
+						    @Html.TranslateFallback(StringResources.LastName, "Last Name") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+						@Html.TextBoxFor(x => x.LastName, new { @class = "form-control", id = "editSurname", ng_model = "LastName", maxlength = "64" })
+						<span ng-show="hasEditFeedback" ng-class="{'trmi trmi-check form-control-feedback':(erroredFields.indexOf('Lastname') === -1), 'trmi trmi-close form-control-feedback':(erroredFields.indexOf('Lastname') >= 0)}" aria-hidden="true"></span>
+						<span ng-show="(erroredFields.indexOf('Lastname') >= 0)" class="help-block">
+						    @Html.TranslateFallback(StringResources.RequiredLastname, "Last name is required")
+						</span>
+					</div>
+
+					<div ng-class="(erroredFields.indexOf('dob') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label class="control-label" for="dobDay">
+							@Html.TranslateFallback(StringResources.DateOfBirth, "Date Of Birth") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span>
+						</label>
+						<div class="row">
+							<div class="col-xs-4">
+								<div class="select-form dob">
+									@Html.DropDownListFor(x => x.DateOfBirthDay, new SelectList(Model.DayList), new { @class = "form-control", name = "dobDay", ng_model = "DobDay" })
+								</div>
+							</div>
+
+							<div class="col-xs-4">
+								<div class="select-form dob">
+									@Html.DropDownListFor(x => x.DateOfBirthMonth, new SelectList(Model.MonthList), new { @class = "form-control", name = "dobMonth", ng_model = "DobMonth" })
+								</div>
+							</div>
+
+							<div class="col-xs-4">
+								<div class="select-form dob">
+									@Html.DropDownListFor(x => x.DateOfBirthYear, new SelectList(Model.YearList), new { @class = "form-control", name = "dobYear", ng_model = "DobYear" })
+								</div>
+							</div>
+						</div>
+						<span ng-show="(erroredFields.indexOf('dob') >= 0)" class="help-block">
+							{{dobError}}
+						</span>
+					</div>
+					<div ng-class="(erroredFields.indexOf('Email') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label for="registerEmail">
+						    @Html.TranslateFallback(StringResources.EmailAddress, "Email Address") <span class="text-danger">*</span></label>
+						@Html.TextBoxFor(x => x.Email, new { @class = "form-control", id = "editEmail", ng_model = "Email", maxlength = "256" })
+						<span ng-show="hasEditFeedback" class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+						<span ng-show="(erroredFields.indexOf('Email') >= 0)" class="help-block">
+							{{emailError}}
+						</span>
+					</div>
+
+					<div ng-class="(erroredFields.indexOf('Telephone') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label for="registerTel">
+						    @Html.TranslateFallback(StringResources.Telephone, "Telephone") <span class="text-danger">*</span></label>
+						@Html.TextBoxFor(x => x.Telephone, new { @class = "form-control", id = "editTel", ng_model = "Telephone", maxlength = "32" })
+						<span ng-show="hasEditFeedback" ng-class="{'trmi trmi-check form-control-feedback':(erroredFields.indexOf('Telephone') === -1), 'trmi trmi-close form-control-feedback':(erroredFields.indexOf('Telephone') >= 0)}" aria-hidden="true"></span>
+						<span ng-show="(erroredFields.indexOf('Telephone') >= 0)" class="help-block">
+							@Html.TranslateFallback(StringResources.TelephoneRequiredErrorMessage, "Phone number is required")
+						</span>
+					</div>
+
+					<div ng-class="(erroredFields.indexOf('Password') >= 0 || erroredFields.indexOf('Login') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+						<label>
+						    @Html.TranslateFallback(StringResources.ReEnterPassword, "Confirm Password") <span class="text-danger">*</span></label>
+						@Html.PasswordFor(x => x.Password, new { @class = "form-control", id = "editPwd", ng_model = "Password" })
+					    <span ng-show="(erroredFields.indexOf('Login') >= 0)" class="help-block">
+					        @Html.TranslateFallback(StringResources.CheckPassword, "Please Check Password")
+					    </span>
+					    <span ng-show="erroredFields.indexOf('Password') >= 0" class="help-block">
+					        @Html.TranslateFallback(StringResources.RequiredPassword, "Password is required")
+					    </span>
+					</div>
+					<div ng-show="hasEditFeedback">
+						<div ng-show="hasEditFeedbackError" ng-repeat="message in messages" class="form-group has-error has-feedback">
+							<span class="help-block">
+								{{ message }}
+							</span>
+						</div>
+					</div>
+					<div>
+						<button class="btn btn-secondary pull-left" type="submit">@Html.TranslateFallback(StringResources.Save, "Save")</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

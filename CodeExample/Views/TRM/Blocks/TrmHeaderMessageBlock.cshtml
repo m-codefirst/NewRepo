@@ -1,0 +1,24 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.HeaderMessage
+
+@if (Model != null && Model.Reason != Enums.TrmMessageReason.None)
+{
+    <div class="header-message alert @Model.BackgroundColour.GetDescriptionAttribute()">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="header-message-wrapper">
+                        <i class="trmi @Model.Icon.GetDescriptionAttribute() pull-left mr-1x"></i>
+                        <span class="message">@Model.Message</span>
+                        @if (Model.ButtonLink != null && !string.IsNullOrEmpty(Model.ButtonText))
+                        {
+                            <a href="@Url.ContentUrlExtension(Model.ButtonLink)" class="btn @Model.ButtonStyle.GetDescriptionAttribute() btn-sm cta-message">@Model.ButtonText</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

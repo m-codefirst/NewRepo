@@ -1,0 +1,22 @@
+﻿@using EPiServer.Framework.Web.Mvc.Html
+@using EPiServer.Web.Mvc.Html
+@model Hephaestus.CMS.Models.PreviewModel
+@{
+    var lang = EPiServer.Globalization.ContentLanguage.PreferredCulture.Name;
+}
+
+<!doctype HTML>
+<html lang="@lang">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview</title>
+    @Html.Raw(Html.RequiredClientResources("Header"))
+</head>
+<body>
+    @Html.RenderEPiServerQuickNavigator()
+    @Html.FullRefreshPropertiesMetaData()
+    @RenderBody()
+    @Html.Raw(Html.RequiredClientResources("Footer"))
+</body>
+</html>

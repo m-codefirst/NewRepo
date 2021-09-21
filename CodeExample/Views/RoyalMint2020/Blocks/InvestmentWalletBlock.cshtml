@@ -1,0 +1,60 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.Bullion.InvestmentWalletViewModel
+
+<div class="your-funds bg-beige-light">
+    <div class="row justify-content-center">
+        <div class="col-12">
+
+            @if (!String.IsNullOrEmpty(Model.CurrentBlock.PensionHeaderTitle) || !String.IsNullOrEmpty(Model.CurrentBlock.HeaderTitle))
+            { 
+            <h2 class="section-head section-head--xl"><span>@(Model.IsSippContact ? Html.PropertyFor(x => x.CurrentBlock.PensionHeaderTitle) :Html.PropertyFor(x => x.CurrentBlock.HeaderTitle))</span></h2>
+            }
+               
+                @(Model.IsSippContact ? Html.PropertyFor(x => x.CurrentBlock.PensionInvestmentWalletSubHeading) : Html.PropertyFor(x => x.CurrentBlock.InvestmentWalletSubHeading))
+
+                <div class="mod-section pt-0">
+                    <div class="row justify-content-center">
+                        <div class="col-md-12 col-lg-4 mb-2">
+                            <div class="panel h-100 bg-white ">
+                                <span class="icon mb-1"><svg><use xlink:href="#total-balance" /></svg></span>
+                                <p class="title">@Html.PropertyFor(x => x.CurrentBlock.TotalBalanceTitle)</p>
+                                <p class="sub-title">@Model.EffectiveBalance.ToCurrencyString()</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-4 mb-2">
+                            <div class="panel h-100 bg-white">
+                                <span class="icon mr-1 mb-1"><svg><use xlink:href="#available-to-invest" /></svg></span>
+                                <p class="title">@Html.PropertyFor(x => x.CurrentBlock.AvailableToInvestTitle)</p>
+                                <p class="sub-title">@Model.AvailableToInvest.ToCurrencyString()</p>
+                            </div>
+                        </div>
+                        @if (!Model.IsSippContact)
+                        {
+                            <div class="col-md-12 col-lg-4 mb-2">
+                                <div class="panel h-100 bg-white">
+                                    <span class="icon  mb-1"><svg><use xlink:href="#lumpsum" /></svg></span>
+                                    <p class="title">@Html.PropertyFor(x => x.CurrentBlock.AvailableToWithdrawTitle)</p>
+                                    <p class="sub-title">@Model.AvailableToWithdraw.ToCurrencyString()</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (!Model.CurrentBlock.HideButtons && !Model.IsSippContact)
+                    {
+                        <div class="row btns justify-content-center">
+                            @if (Model.AvailableToWithdraw.Amount > 0)
+                            {
+                                <div class="col-md-6 col-lg-2-4">
+                                    <a href="@Model.BullionWithdrawFundsUrl" class="btn btn-secondary" style="font-size: 14px">@Html.PropertyFor(x => x.CurrentBlock.WithdrawButtonText)</a>
+                                </div>
+                            }
+                            <div class="col-md-6 col-lg-2-4">
+                                <a href="@Model.BullionAddFundUrl" class="btn btn-primary" style="font-size: 14px">@Html.PropertyFor(x => x.CurrentBlock.AddFundsButtonText)</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+    </div>
+</div>

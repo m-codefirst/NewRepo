@@ -1,0 +1,17 @@
+﻿@model TRM.Web.Models.ViewModels.VariantCarouselBlockViewModel
+
+@if (Model.Item.Any())
+{
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10">
+            <div role="contentinfo" aria-label="carousel" class="mod-carousel mod-panels row" data-small="yes" data-small-break="576" data-small-options='{"slidesToShow": 1, "adaptiveHeight": true, "centerMode": true, "centerPadding": "25px"}' data-medium="yes" data-medium-break="900" data-medium-options='{"slidesToShow": 2, "adaptiveHeight": true,  "centerMode": false}' data-large="yes" data-large-break="1024" data-large-options='{"slidesToShow": @(Model.ItemsToDisplay > 0 ? Model.ItemsToDisplay : 3), "adaptiveHeight": true, "centerMode": false}'>
+                @foreach (var filter in Model.Item)
+                {
+                    <div class="panel col-10 col-sm-6 col-md-4">
+                        @{ Html.RenderPartial("PagePartials/TrmEntryPartial", filter); }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

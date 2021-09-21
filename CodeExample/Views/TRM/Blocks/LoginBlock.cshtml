@@ -1,0 +1,172 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.LoginBlock
+
+@{
+    var id = Guid.NewGuid().ToString().Replace("-","");
+}
+
+
+@if (Request.IsAuthenticated && !PageEditing.PageIsInEditMode)
+{
+}
+else
+{
+
+<div class="col-xs-12 col-sm-5 col-lg-4 col-lg-offset-1" ng-controller="rmLogin" ng-cloak>
+    <div id="loginblock-login-form-main">
+        <div class="mb-2x" id="loginForm-main" ng-show="showTwoStepAuthentication == false">
+            @if (!string.IsNullOrEmpty(Model.Heading))
+            {
+                <h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.Heading)</h4>
+            }
+            @if (!string.IsNullOrEmpty(Model.SubHeading))
+            {
+                <h6 class="mt-0">@Html.PropertyFor(m => m.SubHeading)</h6>
+            }
+            @if (Model.EditorialContent != null && !Model.EditorialContent.IsEmpty)
+            {
+                @Html.PropertyFor(m => m.EditorialContent)
+            }
+            <form class="ng-pristine ng-valid" autocomplete="off" ng-submit="login()">
+                <div class="form-group mb-1x input-subtle">
+                    <label class="sr-only" for="loginEmail1-main">@Html.DisplayFor(m => m.EmailLabel)</label>
+                    <input type="text" class="form-control" id="loginEmail1-main" placeholder="@Html.DisplayFor(m => m.EmailLabel)" data-original-title="" title="">
+                </div>
+                <div class="form-group input-subtle mb-1x">
+                    <label class="sr-only" for="loginUsrPW1-main">@Html.DisplayFor(m => m.PasswordLabel)</label>
+                    <input type="password" class="form-control"  id="loginUsrPW1-main" placeholder="@Model.PasswordLabel" data-original-title="" title="">
+                </div>
+                <p ng-cloak ng-hide="!hasError" class="has-error">
+                    {{ loginMessage }}
+                </p>
+                <div class="row mb-1x">
+                    <div class="col-xs-12 col-sm-8">
+                        <button class="btn btn-secondary btn-block" id="login-main" type="submit">@Html.DisplayFor(m => m.LoginButtonText)</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-show="#forgottenUN-main" data-hide="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.ForgottenUsername)</a>
+                    </div>
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-show="#forgottenPW-main" data-hide="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.ForgottenPassword)</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="mb-2x" id="securityQuestion-loginblock" autocomplete="off" ng-show="showTwoStepAuthentication == true">
+            <h4 class="mt-0 mb-0">@Html.DisplayFor(m => m.TwoStepAuthenticationHeading)</h4>
+            <form class="ng-pristine ng-valid" autocomplete="off" id="formSecurityQuestion" name="formSecurityQuestion" ng-submit="login()">
+                <div class="form-group">
+                    <h6 class="mt-0">{{securityQuestion}}</h6>
+                    <input class="form-control" ng-required="true" auto-focus="{{ showTwoStepAuthentication }}" type="text" value="" ng-model="securityAnswer" id="securityAnswer-loginblock" placeholder="@Html.DisplayFor(m => m.TwoStepAuthenticationPlaceholder)">
+                </div>
+
+                <p ng-cloak ng-hide="!hasError" class="has-error">
+                    <span class="help-block">{{ loginMessage }}</span>
+                </p>
+                <div ng-cloak ng-show="showSuccessMsg" class="help-block">
+                    {{ loginMessage }}
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-md-8">
+                        <button class="btn btn-secondary btn-block" id="loginblock-securityQuestion" type="submit">@Html.DisplayFor(m => m.TwoStepAuthenticationButtonText)</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="hidden mb-2x" id="forgottenPW-main">
+            <h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.ForgottenPasswordHeading)</h4>
+            <h6 class="mt-0">@Html.PropertyFor(m => m.ForgottenPasswordSubHeading)</h6>
+            <form class="" name="forgtternPWform@{@id}"  ng-submit="resetPassword('#showResetConfirmation-loginblock','#showLoginForm-loginblock')">
+                <div class="form-group mb-2x input-subtle">
+                    <label class="sr-only" for="Emailcheckout">@Html.DisplayFor(m => m.EmailLabel)</label>
+                    <input type="email" class="form-control" id="Emailcheckout" ng-required="true" validate-email ng-model="resetEmail" placeholder="@Html.DisplayFor(m => m.EmailPlaceholder)">
+                </div>
+                <div class="row mb-1x">
+                    <div class="col-xs-12 col-md-8">
+                        <button class="btn btn-secondary btn-block" type="submit">@Html.DisplayFor(m => m.ForgottenPassword)</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-hide="#forgottenPW-main" data-show="#forgottenUN-main" class="pw-link">@Html.DisplayFor(m => m.ForgottenMyUsernameButtonText)</a>
+                    </div>
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-hide="#forgottenPW-main" data-show="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.ReturnToLoginButtonText)</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="hidden mb-2x" id="forgottenUN-main">
+            <h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.ForgottenUsernameHeading)</h4>
+            <h6 class="mt-0">@Html.PropertyFor(m => m.ForgottenUsernameSubHeading)</h6>
+            <form class="" name="forgtternUNform@{@id}"  ng-submit="requestUsername('#loginblock-request-username-successed-form','#loginblock-request-username-successed-login')">
+                <div class="form-group mb-2x input-subtle">
+                    <label class="sr-only" for="Usernamecheckout">@Html.DisplayFor(m => m.EmailLabel)</label>
+                    <input type="email" class="form-control" id="Usernamecheckout" ng-required="true" validate-email ng-model="rqUsername" placeholder="@Html.DisplayFor(m => m.EmailPlaceholder)">
+                </div>
+                <div class="row mb-1x">
+                    <div class="col-xs-12 col-md-8">
+                        <button class="btn btn-secondary btn-block" type="submit" ng-disabled="forgtternUNform@{@id}.$invalid">@Html.DisplayFor(m => m.RequestUsername)</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-hide="#forgottenUN-main" data-show="#forgottenPW-main" class="pw-link">@Html.DisplayFor(m => m.ForgottenMyPasswordButtonText)</a>
+                    </div>
+                    <div class="col-xs-12 col-md-12">
+                        <a href="" data-hide="#forgottenUN-main" data-show="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.ReturnToLoginButtonText)</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row hidden" id="loginblock-request-username-successed">
+        <a href="" class="hidden" id="loginblock-request-username-successed-form" data-show="#loginblock-request-username-successed" data-hide="#loginblock-login-form-main"></a>
+        <a href="" id="loginblock-request-username-successed-login" data-hide="#forgottenUN-main" data-show="#loginForm-main" class="hidden"></a>
+        <div class="mb-2x col-xs-12 col-md-11 col-lg-offset-1">
+            <h4 class="mt-0 mb-0">@Html.PropertyFor(m => m.ForgottenUsernameRequestedHeading)</h4>
+            <h6 class="mt-0">@Html.PropertyFor(m => m.ForgottenUsernameSubHeading)</h6>
+            <div class="row mb-3x mt-2x">
+                <div class="contentArea clear col-xs-12 col-md-11" @Html.EditAttributes(m => m.ForgottenUsernameRequestedContentArea)>
+                    <div class="row">
+                        @Html.DisplayFor(m => m.ForgottenUsernameRequestedContentArea)
+                    </div>
+                </div>
+            </div>
+            <div class="row col-xs-12 col-md-12">
+                <a href="" data-hide="#loginblock-request-username-successed" data-show="#loginblock-login-form-main" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.GoToLogin, "Go to login")</a>
+            </div>
+            <div class="row col-xs-12 col-md-12">
+                <a href="/" class="pw-link nav-close" style="position: relative;">@Html.TranslateFallback(StringResources.ReturnToHomePage, "Return to our homepage")</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row hidden" id="passwordResetConfirmation-loginblock">
+        <a id="showResetConfirmation-loginblock" class="hidden" data-show="#passwordResetConfirmation-loginblock" data-hide="#loginblock-login-form-main"></a>
+        <a id="showLoginForm-loginblock" class="hidden" data-hide="#forgottenPW-main" data-show="#loginForm-main"></a>
+        <div class="mb-2x col-xs-12 col-md-11 col-lg-offset-1">
+            <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationHeading, "Password reset sent")</h4>
+            <h6>@Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationSubHeading, "You will receive an email shortly with instructions on how to reset your password.")</h6>
+            <div class="row mb-3x mt-2x">
+                <div class="contentArea clear col-xs-12 col-md-11" @Html.EditAttributes(m => m.ForgottenPasswordConfirmationContentArea)>
+                    <div class="row">
+                        @Html.DisplayFor(m => m.ForgottenPasswordConfirmationContentArea)
+                    </div>
+                </div>
+            </div>
+            <div class="row col-xs-12 col-md-12">
+                <a href="" data-hide="#passwordResetConfirmation-loginblock" data-show="#loginblock-login-form-main" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.GoToLogin, "Go to login")</a>
+            </div>
+            <div class="row col-xs-12 col-md-12">
+                <a href="/" class="pw-link nav-close" style="position: relative;">@Html.TranslateFallback(StringResources.ReturnToHomePage, "Return to our homepage")</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+}

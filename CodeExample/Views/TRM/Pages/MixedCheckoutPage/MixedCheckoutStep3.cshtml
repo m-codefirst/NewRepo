@@ -1,0 +1,267 @@
+﻿@using TRM.Shared.Extensions;
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.Commerce.Shared.Models
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.MixedCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.MixedCheckout.MixedCheckoutStep3ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+@Html.Partial("_BullionSyncWithPampErrorInformTemplate")
+
+<div class="pageContainer">
+    <div class="pageContainer">
+
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>
+        }
+        <div class="container mb-4x mt-2x">
+            @Html.ValidationSummary(false)
+            <div class="page-header">
+                <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Step3PageHeading)</h1>
+            </div>
+            @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+            {
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+            }
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+                        <li><a href="">1.<span>@Html.PropertyFor(x => x.CurrentPage.Step1TabHeading)</span></a></li>
+                        <li><a href="">2. <span>@Html.PropertyFor(x => x.CurrentPage.Step2TabHeading)</span></a> </li>
+                        <li class="active"><a href="">3. <span>@Html.PropertyFor(x => x.CurrentPage.Step3TabHeading)</span></a></li>
+                        <li>4. <span>@Html.PropertyFor(x => x.CurrentPage.Step4TabHeading)</span> </li>
+                    </ol>
+                </div>
+            </div>
+            <div class="row price-section">
+                <div class="main-content col-xs-12 col-md-9 mb-2x">
+                    <h3 class="h3 mt-0">@Html.PropertyFor(x => x.CurrentPage.Step3Heading)</h3>
+                    <form action="@Model.CurrentPage.ContentLink.GetExternalUrl_V2()Step3" method="post" ng-submit="onSubmitCheckout($event)" ng-init="onCheckSyncWithPamp(@Json.Encode(Model.ViewModel.IsSyncWithPampError), @Json.Encode(Model.ViewModel.IsNotEnoughMoney), @Json.Encode(Model.ViewModel.ValidForPayment)); getBasketSummary()" name="step3MixedCheckout" id="checkoutForm">
+
+                        <div ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress">
+                            <h3 class="h3">@Html.PropertyFor(x => x.CurrentPage.Step3ItemsForDeliveryHeading)</h3>
+                            <div class="vaulted-header">
+                                <div class="intro-text">
+                                    @{
+                                        var bullionAddress = Model.ViewModel.DeliveryAddress;
+                                    }
+                                    <p class="mb-0">
+                                        @(!string.IsNullOrEmpty(bullionAddress.Line1) ? bullionAddress.Line1 + ", " : "")
+                                        @(!string.IsNullOrEmpty(bullionAddress.Line2) ? bullionAddress.Line2 + ", " : "")
+                                        @bullionAddress.City, @bullionAddress.PostalCode
+                                    </p>
+                                    <p>
+                                        @Html.PropertyFor(x => x.CurrentPage.Step3DeliveryCostTitle): <strong>{{getInvestmentDelivery()}}</strong>
+                                    </p>
+                                </div>
+                                <div class="price-notify-text">
+                                    <p class="alert alert-info text-slateblue mb-0 text-center">
+                                        @Html.PropertyFor(x => x.CurrentPage.Step3PricesAreNowLiveTitle)
+                                        <i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.Step3PricesAreNowLiveToolTip)"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="checkout-item-block" ng-repeat="shipment in rmCommerce.shipments | filter:{ShipmentUniqueId:'BullionCart-Delivered'}">
+                                @Html.Partial("_InvestmentBullionItems")
+                            </div>
+                        </div>
+
+                        <div ng-if="rmCommerce.hasItemToBeStored">
+                            <h3 class="h3">@Html.PropertyFor(x => x.CurrentPage.Step3ItemsForVaultedHeading)</h3>
+                            <div class="vaulted-header">
+
+                                @Html.PropertyFor(x => x.CurrentPage.Step3ItemsForVaultedDescription)
+
+                                <div class="price-notify-text" ng-if="!rmCommerce.hasItemDeliveredToInvestmentAddress">
+                                    <p class="alert alert-info text-slateblue mb-0 text-center">
+                                        @Html.PropertyFor(x => x.CurrentPage.Step3PricesAreNowLiveTitle)
+                                        <i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.Step3PricesAreNowLiveToolTip)"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="checkout-item-block" ng-repeat="shipment in rmCommerce.shipments | filter:{ShipmentUniqueId:'BullionCart-Vaulted'}">
+                                @Html.Partial("_InvestmentBullionItems")
+                            </div>
+                        </div>
+
+                        <div class="checkout-total">
+                            <div class="row">
+                                <div class="col-xs-6 col-md-3 col-md-offset-6" ng-if="showInvestmentTotalDiscount()">
+                                    <strong class="pull-right">Saved Amount</strong>
+                                </div>
+                                <div class="col-xs-6 col-md-3 text-right" ng-if="showInvestmentTotalDiscount()">
+                                    {{getBullionSavedAmount()}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+                                    <strong>Sub Total</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-3 text-right-sm-up">
+                                    {{getInvestmentSubTotal()}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+                                    <strong>Bullion Delivery</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-3 text-right-sm-up">
+                                    <span class="strong">
+                                        {{getInvestmentDeliveryTotal()}}
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+                                    <strong>VAT</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-3 text-right-sm-up">
+                                    {{getInvestmentVat()}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <hr>
+                            </div>
+                            <div class="row center-items-sm-up reorder-sm">
+                                <div class="col-xs-12 col-sm-6">
+                                    @if (!Model.ViewModel.ShowInsufficientFunds)
+                                    {
+                                        <span class="h6 mt-0 mb-0 coundown-timer inline alert alert-info text-slateblue @(Model.ViewModel.ShowInsufficientFunds ? "hidden" : "")" ng-init="countDown(@Model.CurrentPage.Step3LivePriceValidTime, @Json.Encode(Model.ViewModel.ShowInsufficientFunds))">
+                                            LIVE Prices valid for <span class="h5">{{coundowntimer}}</span> seconds
+                                        </span>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">Investment Total</p>
+                                        </div>
+                                        <div class="col-xs-6 text-right-sm-up">
+                                            <p class="h4 h3-lg-down strong mt-0 mb-0">{{getInvestmentTotal()}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="h6 mt-20 wallet-balance text-right-sm-up">@Html.TranslateFallback(StringResources.BullionQuickCheckOutAvailableWalletBalance, "Available Wallet Balance") <span class="@(Model.ViewModel.ShowInsufficientFunds ? "text-danger" : "text-success")">@Model.ViewModel.AvailableToInvest.ToString()</span></h6>
+                        <hr>
+                        @if (!Model.ViewModel.ShowInsufficientFunds)
+                        {
+                            if (!Model.ViewModel.HideFixPriceButton)
+                            {
+                                <button @(!Model.ViewModel.ValidForPayment ? "disabled" : "") id="payment-btn" type="submit" class="btn btn-secondary mb-1x">@Html.PropertyFor(x => x.CurrentPage.Step3InvestButtonText)</button>
+                            }
+                        }
+                    </form>
+
+                    <div id="add-fund-container" class="@(!Model.ViewModel.ShowInsufficientFunds ? "hidden" : "")">
+                        @using (Html.BeginForm("AddFunds", null, FormMethod.Post, new { name = "formAddFundsMixedCheckout", id = "formAddFundsMixedCheckout" }))
+                        {
+                            <div class="checkout-funds-insufficient alert alert-info text-slateblue">
+                                <h3 class="h3 mt-0">@Html.PropertyFor(x => x.CurrentPage.Step3InsufficientFundsHeading)</h3>
+                                <p>@Html.PropertyFor(x => x.CurrentPage.Step3InsufficientFundsDescription)</p>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5 class="h5">@Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderText): {{getInvestmentTotal()}}</h5>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5 class="h5 wallet-balance text-right-sm">
+                                            @Html.PropertyFor(x => x.CurrentPage.Step3AvailableToInvestTitle):<span class="text-danger">@Model.ViewModel.AvailableToInvest.ToString()</span>
+                                            <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.Step3AvailableToInvestTooltip)"></i>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-secondary mb-1x">@Html.PropertyFor(x => x.CurrentPage.Step3AddFundsButtonText)</button>
+                        }
+                    </div>
+                </div>
+                @if (Model.ViewModel.PurchaseOrder != null)
+                {
+                    <div class="right-content col-xs-12 col-md-3 mb-1x">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="order-summary-complete alert alert-success">
+                                    <div class="summary-header">
+                                        <div class="title">
+                                            <h5 class="h5 mt-0 mb-0 text-success">Retail Order complete</h5>
+                                            <p class="mt-0 mb-0 text-success">Retail Total: @Model.ViewModel.PurchaseOrder.Total</p>
+                                        </div>
+                                        <div class="cta-action">
+                                            <a>
+                                                <span class="complete-icon">
+                                                    <i class="trmi trmi-check text-success"></i>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    @{
+
+                                        var deliveryAddress = new AddressModel();
+                                        var shipment = Model.ViewModel.PurchaseOrder.Shipments.FirstOrDefault();
+
+                                        if (shipment != null)
+                                        {
+                                            deliveryAddress = shipment.Address;
+                                        }
+                                    }
+                                    <div class="summary-details">
+                                        <p class="mt-0 mb-0">
+                                            <strong>Order Number:</strong>
+                                            @foreach (var orderNo in Model.ViewModel.PurchaseOrder.OrderNumbers)
+                                            {
+                                                <span>@orderNo</span>
+                                            }
+                                        </p>
+                                        <p class="mt-0 mb-0">
+                                            <strong>Order Total:</strong><span>@Model.ViewModel.PurchaseOrder.Total</span>
+                                        </p>
+
+                                        <p class="mt-0 mb-0">
+                                            <strong>Paid by:</strong>
+                                            @foreach (var payment in Model.ViewModel.PurchaseOrder.Payments)
+                                            {
+                                                <span>@payment.CardType</span>
+                                            }
+                                        </p>
+                                        <p class="mt-0 mb-0">
+                                            <strong>Delivery to:</strong>
+                                            <span>
+                                                @if (!string.IsNullOrEmpty(deliveryAddress.Line1))
+                                                {
+                                                    <span class="remove-margin-important">@deliveryAddress.Line1,</span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(deliveryAddress.Line2))
+                                                {
+                                                    <span class="remove-margin-important">@deliveryAddress.Line2,</span>
+                                                }
+                                                @deliveryAddress.City, @deliveryAddress.PostalCode, @deliveryAddress.CountryCode
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @Html.DisplayFor(x => x.CurrentPage.Step3RightContentArea)
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+</div>

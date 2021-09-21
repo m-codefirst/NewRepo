@@ -1,0 +1,50 @@
+﻿@model TRM.Web.Models.ViewModels.RMG.RmgBuyViewModel
+<div class="col-sm-12 well pt-0">
+
+    <div ng-controller="rmRmg" ng-init="init(@Model.MinAmount,@Model.MaxAmount, @Model.WalletMinLength, @Model.WalletMaxLength, '@Model.WalletId',0.00)">
+
+        <form name="rmgBuyForm" method="POST" id="rmgBuyForm" action="@Model.CheckoutUrl" autocomplete="off" class="form-horizontal" ng-cloak>
+            <h3>@Model.ThisBlock.Heading</h3>
+
+            <div class="form-group has-feedback " ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid )}">
+                <label class="col-xs-12 mt-0" for="Amount">@Model.ThisBlock.SubHeading @Model.ThisBlock.AmountRangeLabel</label>
+                <div class="col-xs-12 col-sm-12 col-md-7">
+                    <div class="row">
+                        <label class="col-xs-3 col-sm-3 col-md-2 control-label " style="padding-top: 0px !important" for="rmgAmount"><span style="font-size: 38px; line-height: 46px; color:#253746 !important">£</span></label>
+
+                        <div class="col-sm-9 col-xs-9 col-md-10 pt-0" style="padding-right: 15px;">
+                            <input type="text" tabindex="1" name="Amount" ng-model="rmgAmount" ng-blur="amountIsValid(rmgAmount)" class="form-control" ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid ), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid)}" id="Amount" placeholder="0.00" data-original-title="" title="" ng-required="!rmgAmount" required="required" style="">
+                            <span class="trmi form-control-feedback ValidationFail" ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid )}" aria-hidden="true" style=""></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-5">
+                 @Html.PropertyFor(m => m.ThisBlock.LimitInformation)   
+                </div>
+
+            </div>
+            <div class="form-group has-feedback mb-1x" ng-class="{'ValidationFail': (rmgBuyForm.WalletId.$touched && !rmgBuyForm.WalletId.$valid), 'ValidationSuccess': (rmgBuyForm.WalletId.$touched && rmgBuyForm.WalletId.$valid)}">
+                <label class="mt-0 col-xs-12" for="WalletId">@Model.ThisBlock.WalletLabel</label>
+
+                <div class="col-xs-12" style="padding-right: 15px;">
+
+                    <input type="text" tabindex="2"  name="WalletId" class="form-control" ng-change="walletIsValid(rmgWallet)" ng-class="{'ValidationFail': (rmgBuyForm.WalletId.$touched && !rmgBuyForm.WalletId.$valid), 'ValidationSuccess': (rmgBuyForm.WalletId.$touched && rmgBuyForm.WalletId.$valid)}" id="WalletId" placeholder="Please enter your wallet address" ng-model="rmgWallet" data-original-title="" title="" ng-required="!rmgWallet" required="required" style="">
+                    <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (rmgBuyForm.WalletId.$touched && !rmgBuyForm.WalletId.$valid), 'ValidationSuccess': (rmgBuyForm.WalletId.$touched && rmgBuyForm.WalletId.$valid)}" aria-hidden="true" style=""></span>
+                </div>
+
+
+            </div>
+            <div class="row mb-1x">
+                <div class="col-sm-12">
+                    @Html.Raw(Model.ThisBlock.WalletInformation)
+                </div>
+            </div>
+           
+            <div class="row">
+                <div class=" col-md-6">
+                    <button tabindex="3" class=" btn btn-secondary btn-block" ng-disabled="rmgBuyForm.$invalid" type="submit">@Model.ThisBlock.BuyButtonText</button>
+                 </div>
+             </div>
+        </form>
+    </div>
+</div>

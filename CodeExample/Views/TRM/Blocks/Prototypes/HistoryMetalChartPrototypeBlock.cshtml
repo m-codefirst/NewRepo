@@ -1,0 +1,128 @@
+﻿@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Extentions
+
+@model TRM.Web.Models.Blocks.EcomPrototypeBlock
+
+@{
+	var newGuid = Guid.NewGuid();
+}
+<div class="history-metal-chart-block">
+	<h3>History Metal Chart Title</h3>
+	<div class="history-chart-filtering">
+		<div class="filtering-group display-inline-block mb-1x">
+			<p class="h6">Period</p>
+			<div class="select-form">
+				<select class="form-control" id="filterType">
+					<option value="" selected="">Live</option>
+					<option value="01">Today</option>
+					<option value="02">Week</option>
+					<option value="03">Month</option>
+					<option value="04">3 Months</option>
+					<option value="05">6 Months</option>
+					<option value="06">Year</option>
+					<option value="07">3Y</option>
+					<option value="08">5Y</option>
+					<option value="08">All Time</option>
+				</select>
+			</div>
+		</div>
+		<div class="filtering-group">
+			<p class="h6">Currency</p>
+			<ul>
+				<li>
+					<a class="selected" href="#">Pounds</a>
+				</li>
+				<li>
+					<a href="#">Euros</a>
+				</li>
+				<li>
+					<a href="#">Dollars</a>
+				</li>
+			</ul>
+		</div>
+		<div class="filtering-group">
+			<p class="h6">Commodity</p>
+			<ul>
+				<li>
+					<a class="selected" href="#">Gold</a>
+				</li>
+				<li>
+					<a href="#">Silver</a>
+				</li>
+				<li>
+					<a href="#">Platinum</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="history-chart-container">
+		<div id="history-chart@(newGuid)" class="history-chart"></div>
+		<div id="loader@(newGuid)" class="lds-spinner hidden"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+	</div>
+</div>
+
+@Html.Script(
+	@<script type="text/javascript">
+		$(document).ready(function () {
+			google.charts.load('current', { 'packages': ['corechart'] });
+			google.charts.setOnLoadCallback(drawChart);
+
+			function drawChart() {
+
+				var data = new google.visualization.DataTable();
+				data.addColumn('datetime', 'X');
+				data.addColumn('number', '');
+				var chartDatas = [
+					[new Date(2014, 0), 0],
+					[new Date(2014, 1), .4],
+					[new Date(2014, 2), .5],
+					[new Date(2014, 3), 2.9],
+					[new Date(2014, 4), 6.3],
+					[new Date(2014, 5), 9],
+					[new Date(2014, 6), 10.6],
+					[new Date(2014, 7), 10.3],
+					[new Date(2014, 8), 7.4],
+					[new Date(2014, 9), 4.4],
+					[new Date(2014, 10), 1.1],
+					[new Date(2014, 11), 3]
+				];
+				data.addRows(chartDatas);
+				$('#loader@(newGuid)').removeClass('hidden');
+				var options = {
+					legend: { position: 'none' },
+					chartArea: {
+						top: 10, width: '100%', height: '80%'
+					},
+					hAxis: {
+						gridlines: {
+							count: 6,
+						}
+					},
+					vAxis: {
+						format: 'currency',
+						gridlines: {
+							count: 6
+						},
+						textPosition: 'in'
+					},
+					titlePosition: 'in',
+					axisTitlesPosition: 'in',
+					fontName: 'corpid_c4_regular',
+				};
+
+				var chart = new google.visualization.LineChart(document.getElementById('history-chart@(newGuid)'));
+
+				setTimeout(function () {
+					chart.draw(data, options);
+					$('#loader@(newGuid)').addClass('hidden');
+				}, 3000)
+			}
+
+			$(window).resize(function () {
+				drawChart();
+			})
+		})
+	</script>
+)
+

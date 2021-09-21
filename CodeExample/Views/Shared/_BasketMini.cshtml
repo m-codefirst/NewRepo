@@ -1,0 +1,206 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var basketPageUrl = Model.BasketPage.GetExternalUrl_V2();
+    var checkoutPageUrl = Model.CheckoutPage.GetExternalUrl_V2();
+    var bullionOnlyCheckoutUrl = Model.BullionOnlyCheckoutPage.GetExternalUrl_V2();
+    var mixedCheckoutUrl = Model.MixedCheckoutPage.GetExternalUrl_V2();
+    var stoppedTrading = Model.StoppedTrading;
+}
+<div class="nav-section basket-mini" id="navSectionBasket">
+    <div class="section-body minibasket-fixed" id="miniBasket">
+        <div class="row" ng-if="getBasketQty() >= 1" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <h4>@Html.TranslateFallback(StringResources.BasketRecentlyAddedToYourBasket, StringConstants.TranslationFallback.BasketRecentlyAddedToYourBasket)</h4>
+                <div class="basket-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="70%">@Html.TranslateFallback(StringResources.BasketItems, StringConstants.TranslationFallback.BasketItems)</th>
+                                <th width="15%">@Html.TranslateFallback(StringResources.BasketQuantity, StringConstants.TranslationFallback.BasketQuantity)</th>
+                                <th></th>
+                                <th class="text-right" width="15%">@Html.TranslateFallback(StringResources.BasketPrice, StringConstants.TranslationFallback.BasketPrice)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items to be delivered -->
+                            <!-- Delivered to specified address -->
+                            <tr ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)" class="headerBasketItem no-border no-padding-bottom">
+                                <td colspan="5">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h3 class="mt-0 mb-0 h6">Items to be delivered</h3>
+                                            <p class="strong header-font-color mt-0 mb-0 pt-5">Delivered to specified address</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress" ng-repeat="variant in rmCommerce.defaultShipment[0].CartItems" class="headerBasketItem" ng-fade>
+                                <td>
+                                    <p class="mb-0 mt-0">
+                                        <a class="text-slateblue" ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-bind="variant.DisplayName" ng-cloak></a>
+                                    </p>
+                                    <p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>
+
+                                    <!-- message personalize -->
+                                    <div ng-if="variant.HasbeenPersonalised" class="mt-5">
+                                        <span class="bg-lightgray p-1xs mt-1x">
+                                            @Html.TranslateFallback(StringResources.HasBeenPersonalised, StringConstants.TranslationFallback.HasBeenPersonalised)
+                                        </span>
+                                    </div>
+                                    <!-- / message personalize -->
+                                </td>
+                                <td>
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, -1)" ng-disabled="variant.Quantity <= variant.StockSummary.MinQuantity">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="{{variant.Quantity}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, 1)" ng-disabled="variant.Quantity >= variant.StockSummary.MaxQuantity">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code, variant.UniqueId);">									
+										<span class="text-danger">@Html.TranslateFallback(StringResources.BasketRemove, StringConstants.TranslationFallback.BasketRemove)</span>
+									</button>
+                                </td>
+                                <td class="text-right"><span ng-bind="variant.DiscountedPrice" ng-cloak></span><p class="mini-basket-vat">(Inc VAT)</p></td>
+                            </tr>
+
+                            <!-- Delivered to your investment account address -->
+                            <tr ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress" class="headerBasketItem no-border no-padding-bottom">
+                                <td colspan="5">
+                                    <h3 ng-if="!rmCommerce.hasItemDeliveredToSpecifiedAddress" class="mt-0 mb-0 h6">Items to be delivered</h3>
+                                    <p class="strong header-font-color mb-0">Delivered to your investment account address</p>
+                                </td>
+                            </tr>
+
+                            <tr ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress" ng-repeat="variant in rmCommerce.deliveryBullionShipment[0].CartItems"
+                                class="headerBasketItem" ng-fade>
+                                <td>
+                                    <p class="mb-0 mt-0">
+                                        <a class="text-slateblue" ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-bind="variant.DisplayName" ng-cloak></a>
+                                    </p>
+                                    <p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>
+                                </td>
+                                <td>
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, -1)" ng-disabled="variant.Quantity <= variant.StockSummary.MinQuantity">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="{{variant.Quantity}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, 1)" ng-disabled="variant.Quantity >= variant.StockSummary.MaxQuantity">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code, variant.UniqueId);">
+										<span class="text-danger">@Html.TranslateFallback(StringResources.BasketRemove, StringConstants.TranslationFallback.BasketRemove)</span>
+									</button>
+                                </td>
+                                <td class="text-right"><span ng-bind="variant.DiscountedPrice" ng-cloak></span>
+									<p class="mini-basket-vat">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+									<span ng-if="variant.BullionCartItem" class="estimated">@Html.TranslateFallback(StringResources.Estimated, "estimated")</span>
+								</td>
+                            </tr>
+
+                            <!-- Items for Storage at the royal mint -->
+                            <!-- Store In Vault -->
+                            <tr ng-if="rmCommerce.hasItemToBeStored" class="headerBasketItem no-border no-padding-bottom">
+                                <td colspan="5">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h3 class="mt-0 mb-0 h6">Items for Storage at the royal mint</h3>
+                                            <p class="strong header-font-color mt-0 mb-0 pt-5">Store In Vault</p>
+
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr ng-if="rmCommerce.hasItemToBeStored" ng-repeat="variant in rmCommerce.vaultBullionShipment[0].CartItems" class="headerBasketItem" ng-fade>
+                                <td>
+                                    <p class="mb-0 mt-0">
+                                        <a class="text-slateblue" ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-bind="variant.DisplayName" ng-cloak></a>
+                                    </p>
+                                    <p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>
+                                    <p class="mb-0">I Want to invest {{variant.BullionCartItem.RequestedInvestmentString}}</p>
+                                </td>
+                                <td>
+                                    <div ng-if="!variant.BullionCartItem.IsSignatureVariant" class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, -1)" ng-disabled="variant.Quantity <= variant.StockSummary.MinQuantity">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="{{variant.Quantity}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, 1)" ng-disabled="variant.Quantity >= variant.StockSummary.MaxQuantity">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code, variant.UniqueId);"><span class="product-removal mb-xs-1x"><span class="text-danger">Remove</span> </span></button>
+                                </td>
+                                <td class="text-right"><span ng-bind="variant.DiscountedPrice" ng-cloak></span>
+									<p class="mini-basket-vat">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+									<span ng-if="variant.BullionCartItem" class="estimated">@Html.TranslateFallback(StringResources.Estimated, "estimated")</span>
+								</td>
+                            </tr>
+
+                            <tr class="no-border">
+                                <td colspan="5">
+                                    <h3 class="text-right mt-1x">@Html.TranslateFallback(StringResources.BasketSubTotalInfo, StringConstants.TranslationFallback.BasketSubTotalInfo) &nbsp;&nbsp; {{ getSubTotal() }}</h3>
+                                    <p ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored" class="text-right mb-1x">VAT breakdown available in full basket</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-right">
+                    <a class="btn btn-default mr-20" onclick="return closeNavigation();" href="@basketPageUrl">@Html.TranslateFallback(StringResources.BasketFullBasketBtnText, StringConstants.TranslationFallback.BasketFullBasketBtnText)</a>
+                    <a ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && !rmCommerce.hasItemDeliveredToInvestmentAddress && !rmCommerce.hasItemToBeStored"
+                       class="btn btn-primary"
+                       href="@checkoutPageUrl" onclick="return closeNavigation();">@Html.TranslateFallback(StringResources.BasketCheckoutBtnText, StringConstants.TranslationFallback.BasketCheckoutBtnText)</a>
+                    @if (!stoppedTrading)
+                    {
+                        <a ng-if="!rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)"
+                           class="btn btn-primary btn" onclick="return closeNavigation();"
+                           href="@bullionOnlyCheckoutUrl">@Html.TranslateFallback(StringResources.BasketCheckoutBtnText, StringConstants.TranslationFallback.BasketCheckoutBtnText)</a>
+
+                        <a ng-if="rmCommerce.hasItemDeliveredToSpecifiedAddress && (rmCommerce.hasItemDeliveredToInvestmentAddress || rmCommerce.hasItemToBeStored)"
+                           class="btn btn-primary" onclick="return closeNavigation();"
+                           href="@mixedCheckoutUrl">@Html.TranslateFallback(StringResources.BasketCheckoutBtnText, StringConstants.TranslationFallback.BasketCheckoutBtnText)</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="getBasketQty() == 0" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <div class="alert alert-warning">
+                    @Html.TranslateFallback(StringResources.BasketEmpty, StringConstants.TranslationFallback.BasketEmpty)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@using EPiServer.Core
+@using EPiServer.Editor
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.Blocks.LoginBlock
+@if (Request.IsAuthenticated && !PageEditing.PageIsInEditMode)
+{
+}
+else
+{
+
+    <div class="col-xs-12 col-sm-5 col-lg-4 col-lg-offset-1" ng-controller="rmLogin">
+        <div class="mb-2x" id="loginForm-main">
+            @if (!string.IsNullOrEmpty(Model.Heading))
+            {
+                <h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.Heading)</h4>
+            }
+            @if (!string.IsNullOrEmpty(Model.SubHeading))
+            {
+                <h6 class="mt-0">@Html.PropertyFor(m => m.SubHeading)</h6>
+            }
+            @if (Model.EditorialContent != null && !Model.EditorialContent.IsEmpty)
+            {
+                @Html.PropertyFor(m => m.EditorialContent)
+            }
+            <form class="ng-pristine ng-valid" autocomplete="off" ng-submit="login()">
+                <div class="form-group mb-1x input-subtle">
+                    <label class="sr-only" for="loginEmail1-main">@Html.DisplayFor(m => m.EmailLabel)</label>
+                    <input type="email" class="form-control" id="loginEmail1-main" placeholder="@Html.DisplayFor(m => m.EmailLabel)" data-original-title="" title="">
+                </div>
+                <div class="form-group input-subtle mb-1x">
+                    <label class="sr-only" for="loginUsrPW1-main">@Html.DisplayFor(m => m.PasswordLabel)</label>
+                    <input type="password" class="form-control"  id="loginUsrPW1-main" placeholder="@Model.PasswordLabel" data-original-title="" title="">
+                </div>
+                <p ng-cloak ng-hide="!hasError" class="has-error">
+                    {{ loginMessage }}
+                </p>
+                <p class="text-right">
+                    <a href="" data-show="#forgottenPW-main" data-hide="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.ForgottenPassword)</a>
+                </p>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8">
+                        <button class="btn btn-secondary btn-block" id="login-main" type="submit">@Html.DisplayFor(m => m.LoginButtonText)</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="hidden mb-2x" id="forgottenPW-main">
+            <h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.ForgottenPasswordHeading)</h4>
+            <h6 class="mt-0">@Html.PropertyFor(m => m.ForgottenPasswordSubHeading)</h6>
+            <form class="" ng-submit="resetPassword()">
+                <div class="form-group mb-2x input-subtle">
+                    <label class="sr-only" for="Emailcheckout">@Html.DisplayFor(m => m.EmailLabel)</label>
+                    <input type="email" class="form-control" id="Emailcheckout" ng-required="true" ng-model="resetEmail" placeholder="@Html.DisplayFor(m => m.EmailLabel)">
+                </div>
+                <div class="row mb-1x">
+                    <div class="col-xs-12 col-md-8">
+                        <button class="btn btn-secondary btn-block" type="submit">@Html.DisplayFor(m => m.ForgottenPassword)</button>
+                    </div>
+                </div>
+                <div class="row mb-2x">
+                    <div class="block containerBlock col-xs-12 col-md-8" ng-show="(!resetSent && resetError) || resetSent">
+                        @Html.PropertyFor(m => m.ForgottenPasswordCustomerSuccessMessage)
+                    </div>
+                </div>
+                <p><a href="" data-hide="#forgottenPW-main" data-show="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.CancelButtonText)</a>
+                </p>
+            </form>
+        </div>
+    </div>
+}

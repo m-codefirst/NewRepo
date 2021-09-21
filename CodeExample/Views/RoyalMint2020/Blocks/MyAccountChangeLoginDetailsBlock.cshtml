@@ -1,0 +1,60 @@
+﻿@using TRM.Web.Constants
+@using Newtonsoft.Json
+@using TRM.Shared.Extensions;
+
+@model TRM.Web.Models.Blocks.MyAccountChangeLoginDetailsBlock
+
+@{
+        var viewModel = new
+        {
+            introduction = Html.DisplayFor(a => a.IntroductionText).ToHtmlString(),
+            instructions = Html.TranslateFallback(StringResources.ChangeLoginDetailsIntroduction, "To change your username please contact our customer services team on 01234 657 891"),
+            userNameLabel = Html.TranslateFallback(StringResources.Username, "Username"),
+            questionsLabel = Html.TranslateFallback(StringResources.Questions, "Questions"),
+            questionListDefault = Html.TranslateFallback(StringResources.ChangeSecurityQuestionAndAnswer, "Select security question if you wish to change your security question and answer"),
+            answerLabel = Html.TranslateFallback(StringResources.EnterNewSecurityAnswer, "Answer"),
+            confirmAnswerLabel = Html.TranslateFallback(StringResources.ConfirmSecurityAnswer, "Confirm Answer"),
+            passwordLabel = Html.TranslateFallback(StringResources.EnterOriginalPassword, "Please enter your current password"),
+            newPasswordLabel = Html.TranslateFallback(StringResources.EnterNewPassword, "Please enter your new password"),
+            confirmPasswordLabel = Html.TranslateFallback(StringResources.PleaseConfirmNewPassword, "Please confirm your new password"),
+            loginDetailsHeader = Html.TranslateFallback(StringResources.LoginDetailsHeader, StringConstants.TranslationFallback.LoginDetailsHeader), 
+            securityQuestionHeader = Html.TranslateFallback(StringResources.SecurityQuestionHeader, StringConstants.TranslationFallback.SecurityQuestionHeader), 
+            userNameHeader = Html.TranslateFallback(StringResources.UserNameHeader, StringConstants.TranslationFallback.UserNameHeader),
+            passwordHeader = Html.TranslateFallback(StringResources.PasswordHeader, StringConstants.TranslationFallback.PasswordHeader), 
+            submitButton = Html.TranslateFallback(StringResources.SaveChangePasswordChanges, "Save"),
+            errors = new { 
+                 question = new {
+                     required = Html.TranslateFallback(StringResources.RequiredQuestion, StringConstants.TranslationFallback.RequiredQuestion),
+                 },
+                 answer = new {
+                     required = Html.TranslateFallback(StringResources.RequiredQA, StringConstants.TranslationFallback.RequiredQA), 
+                     max = Html.TranslateFallback(StringResources.IncorrectLengthOfQA, StringConstants.TranslationFallback.IncorrectLengthOfQA),
+                 }, 
+                 confirmAnswer = new {
+                     required = Html.TranslateFallback(StringResources.RequiredQA, StringConstants.TranslationFallback.RequiredQA),
+                     max = Html.TranslateFallback(StringResources.IncorrectLengthOfQA, StringConstants.TranslationFallback.IncorrectLengthOfQA),
+                     compare = Html.TranslateFallback(StringResources.NeedSameAsNewSercurityAnswer, StringConstants.TranslationFallback.NeedSameAsNewSercurityAnswer),
+                 },
+                 password = new {
+                     required = Html.TranslateFallback(StringResources.PasswordRequired, StringConstants.TranslationFallback.PasswordRequired),
+                     max = Html.TranslateFallback(StringResources.PasswordMaxLength, StringConstants.TranslationFallback.PasswordMaxLength),
+                 },
+                 newPassword = new {
+                    required = Html.TranslateFallback(StringResources.PasswordRequired, StringConstants.TranslationFallback.PasswordRequired),
+                     max = Html.TranslateFallback(StringResources.PasswordMaxLength, StringConstants.TranslationFallback.PasswordMaxLength),
+                 },
+                 confirmPassword = new {
+                     required = Html.TranslateFallback(StringResources.ConfirmPasswordRequired, StringConstants.TranslationFallback.ConfirmPasswordRequired),
+                     max = Html.TranslateFallback(StringResources.ConfirmPasswordMaxLength, StringConstants.TranslationFallback.ConfirmPasswordMaxLength),
+                     compare = Html.TranslateFallback(StringResources.PasswordMatch, StringConstants.TranslationFallback.PasswordMatch),
+                 },
+             },
+        
+        successMessage = @Html.TranslateFallback(StringResources.LoginDetailChanged, "Login Detail Changed"),
+        errorMessage = @Html.TranslateFallback(StringResources.FailToChangeLoginDetail, "Fail To Change Login Detail"),
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div data-module="change-login-details" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>

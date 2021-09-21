@@ -1,0 +1,201 @@
+﻿@using System.Configuration
+@using EPiServer.Framework.Web.Resources
+@model TRM.Web.Plugins.TestsHelperAdminPanel.TestsHelperAdminPanelViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    @Html.Raw(ClientResources.RenderResources("ShellCore"))
+    @Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+
+    <style>
+        .epi-contentArea {
+            margin-bottom: 24px;
+        }
+
+        .action-buttons button {
+            padding: 4px 8px;
+            margin: 8px 0 16px 0;
+        }
+
+        .action-buttons label {
+            margin-right: 8px;
+        }
+
+        .bottom-border {
+            border-bottom: 2px solid #666666;
+        }
+
+        .lds-hourglass {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+            .lds-hourglass:after {
+                content: " ";
+                display: block;
+                border-radius: 50%;
+                width: 0;
+                height: 0;
+                margin: 8px;
+                box-sizing: border-box;
+                border: 32px solid #666666;
+                border-color: #666666 transparent #666666 transparent;
+                animation: lds-hourglass 1.2s infinite;
+            }
+
+        @@keyframes lds-hourglass {
+            0% {
+                transform: rotate(0);
+                animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+            }
+
+            50% {
+                transform: rotate(900deg);
+                animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            }
+
+            100% {
+                transform: rotate(1800deg);
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <div class="epi-padding">
+        <div class="epi-contentArea">
+            <div class="EP-systemImage">
+                <h1 class="EP-prefix">
+                    Tests Helper Admin Panel
+                </h1>
+                <p class="EP-systemInfo">
+                    Tool to create needed content for Tests. Available only in Development and Integration.
+                </p>
+                <p class="EP-systemInfo">
+                    Current Environment: @ConfigurationManager.AppSettings["episerver:EnvironmentName"]
+                </p>
+            </div>
+        </div>
+
+        <h2 style="margin-bottom: 16px;">Actions:</h2>
+
+        <div class="epi-contentArea action-buttons bottom-border">
+            <h3>Generate admin users</h3>
+            @using (Html.BeginForm("GenerateAdminUsers", "TestsHelperAdminPanel", FormMethod.Post))
+            {
+                <label for="adminuserpassword">User Password</label>
+                <input type="text" id="adminuserpassword" name="adminuserpassword" required="required" />
+                <br />
+                <br />
+                <span>Security question answer: abc</span>
+                <br />
+                <br />
+                <label for="adminusersemails">Admin user emails (each in new line)</label>
+                <br />
+                <textarea required="required" id="adminusersemails" class="text" cols="86" rows="5" name="adminusersemails"></textarea>
+                <br />
+                <br />
+
+                <button>Generate Admin users</button>
+
+                if (Model.GeneratedAdminUsers != null)
+                {
+                    <h5>Admin users:</h5>
+
+                    <table style="width: 40%;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Success</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.GeneratedAdminUsers)
+                            {
+                                <tr>
+                                    <td>@user.Name</td>
+                                    <td>
+                                        @user.Success.ToString()
+                                    </td>
+                                    <td>@user.Message</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            }
+        </div>
+
+
+        <div class="epi-contentArea action-buttons bottom-border">
+            <h3>Generate test users</h3>
+            <span>To list all test user names please also click generate test users button. It will not crate new users if they already exists.</span>
+            <br />
+            <br />
+            @using (Html.BeginForm("GenerateTestUsers", "TestsHelperAdminPanel", FormMethod.Post))
+            {
+                <label for="testuserpassword">User Password</label>
+                <input type="text" id="testuserpassword" name="testuserpassword" required="required" />
+                <br />
+                <br />
+                <span>Security question answer: abc</span>
+                <br />
+                <button id="generatetestusersbtn">Generate Test users</button>
+
+                <br />
+                <div id="generatetestusersloader" style="display: none;" class="lds-hourglass"></div>
+
+                if (Model.GeneratedTestUsers != null)
+                {
+                    <h5>Test users:</h5>
+
+                    <table style="width: 40%;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Success</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.GeneratedTestUsers)
+                            {
+                                <tr>
+                                    <td>@user.Name</td>
+                                    <td>
+                                        @user.Success.ToString()
+                                    </td>
+                                    <td>@user.Message</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            }
+        </div>
+
+
+
+    </div>
+
+    <script type="text/javascript">
+        document.getElementById('generatetestusersbtn').addEventListener("click", function (e) {
+
+            if (!document.getElementById('testuserpassword').value) {
+                return;
+            }
+
+            document.getElementById('generatetestusersloader').style.display = "block";
+        }, true);
+    </script>
+</body>
+</html>

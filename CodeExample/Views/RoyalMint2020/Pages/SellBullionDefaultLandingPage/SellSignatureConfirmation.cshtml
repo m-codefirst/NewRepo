@@ -1,0 +1,104 @@
+﻿@using TRM.Web.Constants
+@using System.Web.Optimization
+@using TRM.Web.Extentions
+@using EPiServer.Web
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.SellBullionDefaultLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel>
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "deliverPageCss")
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="row justify-content-center">
+    <!-- Main Content -->
+    <div class="col-12 col-md-9 py-2">
+        <div class="form-container deliver-sell">
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-8">
+                    <!-- Header & Sale Message -->
+                    <h2 class="section-head"><span>@Html.TranslateFallback(StringResources.ThisSaleHasBeenCompleted, "This Sale has been completed")</span></h2>
+                    <p>@Html.TranslateFallBack(StringResources.SellSignatureConfirmText, "Your sale has been processed with a price per oz of {0} and it will be added to your secure wallet within 5 working days. You will receive an email with your sale confirmation shortly.", Model.ViewModel.PremiumPricePerOzIncludingPremium.ToString())</p>
+
+                    <!-- Main Body -->
+                    @if (@Model.CurrentPage.MainBody != null)
+                    {
+                        <div class="mod-section">
+                            @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                        </div>
+                    }
+
+                    <!-- Middle Content -->
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        <div class="mod-section">
+                            <div class="row">
+                                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Sale Details -->
+                    <div class="order-ref">
+                        @Html.TranslateFallback(StringResources.TransactionNumber, "Transaction Number") #@Model.ViewModel.SellTransactionNumber
+                    </div>
+                    <div class="product-card product-card-horizontal product-order product-consumer">
+                        <div class="row justify-content-center">
+                            <!-- Product Image -->
+                            <div class="col-12 col-sm-4 col-lg-3">
+                                <div class="asset">
+                                    <img src="@Model.ViewModel.SellVariant.ImageUrl" alt="">
+                                </div>
+                            </div><!-- /.asset -->
+                            <!-- Product Info -->
+                            <div class="col-12 col-sm-8 col-lg-9">
+                                <div class="row">
+                                    <div class="col-12 product-information">
+                                        <h3 class="product-name">@Model.ViewModel.SellVariant.Title</h3>
+                                        <h4 class="product-auxiliary">@Model.ViewModel.SellVariant.Subtitle</h4>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="product-quantity">@Html.TranslateFallback(StringResources.WeightInVaultOz, "Weight in vault (oz)") <span>@Model.ViewModel.SellVariant.AvailableToSell.ToString("0.###")</span></div>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.product-information -->
+                                </div><!-- /.row -->
+                            </div><!-- /.product-container -->
+                        </div><!-- /.row -->
+                    </div><!-- /.product-card -->
+                </div>
+            </div>
+
+            <!-- Sale Totals -->
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-8">
+                    <div class="form-spacing">
+                        <div class="order-totals">
+                            <div>@Html.TranslateFallback(StringResources.WeightInVaultOz, "Weight in vault (oz)"): <span>@Model.ViewModel.CombinedWeightInSale.ToString("0.###")</span></div>
+                            <div>@Html.TranslateFallback(StringResources.PricePerOzIncludingPremium, "Price per oz including premium"): <span>@Model.ViewModel.PremiumPricePerOzIncludingPremium</span></div>
+                            <div class="order-total">@Html.TranslateFallback(StringResources.SalePrice, "Sale price"): <span>@Model.ViewModel.SellTotal.ToString()</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Go to Account Button -->
+                    <div class="text-center">
+                        <a href="@Model.ViewModel.BullionAccountDashboardUrl" class="btn btn-primary m-0">@Html.TranslateFallback(StringResources.GoToAccountDashboard, "Go To Account Dashboard")</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Content -->
+            @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+            {
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                </div>
+            }
+        </div> <!-- /.form-container -->
+    </div>
+</div>
+@Html.Action("PushDataLayerSellBack", "Shared", new { viewModel = Model.ViewModel, step = Step.Six })

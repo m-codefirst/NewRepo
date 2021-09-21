@@ -1,0 +1,57 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Core
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.PanelViewModel
+
+@if (Model == null) { return; }
+
+@{
+    var colorClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ThisBlock.TextColour, Enums.eForeColour2020.White);
+    var buttonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ThisBlock.ButtonStyle, Enums.eButtonColour2020.Light);
+    var contentPositionClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ThisBlock.ContentPosition, string.Empty);
+    var textAlignmentClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ThisBlock.ContentTextAlignment, string.Empty);
+    var backgroundImageAlignmentClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ThisBlock.BackgroundImageAlignment, Enums.eBackgroundImageAlignment.MiddleCenter);
+}
+
+<div class="grid asset fluid-image @contentPositionClass">
+    <div class="content @colorClass @textAlignmentClass">
+        <!-- Heading -->
+        @if (!string.IsNullOrWhiteSpace(Model.ThisBlock.Heading))
+        {
+            <h3 class="title">@Model.ThisBlock.Heading</h3>
+        }
+
+        <!-- Sub-Heading -->
+        @if (!string.IsNullOrWhiteSpace(Model.ThisBlock.SubHeading))
+        {
+            <h4 class="sub-title">@Model.ThisBlock.SubHeading</h4>
+        }
+
+        <!-- Content -->
+        @Html.PropertyFor(x => x.ThisBlock.Content)
+
+        <!-- CTA Button -->
+        @if (Model.ThisBlock.LinkHyperlink != null && !string.IsNullOrWhiteSpace(Model.ThisBlock.LinkText))
+        {
+            <a href="@Url.ContentUrlExtension(Model.ThisBlock.LinkHyperlink)" class="btn @buttonClass">@Model.ThisBlock.LinkText</a>
+        }
+    </div>
+    @if (Model.ThisBlock.BackgroundImage != null && !ContentReference.IsNullOrEmpty(Model.ThisBlock.BackgroundImage.LgImage))
+    {
+        if (Model.ThisBlock.LinkHyperlink != null)
+        {
+            <!-- Background -->
+            <a href="@Url.ContentUrlExtension(Model.ThisBlock.LinkHyperlink)" class="background @backgroundImageAlignmentClass">
+                @Html.DisplayFor(a => a.ThisBlock.BackgroundImage)
+            </a>
+        }
+        else
+        {
+            <!-- Background -->
+            <div class="background @backgroundImageAlignmentClass">
+                @Html.DisplayFor(a => a.ThisBlock.BackgroundImage)
+            </div>
+        }
+        
+    }
+</div><!-- /.grid -->

@@ -1,0 +1,38 @@
+﻿@using EPiServer.Find.Helpers.Text
+@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+<div class="clear">
+    <p class="variantSubHeading mb-1x">
+        <meta itemprop="availability" content="@((int) Model.ViewModel.StockSummary.Status)" />
+        <span class="display-inline" ng-class="@((int) Model.ViewModel.StockSummary.Status)| stockClass" itemprop="availability">@Model.ViewModel.StockSummary.StatusMessage</span>
+        <span class="display-inline">|</span>
+
+        @if (Model.ViewModel.StockSummary.Status == Enums.eStockStatus.PreOrder)
+        {
+            <span class="display-inline">@Model.CurrentPage.PreOrderOrBackOrderStatusMessage</span>
+            <span class="display-inline">|</span>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.ViewModel.StockSummary.ShippingMessage))
+        {
+            <span class="display-inline variantPageInventoryItemsShippingMessage">@Model.ViewModel.StockSummary.ShippingMessage</span>
+            <span class="display-inline">|</span>
+        }
+        <span class="display-inline sku">@Html.TranslateFallback(StringResources.ProductCode, @StringConstants.TranslationFallback.ProductCode) @Model.CurrentPage.Code</span>
+    </p>
+
+    <ul class="list-unstyled">
+        @*Supplier Message*@
+        @if (Model.CurrentPage.IsGifting && Model.CurrentPage.SupplierMessage.IsNotNullOrEmpty())
+        {
+            <li>
+                @Model.CurrentPage.SupplierMessage
+            </li>
+        }
+
+        @if (Model.ViewModel.StockSummary.LimitedEditionPresentation > 0)
+        {
+            <li>@Html.TranslateFallback(StringResources.LimitedEdition, @StringConstants.TranslationFallback.LimitedEdition) @Model.ViewModel.StockSummary.LimitedEditionPresentation</li>
+        }
+    </ul>
+</div>
+

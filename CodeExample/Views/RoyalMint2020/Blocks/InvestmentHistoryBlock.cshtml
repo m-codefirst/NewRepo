@@ -1,0 +1,89 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.Bullion.InvestmentHistoryBlockViewModel
+
+
+@helper RenderTitle()
+{
+    if (!Model.HasInvestmentHistory)
+    {
+        <div class="block col-xs-12 col-sm-12">
+            <div class="row">
+                <p class="cta-link text-graylight">@Html.DisplayFor(x => x.CurrentBlock.NoTransactionHistoryMessage)</p>
+            </div>
+        </div>
+    }
+    else
+    {
+
+        if (Model.CurrentBlock.InvestmentHistoryLinkList != null && Model.CurrentBlock.InvestmentHistoryLinkList.Any())
+        {
+            foreach (var item in Model.CurrentBlock.InvestmentHistoryLinkList)
+            {
+                <a class="cta-link" target="@item.Target" href="@Url.ContentUrlExtension(item.Href)" title="@item.Title">@item.Text</a>
+            }
+        }
+    }
+}
+
+@helper RenderCustomArea()
+{
+    if (!Model.HasInvestmentHistory || Model.CurrentBlock.InvestmentHistoryArea != null)
+    {
+        <div class="contentArea">
+            <div class="row">
+                @if (!Model.HasInvestmentHistory)
+                {
+                    @Html.PropertyFor(x => x.CurrentBlock.NoTransactionHistoryArea)
+                }
+                else
+                {
+                    @Html.PropertyFor(x => x.CurrentBlock.InvestmentHistoryArea)
+                }
+            </div>
+        </div>
+    }
+}
+
+@helper RenderCopyContent()
+{
+    if (Model.IsSippContact)
+    {
+        if (!string.IsNullOrEmpty(Model.CurrentBlock.PensionInvestmentServiceSubHeading))
+        {
+            <h5 class="h5 mb-1x">@Html.PropertyFor(x => x.CurrentBlock.PensionInvestmentServiceSubHeading)</h5>
+        }
+        if (Model.CurrentBlock.PensionInvestmentServiceLinkList != null && Model.CurrentBlock.PensionInvestmentServiceLinkList.Any())
+        {
+            foreach (var item in Model.CurrentBlock.PensionInvestmentServiceLinkList)
+            {
+                <a class="cta-link" target="@item.Target" href="@Url.ContentUrlExtension(item.Href)" title="@item.Title">@item.Text</a>
+            }
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.CurrentBlock.InvestmentServiceSubHeading))
+        {
+            <h5 class="h5 mb-1x">@Html.PropertyFor(x => x.CurrentBlock.InvestmentServiceSubHeading)</h5>
+        }
+        if (Model.CurrentBlock.InvestmentServiceLinkList != null && Model.CurrentBlock.InvestmentServiceLinkList.Any())
+        {
+            foreach (var item in Model.CurrentBlock.InvestmentServiceLinkList)
+            {
+                <a class="cta-link" target="@item.Target" href="@Url.ContentUrlExtension(item.Href)" title="@item.Title">@item.Text</a>
+            }
+        }
+    }
+}
+
+<div class="block groupLinkBlock col-xs-12 col-sm-12">
+    <div class="row grouplink-block">
+        @RenderTitle()
+
+        @RenderCopyContent()
+
+        @RenderCustomArea()
+    </div>
+</div>
+

@@ -1,0 +1,60 @@
+﻿@using Castle.Core.Internal
+@using TRM.Web.Models.ViewModels.Bullion
+
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+@{
+    var columnnIdx = 0;
+
+    foreach (var item in Model.Value.MoreDetailCollection)
+    {
+        columnnIdx++;
+
+        if (columnnIdx != 3)
+        {
+            <div class="col-lg-3">
+                <span class="title">@item.Key</span>
+                @item.Value
+            </div>
+        }
+        else
+        {
+            <div class="col-lg-6">
+                <span class="title">@item.Key</span>
+
+                @if (item.Value is string)
+                {
+                    <ul class="summary">
+                        <li>@item.Value</li>
+                    </ul>
+                }
+                else
+                {
+                    if (item.Value is TransactionHistoryOrderDetailViewModel)
+                    {
+                        var orderLIneItemViewModel = item.Value as TransactionHistoryOrderDetailViewModel;
+                        <ul class="summary">
+
+                            @if (!string.IsNullOrEmpty(@orderLIneItemViewModel.DeliveryType))
+                            {
+                                <li>@orderLIneItemViewModel.DeliveryType</li>
+                            }
+
+
+
+                            @if (!orderLIneItemViewModel.OrderLineViewModels.IsNullOrEmpty())
+                            {
+                                foreach (var orderline in orderLIneItemViewModel.OrderLineViewModels)
+                                {
+                                    <li>@orderline.Name</li>
+                                    <li>@orderline.Status</li>
+                                }
+                            }
+
+
+                        </ul>
+                    }
+                }
+            </div>
+        }
+    }
+}

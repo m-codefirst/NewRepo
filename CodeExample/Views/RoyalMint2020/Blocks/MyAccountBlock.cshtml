@@ -1,0 +1,47 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions;
+
+@model TRM.Web.Models.ViewModels.MyAccountViewModel
+
+<h1 class="h2 mt-0">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Welcome, "Welcome") @Model.Firstname</h1>
+<!-- WYSIWYG -->
+<div class="wysiwyg">
+    @Html.DisplayFor(a => a.ThisBlock.WelcomeText)
+</div>
+<!-- WYSIWYG End -->
+<div class="panel panel-default panel-secondary">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+
+                <h3 class="mb-1x mt-0 bb-dotted-b pb-1x">@Html.TranslateFallback(TRM.Web.Constants.StringResources.ManageYourAccount, "Manage your personal account")</h3>
+                <!-- WYSIWYG -->
+                <div class="wysiwyg">
+                    @Html.DisplayFor(a => a.ThisBlock.ManageAccountText)
+                </div>
+                <!-- WYSIWYG End -->
+            </div>
+            <div class="col-xs-12 lead mb-0">
+                <!-- Table -->
+                <div class="row">
+                    <div class="col-xs-12 col-sm-5 pb-1x width-auto strong">
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.CurrentEmailAddress, "Current e-mail-address:")
+                        @if (Model.ThisBlock.EditDetailsPage != null)
+                        {
+                            <br />
+                            <a href="@Model.ThisBlock.EditDetailsPage.GetExternalUrl_V2()" class="btn-arrow light small">Change my e-mail address</a>
+                        }
+                    </div>
+                    <div class="col-xs-12 col-sm-7 pb-1x ">@Model.EmailAddress</div>
+
+                    <div class="col-xs-12 col-sm-5 width-auto clear strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.CurrentEmailAddress, "Customer Account Number:")</div>
+                    <div class="col-xs-12 col-sm-7">@Model.AccountNumber</div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.DisplayFor(a => a.ThisBlock.LowerContentArea)

@@ -1,0 +1,107 @@
+﻿@using System.Linq
+@using EPiServer.Find.Helpers.Text
+@using Mediachase.BusinessFoundation.Data.Meta
+@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.FilterViewModel
+@{
+    var rankedDenomination = StringConstants.FacetRankedDenomination;
+    var alloy = StringConstants.FacetAlloy;
+    var facetQuality = StringConstants.FacetQuality;
+    var pureMetal = StringConstants.FacetPureMetal;
+}
+
+@if (Model.EntryFacets.Count > 0)
+{
+    <div id="ecommerceFilters" ng-cloak>
+
+        @if (Model.EntryFacets.Any(f => f.Terms.Any(t => t.Selected)))
+        {<a class="btn btn-default btn-sm pull-right-md-up mb-xs-1x mb-sm-1x clearButton" type="button" onclick="doSearch();">
+                <span class="small">
+                    @Html.TranslateFallback(StringResources.ClearFilters, "Clear Filters")
+                <span class="trmi trmi-close">
+                </span>
+            </span>
+        </a>}
+        <h3 class="mt-0">@Html.TranslateFallback(StringResources.FilterBy, "Filter by:") </h3>
+        <div class="filter-body">
+            @foreach (var filter in Model.EntryFacets)
+                {
+                    var hasSelectedFacet = filter.Terms.Any(f => f.Selected);
+                    if (filter.Terms.Count == 0 && filter.Terms.All(a => a.Count == 0))
+                    {
+                        continue;
+                    }
+                    var showExpanded = filter.ShowExpanded || hasSelectedFacet ? "collapse in" : "collapse";
+                    var collapsed = filter.ShowExpanded || hasSelectedFacet ? "" : "collapsed";
+                    var filterDivId = filter.Name.Replace(" ", "_").ToLower();
+                    var i = 0;
+                    if (filter.Terms.Any() && filter.Terms[0].Term.IsNotNullOrEmpty() || filter.Terms[0].DisplayName.IsNotNullOrEmpty())
+                    {
+                    <div class="category-filters" filterclasses>
+                        <a class="filter-title @collapsed" role="button" data-toggle="collapse" data-target="#collapse-@filterDivId" aria-controls="collapseExample" ng-cloak>@filter.Name</a>
+                        <div class="@showExpanded" id="collapse-@filterDivId">
+                            <ul class="unordered-list">
+                                @foreach (var filterTerm in filter.Terms)
+                                {
+                                    i++;
+
+                                    var showtoggle = i > Model.ShowMoreFiltersCount ? "true" : "false";
+                                    var ngClass = hasSelectedFacet ? "" : "{'show-toggle hidden' :" + showtoggle + "}";
+
+
+                                    <li ng-class="@ngClass" @showExpanded>
+                                        <span class="checkbox small fancy input-right">
+                                            <input name="filterCheckBox" type="checkbox" EncodedValue="@filter.EncodedValue" @(filterTerm.Count == 0 && !filterTerm.Selected ? "disabled": string.Empty) EncodedTerm="@filterTerm.EncodedTerm" id="@filter.EncodedName.ToLower()-term-@filterTerm.EncodedTerm.ToLower()" @(filterTerm.Selected ? "checked" : string.Empty) data-original-title="" title="" onchange="updateFilters('@Model.AddRemoveFilter(filter.EncodedValue, filterTerm.EncodedTerm)')">
+
+                                            <label class="mb-0" for="@filter.EncodedName.ToLower()-term-@filterTerm.EncodedTerm.ToLower()" ng-cloak>
+                                                @filterTerm.DisplayName @if (!Model.HideFilterCounts) {<text>(@filterTerm.Count)</text>}
+                                            </label>
+                                        </span>
+                                    </li>
+                                }
+                                @if (i > Model.ShowMoreFiltersCount && !hasSelectedFacet)
+                                {
+                                    <li class="small">
+                                        <a class="show-more" role="button">
+                                            @Html.TranslateFallback(StringResources.ShowMore, "View More")
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+        <div class="apply-button hidden-md hidden-lg">
+            <div class="btn btn-block btn-primary" role="button" onclick="applyFilters()">@Html.TranslateFallback(StringResources.ApplyMoreFilters, "Apply Filters")</div>
+        </div>
+    </div>
+}
+
+
+<script language="javascript" type="text/javascript">
+    var  applyFilters = function() {
+
+        var checkboxes = document.getElementsByName('filterCheckBox');
+        var url = '@HttpContext.Current.Request.Url.AbsolutePath';
+        var q = '@HttpContext.Current.Request.QueryString["q"]';
+        url = url + "?q=" + q;
+
+        for (var i = 0; i < checkboxes.length; i++) {
+
+            if (checkboxes[i].checked) {
+                var key = checkboxes[i].attributes["encodedvalue"].nodeValue;
+                var value = checkboxes[i].attributes["encodedterm"].nodeValue;
+                url = url + "&" + key + "=" + value;
+            }
+        }
+
+        return location.assign(url);
+    }
+</script>
+
+
+

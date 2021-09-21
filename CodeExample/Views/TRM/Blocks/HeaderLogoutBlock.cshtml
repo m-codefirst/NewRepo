@@ -1,0 +1,24 @@
+﻿@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@model TRM.Web.Models.ViewModels.HeaderLogoutModel<TRM.Web.Models.Blocks.HeaderLogoutBlock>
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : null;
+
+    var contactFirstName = contact != null ? contact.FirstName : string.Empty;
+}
+<div class="page-header" ng-controller="rmLogin" ng-cloak>
+	<div class="row center-items-sm-up">
+		<div class="col-xs-12 col-md-8">
+			<h1 class="h1 mt-0 text-capitalize">@Model.CurrentBlock.HeaderTitle.Replace("[FirstName]", contactFirstName)</h1>
+		</div>
+		@*<div class="col-xs-12 col-md-4">
+			<div class="pull-right-sm-up">
+				<a href="javascript:void(0)" id="logout-header" class="btn-empty text-slateblue" ng-click="logout(true)">
+					<div class="spinner hidden"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
+					<span>@Model.LogoutText</span>
+				</a>
+			</div>
+		</div>*@
+	</div>
+</div>

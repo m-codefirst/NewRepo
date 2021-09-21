@@ -1,0 +1,67 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.FailedKycDocumentCheckingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycDetailsViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<main id="content" class="container kyc-verification-page">
+    <div class="mod-section">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>
+            </div>
+            <div class="col-md-10 col-lg-8">
+                <div class="form-container">
+                    @if (Model.CurrentPage.DisplayPageHeading)
+                    {
+                        <h1>@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+                    }
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    }
+                    <h2 class="section-head"><span>@Html.PropertyFor(x => x.CurrentPage.ConfirmDetailsMessageHeading)</span></h2>
+                    @if (Model.CurrentPage.TopMiddleContentArea != null)
+                    {
+                        @Html.PropertyFor(x => x.CurrentPage.TopMiddleContentArea)
+                    }
+
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-sm-8 col-md-7 col-lg-6">
+                            <div class="form-spacing">
+                                @if (Model.ViewModel.IsSuccecced)
+                                {
+                                    Html.RenderPartial("RoyalMint2020/_Message", new MessageViewModel { Title = Model.ViewModel.RegisterSuccessfullyMessage, Icon = "check", Text = Model.CurrentPage.ApprovedConfirmDetailsMessageContent });
+                                }
+                                else
+                                {
+                                    Html.RenderPartial("RoyalMint2020/_Message", new MessageViewModel { Title = Model.CurrentPage.RejectedConfirmDetailsMessageTitle, Icon = "close", Text = Model.CurrentPage.RejectedConfirmDetailsMessageContent });
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        @Html.PropertyFor(x => x.CurrentPage.BottomMiddleContentArea)
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

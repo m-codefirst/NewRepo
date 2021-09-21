@@ -1,0 +1,54 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.TrmNavigationBlockViewModel
+@{
+    var viewAll = Html.TranslateFallback(StringResources.MegaMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+    var hasChildren = Model.NavigationDto.ChildNavigationItems != null && Model.NavigationDto.ChildNavigationItems.Any(i => i.VisibleInNav) && Model.NavigationDto.CurrentBlock.ShowChildren;
+    var hasChildrenCss = hasChildren ? "has-children" : string.Empty;
+}
+
+
+<div class="level2 @hasChildrenCss">
+    @{
+        if (Model.NavigationDto.CurrentBlock.DontOutputLabelWithHyperlink || string.IsNullOrWhiteSpace(Model.NavigationDto.MenuItemExternalUrl))
+        {
+            <span class="fauxLink">
+                @Model.NavigationDto.MenuItemDisplayName
+            </span>
+        }
+        else
+        {
+            <a href="@Model.NavigationDto.MenuItemExternalUrl" @(Model.NavigationDto.OpenInANewWindow ? "target='_blank'" : string.Empty) >@Model.NavigationDto.MenuItemDisplayName</a>
+            
+        }
+        if (hasChildren)
+        {
+            <div>
+                @foreach (var child in Model.NavigationDto.ChildNavigationItems.Where(i => i.VisibleInNav))
+                {
+                    <div class="level3">
+                        <a href="@child.MenuItemExternalUrl">@child.MenuItemDisplayName</a>
+                    </div>
+                }
+                
+                <div class="row">
+                    @Html.PropertyFor(m => m.NavigationDto.CurrentBlock.MegaMenuContent, new { ChildrenCssClass = "level3"})
+                </div>
+
+                @if (!Model.NavigationDto.CurrentBlock.DontOutputLabelWithHyperlink)
+                {
+                    <div class="levelParent mt-1x mb-1x strong">
+                        <a href="@Model.NavigationDto.MenuItemExternalUrl" @(Model.NavigationDto.OpenInANewWindow ? "target='_blank'" : string.Empty) title="@viewAll">@viewAll</a>
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                    @Html.PropertyFor(m => m.NavigationDto.CurrentBlock.MegaMenuContent, new { ChildrenCssClass = "level3" })
+            </div>
+        }
+    }
+
+</div>

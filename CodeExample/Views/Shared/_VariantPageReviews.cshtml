@@ -1,0 +1,101 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+
+@{
+    var layout = Model.Layout as TrmLayoutModel;
+}
+
+<div class="row">
+    <div ng-if="reviews.length === 0">
+        @Html.PropertyFor(x => layout.NoFeefoReviewsMessage)
+    </div>
+
+    <div class="block reviewBlock col-xs-12" ng-repeat="review in reviews">
+        <div class="blockContent bb-dotted-gray pb-2x">
+            <div class="row">
+                <div class="reviewTitle col-xs-12">
+                    <h3>
+                        @Html.TranslateFallback(StringResources.Reviewed, "Reviewed")
+                        <time>
+                            {{review.PresentationReviewDate}}
+                        </time>
+                    </h3>
+                </div>
+                <div class="reviewSubtitle col-xs-12">
+                    <h4 class="h5">@Html.TranslateFallback(StringResources.ProductReview, "Product Review")</h4>
+                </div>
+                <div class="reviewStars col-xs-4 col-sm-2">
+                    <p class="text-slateblue" ng-if="review.ProductRating === '++'">
+                        <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span>
+                        <br />
+                        @Html.TranslateFallback(StringResources.ExcellentReview, "Excellent")
+                    </p>
+                    <p class="text-slateblue" ng-if="review.ProductRating === '+'">
+                        <span class="trmi trmi-star-full text-ochre  ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                        <br />
+                        @Html.TranslateFallback(StringResources.GoodReview, "Good")
+                    </p>
+                    <p class="text-slateblue" ng-if="review.ProductRating === '-'">
+                        <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                        <br />
+                        @Html.TranslateFallback(StringResources.PoorReview, "Poor")
+                    </p>
+                    <p class="text-slateblue" ng-if="review.ProductRating === '--'">
+                        <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                        <br />
+                        @Html.TranslateFallback(StringResources.BadReview, "Bad")
+                    </p>
+                </div>
+                <div class="reviewContent col-xs-8 col-sm-10" ng-bind-html-unsafe="review.ProductReview">
+                    <p>{{review.ProductReview}}</p>
+                </div>
+
+                @if (!layout.HideFeefoServiceReviews)
+                {
+                    <div class="reviewSubtitle col-xs-12" ng-if="review.ServiceReview || review.ServiceRating">
+                        <h4 class="h5">@Html.TranslateFallback(StringResources.ServiceReview, "Service Review")</h4>
+                    </div>
+                    <div class="reviewStars col-xs-4 col-sm-2">
+                        <p class="text-slateblue" ng-if="review.ServiceRating === '++'">
+                            <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span>
+                            <br />
+                            @Html.TranslateFallback(StringResources.ExcellentReview, "Excellent")
+                        </p>
+                        <p ng-if="review.ServiceRating === '+'" class="text-slateblue">
+                            <span class="trmi trmi-star-full text-ochre  ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                            <br />
+                            @Html.TranslateFallback(StringResources.GoodReview, "Good")
+                        </p>
+                        <p class="text-slateblue" ng-if="review.ServiceRating === '-'">
+                            <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                            <br />
+                            @Html.TranslateFallback(StringResources.PoorReview, "Poor")
+                        </p>
+                        <p class="text-slateblue" ng-if="review.ServiceRating === '--'">
+                            <span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span><span class="trmi trmi-star-empty text-ochre ng-scope"></span>
+                            <br />
+                            @Html.TranslateFallback(StringResources.BadReview, "Bad")
+                        </p>
+                    </div>
+                    <div class="reviewContent col-xs-8 col-sm-10" ng-bind-html-unsafe="review.ServiceReview">
+                        <p>{{review.ServiceReview}}</p>
+                    </div>
+                }
+
+                <div class="reviewContent col-xs-12 mt-1x" ng-if="review.MerchantComment">
+                    <div class="well">
+                        <h4 class="h5">@Html.TranslateFallback(StringResources.RoyalMintReply, "Royal Mint response")</h4>
+                        <p ng-if="review.MerchantComment" ng-bind-html="review.MerchantComment">{{review.MerchantComment}}</p>
+                        <p ng-if="!review.MerchantComment">@Html.TranslateFallback(StringResources.NoReviewsAvailable, "N/A")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.reviewBlock -->
+    <div class="col-xs-12 text-center" ng-if="reviews.length !== 0">
+        <a class="btn btn-default" id="reviewsLoadMoreButton" ng-click="getMoreReviews('@Model.CurrentPage.Code')" role="button" data-show="#resultsSet80">@Html.TranslateFallback(StringResources.LoadMoreReviews, "Load more Reviews")</a>
+    </div>
+</div>

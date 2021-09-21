@@ -1,0 +1,21 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Models.Blocks
+@model VideoBlock
+
+@if (!string.IsNullOrWhiteSpace(Model.VideoId))
+{
+    <a href="@Url.GetYouTubeUrl("https://youtu.be/", Model.VideoId)" class="asset mod-video fluid-image">
+        @if (Html.IsContainValidImage(Model))
+        {
+            <span class="icon play"><svg><use xlink:href="#play"></use></svg></span>
+            <picture>
+                <source srcset="@Url.GetImageUrl(Model.VideoBlockCoverImage)" media="(min-width: 720px)">
+                <img src="@Url.GetImageUrl(Model.Image)" alt="">
+            </picture>
+        }
+        else
+        {
+            <div class="video-player"><iframe src="@Url.GetYouTubeUrl("https://www.youtube.com/embed/", Model.VideoId + "?autoplay=1")"></iframe></div>
+        }
+    </a>
+}

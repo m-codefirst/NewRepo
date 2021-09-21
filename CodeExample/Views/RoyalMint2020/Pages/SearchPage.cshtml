@@ -1,0 +1,180 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.SearchPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.SearchPageViewModel>
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using EPiServer.Web
+@using System.Web.Optimization
+@using TRM.Web.Models.ViewModels
+
+@{
+    var layout = Model.Layout as TrmLayoutModel;
+    if (layout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var searchPageUrl = Request.Url.AbsolutePath;
+    var viewModel = Model.ViewModel;
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "searchCss")
+}
+
+<script type="text/javascript">
+    function searchKeyPress(e) {
+        e = e || window.event;
+        if (e.keyCode === 13) {
+            document.getElementById("doMainSearch").click();
+            return false;
+        }
+        return true;
+    }
+
+
+    function doSearch() {
+        if (document.getElementById("refine").value.length > 1) {
+            window.location = "@(searchPageUrl)?q=" + document.getElementById("refine").value;
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+
+<div class="pageContainer">
+    @if (!layout.HideSiteBreadcrumb)
+    {
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", layout.Breadcrumb);
+    }
+
+    @if (layout.HasMessage)
+    {
+        Html.RenderPartial("_MessageBox", layout.Message);
+    }
+</div>
+
+<div class="container">
+    <div class="mod-section row justify-content-center">
+        <div class="col col-md-10 col-lg-8 justify-content-center">
+
+            <form action="./" method="post" class="mod-form site-search-refine">
+                <fieldset>
+                    <legend class="sr-only">Refine search results</legend>
+
+                    <div class="row justify-content-center text-center">
+                        <div class="col-11 col-md-10 col-lg-10 col-xl-8">
+                            <h1>Showing @viewModel.TotalCount results for</h1>
+                            @if (viewModel.TotalCount <= 0)
+                            {
+                                <h6>@Html.TranslateFallback(StringResources.NoResultMatch, StringConstants.TranslationFallback.NoResultMatch) <br /> <strong class="display-3">"@viewModel.Filters.Query"</strong></h6>
+                                <p>@Html.TranslateFallback(StringResources.RefineYourSearch, StringConstants.TranslationFallback.RefineYourSearch)</p>
+                            }
+                            <div class="form-group">
+                                <label for="refine" class="sr-only">Search</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="refine" value="@viewModel.Filters.Query" required onkeypress="return searchKeyPress(event);">
+                                    <div class="input-group-append">
+                                        <button id="doMainSearch" class="btn btn-white" type="button" onclick="doSearch();">
+                                            <span class="sr-only">Search</span>
+                                            <span class="icon">
+                                                <svg>
+                                                    <use xlink:href="#search"></use>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div><!-- /.form-group -->
+                        </div>
+                    </div><!-- /.site-search -->
+
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    @if (viewModel.TotalCount > 0)
+    {
+        if (viewModel.TotalShopCount > 0)
+        {
+            <div class="mod-section">
+                <h2 class="section-head"><span>Shop (@viewModel.TotalShopCount)</span></h2>
+
+                <div class="row justify-content-center">
+                    <div class="col-10">
+                        <div class="row justify-content-center">
+                            @foreach (var entryViewModel in viewModel.Shop)
+                            {
+                                <div class="col-12 col-md-6 col-lg-4 d-flex">
+                                    @{ Html.RenderPartial("PagePartials/TrmEntryPartial", entryViewModel); }
+                                </div>
+                            }
+                        </div>
+                        @Html.ActionLink("View all shop product results", "SearchProductListing",
+                            new { q = viewModel.Filters.Query, type = SearchProductListingType.Shop }, new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (viewModel.TotalInvestCount > 0)
+        {
+            <div class="mod-section">
+                <h2 class="section-head"><span>Invest (@viewModel.TotalInvestCount)</span></h2>
+
+                <div class="row justify-content-center">
+                    <div class="col-10">
+                        <div class="row justify-content-center">
+                            @foreach (var entryViewModel in viewModel.Invest)
+                            {
+                                <div class="col-12 col-md-6 col-lg-4 d-flex">
+                                    @{ Html.RenderPartial("PagePartials/TrmEntryPartial", entryViewModel); }
+                                </div>
+                            }
+                        </div>
+                        @Html.ActionLink("View all invest results", "SearchProductListing",
+                            new { q = viewModel.Filters.Query, type = SearchProductListingType.Invest }, new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (viewModel.TotalHelpCount > 0)
+        {
+            <div class="mod-section articles support">
+                <h2 class="section-head"><span>Help (@viewModel.TotalHelpCount)</span></h2>
+
+                <div class="row justify-content-center">
+                    <div class="col-10 col-lg-8">
+                        @foreach (var help in viewModel.HelpWithBreadcrumbItems)
+                        {
+                            Html.RenderPartial("RoyalMint2020/_SearchContentResult", help);
+                        }
+                        @Html.ActionLink("View all help results", "GetContentListing",
+                            new { q = viewModel.Filters.Query, type = GetContentListingType.Help }, new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (viewModel.TotalArticleCount > 0)
+        {
+            <div class="mod-section articles additional">
+                <h2 class="section-head"><span>Additional results (@viewModel.TotalArticleCount)</span></h2>
+
+                <div class="row justify-content-center">
+                    <div class="col-10 col-lg-8">
+                        @foreach (var article in viewModel.ArticleWithBreadcrumbItems)
+                        {
+                            Html.RenderPartial("RoyalMint2020/_SearchContentResult", article);
+                        }
+                        @Html.ActionLink("View all additional results", "GetContentListing",
+                            new { q = viewModel.Filters.Query, type = GetContentListingType.Articles }, new { @class = "btn btn-secondary" })
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

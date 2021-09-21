@@ -1,0 +1,58 @@
+﻿@model TRM.Web.Models.Blocks.ContainerBlock
+@using TRM.Web.Constants
+
+@{ 
+    string backgroundClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.Background, string.Empty);
+    string paddingClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.PaddingClass, string.Empty);
+}
+
+@switch (Model.ContainerType)
+{
+    case Enums.eContainerType.Hero:
+        <div class="mod-hero mod-hero-grid row @paddingClass @backgroundClass">
+            <div class="col-12 px-0 grid-container">
+                <div class="row no-gutters grid-row" @Html.EditAttributes(x => x.Content)>
+                    @Html.DisplayFor(x => x.Content)
+                </div><!-- /.grid-row -->
+            </div>
+        </div><!-- /.mod-hero -->
+        break;
+    case Enums.eContainerType.Masonry:
+        <div class="row justify-content-center @paddingClass @backgroundClass">
+            <div class="col-12 col-md-10">
+                <div class="masonry-grid categories" @Html.EditAttributes(x => x.Content)>
+                    @Html.DisplayFor(x => x.Content)
+                </div>
+            </div>
+        </div>
+        break;
+    case Enums.eContainerType.Accordion:
+        <div class="mod-accordion" id="accordion-@Model.Property.OwnerLink.ID">
+            <div class="row justify-content-center @paddingClass @backgroundClass" @Html.EditAttributes(x => x.Content)>
+                @Html.DisplayFor(x => x.Content, new { AccordionId = Model.Property.OwnerLink.ID })
+            </div>
+        </div>
+        break;
+    case Enums.eContainerType.Form:
+        <div class="mod-section">
+            <div class="row justify-content-center @paddingClass @backgroundClass" @Html.EditAttributes(x => x.Content)>
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="form-container">
+                        <div class="row justify-content-center">
+                            <div class="col-11 md-col-10">
+                                @Html.DisplayFor(x => x.Content, new { @isNewDesign = true })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        break;
+    default:
+        <div class="@backgroundClass @paddingClass">
+            <div class="row justify-content-center" @Html.EditAttributes(x => x.Content)>
+                @Html.DisplayFor(x => x.Content)
+            </div>
+        </div>
+        break;
+}

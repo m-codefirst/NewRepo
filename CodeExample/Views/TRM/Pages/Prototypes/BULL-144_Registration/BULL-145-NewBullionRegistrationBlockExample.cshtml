@@ -1,0 +1,67 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <!-- breadcrumb -->
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    <!-- / breadcrumb -->
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+
+                <!-- Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <h1 class="h1 mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+                }
+                <!-- / Headline -->
+                   
+                <!-- Content Area Top -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                    </div>
+                </div>
+                <!-- / Content Area Top -->
+
+                <!-- Content Area New -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+                    </div>
+                </div>
+                <!-- / Content Area New -->
+
+                <!-- Content Area Middle -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                </div>
+                <!-- / Content Area Middle -->
+
+                <!-- Content Area Bottom -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                    </div>
+                </div>
+                <!-- / Content Area Bottom -->
+            </div>
+        </div>
+    </div>
+</div>
+                                                                                                 -

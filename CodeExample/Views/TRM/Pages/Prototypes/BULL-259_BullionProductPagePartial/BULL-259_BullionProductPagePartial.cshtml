@@ -1,0 +1,137 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	<div class="container transaction-history">
+		<div class="page-header">
+			<div class="row center-items">
+				<div class="col-xs-12 col-md-6">
+					<h1 class="h1 mt-0">Bullion Product Partial Demo</h1>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="trmVariant col-xs-6 col-sm-4">
+				@{ Html.RenderPartial("PagePartials/TrmBarPartial"); }
+			</div>
+			<div class="trmVariant col-xs-6 col-sm-4">
+				@{ Html.RenderPartial("PagePartials/TrmCoinPartial"); }
+			</div>
+			<!--Using current Trm Entry Partial-->
+			<div class="trmVariant col-xs-6 col-sm-4">
+				<a href="" title="Paddington™ Silver Proof 2-Coin Series">
+					<figure class="" ng-class="">
+						<div class="frontImg">
+							<div class="promoTag__wrapper">
+								<div>
+									<span class="promoTag">
+										2-Coin Series
+									</span>
+								</div>
+							</div>
+							<picture>
+								<source media="(min-width: 1200px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=580" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=580">
+								<source media="(min-width: 992px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=442" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=442">
+								<source media="(min-width: 768px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=533" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=533">
+								<source media="(min-width: 0px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=442" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=442">
+								<img ng-src="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=580" alt="Paddington™ Silver Proof 2-Coin Series" class="img-responsive" src="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=580">
+							</picture>
+						</div>
+					</figure>
+				</a>
+				<h3 class="h5 item-title">
+					<a title="Paddington™ Silver Proof 2-Coin Series" href="/our-coins/events/paddington/paddington-silver-proof-2-coin-series/">
+						Four Generations of Royalty 2018 UK Gold Five-Ounce Coin
+					</a>
+				</h3>
+				<div class="item-details">
+					<span class="text-silver">
+						Second titile line, if populated
+					</span>
+				</div>
+
+				<div class="item-price">
+					<div class="h5 mt-0 mb-0">
+						<p>From £8,645.00</p>
+					</div>
+				</div>
+				<div class="item-extras">
+					<p class="mb-1x text-success">In Stock</p>
+				</div>
+				<a class="btn btn-primary btn-block mb-1x">Add To Basket</a>
+
+				<div class="row">
+					<div class="col-xs-5 hidden-xs">
+
+					</div>
+				</div>
+
+			</div>
+			<div class="trmVariant col-xs-6 col-sm-4">
+				@{ Html.RenderPartial("PagePartials/TrmBarPartial"); }
+			</div>
+			<div class="trmVariant col-xs-6 col-sm-4">
+				@{ Html.RenderPartial("PagePartials/TrmCoinPartial"); }
+			</div>
+			<!--Using current Trm Entry Partial-->
+			<div class="trmVariant col-xs-6 col-sm-4">
+				<a href="" title="Paddington™ Silver Proof 2-Coin Series">
+					<figure class="" ng-class="">
+						<div class="frontImg">
+							<div class="promoTag__wrapper">
+								<div>
+									<span class="promoTag">
+										2-Coin Series
+									</span>
+								</div>
+							</div>
+							<picture>
+								<source media="(min-width: 1200px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=580" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=580">
+								<source media="(min-width: 992px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=442" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=442">
+								<source media="(min-width: 768px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=533" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=533">
+								<source media="(min-width: 0px)" ng-srcset="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=442" srcset="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=442">
+								<img ng-src="/Static/img/catalogue/coin-gold-britannia-2018.jpg?width=580" alt="Paddington™ Silver Proof 2-Coin Series" class="img-responsive" src="/globalassets/the-royal-mint/images/pages/shop/events/paddington/coin-2/continuity-final.jpg?width=580">
+							</picture>
+						</div>
+					</figure>
+				</a>
+				<h3 class="h5 item-title">
+					<a title="Paddington™ Silver Proof 2-Coin Series" href="/our-coins/events/paddington/paddington-silver-proof-2-coin-series/">
+						Four Generations of Royalty 2018 UK Gold Five-Ounce Coin
+					</a>
+				</h3>
+				<div class="item-details">
+					<span class="text-silver">
+						Second titile line, if populated
+					</span>
+				</div>
+
+				<div class="item-price">
+					<div class="h5 mt-0 mb-0">
+						<p>From £8,645.00</p>
+					</div>
+				</div>
+				<div class="item-extras">
+					<p class="mb-1x text-success">In Stock</p>
+				</div>
+				<a class="btn btn-primary btn-block mb-1x">Add To Basket</a>
+
+				<div class="row">
+					<div class="col-xs-5 hidden-xs">
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>

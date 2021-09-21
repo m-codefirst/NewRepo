@@ -1,0 +1,81 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var view = Html.TranslateFallback(StringResources.LeftMenuView, StringConstants.TranslateFallback.View);
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslateFallback.ViewAll);
+    var showHideMore = Html.TranslateFallback(StringResources.LeftMenuShowHideMore, StringConstants.TranslateFallback.ShowHideMore);
+}
+
+<nav class="mobile-sidenav col-xs-12" id="catFilters">
+    <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="fa fa-close"></i></a>
+    <div class="row">
+        <div class="dynamic navigationBlock col-xs-12" id="dynamic-menu">
+            <div class="blockContent">
+                <ul class="level0 contentNav">
+                    @{
+                        var uniqueCounter = 0;
+                    }
+                    @foreach (var tierOneItem in Model.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems)
+                    {
+                        var tierOneHasChildren = tierOneItem.ChildNavigationItems != null && tierOneItem.ChildNavigationItems.Any();
+                        if (tierOneHasChildren)
+                        {
+                            <li class="has-children">
+                                <a class="btn-collapse @(tierOneItem.ShowExpanded ? string.Empty : "collapsed")" data-toggle="collapse" data-target="#page-menu-@uniqueCounter" title="@showHideMore">
+                                    @tierOneItem.MenuItemDisplayName
+                                </a>
+                                <ul class="level1 collapse @(tierOneItem.ShowExpanded ? "in" : string.Empty)" id="page-menu-@uniqueCounter">
+                                    @{
+                                        var tierTwoUniqueCounter = 0;
+                                    }
+                                    @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems)
+                                    {
+                                        var tierTwoHasChildren = tierTwoItem.ChildNavigationItems != null && tierTwoItem.ChildNavigationItems.Any();
+
+                                        <li>
+                                            @if (!tierTwoItem.IsContainer)
+                                            {
+                                                <a href="@tierTwoItem.MenuItemExternalUrl" title="@tierTwoItem.MenuItemDisplayName">@tierTwoItem.MenuItemDisplayName</a>
+                                                if (tierTwoHasChildren)
+                                                {
+                                                    var idString = uniqueCounter + "_" + tierTwoUniqueCounter;
+
+                                                    <ul class="level2 collapse @(tierTwoItem.ShowExpanded ? "in" : string.Empty)" id="@idString" aria-expanded="@(tierTwoItem.ShowExpanded ? "true" : string.Empty)">
+                                                        <li><a href="#" title="Queen's 90th Birthday">Queen's 90th Birthday</a></li>
+                                                        @foreach (var child in tierTwoItem.ChildNavigationItems)
+                                                        {
+                                                            <li><a href="@child.MenuItemExternalUrl" title="@child.MenuItemDisplayName">@child.MenuItemDisplayName</a></li>
+                                                        }
+                                                        <li><a href="@tierTwoItem.MenuItemExternalUrl" title="@viewAll">@viewAll</a></li>
+                                                    </ul>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @tierTwoItem.MenuItemDisplayName
+                                            }
+                                        </li>
+                                    }
+                                    @if (!tierOneItem.IsContainer)
+                                    {
+                                        <li>
+                                            <a href="@tierOneItem.MenuItemExternalUrl" title="@viewAll">@view @tierOneItem.MenuItemDisplayName</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a href="@tierOneItem.MenuItemExternalUrl" title="@tierOneItem.MenuItemDisplayName">@tierOneItem.MenuItemDisplayName</a>
+                                            </li>
+                                            }
+                                            uniqueCounter++;
+                                        }
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

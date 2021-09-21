@@ -1,0 +1,107 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions 
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var nonSellableUrl = Url.ContentUrlExtension(Model.CurrentPage.NonSellableUrl);
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+    var urlTarget = Model.CurrentPage.OpenNonSellableInNewTab ? "_blank" : "_self";
+}
+
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+}
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+
+<div class="container">
+    <div class="row" itemscope itemtype="http://schema.org/Product">
+        @{
+            Html.RenderPartial("_VariantPageImageCarousel", Model);
+        }
+        <div class="col-xs-12 col-md-5 mb-2x">
+            <div class="variantHeading mt-md-up-4x mb-sm-2x">
+                @if (!string.IsNullOrEmpty(Model.ViewModel.DisplayName))
+                {
+                    <h1 class="h2 mt-0 mb-0" itemprop="name">@Model.ViewModel.DisplayName</h1>
+                }
+                <meta itemprop="sku" content="@Model.CurrentPage.Code" />
+                <meta itemprop="brand" content="The Royal Mint" />
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.SubDisplayName))
+                {
+                    <h2 class="mt-0 mb-0 text-silver h4" itemprop="alternateName">@Model.CurrentPage.SubDisplayName</h2>
+                }
+            </div>
+            @{
+                Html.RenderPartial("_VariantPageQuickInfo", Model);
+            }
+            <div class="variantAddToBakset mb-2x">
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.NonSellableButtonText) && !string.IsNullOrEmpty(nonSellableUrl))
+                {
+                    <div class="item-add">
+                        <a class="btn btn-primary btn-block" itemprop="url" target="@urlTarget" href="@nonSellableUrl">@Html.DisplayFor(m => m.CurrentPage.NonSellableButtonText)</a>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.NonSellableHint))
+                {
+                    <a class="btn btn-link text-slateblue" data-toggle="tooltip" data-placement="top" title="" data-original-title="@Model.CurrentPage.NonSellableHint"><i class="trmi trmi-question"></i></a>
+                }
+
+            </div>
+            @{
+                if (myLayout.ShowSocialShareOnNonSellableEntryDetails)
+                {
+                    <div class="social-items mb-1x">
+                        @Html.Raw(myLayout.SocialSharesSnippetOnEntryDetails)
+                    </div>
+                }
+            }
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.TopContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.TopContent)
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-2">
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.MiddleContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.MiddleContent)
+                </div>
+            </div>
+            @{
+                Html.RenderPartial("_VariantPageTabArea", Model);
+            }
+            @if (Model.ViewModel.RelatedEntries != null && Model.ViewModel.RelatedEntries.Any())
+            {
+                Html.RenderPartial("_RelatedEntries", Model);
+            }
+
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.BottomContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.BottomContent)
+                </div>
+            </div>
+
+            @if (!myLayout.PerformanceMode && !Model.CurrentPage.HideRecentlyViewed)
+            {
+                <div class="row">
+                    @{Html.RenderPartial("_VariantPageRecentlyViewed", @Model.CurrentPage.Code);
+
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,234 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using System.Web
+@using TRM.Web.Models.ViewModels
+@using Newtonsoft.Json
+@using TRM.Shared.Extensions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep3ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+
+    var url = string.Empty;
+    if (Request != null && Request.Url != null)
+    {
+        var trmLayout = (TrmLayoutModel)Model.Layout;
+        url = trmLayout.CheckoutPage.GetExternalUrl_V2();
+    }
+    var isLoggedIn = Request.IsAuthenticated;
+
+
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = isLoggedIn
+          ? new List<ProgressBarItem> {
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step1Heading,
+                    Number = Model.CurrentPage.Step1Number,
+                    Url = url,
+                    IsComplete = true,
+                    IsCurrent = false,
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step3Heading,
+                    Number = Model.CurrentPage.Step3Number,
+                    IsComplete = false,
+                    IsCurrent = true,
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step4Heading,
+                    Number = Model.CurrentPage.Step4Number
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step5Heading,
+                    Number = Model.CurrentPage.Step5Number
+                }
+            }
+          : new List<ProgressBarItem> {
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step1Heading,
+                    Number = Model.CurrentPage.Step1Number,
+                    Url = url,
+                    IsCurrent = false,
+                    IsComplete = true
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step2Heading,
+                    Number = Model.CurrentPage.Step2Number,
+                    IsComplete = true,
+                    IsCurrent = false,
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step3Heading,
+                    Number = Model.CurrentPage.Step3Number,
+                    IsComplete = false,
+                    IsCurrent = true
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step4Heading,
+                    Number = Model.CurrentPage.Step4Number
+                },
+                new ProgressBarItem {
+                    Heading = Model.CurrentPage.Step5Heading,
+                    Number = Model.CurrentPage.Step5Number
+                }
+            }
+    };
+
+    var FormViewModel = new
+    {
+        antiForgeryTokenValue = TRM.Web.Extentions.HtmlHelperExtensions.AntiForgeryTokenValue(Html),
+        isAuthenticated = Request.IsAuthenticated,
+        warning = Model.ViewModel.Message,
+        fullNameField = new
+        {
+            name = "RecipientsFullName",
+            label = Model.CurrentPage.Step3FullNameLabel,
+            placeholder = Model.CurrentPage.Step3FullNamePlaceholder,
+            error = Model.CurrentPage.Step3FullNameErrorMsg ?? Html.TranslateFallback(StringResources.NameRequired, "Name is required"),
+            existing = Model.ViewModel.RecipientsFullName.Replace("'", " "),
+        },
+        addressField = new
+        {
+            label = Model.CurrentPage.Step3ChooseDeliveryMessage,
+            optionSelect = Html.TranslateFallback(StringResources.SelectionPleaseSelect, StringConstants.TranslationFallback.SelectionPleaseSelect),
+            optionNew = Html.TranslateFallback(StringResources.SelectionNew, StringConstants.TranslationFallback.SelectionNew),
+            nickname = Model.CurrentPage.AddressNicknameLabel,
+            error = Model.CurrentPage.AddressNicknameErrorMessage,
+            help = Model.CurrentPage.AddressNicknameMessage,
+            validationError = Html.TranslateFallback(StringResources.RequiredNickname, "Nickname is required"),
+            validationNickNameAlreadyExists = Html.TranslateFallback(StringResources.NicknameExisted, "Nickname already exists"),
+
+        },
+        postCodeField = new
+        {
+            label = Model.CurrentPage.PostcodeLabel,
+            value = Model.ViewModel.DeliveryAddress.PostalCode,
+            placeholder = Model.CurrentPage.PostcodePlaceholder,
+            enterManually = Model.CurrentPage.EnterManuallyText,
+            cancel = Model.CurrentPage.EnterManuallyCancelText,
+            error = Html.TranslateFallback(StringResources.InvalidPostcode, "Postcode is invalid"),
+            postcodeAnywhereLicense = myLayout.PostcodeAnywhereLicense
+        },
+        addressLine1Field = new
+        {
+            label = Model.CurrentPage.AddressLine1Label ?? Html.TranslateFallback(StringResources.AddressLineOne, "Address Line 1"),
+            value = Model.ViewModel.DeliveryAddress.Line1,
+        },
+        addressLine2Field = new
+        {
+            label = Model.CurrentPage.AddressLine2Label ?? Html.TranslateFallback(StringResources.AddressLineTwo, "Address Line 2"),
+            value = Model.ViewModel.DeliveryAddress.Line2,
+        },
+        cityField = new
+        {
+            label = Model.CurrentPage.AddressLine3Label,
+            value = Model.ViewModel.DeliveryAddress.City,
+
+        },
+        countryField = new
+        {
+            list = Model.ViewModel.CountryList,
+            label = Html.TranslateFallback(StringResources.County, "Country"),
+        },
+        countyField = new
+        {
+            label = Model.CurrentPage.AddressCountyLabel ?? Html.TranslateFallback(StringResources.County, "County"),
+        },
+        isNewUser = Model.ViewModel.IsNewUser,
+        isRegistration = Model.ViewModel.UserRegistration,
+        registrationField = new
+        {
+            Title = Model.ViewModel.UserRegistration.Title,
+            FirstName = Model.ViewModel.UserRegistration.FirstName,
+            LastName = Model.ViewModel.UserRegistration.LastName,
+            EmailAddress = Model.ViewModel.UserRegistration.EmailAddress,
+            Telephone = Model.ViewModel.UserRegistration.Telephone,
+            Password = Model.ViewModel.UserRegistration.Password,
+            DateOfBirth = Model.ViewModel.UserRegistration.DateOfBirth,
+            ByEmail = Model.ViewModel.UserRegistration.ByEmail.ToString(),
+            ByPost = Model.ViewModel.UserRegistration.ByPost.ToString(),
+            ByTelephone = Model.ViewModel.UserRegistration.ByTelephone.ToString(),
+        },
+        deliveryField = new
+        {
+            heading = Model.CurrentPage.Step3YourDeliveryAddress,
+            optionsHeading = Model.CurrentPage.Step3DeliveryOptionsHeading,
+            optionsMessage = Model.CurrentPage.Step3DeliveryOptionsMessage,
+            multipleDeliveryMessage = Model.CurrentPage.MultipleDeliveryMessage,
+            error = Html.TranslateFallback(StringResources.Error, "Address is required"),
+            errorCountryCode = Html.TranslateFallback(StringResources.ErrorCountryCode, "Country is required"),
+            errorPostCode = Html.TranslateFallback(StringResources.ErrorPostCode, "Postal Code is required"),
+            postalCodeMaxLength = string.Format(Html.TranslateFallback(StringResources.MaxlengthError, "Postal Code is over {0} signs"), 11),
+            errorPostCodeInvalid = Html.TranslateFallback(StringResources.ErrorPostCodeInvalid, "Postcode is invalid"),
+            addressLine1MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            addressLine2MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            cityRequired = Html.TranslateFallback(StringResources.RequiredCity, "City is required"),
+            cityMaxLength = string.Format(Html.TranslateFallback(StringResources.CityMaxlengthError, "City cannot be longer than {0} characters"), 64),
+            countyMaxLength = string.Format(Html.TranslateFallback(StringResources.CountyMaxlengthError, "County cannot be longer than {0} characters"), 64),
+        },
+        giftField = new
+        {
+            isGiftLabel = Model.CurrentPage.IsGiftLabel,
+            isGiftSelected = Model.ViewModel.IsGiftOrder,
+            heading = Html.TranslateFallback(StringResources.GiftMessageHeading, "Gift Message"),
+            message = Html.TranslateFallback(StringResources.GiftMessage, "You can leave a special message, this will be printed on the despatch note and the value of the order will be removed. This message will not be printed inside a card."),
+            tooltip = Model.CurrentPage.GiftMessageTooltip,
+            value = Model.ViewModel.GiftMessage,
+            maxlength = myLayout.GiftingMessageMaxLength,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.MaxlengthErrorGiftMessage, "Your message cannot be longer than {0} characters"), myLayout.GiftingMessageMaxLength),
+            placeholder = Html.TranslateFallback(StringResources.GiftMessagePlaceholder, "Enter your gift message here"),
+        },
+        marketMessage = Model.CurrentPage.Step3InvalidMarketMessage,
+        undeliverableItems = Model.CurrentPage.Step3UndeliverableItemsHeading,
+        basket = new
+        {
+            url = myLayout.BasketPage.GetExternalUrl_V2(),
+            text = Html.TranslateFallback(StringResources.ReturnToBasket, "Return to basket"),
+        },
+        noDeliveryOptionsMessage = Model.CurrentPage.Step3NoDeliveryOptionsMessage != null ? Model.CurrentPage.Step3NoDeliveryOptionsMessage.ToString() : @Html.TranslateFallback(StringResources.NoDeliveryOptionsMessage, "No delivery option for selected address"),
+        shippingApiCallFailedMessage = Model.CurrentPage.Step3ShippingApiCallFailedMessage != null ? Model.CurrentPage.Step3ShippingApiCallFailedMessage.ToString() : @Html.TranslateFallback(StringResources.ShippingApiCallFailedMessage, "Shipping API call failed"),
+        nextButton = Model.CurrentPage.NextButtonText,
+        nextLabel = Model.CurrentPage.Step3NextStepLabel,
+        actionUrl = Url.Action("CheckoutStep4"),
+        addressIncomplete = Html.TranslateFallBack(TRM.Shared.Constants.StringResources.AddressIncomplete, "Address is incomplete, please enter manually"),
+    };
+}
+
+<div class="mod-section">
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+    <div class="row justify-content-center text-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container">
+                <div class="form-spacing">
+                    @if (Model.CurrentPage.DisplayPageHeading)
+                    {
+                        <h1>@Html.PropertyFor(x => x.CurrentPage.Heading)</h1>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.Step3ContentHeading))
+                {
+                    <h2 class="section-head pt-0"><span>@Html.PropertyFor(x => x.CurrentPage.Step3ContentHeading)</span></h2>
+                }
+                @if (Model.ViewModel.IsMetapackAvailable)
+                {
+                    <div data-module="metapack" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+                }
+                else
+                {
+                    <div data-module="delivery" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Four })

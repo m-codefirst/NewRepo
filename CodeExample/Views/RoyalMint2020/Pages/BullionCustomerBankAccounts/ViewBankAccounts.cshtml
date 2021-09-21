@@ -1,0 +1,223 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Models.Layouts
+@using EPiServer.Web
+@using System.Web.Optimization
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionCustomerBankAccountPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.CustomerBankAccount.LinkedBankAccountsViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    bool showAutomaticMenu = Model.CurrentPage.ShowAutomaticLeftNavigation && myLayout.LeftMenu != null && myLayout.LeftMenu.AutomaticLeftMenuDto != null && myLayout.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems != null && myLayout.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems.Any();
+    bool showManualMenu = Model.CurrentPage.ShowManualLeftNavigation && myLayout.LeftMenu != null && myLayout.LeftMenu.ManualLeftMenuDto != null && myLayout.LeftMenu.ManualLeftMenuDto.ChildNavigationItems != null && myLayout.LeftMenu.ManualLeftMenuDto.ChildNavigationItems.Any();
+
+    bool hasMenu = showAutomaticMenu || showManualMenu;
+
+    string mainClass = hasMenu ? "col-md-9 py-2" : string.Empty;
+    string copyClass = Model.CurrentPage.TextAlignment.DescriptionAttr();
+    string colClass = Model.CurrentPage.IsFullWidthContainer ? "col-12" : "col-10";
+    string firstSectionClass = hasMenu ? "pt-0" : string.Empty;
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "accountCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "helpPageCss")
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    <!-- Breadcrumbs -->
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        if (hasMenu)
+        {
+            myLayout.Breadcrumb.IsWide = true;
+        }
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", myLayout.Breadcrumb);
+    }
+</div>
+<div class="row">
+    <!-- Left Menu -->
+    @if (showManualMenu)
+    {
+        Html.RenderPartial("RoyalMint2020/_ManualLeftMenu", myLayout);
+    }
+
+    @if (showAutomaticMenu)
+    {
+        Html.RenderPartial("RoyalMint2020/_AutomaticLeftMenu", myLayout);
+    }
+
+    <!-- Main Content -->
+    <div class="col-12 @mainClass">
+        @if (myLayout.HasMessage)
+        {
+            Html.RenderPartial("_MessageBox", myLayout.Message);
+        }
+
+        <!-- Main Body -->
+        <div class="mod-section mod-section-copy mod-section-first @firstSectionClass">
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                    @if (Model.CurrentPage.DisplayPageHeading)
+                    {
+                        @Html.Partial("_PageHeader", myLayout)
+                    }
+                    @Html.DisplayFor(m => m.CurrentPage.MainBody)
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass">
+                    <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass">
+                    <h2 class="section-head"><span>Bank accounts</span></h2>
+                    @Html.Raw(Model.CurrentPage.ViewBankAccountIntroText)
+
+                    @if (!string.IsNullOrEmpty(Model.ViewModel.AddedAccountMessage))
+                    {
+                        <div class="mod-notification">
+                            <div class="title">
+                                <div class="notification-icon"><span class="icon"><svg><use xlink:href="#check"></use></svg></span></div>
+                                @Model.ViewModel.AddedAccountMessage
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ViewModel.EditedAccountMessage))
+                    {
+                        <div class="mod-notification">
+                            <div class="title">
+                                <div class="notification-icon"><span class="icon"><svg><use xlink:href="#check"></use></svg></span></div>
+                                @Model.ViewModel.EditedAccountMessage
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass">
+
+                    @if (Model.ViewModel.BankAccounts.Any())
+                    {
+                        var bankHasAction = !(string.IsNullOrEmpty(Model.CurrentPage.ActionDeleteText) && string.IsNullOrEmpty(Model.CurrentPage.ActionEditText));
+                        var accountInformationText = Model.CurrentPage.AccountInformationText ?? "Account Information";
+                        var ibanLabel = Model.CurrentPage.AccountInfoTableIbanLabel ?? "IBAN#";
+                        var sortLabel = Model.CurrentPage.AccountInfoTableSortLabel ?? "SORT#";
+                        var accLabel = Model.CurrentPage.AccountInfoTableAccLabel ?? "ACC#";
+                        var swiftLabel = Model.CurrentPage.AccountInfoTableSwiftLabel ?? "SWIFT#";
+
+                        <div class="table-responsive">
+                            <table class="table table-mobile">
+                                <thead>
+                                    <tr>
+                                        <th>@Model.CurrentPage.AccountHolderText</th>
+                                        <th>@Model.CurrentPage.AccountNicknameText</th>
+                                        <th>@accountInformationText</th>
+                                        @if (bankHasAction)
+                                        {
+                                            <th class="actions">@Model.CurrentPage.ActionText</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var bankAccount in Model.ViewModel.BankAccounts)
+                                    {
+
+                                        <tr>
+                                            <td data-label="@Model.CurrentPage.AccountHolderText">@bankAccount.AccountHolderName</td>
+                                            <td data-label="@Model.CurrentPage.AccountNicknameText">@bankAccount.AccountNickName</td>
+
+                                            <td data-label="@accountInformationText">
+                                                @if (bankAccount.Iban != null)
+                                                {
+                                                    @ibanLabel<text> </text> @bankAccount.Iban
+                                                }
+
+                                                @if (bankAccount.AccountNumber != null)
+                                                {
+                                                    @accLabel<text> </text> @bankAccount.AccountNumber
+                                                }
+
+                                                @if (bankAccount.SortCode != null)
+                                                {
+                                                    <br />
+                                                    @sortLabel<text> </text>
+                                                    @bankAccount.SortCode
+                                                }
+                                                @if (bankAccount.Swift != null)
+                                                {
+                                                    <br />
+                                                    @swiftLabel<text> </text>@bankAccount.Swift
+                                                }
+                                            </td>
+
+                                            @if (bankHasAction)
+                                            {
+                                                <td class="actions">
+                                                    @if (!string.IsNullOrEmpty(Model.CurrentPage.ActionDeleteText))
+                                                    {
+                                                        @Html.ActionLink(Model.CurrentPage.ActionDeleteText, "Remove", new { bankAccountId = bankAccount.Id }, new { @class = "btn btn-secondary btn-small" })
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="text-right">
+                                @Html.ActionLink(Model.CurrentPage.AddBankAccountButtonText, "AddBankAccount", null, new { @class = "btn btn-primary" })
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mod-notification">
+                            <div class="title">
+                                <div class="notification-icon"><span class="icon"><svg><use xlink:href="#info"></use></svg></span></div>
+                                @Html.TranslateFallback(Model.CurrentPage.NoAccountsText, "No bank accounts currently linked to your account")
+                            </div>
+                            <div class="text-right">
+                                @Html.ActionLink(Model.CurrentPage.AddBankAccountButtonText, "AddBankAccount", null, new { @class = "btn btn-light" })
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (Model.CurrentPage.LinkedBankAccountsContentArea != null || PageEditing.PageIsInEditMode)
+            {
+                <div class="row justify-content-center mt-1x">
+                    <div class="@copyClass @colClass">
+                        @Html.PropertyFor(x => x.CurrentPage.LinkedBankAccountsContentArea)
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div class="@copyClass @colClass">
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+    </div>
+</div>

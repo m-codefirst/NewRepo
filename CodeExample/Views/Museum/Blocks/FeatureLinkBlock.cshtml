@@ -1,0 +1,49 @@
+﻿@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.FeatureLinkBlock
+<div class="block-container">
+    <!-- Block Content -->
+    <div class="blockContent">
+
+        <!-- Default Content -->
+        <div class="defaultContent text-left">
+            <div class="content">
+                @if (Model.IconPosition != Enums.eIconPosition.None && !string.IsNullOrWhiteSpace(Model.CustomIconCss))
+                {
+                    <i class="trmi @Model.CustomIconCss text-ochre" aria-hidden="true"></i>
+                }
+
+
+                <!-- Default Heading -->
+                <h3 class="heading" @Html.EditAttributes(m => m.Heading)>
+                    @if (!string.IsNullOrEmpty(Url.ContentUrlExtension(Model.LinkUrl)))
+                    {
+                        @Html.Raw("<a class='headingLink' title='" + Model.LinkText + "' href='" + Url.ContentUrlExtension(Model.LinkUrl) + "'>")
+                    }
+
+                    @Html.DisplayFor(m => m.Heading)
+
+                    @if (!string.IsNullOrEmpty(Url.ContentUrlExtension(Model.LinkUrl)))
+                    {
+                        @Html.Raw("</a>")
+                    }
+                </h3>
+
+
+
+                <div class="xhtml" @Html.EditAttributes(m => m.Content)>
+                    <!-- WYSIWYG XHMTL Content -->
+                    @{ var content = Html.ParseXhtmlString(Model.Content); }
+                    @Html.DisplayFor(m => content)
+                </div>
+                <!-- Default Link -->
+                @if (!string.IsNullOrEmpty(Url.ContentUrlExtension(Model.LinkUrl)))
+                {
+                    <a class="defaultLink btn-arrow" href="@Url.ContentUrlExtension(Model.LinkUrl)" title="@Model.LinkText" @Html.EditAttributes(m => m.LinkText)>@Html.DisplayFor(m => m.LinkText)</a>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+

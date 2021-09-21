@@ -1,0 +1,33 @@
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var HasFunds = true;
+	var HasHistory = true; //false;
+	var AllowCredit = false;
+	var AccountActive = false;
+}
+<div class="impersonating-notification">
+	<div class="container impersonating-notification__content">
+		[Admin] You are impersonating user [hollib123]
+		<button type="button" class="btn btn-default mb-1x btn-custom-impersonating">Stop Impersonating</button>
+	</div>
+</div>
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

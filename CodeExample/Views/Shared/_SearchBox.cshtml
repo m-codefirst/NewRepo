@@ -1,0 +1,186 @@
+﻿@using EPiServer.Framework.Localization
+@using EPiServer.Globalization
+@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.ContentTypes.Business.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var searchPageUrl = Model.SearchPage.GetExternalUrl_V2();
+    var startPage = Model.GetAppropriateStartPageForSiteSpecificProperties();
+
+    var isBullionUser = false;
+    var currencyCode = string.Empty;
+    var isPensionProvider = false;
+    if (Request.IsAuthenticated)
+    {
+        var currentContact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+        if (currentContact != null)
+        {
+            currencyCode = Model.DefaultCurrencyCode;
+            isBullionUser = Model.CustomerIsBullionAccount;
+            isPensionProvider = Model.IsPensionProviderContact;
+        }
+    }
+}
+
+<script type="text/javascript">
+    function headerSearchKeyPress(e) {
+        e = e || window.event;
+        if (e.keyCode === 13) {
+            document.getElementById("OneBoxSearch").click();
+            return false;
+        }
+        return true;
+    }
+    function doOneBoxSearch() {
+        if (document.getElementById("headerSearch").value.length > 0) {
+            window.location = "@(searchPageUrl)?q=" + document.getElementById("headerSearch").value;
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+
+<div class="nav-section" id="navSectionSearch">
+    <div class="row" ng-controller="rmSearchBar as rmSearch">
+        <div class="col-xs-12 col-md-8 col-md-offset-3">
+            <form id="searchForm">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="@Html.TranslateFallback(StringResources.OneBoxSearchFor,"Search for...")" value="" ng-model="searchTerm" ng-change="doSearch()" id="headerSearch" onkeypress="return headerSearchKeyPress(event);">
+                    <span class="input-group-btn">
+                        <button id="OneBoxSearch" class="btn btn-default" type="button" onclick="doOneBoxSearch()"><span class="visible-md-inline visible-lg-inline">@Html.TranslateFallback(StringResources.Search, "Search")</span><span class="trmi trmi-search visible-xs-inline visible-sm-inline"></span></button>
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-12 col-md-9 col-md-offset-3 header-search-results" ng-if="(models.SuggestionsTotal >= 1 || models.ArticlesTotal >= 1 || models.HelpTotal >= 1)">
+            <a class="btn btn-link btn-sm pull-right pr-0 btn-arrow" ng-if="models.SuggestionsTotal > models.ResultsPerPage ||  models.ArticlesTotal > models.ResultsPerPage || models.HelpTotal > models.ResultsPerPage" onclick="doOneBoxSearch()">@Html.TranslateFallback(StringResources.ViewAllResults, "View all results")</a>
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active" ng-show="models.Suggestions.length >= 1">
+                    <a data-target="#tabProducts" aria-controls="tabProducts" role="tab" data-toggle="tab">@Html.TranslateFallback(StringResources.Products, "Products") ({{models.SuggestionsTotal}})</a>
+                </li>
+                <li role="presentation" ng-show="models.Articles.length >= 1">
+                    <a data-target="#tabArticles" aria-controls="tabArticles" role="tab" data-toggle="tab">@Html.TranslateFallback(StringResources.Articles, "Articles") ({{models.ArticlesTotal}})</a>
+                </li>
+                <li role="presentation" ng-show="models.Help.length >= 1">
+                    <a data-target="#tabHelp" aria-controls="tabHelp" role="tab" data-toggle="tab">@Html.TranslateFallback(StringResources.Help, "Help") ({{ models.HelpTotal}})</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade" ng-class="models.SuggestionsTotal > 0 ? 'active in'  : ''" id="tabProducts">
+                    <h3>@Html.TranslateFallback(StringResources.RecommendedProducts, "Recommended Products")</h3>
+                    <div class="rmGridView">
+                        <article ng-repeat="product in models.Suggestions" class="trmVariant" ng-class="{clear:!($index % 3)}" ng-if="$index < models.ResultsPerPage">
+                            <a ng-href="{{product.EntryUrl}}" title="{{product.DisplayName}}">
+                                <figure class="" ng-class="{'image-flip' : product.AltImageUrl}">
+                                    <span class="frontImg">
+                                        <span class="promoTag" ng-if="product.TagMessage">
+                                            {{product.TagMessage}}
+                                        </span>
+                                        @Html.GetMyPictureHtml("{{product.DefaultImageUrl}}",
+new Dictionary<string, string> { { "alt", "{{product.DisplayName}}" }, { "class", "img-responsive" } },
+new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 263 }, { StringConstants.Breakpoints.Md, 213 } })
+                                    </span>
+                                    <span class="backImg" ng-if="product.AltImageUrl">
+                                        @Html.GetMyPictureHtml("{{product.AltImageUrl}}",
+new Dictionary<string, string> { { "alt", "{{product.DisplayName}}" }, { "class", "img-responsive" } },
+new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 263 }, { StringConstants.Breakpoints.Md, 213 } })
+                                    </span>
+                                </figure>
+                            </a>
+
+                            <h3 class="h5 item-title ng-scope">
+                                <a ng-href="{{product.EntryUrl}}" title="{{product.DisplayName}}">
+                                    {{product.DisplayName}}
+                                </a>
+                            </h3>
+                            <div class="item-details">
+                                <p class="mb-0">{{product.SubDisplayName}}</p>
+                            </div>
+
+                            <div class="item-price">
+                                <span class="estimated display-xs pull-right" ng-if="product.IsPreciousMetalsVariant && !product.IsSignatureOnlyVariant">@Html.TranslateFallBack(StringResources.Estimated, "Estimated")</span>
+                                <div class="h5 mt-0 mb-0" ng-if="product.IsPreciousMetalsVariant && product.IsSignatureOnlyVariant">@Html.TranslateFallBack(StringResources.FromPrice, "From ") {{product.MinimumPurchaseFormatted}}</div>
+                                <div class="h5 mt-0 mb-0" ng-if="product.IsPreciousMetalsVariant && !product.IsSignatureOnlyVariant">@Html.TranslateFallBack(StringResources.FromPrice, "From ") {{product.PriceString}}</div>
+                                <div class="h5 mt-0 mb-0" ng-if="!product.IsPreciousMetalsVariant && product.PriceString">
+                                    {{product.PriceString }}
+                                </div>
+                                <span class="small-text" ng-if="product.IsPreciousMetalsVariant && !product.IsSignatureOnlyVariant">
+                                    @Html.TranslateFallBack(StringResources.ExVat, "ex VAT ")
+                                </span>
+                            </div>
+
+                            <div class="item-extras" ng-show="product.StockSummary != null">
+                                <p ng-class="product.StockSummary.Status | stockClass">{{product.StockSummary.StatusMessage}}</p>
+                            </div>
+                            @if (!isPensionProvider)
+                            {
+                                if (isBullionUser && !currencyCode.Equals(Mediachase.Commerce.Currency.GBP))
+                                {
+                                    <div ng-if="!product.IsPreciousMetalsVariant" class="alert @startPage.ItemNotAvailableForNotGbpCurrency.DescriptionAttr() margin-bottom-5px">
+                                        @LocalizationService.Current.GetStringByCulture(StringResources.ItemNotAvailableForNotGBPCurrency, "Consumer products not available in this currency", ContentLanguage.PreferredCulture)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a ng-if="product.PriceString && !product.IsPreciousMetalsVariant" ng-hide="product.StockSummary.CanAddToBasket === false" class="btn btn-primary btn-block mb-1x" id="item_{{product.Code}}" ng-click="addToBasket({id:product.Code})">@Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket")</a>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert @startPage.CanNotPensionMessageColour.DescriptionAttr() margin-bottom-5px mb-1x" ng-if="product.PriceString && !product.IsPreciousMetalsVariant">
+                                    @LocalizationService.Current.GetStringByCulture(StringResources.ItemNotAvailableForPensionProvider, "This product cannot be bought within a pension provider", ContentLanguage.PreferredCulture)
+                                </div>
+                            }
+                            <a ng-if="product.IsPreciousMetalsVariant" ng-href="{{product.EntryUrl}}" class="btn btn-default btn-block mb-1x">@Html.TranslateFallback(StringResources.SeeMore, "See More")</a>
+                        </article>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" ng-class="models.SuggestionsTotal == 0 && models.ArticlesTotal > 0 ? 'active in'  : ''" id="tabArticles">
+                    <div class="rmGridView">
+                        <article ng-repeat="articleItem in models.Articles" class="standardPage col-xs-6 col-sm-4" ng-if="$index < models.ResultsPerPage">
+                            <figure ng-if="articleItem.Teaser.TeaserImageUrl">
+                                <a href="{{articleItem.PageUrl}}" title="{{articleItem.Teaser.TeaserTitle}}">
+                                    <img class="img-responsive" ng-src="{{articleItem.Teaser.TeaserImageUrl}}" alt="{{articleItem.Teaser.TeaserTitle}}">
+                                </a>
+                            </figure>
+                            <h3 class="h5 item-title">
+                                <a ng-href="{{articleItem.PageUrl}}" title="{{articleItem.Teaser.TeaserTitle}}">
+                                    {{articleItem.Teaser.TeaserTitle}}
+                                </a>
+                            </h3>
+                            <div ng-if="articleItem.Teaser.TeaserDescription">
+                                <p class="item-subtitle">{{articleItem.Teaser.TeaserDescription}}</p>
+                                <p>
+                                    <a ng-href="{{articleItem.PageUrl}}" title="{{articleItem.Teaser.TeaserTitle}}">@Html.TranslateFallback(StringResources.ReadMore, "Read more")</a>
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" ng-class="models.SuggestionsTotal == 0 && models.ArticlesTotal == 0 && models.HelpTotal > 0 ? 'active in'  : ''" id="tabHelp">
+                    <div class="rmGridView">
+                        <article ng-repeat="helpItem in models.Help" class="helpPage col-xs-6 col-sm-4" ng-if="$index < models.ResultsPerPage">
+                            <h3 class="h5 item-title">
+                                <a ng-href="{{helpItem.PageUrl}}" title="{{helpItem.Teaser.TeaserTitle}}">
+                                    {{helpItem.Teaser.TeaserTitle}}
+                                </a>
+                            </h3>
+                            <p class="item-subtitle">{{helpItem.Teaser.TeaserDescription}}</p>
+                            <p>
+                                <a ng-href="{{helpItem.PageUrl}}" title="{{helpItem.Teaser.TeaserTitle}}">@Html.TranslateFallback(StringResources.ReadMore, "Read more")</a>
+                            </p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

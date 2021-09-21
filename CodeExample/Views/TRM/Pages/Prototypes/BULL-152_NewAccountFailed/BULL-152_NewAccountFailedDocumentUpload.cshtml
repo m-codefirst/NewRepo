@@ -1,0 +1,152 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer bull-registration">
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <!-- BULL-151 - Bullion Registration Step 5 - Application Successful -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                    <!-- Step bar -->
+                    <ol class="nav nav-bar nav-progress-bar row">
+                        <li class="done col-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/AccountDetails_01a-01/"><span>1.</span></a></li>
+                        <li class="activecol-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/"><span>2.</span></a></li>
+                        <li class="col-xs-4 no-padding"><a href="/prototypes/bullion/registration/populated/VerifyYourIdentity_03a-01/"><span>3.</span></a></li>
+                    </ol>
+                    <!-- / Step bar -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h1 class="h3 mt-0 mb-2x">Upload Documents to confirm your details</h1>
+                        <p class="mt-1x">
+                            To ensure the data that you've provided is correct, we just need you to submit some documents that will confirm your identity.
+                            Please provide a scan or photograph of:
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="panel panel-transparent mb-0">
+                            <div class="panel-body">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-1 col-md-1">
+                                        <div class="radio radio-checked small fancy mt-1x">
+                                            <input type="radio" name="radioExample" value="" id="radioOne" data-original-title="" title="" onchange="radioChange(this)">
+                                            <label class="" for="radioOne">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7 col-md-9">
+                                        <div class="form-group">
+                                            <h4>Driving Licence</h4>
+                                            <span class="document-uploaded-one d-none">
+                                                <i class="trmi trmi-check"></i> <span class="document-uploaded-content">Upload Successful</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2 col-md-2">
+                                        <button id="buttonUploadOne" class="btn btn-secondary btn-upload-document" onclick="uploadDocumentNewAccount(this,'.document-uploaded-one')">
+                                            Upload
+                                        </button>
+                                        <input name="logo" type="file" onchange="uploadDocument(this,'.document-uploaded-one')" class="file-upload-document d-none">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-xs-12">
+                                    <div class="col-xs-1 col-md-1">
+                                        <div class="radio radio-checked small fancy mt-1x">
+                                            <input type="radio" name="radioExample" value="" id="radioTwo" data-original-title="" title="" onchange="radioChange(this)">
+                                            <label class="" for="radioTwo">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-7 col-md-9">
+                                        <div class="form-group">
+                                            <h4>Document Two</h4>
+                                            <span class="document-uploaded-two d-none">
+                                                <i class="trmi trmi-check"></i> <span class="document-uploaded-content">Upload Successful</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-2 col-md-2">
+                                        <button id="buttonUploadTwo" class="btn btn-secondary btn-upload-document" onclick="uploadDocumentNewAccount(this,'.document-uploaded-two')">
+                                            Upload
+                                        </button>
+                                        <input name="logo" type="file" onchange="uploadDocument(this,'.document-uploaded-two')" class="file-upload-document d-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-5 mt-1x">
+                        <button type="button" class="btn btn-default btn-block mr-1x">Back</button>
+                    </div>
+                    <div class="col-xs-12 col-sm-5 mt-1x">
+                        <button type="button" class="btn btn-secondary btn-block">Submit Documents</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+<script>
+    var uploadDocumentNewAccount = function(button, documentName) {
+        var _this = button;
+        if(button.innerHTML === 'Upload'){
+            setTimeout(function() {
+                var inputFile = $(_this).next();
+                if (inputFile && inputFile.length > 0){
+                    inputFile[0].click();
+                }
+                button.innerHTML = 'Remove';
+            }, 0);
+        } else {
+            button.innerHTML = 'Upload';
+            $(documentName).addClass('d-none');
+        }
+    };
+
+    var uploadDocument = function(button, documentName){
+        if (button && documentName) {
+            var fileNameUpload = button.value.split('\\').pop();
+            $(documentName).removeClass('d-none');
+            $(documentName).find('.document-uploaded-content')[0].innerHTML = fileNameUpload;
+            return;
+        }
+    }
+
+    var radioChange = function(checkbox) {
+        var buttonUploadDocuments = Array.from($('.btn-upload-document'));
+        buttonUploadDocuments.forEach(function (buttonUpload) {
+            buttonUpload.innerHTML = "Upload";
+        });
+    }
+</script>

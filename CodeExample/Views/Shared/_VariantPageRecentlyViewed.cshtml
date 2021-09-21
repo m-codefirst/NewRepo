@@ -1,0 +1,45 @@
+﻿@using TRM.Web.Constants
+@model string
+<div class="col-xs-12" rvdirective>
+    <div class="mb-2x ng-cloak" ng-controller="rmRecentlyViewed as recentlyViewed" ng-init="init('@Model')" ng-cloak>
+            <div ng-if="recentlyViewed.products.length > 0">
+                <a class="small pull-right btn btn-link btn-sm pl-0 pr-0" data-toggle="collapse" data-target="#rvExtras" ng-if="hiddenItems > 0">
+                    <span class="small">@Html.TranslateFallback(StringResources.ShowMore, "Show More")</span>
+                </a>
+                <h3 class="bb-solid-g pb-1x">@Html.TranslateFallback(StringResources.RecentlyViewedHeading, "Recently Viewed") ({{recentlyViewed.products.length}})</h3>
+                <section class="recently-viewed">
+                    <article ng-repeat="product in recentlyViewed.products | limitTo: displayBreak" class="trmVariant">
+                        <figure class="">
+                            <a ng-href="{{product.EntryUrl}}" title="{{product.Name}}">
+                                <img alt="{{product.Name}}" class="img-responsive" ng-src="{{product.DefaultImageUrl}}?width=300">
+                            </a>
+                        </figure>
+                        <h4 class="h6 item-title">
+                            <a ng-href="{{product.EntryUrl}}" title="{{product.Name}}">
+                            {{product.Name | limitTo: 40}}
+                            </a>
+                        </h4>
+                        <a ng-click="removeFromRV(product)" class="btn btn-default btn-small btn-remove"><i class="trmi trmi-close"></i><span class="sr-only">@Html.TranslateFallback(StringResources.RecentlyViewedRemove, "Remove")</span></a>
+                    </article>
+                </section>
+                <div class="collapse" id="rvExtras" ng-if="hiddenItems > 0" ng-cloak>
+                    <section class="recently-viewed">
+                        <article ng-repeat="product in recentlyViewed.products | limitTo: hiddenItems:displayBreak" class="trmVariant">
+                            <figure class="">
+                                <a ng-href="{{product.EntryUrl}}" title="{{product.Name}}">
+                                    <img alt="{{product.Name}}" class="img-responsive" ng-src="{{product.DefaultImageUrl}}?width=300">
+                                </a>
+                            </figure>
+                            <h4 class="h6 item-title">
+                                <a ng-href="{{product.EntryUrl}}" title="{{product.Name}}">
+                                    {{product.Name | limitTo: 40}}
+                                </a>
+                            </h4>
+                            <a ng-click="removeFromRV(product)" class="btn btn-default btn-small btn-remove"><i class="trmi trmi-close"></i><span class="sr-only">@Html.TranslateFallback(StringResources.RecentlyViewedRemove, "Remove")</span></a>
+                        </article>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+

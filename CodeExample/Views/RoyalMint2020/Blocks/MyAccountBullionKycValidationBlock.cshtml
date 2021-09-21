@@ -1,0 +1,64 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Controllers.Blocks.MyAccountBullionKycValidationViewModel
+
+@{ 
+    var notificationTypeClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.CurrentBlock.NotificationType, Enums.eNotificationType.Alert);
+    var notificationIcon = Model.CurrentBlock.NotificationType == Enums.eNotificationType.Alert ? "exclamation" : "info";
+}
+
+<div class="mod-notification @notificationTypeClass">
+    <div class="title">
+        <div class="notification-icon"><span class="icon"><svg><use xlink:href="#@notificationIcon"></use></svg></span></div>
+        @(Model.FailedInsufficentFund == true ? Html.PropertyFor(x => x.CurrentBlock.LtInsufficentHeading) : Html.PropertyFor(x => x.CurrentBlock.Heading))
+    </div>
+    @if (Model.FailedInsufficentFund == true)
+    {
+        if (!string.IsNullOrEmpty(Model.CurrentBlock.FailAutoInvestDescription))
+        {
+            <p>@Html.PropertyFor(x => x.CurrentBlock.FailAutoInvestDescription)</p>
+        }
+        if (!string.IsNullOrEmpty(Model.CurrentBlock.FailAutoInvestButtonText))
+        {
+            <div class="text-right">
+                <a href="@Url.ContentUrlExtension(Model.CurrentBlock.FailAutoInvestButtonLink)" class="btn btn-light">
+                    @Html.PropertyFor(x => x.CurrentBlock.FailAutoInvestButtonText)
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        if (Model.FailedStage1)
+        {
+            if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage1Description))
+            {
+                <p>@Html.PropertyFor(x => x.CurrentBlock.FailStage1Description)</p>
+            }
+            if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage1ButtonText))
+            {
+                <div class="text-right">
+                    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.FailStage1ButtonLink)" class="btn btn-light">
+                        @Html.PropertyFor(x => x.CurrentBlock.FailStage1ButtonText)
+                    </a>
+                </div>
+            }
+        }
+        if (Model.FailedStage2)
+        {
+            if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage2Description))
+            {
+                <p>@Html.PropertyFor(x => x.CurrentBlock.FailStage2Description)</p>
+            }
+            if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage2ButtonText))
+            {
+                <div class="text-right">
+                    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.FailStage2ButtonLink)" class="btn btn-light">
+                        @Html.PropertyFor(x => x.CurrentBlock.FailStage2ButtonText)
+                    </a>
+                </div>
+            }
+        }
+    }
+
+</div>

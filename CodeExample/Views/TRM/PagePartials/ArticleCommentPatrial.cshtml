@@ -1,0 +1,62 @@
+﻿@using EPiServer.Web
+@using TRM.Shared.Extensions 
+@model TRM.Web.Models.ViewModels.ArticleCommentsViewModel
+
+@if (Model.EnableComment)
+{
+    <div class="row">
+        <div class="block reviewBlock col-xs-12">
+            <h5 class="padding-heading"><small class="pull-right">@Model.Comments.Count @Model.Heading</small> @Model.Heading </h5>
+            <ul class="media-list">
+                @foreach (var comment in Model.Comments)
+                {
+                    <li class="media">
+                        <div class="media-body">
+                            <div class="well-sm">
+                                <h3 class="h6 item-title mb-0 mt-0">@comment.Contact </h3>
+                                <p class="media-date h6 item-title mb-0 mt-0"><small data-utcdate="@comment.CommentAt"></small></p>
+                                <p class="media-comment">
+                                    @comment.Message
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+            @if (!string.IsNullOrEmpty(Model.AnonymousMsg))
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    @Model.AnonymousMsg
+                </div>
+            }
+            else if (Model.ShowCommentBox)
+            {
+                <div>
+                    <h5 class="text-capitalize msgPlaceHolder">@Model.SubHeading</h5>
+                </div>
+                <form action="#" method="post" class="form-horizontal" id="commentForm" role="form">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <p class="info">@Model.MaxinumWarningMessage</p>
+                            <textarea maxlength="1000" class="form-control required" name="addComment" id="addComment" rows="5"></textarea>
+                            <p style="margin-top:5px">@Model.HighlightText</p>
+                            <label id="addCommentValidation" name="addCommentValidation" class="invalid"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-offset-0 col-xs-12">
+                            <button class="btn btn-secondary" type="button" id="submitComment">@Model.SubmitButtonText</button>
+                            <input type="hidden" id="contentId" name="contentId" value="@Model.ArticleId" />
+                            <input type="hidden" id="submitUrl" name="submitUrl" value="@Url.ContentUrlExtension(Model.ArticleId)" />
+                            <input type="hidden" id="maximumMessageSize" name="maximumMessageSize" value="@Model.MaximumMessageSize" />
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+}
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "article").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireStyle("/bundles/" + SiteDefinition.Current.Name + "articleCss").AtHeader();
+}

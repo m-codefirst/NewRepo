@@ -1,0 +1,119 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using Newtonsoft.Json
+@using TRM.Web.Models.ViewModels
+@using TRM.Shared.Extensions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep4ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem {
+                Heading = "Account",
+                Number = "1",
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Personal",
+                Number = "2",
+                Url = string.Format("{0}Step2", currentUrl),
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Verify",
+                Number = "3",
+                Url = string.Format("{0}Step3", currentUrl),
+                IsComplete =  true,
+            },
+            new ProgressBarItem {
+                Heading = "Security",
+                Number = "4",
+                Url = string.Format("{0}Step4", currentUrl),
+                IsCurrent = true
+            },
+            new ProgressBarItem {
+                Heading = "Complete",
+                Number = "5",
+                Url = string.Format("{0}Step4", currentUrl)
+            }
+        }
+    };
+
+    var FormViewModel = new
+    {
+        ActionUrl = Url.Action("Step4"),
+        CurrentUrl = currentUrl,
+        MiddleContentStep4 = @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep4).ToString(),
+        Step4Heading = Model.CurrentPage.Step4Heading,
+        SecurityQuestionList = Model.ViewModel.SecurityQuestionList,
+        SecurityQuestionLabel = Model.CurrentPage.SecurityQuestionLabel,
+        SecurityQuestionOptionMessage = Model.CurrentPage.SecurityQuestionOptionMessage,
+        SecurityQuestionOptionPlaceholder = Model.CurrentPage.SecurityQuestionOptionPlaceholder ?? "Select a question",
+        SecurityQuestionOptionErrorMessage = ErrorMessage("SecurityQuestion"),
+        SecurityQuestion = Model.ViewModel.SecurityQuestion,
+        SecurityQuestionRequired = Html.TranslateFallback(StringResources.RequiredQuestion, "Security Question is required"),
+        SecurityAnswerLabel = Model.CurrentPage.SecurityAnswerLabel,
+        SecurityAnswerMessage = Model.CurrentPage.SecurityAnswerMessage,
+        SecurityAnswerErrorMessage = ErrorMessage("SecurityAnswer"),
+        SecurityAnswerPlaceholder = Model.CurrentPage.SecurityAnswerPlaceholder,
+        SecurityAnswer = Model.ViewModel.SecurityAnswer,
+        SecurityAnswerRequired = Html.TranslateFallback(StringResources.RequiredQA, "Security Answer is required"),
+        SecurityAnswerLength = Html.TranslateFallback(StringResources.IncorrectLengthOfQA, "Answer must be 1 to 50 characters "),
+        Step4SubmitButtonText = Model.CurrentPage.Step4SubmitButtonText,
+        Step4BackButtonText = Model.CurrentPage.Step4BackButtonText,
+    };
+}
+
+@functions
+{
+    public string ErrorMessage(string fieldName)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return @Html.ValidationMessage(fieldKey).ToString();
+
+        }
+        else
+        {
+            return "";
+
+        }
+
+    }
+}
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="mod-section">
+    @if (!Model.CurrentPage.HideStepProgressBar)
+    {
+        Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel);
+    }
+
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <h1>@Html.DisplayFor(x => x.CurrentPage.Heading)</h1>
+    }
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    </div>
+
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <div data-module="bullion-checkout-security-question" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

@@ -1,0 +1,35 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	<div class="container mb-4x mt-2x">
+		<div class="page-header">
+			<h1 class="h1">Metal Price Block Demo</h1>
+		</div>
+		<div class="row">
+			<!--Middle Content Area-->
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+			<!--Middle Content Area-->
+		</div>
+		<div class="row">
+			<!--EcomPrototype Content Area-->
+			@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+			<!--/EcomPrototypeContentArea Content Area-->
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

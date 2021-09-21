@@ -1,0 +1,23 @@
+﻿@using Newtonsoft.Json
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.ViewModels.MyAccountContactPreferencesViewModel
+
+@{
+    var viewModel = new
+    {
+        introduction = @Html.DisplayFor(a => a.CurrentBlock.IntroductionText).ToHtmlString(),
+        byEmailLabel = @Html.TranslateFallback(StringResources.IWouldLikeToBeContactedByEmail, "I would like to receive news and information by e-mail"),
+        byPhoneLabel = @Html.TranslateFallback(StringResources.IWouldLikeToBeContactedByPhone, "I would like to receive news and information by telephone"),
+        byPostLabel = @Html.TranslateFallback(StringResources.IWouldLikeToBeContactedByPost, "I would like to receive news and information by post"),
+        submitButton = @Html.TranslateFallback(StringResources.SaveContactPreferencesChanges, "Save"),
+        changeSuccessMessage = @Html.TranslateFallback(StringResources.PreferencesUpdated, "Your preferences have been updated"),
+        byEmail = Model.ByEmail,
+        byPhone = Model.ByPhone,
+        byPost = Model.ByPost,
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div data-module="contact-preferences" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>

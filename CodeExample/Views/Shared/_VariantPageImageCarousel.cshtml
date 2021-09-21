@@ -1,0 +1,68 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+<div class="row variant-carousel-container">
+	<div class="col-xs-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2 mt-xs-2x">
+		<div class="prod-main-img prod-carousel" data-navfor="#carThumbs" id="carMain" data-direction="horizontal">
+		    @if (Model.ViewModel.ImagesFor360 != null && Model.ViewModel.ImagesFor360.Any())
+		    {
+		        <figure class="carousel-img image360" itemprop="image">
+		            <div class="image360-wrapper">
+		                <img class="icon360-overlay" src="@Model.ViewModel.Icon360Overlay"/>
+		                <div class="image360-container" id='mySpriteSpin'></div>
+		                <div class="image360-controls">
+		                    <div class="play-button-circle playing" id='toggle' onclick="Product360Image.togglePlayPause()"></div>
+		                    <div class="slidecontainer">
+		                        <input id="slider360" class="slider" type="range" min="1" max="@(Model.ViewModel.ImagesFor360.Count - 1)" value="1" oninput="Product360Image.changeFrame()">
+		                    </div>
+		                </div>
+		            </div>
+		        </figure>
+		    }
+			<figure class="carousel-img default-img" itemprop="image">
+				@Html.GetMyPictureHtml(Model.ViewModel.DefaultImageUrl,
+									   new Dictionary<string, string> { { "alt", Model.ViewModel.DisplayName }, { "class", "img-zoom img-responsive" }, { "data-zoom-image", Model.ViewModel.DefaultImageUrl } },
+									   new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 540 }, { StringConstants.Breakpoints.Md, 442 }, { StringConstants.Breakpoints.Sm, 533 }, { StringConstants.Breakpoints.Xs, 285 } })
+			</figure>
+			@if (Model.ViewModel.Images != null && Model.ViewModel.Images.Any())
+			{
+				foreach (var image in Model.ViewModel.Images)
+				{
+					<figure class="carousel-img" itemprop="image">
+						@Html.GetMyPictureHtml(image,
+											   new Dictionary<string, string> { { "alt", Model.ViewModel.DisplayName }, { "class", "img-zoom img-responsive" }, { "data-zoom-image", image } },
+											   new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 540 }, { StringConstants.Breakpoints.Md, 442 }, { StringConstants.Breakpoints.Sm, 533 }, { StringConstants.Breakpoints.Xs, 285 } })
+					</figure>
+				}
+			}
+		</div>
+	</div>
+	<div class="col-xs-12 col-sm-2 col-sm-pull-9 col-md-2 col-md-pull-10 hidden-xs">
+		<div class="gallery-thumbnails prod-carousel" id="carThumbs" data-navfor="#carMain" data-direction="vertical">
+		    @if (Model.ViewModel.ImagesFor360 != null && Model.ViewModel.ImagesFor360.Any())
+		    {
+		        <figure class="carousel-img thumbail-360" itemprop="image">
+		            @Html.GetMyPictureHtml(Model.ViewModel.Icon360,
+		                new Dictionary<string, string> { { "alt", Model.ViewModel.DisplayName }, { "class", "img-responsive carousel-img" } },
+		                new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 82 }, { StringConstants.Breakpoints.Md, 63 }, { StringConstants.Breakpoints.Sm, 93 }, { StringConstants.Breakpoints.Xs, 1 } })
+		        </figure>
+		    }
+		    <figure class="carousel-img default-img" itemprop="image">
+		        @Html.GetMyPictureHtml(Model.ViewModel.DefaultImageUrl,
+		            new Dictionary<string, string> { { "alt", Model.ViewModel.DisplayName }, { "class", "img-responsive carousel-img" }, { "data-zoom-image", Model.ViewModel.DefaultImageUrl } },
+		            new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 82 }, { StringConstants.Breakpoints.Md, 63 }, { StringConstants.Breakpoints.Sm, 93 }, { StringConstants.Breakpoints.Xs, 1 } })
+		    </figure>
+		    @if (Model.ViewModel.Images != null && Model.ViewModel.Images.Any())
+		    {
+		        foreach (var image in Model.ViewModel.Images)
+		        {
+		            <figure class="carousel-img" itemprop="image">
+		                @Html.GetMyPictureHtml(image,
+		                    new Dictionary<string, string> { { "alt", Model.ViewModel.DisplayName }, { "class", "img-responsive carousel-img" }, { "data-zoom-image", image } },
+		                    new Dictionary<string, int> { { StringConstants.Breakpoints.Lg, 82 }, { StringConstants.Breakpoints.Md, 63 }, { StringConstants.Breakpoints.Sm, 93 }, { StringConstants.Breakpoints.Xs, 1 } })
+		            </figure>
+		        }
+		    }
+		</div>
+	</div>
+</div>

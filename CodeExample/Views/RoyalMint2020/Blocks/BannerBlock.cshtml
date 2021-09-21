@@ -1,0 +1,575 @@
+﻿@model TRM.Web.Models.Blocks.BannerBlock
+
+@using TRM.Web.Constants
+@using EPiServer.Core
+@using EPiServer.Find.Helpers
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions
+@using TRM.Web.Extentions
+
+@if (Model.ShowContent())
+{
+    bool hasImage = Model.Image != null && !ContentReference.IsNullOrEmpty(Model.Image.LgImage);
+    bool hasCoinImage = Model.CoinImage != null && !ContentReference.IsNullOrEmpty(Model.CoinImage.LgImage);
+    bool hasCopy = Model.Content != null;
+    bool hasPrimaryButton = Model.PrimaryLink != null && !string.IsNullOrWhiteSpace(Model.LinkText);
+    bool hasSecondaryButton = Model.SecondaryLink != null && !string.IsNullOrWhiteSpace(Model.SecondaryLinkText);
+    bool hasCTAButtons = hasPrimaryButton || hasSecondaryButton;
+    bool hasBackgroundImageLink = hasImage && !string.IsNullOrEmpty(Url.ContentUrlExtension(Model.Image.ImageLink));
+    bool hasCoinImageLink = hasCoinImage && !string.IsNullOrEmpty(Url.ContentUrlExtension(Model.CoinImage.ImageLink));
+
+    var bannerLink = hasBackgroundImageLink
+        ? Model.Image.ImageLink
+        : hasPrimaryButton
+        ? Model.PrimaryLink
+        : hasSecondaryButton
+        ? Model.SecondaryLink
+        : null;
+
+    var coinLink = hasCoinImageLink ? Model.CoinImage.ImageLink : bannerLink;
+
+    string bannerLinkOpeningTag = $"<a title='{Model.Heading + " - " + Model.LinkText}' href='{Url.ContentUrlExtension(bannerLink)}'>";
+    string bannerLinkClosingTag = "</a>";
+
+    string coinLinkOpeningTag = $"<a href='{Url.ContentUrlExtension(coinLink)}'>";
+    string coinLinkClosingTag = "</a>";
+
+    string textAlignmentClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.TextAlignment, Enums.eTextAlignment.Center);
+    string backgroundClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.Background, string.Empty);
+    string backgroundOverlayClass = Model.ShowOverlayGradient ? "background-overlay" : string.Empty;
+    string primaryButtonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ButtonStyle, Enums.eButtonColour2020.Primary);
+    string secondaryButtonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.SecondaryButtonStyle, Enums.eButtonColour2020.Secondary);
+    string headingTag = GetHeadingTag().ToString().ToLowerInvariant();
+
+    switch (Model.BannerType)
+    {
+        case Enums.eBannerType.Master:
+        default:
+            string mastheadImageClass = hasImage ? string.Empty : "masthead-container-no-img";
+
+            <div class="mod-masthead flush">
+                <div class="masthead-container row justify-content-center @mastheadImageClass  has-copy">
+                    <div class="col-12 col-md-10 col-lg-8">
+                        <div class="content fluid-image @Model.TextColour.DescriptionAttr() @textAlignmentClass">
+                            @if (hasCoinImage)
+                            {
+                                <div class="content-image">
+                                    @if (coinLink != null && !hasCoinImageLink)
+                                    {
+                                        @Html.Raw(coinLinkOpeningTag)
+                                    }
+
+                                    @Html.PropertyFor(a => a.CoinImage)
+
+                                    @if (coinLink != null && !hasCoinImageLink)
+                                    {
+                                        @Html.Raw(coinLinkClosingTag)
+                                    }
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.Heading) || !string.IsNullOrEmpty(Model.SubHeading))
+                            {
+                                <div class="row justify-content-center">
+                                    <div class="col-11 col-md-10">
+                                        @if (!string.IsNullOrEmpty(Model.Heading))
+                                        {
+                                            using (Html.WrapInTag(headingTag, "title"))
+                                            {
+                                                if (bannerLink != null)
+                                                {
+                                                    @Html.Raw(bannerLinkOpeningTag)
+                                                }
+
+                                                <span>@Html.PropertyFor(a => a.Heading)</span>
+                                                if (!string.IsNullOrWhiteSpace(Model.HeadingLine2))
+                                                {
+                                                    <span>@Html.PropertyFor(a => a.HeadingLine2)</span>
+                                                }
+
+                                                if (bannerLink != null)
+                                                {
+                                                    @Html.Raw(bannerLinkClosingTag)
+                                                }
+                                            }
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.SubHeading))
+                                        {
+                                            <h2 class="sub-title">
+                                                @if (bannerLink != null)
+                                                {
+                                                    @Html.Raw(bannerLinkOpeningTag)
+                                                }
+
+                                                @Html.PropertyFor(a => a.SubHeading)
+
+                                                @if (bannerLink != null)
+                                                {
+                                                    @Html.Raw(bannerLinkClosingTag)
+                                                }
+                                            </h2>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (hasCopy)
+                            {
+                                <div class="copy">
+                                    <div class="row justify-content-center">
+                                        <div class="col-10">
+                                            <div class="d-none d-md-block">
+                                                @Html.PropertyFor(a => a.Content)
+                                            </div>
+
+                                            @if (hasCTAButtons)
+                                            {
+                                                <div class="cta-buttons">
+                                                    @if (hasPrimaryButton)
+                                                    {
+                                                        <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                                            @Html.PropertyFor(a => a.LinkText)
+                                                        </a>
+                                                    }
+
+                                                    @if (hasSecondaryButton)
+                                                    {
+                                                        <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                                            @Html.PropertyFor(a => a.SecondaryLinkText)
+                                                        </a>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (hasCTAButtons)
+                            {
+                                <div class="cta-buttons">
+                                    @if (hasPrimaryButton)
+                                    {
+                                        <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                            @Html.PropertyFor(a => a.LinkText)
+                                        </a>
+                                    }
+
+                                    @if (hasSecondaryButton)
+                                    {
+                                        <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                            @Html.PropertyFor(a => a.SecondaryLinkText)
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.ShowOverlaySymbol)
+                    {
+                        <span class="icon icon-roundal"><svg><use xlink:href="#roundal" /></svg></span>
+                    }
+
+                    @if (hasImage)
+                    {
+                        if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkOpeningTag)
+                        }
+
+                        <div class="background @backgroundOverlayClass"> @Html.PropertyFor(a => a.Image)</div>
+
+
+                        if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkClosingTag)
+                        }
+                    }
+                </div>
+            </div>
+            break;
+        case Enums.eBannerType.ForArticle:
+            bool hasContent = !string.IsNullOrEmpty(Model.Heading) || !string.IsNullOrEmpty(Model.SubHeading) || hasCopy || hasCTAButtons;
+            string hasContentClass = hasContent ? "pt-5 pb-5 mt-2" : "d-none";
+
+            <div class="mod-article-banner flush @backgroundClass">
+                <div class="row justify-content-center position-relative overflow-hidden">
+                    <div class="article-banner-inner col-12 col-md-10 col-lg-8 @hasContentClass">
+                        <div class="content fluid-image @textAlignmentClass">
+                            @if (hasCoinImage)
+                            {
+                                <div class="content-image mb-5">
+                                    @Html.PropertyFor(a => a.CoinImage)
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.Heading) || !string.IsNullOrEmpty(Model.SubHeading))
+                            {
+                                <div class="row justify-content-center">
+                                    <div class="col-11 col-md-10">
+                                        @if (!string.IsNullOrEmpty(Model.Heading))
+                                        {
+                                            using (Html.WrapInTag(headingTag, "title"))
+                                            {
+                                                <span class="d-block">@Html.PropertyFor(a => a.Heading)</span>
+                                                if (!string.IsNullOrWhiteSpace(Model.HeadingLine2))
+                                                {
+                                                    <span>@Html.PropertyFor(a => a.HeadingLine2)</span>
+                                                }
+                                            }
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.SubHeading))
+                                        {
+                                            <h2 class="sub-title mb-3">@Html.PropertyFor(a => a.SubHeading)</h2>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (hasCopy)
+                            {
+                                <div class="copy">
+                                    <div class="row justify-content-center">
+                                        <div class="col-10">
+                                            @Html.PropertyFor(a => a.Content)
+
+                                            @if (hasCTAButtons)
+                                            {
+                                                <div class="cta-buttons">
+                                                    @if (hasPrimaryButton)
+                                                    {
+                                                        <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                                            @Html.PropertyFor(a => a.LinkText)
+                                                        </a>
+                                                    }
+
+                                                    @if (hasSecondaryButton)
+                                                    {
+                                                        <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                                            @Html.PropertyFor(a => a.SecondaryLinkText)
+                                                        </a>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (hasCTAButtons)
+                            {
+                                <div class="cta-buttons">
+                                    @if (hasPrimaryButton)
+                                    {
+                                        <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                            @Html.PropertyFor(a => a.LinkText)
+                                        </a>
+                                    }
+
+                                    @if (hasSecondaryButton)
+                                    {
+                                        <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                            @Html.PropertyFor(a => a.SecondaryLinkText)
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.ShowOverlaySymbol)
+                    {
+                        <span class="icon icon-roundal"><svg><use xlink:href="#roundal" /></svg></span>
+                    }
+
+                    @if (hasImage)
+                    {
+                        <div class="flush asset fluid-image">
+                            @if (bannerLink != null && !hasBackgroundImageLink)
+                            {
+                                @Html.Raw(bannerLinkOpeningTag)
+                            }
+
+                            @Html.PropertyFor(a => a.Image)
+
+                            @if (bannerLink != null && !hasBackgroundImageLink)
+                            {
+                                @Html.Raw(bannerLinkClosingTag)
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            break;
+
+        case Enums.eBannerType.Overlay:
+            <div class="mod-hero mod-hero-overlay @textAlignmentClass">
+                <div class="overlay">
+                    @if (!string.IsNullOrEmpty(Model.Heading))
+                    {
+                        using (Html.WrapInTag(headingTag, "title"))
+                        {
+                            if (bannerLink != null)
+                            {
+                                @Html.Raw(bannerLinkOpeningTag)
+                            }
+
+                            <span>@Html.PropertyFor(a => a.Heading)</span>
+                            if (!string.IsNullOrWhiteSpace(Model.HeadingLine2))
+                            {
+                                <span>@Html.PropertyFor(a => a.HeadingLine2)</span>
+                            }
+
+                            if (bannerLink != null)
+                            {
+                                @Html.Raw(bannerLinkClosingTag)
+                            }
+                        }
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SubHeading))
+                    {
+                        <h3 class="sub-title">
+                            @if (bannerLink != null)
+                            {
+                                @Html.Raw(bannerLinkOpeningTag)
+                            }
+
+                            @Html.PropertyFor(a => a.SubHeading)
+
+                            @if (bannerLink != null)
+                            {
+                                @Html.Raw(bannerLinkClosingTag)
+                            }
+                        </h3>
+                    }
+
+                    @if (hasImage)
+                    {
+                        if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkOpeningTag)
+                        }
+
+                        @Html.PropertyFor(a => a.Image)
+
+                        if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkClosingTag)
+                        }
+                    }
+                </div>
+
+                <div class="section-copy row justify-content-center">
+                    <div class="col-10 col-sm-8">
+                        @Html.PropertyFor(a => a.Content)
+                    </div>
+                </div>
+                @if (hasCTAButtons)
+                {
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-sm-8">
+                            <div class="cta-buttons">
+                                @if (hasPrimaryButton)
+                                {
+                                    <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                        @Html.PropertyFor(a => a.LinkText)
+                                    </a>
+                                }
+
+                                @if (hasSecondaryButton)
+                                {
+                                    <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                        @Html.PropertyFor(a => a.SecondaryLinkText)
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div><!-- /.mod-hero -->
+            break;
+        case Enums.eBannerType.ImageInBetween:
+            <div class="mod-hero @textAlignmentClass">
+                <div class="row justify-content-center mt-lg-4">
+                    <div class="col-10 col-md-8 titles mt-4 mt-lg-4">
+                        @if (!string.IsNullOrEmpty(Model.Heading))
+                        {
+                            using (Html.WrapInTag(headingTag, "title"))
+                            {
+                                <span>@Html.PropertyFor(a => a.Heading)</span>
+                                if (!string.IsNullOrWhiteSpace(Model.HeadingLine2))
+                                {
+                                    <span>@Html.PropertyFor(a => a.HeadingLine2)</span>
+                                }
+                            }
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SubHeading))
+                        {
+                            <h3 class="sub-title">@Html.PropertyFor(a => a.SubHeading)</h3>
+                        }
+                    </div>
+                </div>
+
+                @if (hasImage)
+                {
+                    <div class="flush asset fluid-image">
+                        @if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkOpeningTag)
+                        }
+
+                        @Html.PropertyFor(a => a.Image)
+
+                        @if (bannerLink != null && !hasBackgroundImageLink)
+                        {
+                            @Html.Raw(bannerLinkClosingTag)
+                        }
+                    </div>
+                }
+
+                <div class="section-copy row justify-content-center">
+                    <div class="col-10 col-sm-8">
+                        @Html.PropertyFor(a => a.Content)
+                    </div>
+                </div>
+
+                @if (hasCTAButtons)
+                {
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-sm-8">
+                            <div class="cta-buttons">
+                                @if (hasPrimaryButton)
+                                {
+                                    <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                        @Html.PropertyFor(a => a.LinkText)
+                                    </a>
+                                }
+
+                                @if (hasSecondaryButton)
+                                {
+                                    <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                        @Html.PropertyFor(a => a.SecondaryLinkText)
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div><!-- /.mod-hero -->
+            break;
+        case Enums.eBannerType.ProductLeft:
+        case Enums.eBannerType.ProductRight:
+            string reverseClass = Model.BannerType == Enums.eBannerType.ProductRight ? "flex-row-reverse" : string.Empty;
+
+            <div class="mod-hero mod-hero-product flush">
+                <div class="row @reverseClass">
+                    <div class="col-md-6 content-container bg-purple-mid">
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-lg-8">
+                                <div class="content @textAlignmentClass">
+                                    @if (!string.IsNullOrEmpty(Model.Heading))
+                                    {
+                                        using (Html.WrapInTag(headingTag, "title"))
+                                        {
+                                            <span>@Html.PropertyFor(a => a.Heading)</span>
+                                            if (!string.IsNullOrWhiteSpace(Model.HeadingLine2))
+                                            {
+                                                <span>@Html.PropertyFor(a => a.HeadingLine2)</span>
+                                            }
+                                        }
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(Model.SubHeading))
+                                    {
+                                        <h3 class="sub-title">@Html.PropertyFor(a => a.SubHeading)</h3>
+                                    }
+
+                                    @Html.PropertyFor(a => a.Content)
+
+                                    @if (hasCTAButtons)
+                                    {
+                                        <div class="cta-buttons">
+                                            @if (hasPrimaryButton)
+                                            {
+                                                <a href="@Url.ContentUrlExtension(Model.PrimaryLink)" class="btn @primaryButtonClass">
+                                                    @Html.PropertyFor(a => a.LinkText)
+                                                </a>
+                                            }
+
+                                            @if (hasSecondaryButton)
+                                            {
+                                                <a href="@Url.ContentUrlExtension(Model.SecondaryLink)" class="btn @secondaryButtonClass">
+                                                    @Html.PropertyFor(a => a.SecondaryLinkText)
+                                                </a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 asset fluid-image">
+                        @if (hasCoinImage)
+                        {
+                            <div class="product">
+                                @if (coinLink != null && !hasCoinImageLink)
+                                {
+                                    @Html.Raw(coinLinkOpeningTag)
+                                }
+
+                                @Html.PropertyFor(a => a.CoinImage)
+
+                                @if (coinLink != null && !hasCoinImageLink)
+                                {
+                                    @Html.Raw(coinLinkClosingTag)
+                                }
+                            </div>
+                        }
+
+                        @if (hasImage)
+                        {
+                            <div class="background">
+                                @if (bannerLink != null && !hasBackgroundImageLink)
+                                {
+                                    @Html.Raw(bannerLinkOpeningTag)
+                                }
+
+                                @Html.PropertyFor(a => a.Image)
+
+                                @if (bannerLink != null && !hasBackgroundImageLink)
+                                {
+                                    @Html.Raw(bannerLinkClosingTag)
+                                }
+                            </div>
+                        }
+                    </div>
+                </div><!-- /.row -->
+            </div>
+            break;
+    }
+}
+
+@functions {
+    private Enums.eBannerHeadingHtmlTag GetHeadingTag()
+    {
+        if (Model.HeadingTag != Enums.eBannerHeadingHtmlTag._default)
+        {
+            return Model.HeadingTag;
+        }
+    
+        switch (Model.BannerType)
+        {
+            case Enums.eBannerType.ProductLeft:
+            case Enums.eBannerType.ProductRight:
+            case Enums.eBannerType.Overlay:
+            case Enums.eBannerType.ImageInBetween:
+                return Enums.eBannerHeadingHtmlTag.h2;
+
+            case Enums.eBannerType.ForArticle:
+            case Enums.eBannerType.Master:
+            default:
+                return Enums.eBannerHeadingHtmlTag.h1;
+        }
+    }
+}

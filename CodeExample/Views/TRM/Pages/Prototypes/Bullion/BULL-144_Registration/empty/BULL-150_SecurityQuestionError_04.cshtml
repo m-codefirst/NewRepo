@@ -1,0 +1,89 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+
+
+    <!-- BULL-150 - Bullion Registration Step 4 - Security Questions -->
+    <div class="container mb-4x mt-2x">
+        <!-- Step bar -->
+        <ol class="nav nav-bar nav-progress-bar mb-2x">
+            <li><a href="/prototypes/bullion/registration/empty/AccountDetailsError_01a/">1.&nbsp;<span>Account Details</span>&nbsp;</a></li>
+            <li><a href="/prototypes/bullion/registration/empty/PersonalDetailsError_02/">2.&nbsp;<span>Personal Details</span>&nbsp;</a></li>
+            <li><a href="/prototypes/bullion/registration/empty/VerifyYourIdentityError_03a/">3.&nbsp;<span>Verify your identity</span>&nbsp;</a></li>
+            <li class="active"><a href="/prototypes/bullion/registration/empty/SecurityQuestionError_04/">4.&nbsp;<span>Security Question</span>&nbsp;</a></li>
+            <li><a href="/prototypes/bullion/registration/empty/ApplicationSuccessfulError_05/" class="text-nowrap">5.&nbsp;<span>Application Successful</span>&nbsp;</a></li>
+        </ol>
+        <!-- / Step bar -->
+        <!-- Sub Headline -->
+        @if (Model.CurrentPage.DisplayPageHeading)
+            {
+            <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+        }
+        <!-- / Sub Headline -->
+        <!-- Content Area -->
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+        <!-- / Content Area -->
+        <!-- Form -->
+        <main class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+
+                <!-- select - security question -->
+                <div class="form-group has-feedback ValidationFail">
+                    <label class="control-label" for="">
+                        Select a Security Question only you know the answer to
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="select-form">
+                        <select class="form-control" id="" name="" " style="">
+                            <option selected="selected" value="Select a question">Select a question</option>
+                            <option value="First Dog">First Dog</option>
+                            <option value="First Cat">First Cat</option>
+                            <option value="First Flat">First Flat</option>
+                        </select>
+                    </div>
+                    <span id="" class="help-block">Security Question is required</span>
+                </div>
+                <!-- / select - security question -->
+                <!-- input - security answer -->
+                <div class="form-group has-feedback ValidationFail">
+                    <label class="control-label" for="">
+                        Security Answer
+                        <span class="text-danger">*</span>
+                        <small class="text-greyblue text-nowrap">(Field summary information)</small>
+                    </label>
+                    <input type="text" class="form-control" id="" placeholder="Please enter your Security Answer" data-original-title="" title="">
+                    <span id="" class="help-block">Security Answer is required</span>
+                    <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                </div>
+                <!-- / input - security answer -->
+            </div>
+
+            <!-- toolbar -->
+            <div class="col-xs-12 mb-2x">
+                <a href="/prototypes/bullion/registration/empty/SecurityQuestionError_04/" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                <a href="#" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+            </div>
+            <!-- / toolbar -->
+        </main>
+        <!-- / Form -->
+        <div class="row">
+            <!-- Content Area -->
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            <!-- / Content Area -->
+        </div>
+        <!-- / BULL-150 - Bullion Registration Step 4 - Security Question -->
+
+    </div>
+
+</div>

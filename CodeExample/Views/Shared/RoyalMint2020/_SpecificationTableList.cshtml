@@ -1,0 +1,11 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+<div class="mod-section specification row justify-content-center">
+    <div class="col-12 col-sm-10">
+        <h2 class="section-head pt-0"><span>Specification</span></h2>
+
+        @Html.Partial("SpecificationTableBlock", Model.ViewModel.EntrySpecificationViewModel)
+
+        @Html.PropertyFor(x => x.CurrentPage.ExtraSpecifications)
+    </div>
+</div>

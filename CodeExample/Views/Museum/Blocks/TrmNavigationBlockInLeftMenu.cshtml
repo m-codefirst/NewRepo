@@ -1,0 +1,39 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.TrmNavigationBlockViewModel
+
+@{
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+    var showHideMore = Html.TranslateFallback(StringResources.LeftMenuShowHideMore, StringConstants.TranslationFallback.ShowHideMore);
+    var valuePassedIn = ViewData.ContainsKey("Counter") ? this.ViewData["Counter"].ToString() : "0";
+    var navId = string.Format("{0}-{1}", Model.NavigationDto.CurrentBlock.Property.OwnerLink.ID, valuePassedIn);
+}
+
+
+@if (Model.NavigationDto.ChildNavigationItems.Any())
+{
+
+    <li class="has-children">
+        <a class="btn-collapse @(Model.NavigationDto.ShowExpanded ? string.Empty : "collapsed")" data-toggle="collapse" data-target="#page-menu-@navId" title="@showHideMore">
+        @Model.NavigationDto.MenuItemDisplayName </a>
+            <ul class="level2 collapse @(Model.NavigationDto.ShowExpanded ? "in" :string.Empty )" id="page-menu-@navId">
+                @foreach (var child in Model.NavigationDto.ChildNavigationItems)
+                {
+                    if (!child.IsContainer)
+                    {
+                        <li>
+                            <a href="@child.MenuItemExternalUrl" title="@child.MenuItemDisplayName">@child.MenuItemDisplayName</a>
+                        </li>
+                    }
+                }
+                
+                @if (!Model.NavigationDto.IsContainer && !Model.NavigationDto.CurrentBlock.DontOutputLabelWithHyperlink)
+                {
+                    <li>
+                        <a href="@Model.NavigationDto.MenuItemExternalUrl" title="@viewAll">@viewAll</a>
+                    </li>
+                }
+            </ul>
+    </li>
+
+}
+

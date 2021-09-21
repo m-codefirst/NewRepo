@@ -1,0 +1,355 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var HasFunds = true;
+	var HasHistory = false;
+	var AllowCredit = false;
+}
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	<div class="container account-dashboard">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="page-header">
+					<h1>Holli, Welcome Back!</h1>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+		</div>
+		<!-- Investment funds -->
+		<div class="row">
+			<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="block-container toggle-block-container panel-box bg-gray">
+							<div class="blockContent">
+								<h3 class="title hidden-xs hidden-sm">
+									Investment Wallet
+								</h3>
+								<h3 class="title no-underline visible-xs visible-sm">
+									<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#investmentWallet" role="button" class="open">Investment Wallet</a>
+								</h3>
+								<div class="mt-1x collapse-xs collapse-sm in" id="investmentWallet">
+									<div class="row">
+										<div class="block investmentWalletBlock col-xs-12 col-sm-12">
+											<div class="row investment-wallet-block">
+												<div class="col-xs-12">
+													@if (!HasFunds && !HasHistory)
+													{
+														<p class="mt-0">You have no available Funds to spend on Bullion or Signature</p>	}
+													else
+													{
+														<p class="mt-0">Morbi consequat, risus ac vulputate viverra, ex nunc congue lacus, eget vehicula liguala eros risus. Nullam sed quam lorem. Pellentesque habitant morbi.</p>	}
+													<div class="fund-wrapper">
+														<div class="fund-histories">
+															@if (HasFunds || HasHistory)
+															{
+																<div class="investment-history">
+																	<div class="vault-box total-history">
+																		<span class="price mt-0 h2">
+																			£1,305.80
+																		</span>
+																		<p class="type">
+																			<span>TOTAL BALANCE</span>
+																			<i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+																		</p>
+																	</div>
+																	<div class="vault-box total-history">
+																		<span class="price text-success mt-0 h2">
+																			£985.00
+																		</span>
+																		<p class="type">
+																			<span>AVAILABLE TO INVEST</span>
+																			<i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+																		</p>
+																	</div>
+																	<div class="vault-box total-history">
+																		<span class="price mt-0 h2">
+																			£785.00
+																		</span>
+																		<p class="type">
+																			<span>AVAILABLE TO WITHDRAW</span>
+																			<i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+																		</p>
+																	</div>
+																</div>	}
+														</div>
+														<div class="fund-actions">
+															<button class="btn btn-block btn-bg-purple icon-btn">
+																<span>Add funds</span>
+															</button>
+															@if (HasFunds || HasHistory)
+															{
+																<button class="btn btn-block btn-bg-white icon-btn @(!HasFunds ? " disabled" :"")">
+																	<span>Withdraw Funds</span>
+																</button>	}
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Investment funds -->
+		<!-- Investment Vault -->
+		<div class="row">
+			<div class="investment-vault-wrapper mb-2x">
+				<div class="block stretcherBlock col-xs-12 col-sm-12">
+					<div class="block-container">
+						<div class="blockContent">
+							<div class="row stretch-items-container has-two-children reorder-sm-down">
+								<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="block-container toggle-block-container panel-box bg-gray">
+												<div class="blockContent">
+													<h3 class="title hidden-xs hidden-sm">
+														Investments
+													</h3>
+													<h3 class="title no-underline visible-xs visible-sm">
+														<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#investmentHistory" role="button">Investments</a>
+													</h3>
+													<div class="mt-1x collapse-xs collapse-sm" id="investmentHistory">
+														<div class="row">
+															<div class="block groupLinkBlock col-xs-12 col-sm-12">
+																<div class="row grouplink-block">
+																	<div class="col-xs-12">
+																		@if (!HasHistory)
+																		{
+																			<p class="cta-link text-graylight">You currently have no transaction history</p>	}
+																		else
+																		{
+																			<a class="cta-link" href="">View Statement History</a>
+																			<a class="cta-link" href="">View Transaction History </a>	}
+																		<h5 class="h5 mb-1x">Learn more about our investment services</h5>
+																		<a class="cta-link" href="">Vault Services and Storage Fees </a>
+																		<a class="cta-link" href="">Concierge Service </a>
+																		<a class="cta-link" href="">Learn more about digital gold </a>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="block-container toggle-block-container panel-box bg-gray">
+												<div class="blockContent">
+													<h3 class="title hidden-xs hidden-sm">
+														Vaulted Investments
+													</h3>
+													<h3 class="title no-underline visible-xs visible-sm">
+														<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#fundVaultInvestment" role="button" class="open">Vaulted Investments</a>
+													</h3>
+													<div class="mt-1x collapse-xs collapse-sm in" id="fundVaultInvestment">
+														<div class="row">
+															<div class="block vaultedInvestmentBlock col-xs-12 col-sm-12">
+																<div class="row vaulted-investment-block">
+																	<div class="col-xs-12">
+																		<p>Did you know you can vault your investments on our secure site...</p>
+																		<div class="row vault-hodding-item">
+																			@if (!HasHistory)
+																			{
+																				<div class="col-xs-12">
+																					<div class="total-vault-empty">
+																						<div class="total-vault">
+																							<p class="price">£0</p>
+																							<p class="type">Total Holdings</p>
+																						</div>
+																						<div class="alert alert-info text-center">
+																							<h6 class="h6 mt-0 mb-0">
+																								You currently have no holdings
+																							</h6>
+																						</div>
+																					</div>
+																				</div>	}
+																			else
+																			{
+																				<div class="col-xs-12">
+																					<div class="total-vault">
+																						<p class="price">£15,736.00</p>
+																						<p class="type">TOTAL HOLDING VALUE</p>
+																					</div>
+																				</div>
+																				<div class="col-xs-12">
+																					<div class="row">
+																						<div class="col-xs-12 col-sm-4">
+																							<div class="sub-total-vault gold">
+																								<p class="price">£10,368.00</p>
+																								<p class="quantity">300<span>oz</span></p>
+																								<p class="type">Gold</p>
+																							</div>
+																						</div>
+																						<div class="col-xs-12 col-sm-4">
+																							<div class="sub-total-vault silver">
+																								<p class="price">£5,368.00</p>
+																								<p class="quantity">300<span>oz</span></p>
+																								<p class="type">Silver</p>
+																							</div>
+																						</div>
+																						<div class="col-xs-12 col-sm-4">
+																							<div class="sub-total-vault platium">
+																								<p class="price">£0.00</p>
+																								<p class="quantity">300<span>oz</span></p>
+																								<p class="type">Platinum</p>
+																							</div>
+																						</div>
+																					</div>
+																				</div>	}
+																		</div>
+																		<div class="row">
+																			<div class="col-xs-12">
+																				<div class="vault-actions text-center">
+																					<a href="" class="btn btn-block btn-secondary mb-1x">View Vaulted Holdings</a>
+																					<a class="cta-link" href="">Browse Vaultable products</a>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Investment Vault -->
+		@if (AllowCredit)
+		{
+					<!-- Credit Account -->
+			<div class="row mb-2x">
+				<div class="col-xs-12">
+					<div class="panel-box bg-gray account-credit-wrapper">
+						<h3 class="title hidden-xs">Credit Account</h3>
+						<h3 class="title no-underline visible-xs">
+							<a data-collapse-xs-sm data-target="#creditAccount" href="#" class="">Credit Account</a>
+						</h3>
+						<div class="collapse-xs" id="creditAccount">
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pellentesque nibh leo, et eleifend elit.</p>
+							<div class="account-credit-actions">
+								<a href="" class="btn btn-block btn-default">Account Balance</a>
+								<a href="" class="btn btn-block btn-default">View Statement History</a>
+								<a href="" class="btn btn-block btn-secondary">Make a payment</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+					<!-- End Credit Account -->
+		}
+		<!-- Account Menu -->
+		<div class="row">
+			<div class="account-navigation-wrapper mb-2x">
+				<div class="block stretcherBlock col-xs-12 col-sm-12">
+					<div class="block-container">
+						<div class="blockContent">
+							<div class="row stretch-items-container has-two-children">
+								@if (HasHistory || HasFunds)
+								{
+									<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+										<div class="row">
+											<div class="col-xs-12">
+												<div class="block-container toggle-block-container panel-box bg-gray">
+													<div class="blockContent">
+														<h3 class="title hidden-xs hidden-sm">
+															My Retail Orders
+														</h3>
+														<h3 class="title no-underline visible-xs visible-sm">
+															<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#newId1" role="button" class="">My Retail Orders</a>
+														</h3>
+														<div class="mt-1x collapse-xs collapse-sm" id="newId1">
+															<div class="row">
+																<div class="block groupLinkBlock col-xs-12 col-sm-12">
+																	<div class="row grouplink-block">
+																		<div class="col-xs-12">
+																			<a class="cta-link" href="">View Open Orders</a>
+																			<a class="cta-link" href="">View Closed Orders</a>
+																			<a class="cta-link" href="">How to return an item</a>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								}
+
+								<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="block-container toggle-block-container panel-box bg-gray">
+												<div class="blockContent">
+													<h3 class="title hidden-xs hidden-sm">
+														My Account Information
+													</h3>
+													<h3 class="title no-underline visible-xs visible-sm">
+														<a data-toggle="collapse" data-collapse-xs-sm data-target="#newId2" role="button" class="">My Account Information</a>
+													</h3>
+													<div class="mt-1x collapse-xs collapse-sm" id="newId2">
+														<div class="row">
+															<div class="block groupLinkBlock col-xs-12 col-sm-12">
+																<div class="row grouplink-block">
+																	<div class="col-xs-12">
+																		<a class="cta-link" href="">Update Personal Information</a>
+																		<a class="cta-link" href="">Manage Addresses</a>
+																		<a class="cta-link" href="">Contact Preferences</a>
+																		<a class="cta-link" href="">Change Security Details</a>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Account Menu -->
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+		</div>
+	</div>
+</div>

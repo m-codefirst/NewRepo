@@ -1,0 +1,29 @@
+﻿<div class="upload-picture-block">
+	<form class="">
+		<div class="row">
+			<div class="col-xs-12 col-sm-4">
+				<div class="input-upload-box mb-2x" id="userActions">
+					<div class="image-input-box">
+						<input class="upload-file" type="file" name="fileUpload" id="fileUpload">
+						<label for="fileUpload" class="upload-title text-silver text-center p-1x">
+							<img src="~/Static/img/content/images.svg" />
+							Drag & drop or click to upload
+						</label>
+						<img id="imgPreview" class="preview-img" src="" />
+					</div>
+					<i id="removeFile" class="trm trmi-close" data-toggle="tooltip" data-placement="top" data-original-title="Remove"></i>
+				</div>				
+				<p class="alert alert-danger hidden" id="fileTypeError">Invalid image format.</p>
+				<button id="uploadFileBtn" disabled type="submit" class="btn btn-secondary btn-150 mb-2x">Upload</button>
+				<a href="" class="display-block mb-xs-1x">Choose a different ID type</a>
+			</div>
+			<div class="col-xs-12 col-sm-8 contentArea">
+				<div class="row">
+					<div class="col-xs-12">
+						<p class="pr-4x mr-4x mt-2x">Please do not redact, watermark or otherwise obscure any part of your ID. This will help ensure we can verify your identity document as quickly and accurately as possiple.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

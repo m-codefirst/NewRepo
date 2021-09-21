@@ -1,0 +1,139 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.SellBullionDefaultLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+}
+
+<div class="pageContainer">
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2 mb-1x">
+                <div>
+                    @Html.ValidationSummary(false)
+                </div>
+                <!-- Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <div class="page-header">
+                        <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Heading)</h1>
+                    </div>
+                }
+
+                @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+                @using (Html.BeginForm("Index", null, FormMethod.Post, new { @id = "sell-back-form" }))
+                {
+                    <input type="hidden" name="VariantCode" id="variant-code" value="@Model.ViewModel.SellVariant.Code" />
+                    for (var i = 0; i < Model.ViewModel.WalletItems.Count; i++)
+                    {
+                        <input type="hidden" name="WalletItems[@i].Id" value="@Model.ViewModel.WalletItems[i].Id" />
+                        <input type="hidden" name="WalletItems[@i].RowVersion" value="@Convert.ToBase64String(Model.ViewModel.WalletItems[i].RowVersion)" />
+                    }
+                    <div class="checkout-item-block">
+                        <div class="checkout-item-wrapper">
+                            <div class="item-image hidden-xs">
+                                <img src="@Model.ViewModel.SellVariant.ImageUrl">
+                            </div>
+                            <div class="item-info">
+                                <h6 class="h6 mt-0 mb-0">@Model.ViewModel.SellVariant.Title</h6>
+                                <p class="text-graylight">@Model.ViewModel.SellVariant.Subtitle</p>
+                                <div class="row">
+                                    <div class="clearfix"></div>
+                                    <div class="col-xs-8">
+                                        <strong>@Html.TranslateFallback(StringResources.VaultQuantity, "Vault Quantity"):</strong>
+                                    </div>
+                                    <div class="col-xs-4 text-right">
+                                        @Model.ViewModel.SellVariant.QuantityInVault.ToString("####")
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-xs-8">
+                                        <strong>@Html.TranslateFallback(StringResources.AvailableToSell, "Available to Sell"):</strong>
+                                        <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.TranslateFallback(StringResources.AvailableToSellTooltip, "Tooltip")"></i>
+                                    </div>
+                                    <div class="col-xs-4 text-right">
+                                        @Model.ViewModel.SellVariant.AvailableToSell.ToString("####")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-price flex-align-left-sm-up primary-price">
+                                <div class="price-info">
+                                    <p class="h6 text-center">@Html.TranslateFallback(StringResources.SellQty, "Sell Qty")</p>
+                                    <div class="h5 mt-0 mb-0">
+                                        <div class="input-group qty-group mb-xs-1x">
+                                            <span class="input-group-btn decrease-btn">
+                                                <button class="btn qty-btn" type="button" ng-disabled="quantityToSell <= 1">
+                                                    <i class="trmi trmi-minus"></i>
+                                                </button>
+                                            </span>
+                                            <input type="text" id="sell-quantity"
+                                                   class="form-control text-center qty-input"
+                                                   data-min="1"
+                                                   data-max="@Model.ViewModel.SellVariant.AvailableToSell"
+                                                   ng-model="quantityToSell" floating-number-only
+                                                   ng-init="quantityToSell = @Model.ViewModel.SellVariant.AvailableToSell"
+                                                   value="@Model.ViewModel.SellVariant.QuantityToSellOrDeliver.ToString("#")"
+                                                   name="QuantityToSellOrDeliver">
+                                            <span class="input-group-btn increase-btn">
+                                                <button class="btn qty-btn" type="button" ng-disabled="quantityToSell >= @Model.ViewModel.SellVariant.AvailableToSell">
+                                                    <i class="trmi trmi-plus"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkout-total" id="sell-back-detail">
+                        @Html.Partial("_SellPhysicalFromVaultTotal", Model.ViewModel)
+                    </div>
+
+                    if (startPage.StopTrading)
+                    {
+                        <div class="col-xs-12">
+                            <div class="alert @startPage.StopTradingMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.UnableToSell)
+                    {
+                        <div class="col-xs-12">
+                            <div class="alert no-margins-v mb-0">
+                                @Html.TranslateFallback(StringResources.UnableToSellOrDeliverFromVault, "Customer flagged as unable to sell from vault or deliver from vault")
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.SellVariant.AvailableToSell > 0)
+                    {
+                        <button type="submit" class="btn btn-secondary pull-right-sm-up mt-2x mb-1x sellPhysicalBtn">@Html.TranslateFallback(StringResources.SellNow, "Sell Now")</button>
+                    }
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "sellOrDeliverFromVault").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"$(function () {TrmWalletModule.init(" + Model.CurrentPage.IntervalUpdateTime + "); TrmWalletModule.sellPhysicalQuantity();});").AtFooter();
+}

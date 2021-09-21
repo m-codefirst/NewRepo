@@ -1,0 +1,115 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using Newtonsoft.Json
+@using System.Web.Optimization
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.SellBullionDefaultLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel>
+
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "vaultedHoldingsCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "investSignaturePageCss")
+}
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+
+
+    var deliverBullionViewModel = new
+    {
+        texts = new
+        {
+            vaultQuantity = @Html.TranslateFallback(StringResources.WeightInSaleOz, "Weight in sale (oz)"),
+            availableToSell = @Html.TranslateFallback(StringResources.AvailableToSell, "Available to Sell"),
+            availableToSellTooltip = @Html.TranslateFallback(StringResources.AvailableToSellTooltip, "Available to Sell"),
+            sellQty = @Html.TranslateFallback(StringResources.SellQty, "Sell Qty"),
+            unableToSellOrDeliverFromVault = Html.TranslateFallback(StringResources.UnableToSellOrDeliverFromVault, "Customer flagged as unable to sell from vault or deliver from vault"),
+            sellNow = Html.TranslateFallback(StringResources.SellNow, "Sell Now"),
+            combinedWeightInSale = @Html.TranslateFallback(StringResources.WeightInSaleOz, "Weight in sale (oz)"),
+            pricePerOzIncludingPremium = @Html.TranslateFallback(StringResources.PricePerOzIncludingPremium, "Price per oz including premium"),
+            sellTodayFor = @Html.TranslateFallback(StringResources.SellTodayFor, "Sell today for"),
+            stopTradingMessage = @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage),
+            livePriceValidFor = @Html.TranslateFallback(StringResources.LivePricesValidForSeconds, "Live prices valid for"),
+            seconds = Html.TranslateFallBack(StringResources.BullionQuickCheckOutSeconds, "seconds"),
+            pleaseConfirmWhatYouWouldLikeToSellToday = @Html.TranslateFallback(StringResources.PleaseConfirmWhatYouWouldLikeToSellToday, "Please confirm what you would like to sell today"),
+            defineAnApproxValueToSell = @Html.TranslateFallback(StringResources.DefineAnApproxValueToSell, "Define an approx value to sell"),
+            defineAWeightOzToSell = @Html.TranslateFallback(StringResources.DefineAWeightOzToSell, "Define a weight (oz) to sell"),
+            sellAllMyVaultHoldingForThisMetal = @Html.TranslateFallback(StringResources.SellAllMyVaultHoldingForThisMetal, "Sell all my Vault Holding for this Metal"),
+            calculate = @Html.TranslateFallback(StringResources.Calculate, "Calculate"),
+            availableToSellOz = @Html.TranslateFallback(StringResources.AvailableToSellOz, "Available to sell (oz)"),
+            approxValuation = @Html.TranslateFallback(StringResources.ApproxValuation, "Approx Valuation"),
+            approxPricePerOz = Html.TranslateFallback(StringResources.ApproxPricePerOz, "Approx price per oz")
+        },
+        isSignatureProduct = true,
+        availableToSell = Model.ViewModel.SellVariant.AvailableToSell.ToString("0.###"),
+        quantityInVault = Model.ViewModel.SellVariant.QuantityInVault.ToString("0.###"),
+        quantityToSellOrDeliver = Model.ViewModel.SellVariant.QuantityToSellOrDeliver,
+        code = Model.ViewModel.SellVariant.Code,
+        walletItems = Model.ViewModel.WalletItems,
+        imageUrl = Model.ViewModel.SellVariant.ImageUrl,
+        title = Model.ViewModel.SellVariant.Title,
+        subtitle = Model.ViewModel.SellVariant.Subtitle,
+        actionUrl = Url.Action("Index"),
+        unableToSell = Model.ViewModel.UnableToSell,
+        premiumRequestId = Model.ViewModel.PremiumRequestId,
+        combinedWeightInSale = Model.ViewModel.CombinedWeightInSale.ToString("0.###"),
+        premiumPricePerOzIncludingPremium = Model.ViewModel.PremiumPricePerOzIncludingPremium.ToString(),
+        sellTotal = @Model.ViewModel.SellTotal.ToString(),
+        sellTotalAmount = Model.ViewModel.SellTotal.Amount,
+        stopTrading = startPage.StopTrading,
+        currency = Model.ViewModel.SellTotal.Currency.CurrencyCode.ToCurrencySymbol()
+    };
+}
+
+<div class="row justify-content-center text-center mod-section">
+    <div class="col-md-10 col-lg-8">
+
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>
+        }
+        <div class="form-container deliver-sell">
+            <div class="row">
+                <div class="col">
+
+                    <!-- Headline -->
+
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-md-8">
+                            <h2 class="section-head pt-0"><span>@Html.PropertyFor(x => x.CurrentPage.Heading)</span></h2>
+                            <div class="text-danger text-center mt-3 mb-3">
+                                @Html.ValidationSummary(false)
+                            </div>
+                            @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                            @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                            {
+                                <div class="row mod-section">
+                                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                                </div>
+                            }
+                            <div data-module="sell-bullion" data-settings="@JsonConvert.SerializeObject(deliverBullionViewModel)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+</div>
+@Html.Action("PushDataLayerSellBack", "Shared", new { viewModel = Model.ViewModel, step = Step.One })

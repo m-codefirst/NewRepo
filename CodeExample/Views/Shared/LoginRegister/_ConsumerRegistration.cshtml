@@ -1,0 +1,32 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+
+<div class="col-xs-12 col-md-5 col-lg-4 col-md-offset-1  ">
+    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.NewToRoyalMint, "New to The Royal Mint")</h4>
+    <h6 class="mt-0">@Html.TranslateFallback(StringResources.CreateYourAccount, "Create your account")</h6>
+    <a href="@Model.RegistrationPage.GetExternalUrl_V2()" class="btn btn-secondary btn-block hidden-lg hidden-md">@Html.TranslateFallback(StringResources.Register, "Register")</a>
+    <div class="hidden-xs hidden-sm">
+        <form autocomplete="off" ng-submit="AttemptRegistration()" ng-controller="rmRegistration">
+            <div class="form-group input-subtle mb-1x">
+                <input type="text" class="form-control" id="registerFirstName-header" ng-required="true" ng-model="registerFirstName" placeholder="@Html.TranslateFallback(StringResources.FirstName, "First Name")*">
+            </div>
+            <div class="form-group input-subtle mb-1x">
+                <input type="text" class="form-control" id="registerLastName-header" ng-required="true" ng-model="registerLastName" placeholder="@Html.TranslateFallback(StringResources.LastName, "Last Name")*">
+            </div>
+            <div class="form-group input-subtle mb-1x">
+                <input type="email" class="form-control" id="registerEmail1-header" ng-required="true" ng-model="registerEmail" placeholder="@Html.TranslateFallback(StringResources.EmailAddress, "Email address")*">
+            </div>
+            <div class="alert alert-danger" ng-show="regError == true" ng-cloak>
+                @Html.TranslateFallback(StringResources.EmailAddressInUse, "This email address is already in use, please try logging in or if you've forgotten your password, try resetting your password")
+            </div>
+            <div class="row mt-2x">
+                <div class="col-xs-12 col-md-6">
+                    <button class="btn btn-default" type="submit">@Html.TranslateFallback(StringResources.Continue, "Continue")</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

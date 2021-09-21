@@ -1,0 +1,76 @@
+﻿
+@using TRM.Web.Constants
+@model  TRM.Web.Models.DTOs.RMG.RmgOrderSummary
+    
+@{
+
+    var cols = !string.IsNullOrEmpty(Model.FirstPage) ? 3 :6;
+}
+
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-offset-1 mb-2x" ng-controller="rmRmg" ng-init="init(@Model.MinAmount,@Model.MaxAmount, 0, 0, '', @Model.Amount)">
+
+    <div class="bg-lightgray p-2x">
+        <h3 class="bb-solid-g mb-2x mt-0 pb-1x hidden-xs ">@Html.TranslateFallback(StringResources.RmgBasketSummary, StringConstants.TranslationFallback.RmgBasketSummary)</h3>
+        <h3 class="bb-solid-g mb-0 mt-0 pb-1x visible-xs">
+            <a data-collapse-xs-sm="" data-target="#rmgBasketBody" class="open" href="#">@Html.TranslateFallback(StringResources.RmgBasketSummary, StringConstants.TranslationFallback.RmgBasketSummary)</a>
+        </h3>
+      
+        <div class="collapse in" id="rmgBasketBody" >
+            <div class="row h6" >
+                <div class="col-xs-6">@Html.TranslateFallback(StringResources.RmgBasketValue, StringConstants.TranslationFallback.RmgBasketValue)</div>
+                <div class="summaryAmount col-xs-@cols text-right">£@Model.Amount.ToString("#,###.00") </div>
+                @if (!string.IsNullOrEmpty(Model.FirstPage))
+                {
+                    <div class="col-xs-@cols">
+                        <a ng-click="showRmgAmoutUpdate()" href="" style="border: none;"  >@Html.TranslateFallback(StringResources.RmgBasketChangeAmount, StringConstants.TranslationFallback.RmgBasketChangeAmount)</a>
+                    </div>
+                
+                <div class="rmgUpdate mt-5" style="display: none;">
+                    <form action="@Model.CheckoutUrl"  method="post" name="rmgBuyForm" id="rmgBuyForm" >
+                        @*<label class="col-xs-12 mt-0" for="Amount">@Model.ThisBlock.SubHeading @Model.ThisBlock.AmountRangeLabel</label>*@
+                        <div class="col-xs-9 pt-1x">
+                            <div class="row">
+                                <div class="form-group has-feedback " ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid )}">
+
+                                    <label class="col-xs-3 col-sm-3 col-md-2 control-label " style="padding-top: 0px !important" for="rmgAmount"><span style="font-size: 38px; line-height: 46px; color: #253746 !important">£</span></label>
+
+                                    <div class="col-sm-9 col-xs-9 col-md-10 pt-0">
+                                        <input type="text" tabindex="1" name="Amount" ng-model="rmgAmount" ng-blur="amountIsValid(rmgAmount)" class="form-control" ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid ), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid)}" id="Amount" placeholder="0.00" data-original-title="" title="" ng-required="!rmgAmount" required="required" style="">
+                                        <span class="trmi form-control-feedback ValidationFail" ng-class="{'ValidationFail': (rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid), 'ValidationSuccess': (rmgBuyForm.Amount.$touched && rmgBuyForm.Amount.$valid )}" aria-hidden="true" style="margin-right: 15px;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+               
+                        <div class="col-xs-3 pt-1x">
+
+                            <input type="hidden" name="WalletId" id="WalletId" value="@Model.WalletId" />
+                  
+                            <a href="" style="line-height: 46px;" ng-click="updateRmgAmount()" ng-disabled="rmgBuyForm.Amount.$touched && !rmgBuyForm.Amount.$valid">@Html.TranslateFallback(StringResources.RmgBasketUpdateAmount, StringConstants.TranslationFallback.RmgBasketUpdateAmount)</a>
+
+                        </div>
+                    </form>
+                </div>
+
+                }
+            </div>
+            <div class="row h6" >
+                <div class="col-xs-6">@Html.TranslateFallback(StringResources.RmgBasketCharges, StringConstants.TranslationFallback.RmgBasketCharges)</div>
+                <div class="summaryCharges col-xs-@cols text-right">£@Model.PremiumAmount.ToString("#,##0.00")</div>
+            </div>
+            <div class="row h6">
+                <div class="col-xs-6">@Html.TranslateFallback(StringResources.RmgBasketTotal, StringConstants.TranslationFallback.RmgBasketTotal)</div>
+                <div class=" summaryTotal col-xs-@cols text-right">£@Model.Total.ToString("#,##0.00")</div>
+            </div>
+
+            <div class="row h6" >
+                <div class="col-xs-12">@Html.TranslateFallback(StringResources.RmgBasketWallet, StringConstants.TranslationFallback.RmgBasketWallet)</div>
+                <div class="col-xs-12 mt-5" style="overflow: hidden;">@Model.WalletId</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+

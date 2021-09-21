@@ -1,0 +1,33 @@
+﻿@using EPiServer.Core
+@using EPiServer.Find.Helpers
+@using EPiServer.Find.Helpers.Text
+@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.VideoBlock
+@{
+    var hasImage = Model.VideoBlockCoverImage != null && !ContentReference.IsNullOrEmpty(Model.VideoBlockCoverImage.Image);
+}
+
+@if (Model.VideoId.IsNull()){return;}
+
+<div class="blockContent embed-responsive embed-responsive-16by9">
+
+    <div class="youtube embed-responsive-item" id="@Model.VideoId" @(hasImage ? "src=" + Url.ContentUrlExtension(Model.VideoBlockCoverImage.Image) : string.Empty) >
+        @if (!Model.Title.IsNullOrWhiteSpace() || !Model.Description.IsNull())
+        {
+            <div class="video-overlay hidden-xs">
+                @if (!Model.Title.IsNullOrWhiteSpace())
+                {
+                    <h4 class="mb-0">@Html.DisplayFor(m => m.Title)</h4>
+                }
+                @if (!Model.Description.IsNull())
+                {
+                    <p>@Html.DisplayFor(m => m.Description)</p>
+                }
+
+            </div>
+        }
+        
+       
+    </div>
+</div>

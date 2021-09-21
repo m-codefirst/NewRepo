@@ -1,0 +1,71 @@
+﻿@model TRM.Web.Models.ViewModels.MegaMenuViewModel
+@using TRM.Web.Constants
+
+@{
+    const string TargetBlankAttributes = "target=_blank rel=noopener";
+}
+
+@foreach (var tierOneItem in Model.MegaMenuDto.ChildNavigationItems.Where(i => i.VisibleInNav))
+{
+    var tierOneHasChildren = tierOneItem.ChildNavigationItems != null && tierOneItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+    var tierOneHasChildrenClass = tierOneHasChildren ? "has-children" : string.Empty;
+    var tierOneTitleClass = tierOneHasChildren ? "navigation-more" : string.Empty;
+
+    <li class="first-level @tierOneHasChildrenClass @tierOneItem.HideOnClasses">
+        <a tabindex="0" class="@tierOneTitleClass @tierOneItem.CssClass" href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)>@tierOneItem.MenuItemDisplayName</a>
+
+        @if (tierOneHasChildren)
+        {
+            <ul class="navigation-menu dropdown" role="menubar" data-label="@tierOneItem.MenuItemDisplayName">
+                <li class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-lg-10">
+                            <div class="row">
+                                @{
+                                    var tierTwoItemsCount = 0;
+                                }
+
+                                @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems.Where(i => i.VisibleInNav))
+                                {
+                                    var tierTwoHasChildren = tierTwoItem.ChildNavigationItems != null && tierTwoItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+                                    var tierTwoTitleClass = tierTwoHasChildren ? "navigation-more" : string.Empty;
+
+                                    <div class="col @tierTwoItem.HideOnClasses">
+                                        @if (tierTwoItemsCount == 0)
+                                        {
+                                            <a tabindex="0" role="menuitem" class="toolbar-title d-md-none @tierOneItem.CssClass" href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)><span>@tierOneItem.MenuItemDisplayName</span></a>
+                                        }
+
+                                        <ul role="menu">
+                                            <li>
+                                                <a href="@tierTwoItem.MenuItemExternalUrl" class="title @tierTwoTitleClass @tierTwoItem.CssClass" @(tierTwoItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)>@tierTwoItem.MenuItemDisplayName</a>
+                                                @if (tierTwoHasChildren)
+                                                {
+                                                    <ul role="menu" class="navigation-menu" data-label="@tierTwoItem.MenuItemDisplayName">
+                                                        @foreach (var tierThreeItem in tierTwoItem.ChildNavigationItems.Where(i => i.VisibleInNav))
+                                                        {
+                                                            <li class="@tierThreeItem.HideOnClasses">
+                                                                <a tabindex="0" role="menuitem" class="@tierThreeItem.CssClass" href="@tierThreeItem.MenuItemExternalUrl" @(tierThreeItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)>@tierThreeItem.MenuItemDisplayName</a>
+                                                            </li>
+                                                        }
+                                                        @if (tierTwoItem.ShowViewAll)
+                                                        {
+                                                            var viewAll = string.IsNullOrWhiteSpace(tierTwoItem.ViewAllText) ? Html.TranslateFallback(StringResources.MegaMenuViewAll, StringConstants.TranslationFallback.ViewAll) : tierTwoItem.ViewAllText;
+                                                            <li><a tabindex="0" role="menuitem" href="@tierTwoItem.MenuItemExternalUrl" class="all" @(tierTwoItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)>@viewAll</a></li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    tierTwoItemsCount++;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </li> <!--/.container -->
+            </ul>
+        }
+    </li>
+}

@@ -1,0 +1,132 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using EPiServer
+@using EPiServer.Web
+
+@model TRM.Web.Models.Blocks.Bullion.BullionHistoricMetalPriceChartBlock
+
+@{
+    var uniqueGuid = Guid.NewGuid().ToString();
+    var periods = Enum.GetValues(typeof(HistoricPeriod)).Cast<HistoricPeriod>();
+
+    var chartId = string.Format("metalPriceChart-{0}", uniqueGuid);
+    var chartLoaderId = string.Format("metalPriceChartLoader-{0}", uniqueGuid);
+
+    var hAxisGridLines = Model.MetalPriceChartHAxisGridLines > 0 ? Model.MetalPriceChartHAxisGridLines : 6;
+    var vAxisGridLines = Model.MetalPriceChartVAxisGridLines > 0 ? Model.MetalPriceChartVAxisGridLines : 6;
+    var commodity = !string.IsNullOrWhiteSpace(Model.InitialMetal) ? Model.InitialMetal : "xau";
+    var currency = !string.IsNullOrWhiteSpace(Model.InitialCurrency) ? Model.InitialCurrency.ToLower() : "eur";
+    var refreshFrequently = Model.MetalPriceLiveRefreshFrequently > 0 ? Model.MetalPriceLiveRefreshFrequently * 1000 : 30000;
+}
+<div class="history-metal-chart-block" ng-controller="rmHistoricMetalPriceChart as vm"
+     ng-init="vm.chartId='@chartId';vm.hAxisGridLines = @hAxisGridLines; vm.vAxisGridLines = @vAxisGridLines; vm.refreshFrequently = @refreshFrequently; vm.initData('@Model.InitialPeriod.ToString()', '@commodity', '@currency')">
+    @if (!string.IsNullOrWhiteSpace(Model.Heading))
+    {
+        <h3>@Model.Heading</h3>
+    }
+
+    <div class="row">
+
+        <div class="history-chart-summary col-md-4 col-xs-12 pull-right">
+            <table class="table table-standard table-meta-price mb-10">
+                <thead>
+                    <tr class="meta-price__header">
+                        <th colspan="3">{{vm.summary.TableHeading}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-bold">@(Model.TextTableSummaryCurrent ?? "Current")</td>
+                        <td>{{vm.summary.Current}}</td>
+                    </tr>
+                    <tr class="meta-price__alternate">
+                        <td class="text-bold">{{vm.summary.TimePeriodLegendName}}@(Model.TextTableSummaryHigh ?? "High")</td>
+                        <td>{{vm.summary.High}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold">{{vm.summary.TimePeriodLegendName}}@(Model.TextTableSummaryLow ?? "Low")</td>
+                        <td>{{vm.summary.Low}}</td>
+                    </tr>
+                    <tr class="meta-price__alternate">
+                        <td class="text-bold">{{vm.summary.TimePeriodLegendName}}@(Model.TextTableSummaryChange ?? "Change")</td>
+                        <td ng-class="{'text-green': vm.summary.ChangeNumber>0, 'text-red': vm.summary.ChangeNumber<0}">{{vm.summary.Change}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="history-chart-filtering col-md-8 col-xs-12 pull-left">
+            <div class="filtering-group display-inline-block mb-1x">
+                <p class="h6">Period</p>
+                <div class="select-form">
+                    <select class="form-control" id="filterType" ng-model="vm.period" ng-change="vm.changeChartView(vm.period, vm.currency, vm.commodity)">
+                        @foreach (var period in periods)
+                        {
+                            var transKey = string.Format(StringResources.Period, period.ToString().ToLower());
+                            <option value="@period">@Html.TranslateFallBack(transKey, period.ToString())</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="filtering-group">
+                <p class="h6">Currency</p>
+                <ul>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.currency=='gbp'}" ng-click="vm.changeChartView(vm.period, 'gbp', vm.commodity)">Pounds</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.currency=='eur'}" ng-click="vm.changeChartView(vm.period, 'eur', vm.commodity)">Euros</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.currency=='usd'}" ng-click="vm.changeChartView(vm.period, 'usd', vm.commodity)">Dollars</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="filtering-group">
+                <p class="h6">Commodity</p>
+                <ul>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.commodity=='xau'}" ng-click="vm.changeChartView(vm.period, vm.currency, 'xau')">Gold</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.commodity=='xag'}" ng-click="vm.changeChartView(vm.period, vm.currency, 'xag')">Silver</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" ng-class="{'selected':vm.commodity=='xpt'}" ng-click="vm.changeChartView(vm.period, vm.currency, 'xpt')">Platinum</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="history-chart-container">
+        <div id="@chartId" class="history-chart"></div>
+        <div id="@chartLoaderId" class="lds-spinner" ng-show="vm.isLoading">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <p class="text-center chart-footnote">
+        <i class="trmi trmi-info mr-5"></i>
+        <span class="small-text">@(Model.TextPricesUpdatedAt ?? "Prices updated at") {{vm.lastUpdatedTime}} <br /> @Model.TextPricesUpdatedAtExplanation</span>
+    </p>
+</div>
+@Html.Script(
+    @<script type="text/javascript">
+         window.addEventListener('load',
+             function() {
+                 google.charts.load('current', { 'packages': ['corechart'] });
+             });
+    </script>)

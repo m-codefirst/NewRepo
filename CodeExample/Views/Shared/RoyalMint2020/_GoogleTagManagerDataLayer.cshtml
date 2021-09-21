@@ -1,0 +1,100 @@
+﻿@using EPiServer.Editor
+@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Business.Gtm
+
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@if (!PageEditing.PageIsInEditMode)
+{
+    if (!string.IsNullOrWhiteSpace(Model.GoogleTagManagerHeaderSnippet))
+    {
+        <script type="text/javascript">
+        var dataLayer = [
+            @{
+                    var gtmReader = ServiceLocator.Current.GetInstance<IReadGtmDataLayer>();
+                if (gtmReader != null)
+                {
+                    var dataLayer = gtmReader.Read(new HttpContextWrapper(HttpContext.Current));
+                    if (!string.IsNullOrWhiteSpace(dataLayer))
+                    {
+                        @Html.Raw(dataLayer)
+                    }
+                }
+            }
+        ];
+        </script>
+    }
+    
+    <script type="text/javascript">
+        window.addEventListener("gmBasketUpdate", function (e) {           
+            var updatedProduct = e.detail.product;
+            var updatedBasketSummary = e.detail.basket;
+            var ecommerce = [];
+            var data = window.dataLayer
+            data.forEach(function (e, index) {
+                e.index = index;
+            });
+
+            data.filter(function (e) {
+                return e.hasOwnProperty('ecommerce')
+            }).forEach(function (ec) {
+                if (ec.ecommerce !== null) {
+                    ec.ecommerce.index = ec.index;
+                    ecommerce.push(ec.ecommerce)
+                }
+
+            })
+          
+            var checkout = ecommerce.filter(function (e) { return e.hasOwnProperty('checkout') })
+
+            if (checkout.length > 0 && dataLayer[checkout[0].index].ecommerce.checkout.actionField) {
+                dataLayer[checkout[0].index].ecommerce.checkout.actionField.revenue = updatedBasketSummary.revenue
+                dataLayer[checkout[0].index].ecommerce.checkout.actionField.tax = updatedBasketSummary.tax
+                dataLayer[checkout[0].index].ecommerce.checkout.actionField.shipping = updatedBasketSummary.shipping
+                dataLayer[checkout[0].index].ecommerce.checkout.actionField.coupon = updatedBasketSummary.coupon
+            }
+        
+                   
+            if (checkout.length > 0 && updatedProduct !== null) {
+                var currentBasket = checkout[0].checkout
+                var products = currentBasket.products;
+
+                var product = products.filter(function (p) {
+                    return p.id === updatedProduct.id
+                })[0]
+
+                if (product !== undefined) {
+                    product.quantity = updatedProduct.quantity
+                    product.price = updatedProduct.price
+                    product.dimension2 = updatedProduct.dimension2
+                    // Add other properties update if needed
+                }
+                else {
+                    product = updatedProduct;
+                }
+
+                var updatedProducts = products.filter(function (p) {
+                    return p.id !== updatedProduct.id
+                })
+
+                if (updatedProduct.action !== "remove") {
+                    updatedProducts.push(product);
+                }
+                
+                currentBasket.products = updatedProducts
+                dataLayer[checkout[0].index].ecommerce.checkout = currentBasket                        
+            }
+        
+            else if (checkout.length === 0 && updatedProduct !== null) {
+                dataLayer.push({
+                    'ecommerce': {
+                        'checkout': {
+                            'products': [updatedProduct]
+                        }
+                    }
+                })
+            }
+        })
+     
+    </script>
+}

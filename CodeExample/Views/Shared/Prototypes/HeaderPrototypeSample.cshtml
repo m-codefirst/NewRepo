@@ -1,0 +1,17 @@
+﻿@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@model  TrmLayoutModel
+
+<div class="header-container">
+    This is a custom header prototype sample
+    <div class="container">
+        <header class="brand-header">
+            <figure class="site-logo-container pull-left">
+                <a href="@(Url.ContentUrlExtension(Model.BaseUri))" title="The Royal Mint">
+                    <img class="img-responsive" src="@Url.ContentUrlExtension(Model.SiteLogo)" alt="RoyalMint">
+                </a>
+            </figure>
+            @Html.Partial("MegaMenuSample", Model)
+        </header>
+    </div>
+</div>

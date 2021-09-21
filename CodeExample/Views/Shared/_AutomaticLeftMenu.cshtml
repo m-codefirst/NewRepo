@@ -1,0 +1,67 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+    var showHideMore = Html.TranslateFallback(StringResources.LeftMenuShowHideMore, StringConstants.TranslationFallback.ShowHideMore);
+}
+@if (Model.LeftMenu != null && Model.LeftMenu.AutomaticLeftMenuDto != null && Model.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems != null &&  Model.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems.Any())
+{
+    <nav class="mobile-sidenav col-xs-12" id="pageMenu">
+        <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+        <div class="row">
+            <div class="navigationBlock col-xs-12">
+                <div class="blockContent">
+                    <ul class="level0 contentNav">
+                        @{
+                            var uniqueCounter = 0;
+                        }
+                        @foreach (var tierOneItem in Model.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                        {
+                            if (tierOneItem.ChildNavigationItems.Any())
+                            {
+                                <li class="has-children">
+                                    <a class="btn-collapse @(tierOneItem.ShowExpanded ? string.Empty : "collapsed")" data-toggle="collapse" data-target="#page-menu-@uniqueCounter" title="@showHideMore">
+                                        @tierOneItem.MenuItemDisplayName
+                                    </a>
+                                    <ul class="level1 collapse @(tierOneItem.ShowExpanded ? "in" : string.Empty)" id="page-menu-@uniqueCounter">
+                                        @{
+                                            var tier2Counter = 0;
+                                        }
+                                        @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                                        {
+                                            if (!tierTwoItem.IsContainer)
+                                            {
+                                                <li>
+                                                    <a href="@tierTwoItem.MenuItemExternalUrl" title="@tierTwoItem.MenuItemDisplayName">@tierTwoItem.MenuItemDisplayName</a>
+                                                </li>
+                                            }
+                                            tier2Counter++;
+
+                                           
+                                        }
+                                        @if (!tierOneItem.IsContainer && tierOneItem.CurrentBlock != null &&  !tierOneItem.CurrentBlock.DontOutputLabelWithHyperlink)
+                                        {
+                                            <li>
+                                                <a href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? "target=_blank" : string.Empty) title="@viewAll">@viewAll</a>
+                                            </li>
+                                        }
+                                       
+                                    </ul>
+                                </li>
+
+                            }
+                            else
+                            {
+                                <li>
+                                    <a href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? "target=_blank" : string.Empty) title="@tierOneItem.MenuItemDisplayName">@tierOneItem.MenuItemDisplayName</a>
+                                </li>
+                            }
+                            uniqueCounter++;
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+}

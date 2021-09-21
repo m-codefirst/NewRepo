@@ -1,0 +1,67 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.GdprConsentPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.GdprConsentPageViewModel>
+
+@functions
+{
+    public bool FieldHasErrors(string fieldName)
+    {
+        return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+    }
+}
+
+@helper ErrorMessage(MvcHtmlString error)
+    {
+        <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+        <span class="help-block">
+            @error
+        </span>
+}
+
+@{ var feedbackClass = "has-error has-feedback"; }
+
+@{
+    Html.RenderPartial("GDPRUnknownCustomerPage", Model); 
+
+    //CanPost field
+    var thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.CanPost"))
+    {
+        thisFeedbackClass = "has-error has-feedback";
+    }
+    <div class="form-group mb-2x @thisFeedbackClass">
+        <div class="col-xs-12 col-sm-9 col-sm-push-3">
+            <div class="checkbox small fancy">
+                @Html.CheckBoxFor(a => a.ViewModel.CanPost, new { @id = "canPost" })
+                <label class="" for="canPost">
+                    @Html.PropertyFor(a => a.CurrentPage.CanPostLabel)
+                </label>
+                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                {
+                    @ErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.CanPost))
+                }
+            </div>
+        </div>
+    </div>
+
+    //CanPhone field
+    thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.CanPhone"))
+    {
+        thisFeedbackClass = "has-error has-feedback";
+    }
+    <div class="form-group mb-2x @thisFeedbackClass">
+        <div class="col-xs-12 col-sm-9 col-sm-push-3">
+            <div class="checkbox small fancy">
+                @Html.CheckBoxFor(a => a.ViewModel.CanPhone, new { @id = "canPhone" })
+                <label class="" for="canPhone">
+                    @Html.PropertyFor(a => a.CurrentPage.CanPhoneLabel)
+                </label>
+                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                {
+                    @ErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.CanPhone))
+                }
+            </div>
+        </div>
+    </div>
+}

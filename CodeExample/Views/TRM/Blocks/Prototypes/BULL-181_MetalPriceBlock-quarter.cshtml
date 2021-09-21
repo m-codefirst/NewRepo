@@ -1,0 +1,236 @@
+@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions
+@model TRM.Web.Models.Blocks.EcomPrototypeBlock
+
+<div class="block-container">
+    <div class="row">
+    <div class="col-12 col-md-12">
+       <h3>Display Option - Quarter</h3>
+    </div>
+    <div class="table-overflow col-12 col-sm-3">
+        <table class="table table-standard table-meta-price mb-10">
+            <tbody>
+                <tr>
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Gold</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Buy</div>
+                        <div class="meta-price--right width-50">$984.75</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$988.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                    <defs>
+                                        <style>
+
+                                        </style>
+                                    </defs>
+                                    <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <span class="text-green">0.30%</span>
+                        </div>
+                    </td>   
+                </tr>
+                <tr class="meta-price__alternate">
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Silver</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Buy</div>
+                        <div class="meta-price--right width-50">$11.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$11.75</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <span>0.13%</span>
+                        </div>
+                    </td>   
+                </tr>
+                <tr>
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Platinum</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Buy</div>
+                        <div class="meta-price--right width-50">$654.00</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$658.00</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 20 20"
+                                 style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                            <polyline class="chevron-down__colour" points="18 6 10 14 2 6" />
+                            </svg>
+                            <span class="text-red">0.13%</span>
+                        </div>
+                    </td>   
+                </tr>
+            </tbody>
+        </table>
+        <i class="trmi trmi-info mr-5" title="Title"></i>
+        <span class="small-text">Live Prices Updated 16:02 01/03/19</span>
+    </div>
+    <div class="table-overflow col-12 col-sm-3">
+    <table class="table table-standard table-meta-price mb-10">
+            <tbody>
+                <tr>
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Gold</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Buy</div>
+                        <div class="meta-price--right width-50">$984.75</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$988.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                    <defs>
+                                        <style>
+
+                                        </style>
+                                    </defs>
+                                    <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <span class="text-green">0.30%</span>
+                        </div>
+                    </td>   
+                </tr>
+                <tr class="meta-price__alternate">
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Silver</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Buy</div>
+                        <div class="meta-price--right width-50">$11.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$11.75</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <span>0.13%</span>
+                        </div>
+                    </td>   
+                </tr>
+            </tbody>
+        </table>
+        <i class="trmi trmi-info mr-5" title="Title"></i>
+        <span class="small-text">Live Prices Updated 16:02 01/03/19</span>
+    </div>
+        <div class="table-overflow col-12 col-sm-3">
+    <table class="table table-standard table-meta-price mb-10">
+            <tbody>
+                <tr>
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Gold</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$988.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                    <defs>
+                                        <style>
+
+                                        </style>
+                                    </defs>
+                                    <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <span class="text-green">0.30%</span>
+                        </div>
+                    </td>   
+                </tr>
+                <tr class="meta-price__alternate">
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Silver</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$11.75</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <span>0.13%</span>
+                        </div>
+                    </td>   
+                </tr>
+            </tbody>
+        </table>
+        <i class="trmi trmi-info mr-5" title="Title"></i>
+        <span class="small-text">Live Prices Updated 16:02 01/03/19</span>
+    </div>
+    <div class="table-overflow col-12 col-sm-3">
+    <table class="table table-standard table-meta-price mb-10">
+            <tbody>
+                <tr>
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Metal</div>
+                        <div class="meta-price--right width-50 text-bold">Gold</div>
+                    </td>     
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Sell</div>
+                        <div class="meta-price--right width-50">$988.50</div>
+                    </td>   
+                    <td class="d-block">
+                        <div class="meta-price--left width-50">Change</div>
+                        <div class="meta-price--right width-50">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                    <defs>
+                                        <style>
+
+                                        </style>
+                                    </defs>
+                                    <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <span class="text-green">0.30%</span>
+                        </div>
+                    </td>   
+                </tr>
+            </tbody>
+        </table>
+        <i class="trmi trmi-info mr-5" title="Title"></i>
+        <span class="small-text">Live Prices Updated 16:02 01/03/19</span>
+    </div>
+    </div>
+</div>

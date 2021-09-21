@@ -1,0 +1,179 @@
+﻿@using TRM.Shared.Extensions;
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep4ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+}
+
+@functions
+{
+    public string GetFeedbackClass(string fieldName, string classes = null)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return string.IsNullOrEmpty(classes) ? "has-feedback ValidationFail" : classes;
+        }
+        return "has-feedback";
+    }
+}
+
+@helper ErrorMessage(string fieldName, bool isShowFeedbackIcon = true)
+{
+    var fieldKey = string.Format("viewModel.{0}", fieldName);
+    if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+    {
+        <span id="bull-email__helpBlock2" class="help-block">@Html.ValidationMessage(fieldKey)</span>
+        if (isShowFeedbackIcon)
+        {
+            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+        }
+    }
+}
+
+<div class="container-fluid no-padding">
+    <!-- Content Area -->
+    @*@Html.PropertyFor(m => m.CurrentPage.MainBody)*@
+    <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+    <!-- / Content Area -->
+</div>
+
+<div class="container bull-registration">
+
+    <!-- Content Area -->
+    @*@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)*@
+    <!-- / Content Area -->
+    <!-- BULL-150 - Bullion Registration Step 4 - Security Questions -->
+    <div class="container mb-4x mt-2x">
+        <!-- page header -->
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        <!-- / page header -->
+        @if (!Model.CurrentPage.HideStepProgressBar)
+        {
+            <!-- Step bar -->
+            <div class="row">
+                <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                    <!-- Step bar -->
+                    <ol class="nav nav-bar nav-progress-bar">
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}", currentUrl)"><span>1</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step2", currentUrl)"><span>2</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step3", currentUrl)"><span>3</span></a></li>
+                        <li class="col-xs-3 no-padding active"><a href="javascript:void(0);"><span>4</span></a></li>
+                    </ol>
+
+                    <!-- / Step bar -->
+                </div>
+            </div>
+            <!-- / Step bar -->
+        }
+
+        <!-- Form -->
+        @using (Html.BeginForm("Step4", null, FormMethod.Post, new { name = "formSecurityQuestion", id = "formSecurityQuestionRegistration" }))
+        {
+            <main class="row">
+                <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                    <!-- Sub Headline -->
+                    <h1 class="h3 mt-0">@Html.PropertyFor(m => m.CurrentPage.Step4Heading)</h1>
+                    <!-- / Sub Headline -->
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                        </div>
+                    }
+
+                    @if (Model.CurrentPage.MiddleContentStep4 != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep4)
+                        </div>
+                    }
+                    <!-- select - security question -->
+                    <div class="form-group @GetFeedbackClass("SecurityQuestion")"
+                         ng-class="{'ValidationFail': (formSecurityQuestion['ViewModel.SecurityQuestion'].$touched && (!formSecurityQuestion['ViewModel.SecurityQuestion'].$valid || SecurityQuestion == 'Select a question')), 'ValidationSuccess': (formSecurityQuestion['ViewModel.SecurityQuestion'].$touched && formSecurityQuestion['ViewModel.SecurityQuestion'].$valid && SecurityQuestion != 'Select a question')}">
+                        <label class="control-label" for="">
+                            @Html.PropertyFor(x => x.CurrentPage.SecurityQuestionLabel)
+                            <span class="text-danger">*</span>
+                            <small class="text-greyblue">@Html.PropertyFor(x => x.CurrentPage.SecurityQuestionOptionMessage)</small>
+                        </label>
+                        <div class="select-form">
+                            @Html.DropDownListFor(m => m.ViewModel.SecurityQuestion, new SelectList(Model.ViewModel.SecurityQuestionList, "Key", "Value"), new { @class = "form-control", ng_model = "SecurityQuestion", ng_init = "SecurityQuestion = '" + (string.IsNullOrEmpty(Model.ViewModel.SecurityQuestion) ? "Select a question" : Model.ViewModel.SecurityQuestion) + "'" })
+                            <span ng-if="!formSecurityQuestion['ViewModel.SecurityQuestion'].$valid || SecurityQuestion == 'Select a question'">
+                                @ErrorMessage("SecurityQuestion", false)
+                            </span>
+                        </div>
+                    </div>
+                    <!-- / select - security question -->
+                    <!-- input - security answer -->
+                    <div class="form-group @GetFeedbackClass("SecurityAnswer")"
+                         ng-class="{'ValidationFail': (formSecurityQuestion['ViewModel.SecurityAnswer'].$dirty || formSecurityQuestion['ViewModel.SecurityAnswer'].$touched && !formSecurityQuestion['ViewModel.SecurityAnswer'].$valid), 'ValidationSuccess': (formSecurityQuestion['ViewModel.SecurityAnswer'].$dirty && formSecurityQuestion['ViewModel.SecurityAnswer'].$valid)}">
+                        <label class="control-label" for="">
+                            @Html.PropertyFor(x => x.CurrentPage.SecurityAnswerLabel)
+                            <span class="text-danger">*</span>
+                            <small class="text-greyblue">@Html.PropertyFor(x => x.CurrentPage.SecurityAnswerMessage)</small>
+                        </label>
+
+                        <div class="has-feedback">
+                            @Html.TextBoxFor(x => x.ViewModel.SecurityAnswer, new
+                            {
+                                @class = "form-control",
+                                data_required = "true",
+                                data_notequal = "",
+                                ng_model = "SecurityAnswer",
+                           ng_init = "SecurityAnswer = '" + Model.ViewModel.SecurityAnswer + "'",
+                                placeholder = Model.CurrentPage.SecurityAnswerPlaceholder,
+                                ng_minlength = "1",
+                                ng_maxlength = "50"
+                            })
+
+                            <span class="text-danger" ng-show="formSecurityQuestion['ViewModel.SecurityAnswer'].$error.required && formSecurityQuestion['ViewModel.SecurityAnswer'].$dirty">
+                                @Html.TranslateFallback(StringResources.RequiredQA, "Security Answer is required")
+                            </span>
+
+                            <span class="text-danger" ng-show="(formSecurityQuestion['ViewModel.SecurityAnswer'].$error.maxlength || formSecurityQuestion['ViewModel.SecurityAnswer'].$error.minlength) && formSecurityQuestion['ViewModel.SecurityAnswer'].$dirty">
+                                @Html.TranslateFallback(StringResources.IncorrectLengthOfQA, "Answer must be 1 to 50 characters ")
+                            </span>
+                            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <!-- / input - security answer -->
+                </div>
+
+
+                <!-- toolbar -->
+                <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 mb-2x">
+                    <a href="@string.Format("{0}Step3", currentUrl)" type="" class="btn btn-default mb-1x">@Model.CurrentPage.Step4BackButtonText</a>
+                    <input type="submit" class="btn btn-secondary mb-1x ml-1x" value="@Model.CurrentPage.Step4SubmitButtonText" />
+                </div>
+                <!-- / toolbar -->
+            </main>
+        }
+        <!-- / Form -->
+
+
+    </div>
+
+</div>
+<div class="container-fluid no-padding">
+    <div class="contentArea row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <!-- Content Area -->
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        <!-- / Content Area -->
+    </div>
+</div>

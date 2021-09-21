@@ -1,0 +1,33 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+@model TRM.Web.Models.Blocks.Bullion.kyc.KycUploadImageBlock
+
+@{
+    var viewModel = new {
+        imageLink = @Url.ContentUrlExtension(Model.ImageLink),
+        imagePlaceholder = Model.ImagePlaceholder,
+        invalidImage = @Html.TranslateFallback(StringResources.InvalidImage, "Invalid image."),
+        uploadButtonText = Model.UploadButtonText,
+        bottomLink = @Url.ContentUrlExtension(Model.BottomLink),
+    };
+}
+
+
+<div class="form-spacing text-right">
+    <a href="@Url.ContentUrlExtension(Model.BottomLink)" class="btn btn-default pl-0 pr-0 mb-0">@Html.PropertyFor(x => x.BottomLinkText)</a>
+</div>
+@if (Model.MiddleTopContent != null)
+{
+    <div class="form-spacing">
+        @Html.PropertyFor(x => x.MiddleTopContent)
+    </div>
+}
+<div class="form-spacing">
+    <div class="mb-4">
+        @Html.PropertyFor(x => x.MiddleRightContent)
+    </div>
+    <div data-module="kyc-upload-image" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+    <a href="@Url.ContentUrlExtension(Model.BottomLink)" class="display-block mb-xs-1x">@Html.PropertyFor(x => x.BottomLinkText)</a>
+</div>

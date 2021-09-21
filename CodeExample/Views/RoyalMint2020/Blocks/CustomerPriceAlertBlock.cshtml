@@ -1,0 +1,47 @@
+﻿@using TRM.Web.Extentions
+@using EPiServer.Web
+@model TRM.Web.Models.Blocks.Bullion.CustomerPriceAlertBlock
+@{
+    var newContent = Model.Content.ToString();
+
+    if (Model.Content != null && !string.IsNullOrEmpty(Model.GoldPrice))
+    {
+        newContent = Model.Content.ToString().Replace("[_gold]", Model.GoldPrice);
+    }
+}
+<div class="panel panel-default panel-secondary">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8">
+                <div class="row  pb-1x">
+                    <div class="col-xs-12" id="currentGoldPriceAlert">
+                        @Html.Raw(newContent)
+                    </div>
+                </div>
+                <div class="row">
+                    <form onsubmit="CustomerPriceAlert.RegisterPriceAlert()">
+                        <div class="col-xs-12 col-sm-6 col-lg-5">
+                            <div class="form-group mb-0 mb-xs-1x">
+                                <label>@Html.PropertyFor(x => x.PriceLable)<span class="text-danger">*</span></label>
+                                <div class="input-group subtle  mb-0">
+                                    <div class="input-group-addon">@Model.GetDefaultCurrencySymbol()</div>
+                                    <input type="text" class="form-control currency-input" id="alertNumber" ng-model="alertNumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 pull-right">
+                            <div class="form-group  mb-0">
+                                <label class="hidden-xs">&nbsp;</label>
+                                <button type="submit" id="registerPriceAlertBtn" class="btn btn-secondary btn-block">@Html.PropertyFor(x => x.SubmitButton)</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "customerPriceAlert").AtFooter();
+}

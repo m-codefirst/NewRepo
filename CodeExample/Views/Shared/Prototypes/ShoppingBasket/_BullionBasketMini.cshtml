@@ -1,0 +1,134 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var basketPageUrl = Model.BasketPage.GetExternalUrl_V2();
+    var checkoutPageUrl = Model.CheckoutPage.GetExternalUrl_V2();
+}
+<div class="nav-section basket-mini" id="navSectionBasket">
+    <div class="section-body minibasket-fixed" id="miniBasket">
+        <div class="row" ng-if="getBasketQty() >= 1" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <h4>@Html.TranslateFallback(StringResources.BasketRecentlyAddedToYourBasket, StringConstants.TranslationFallback.BasketRecentlyAddedToYourBasket)</h4>
+                <div class="basket-container">
+                    <table class="table mini-basket-table">
+                        <thead>
+                            <tr>
+                                <th width="70%">@Html.TranslateFallback(StringResources.BasketItems, StringConstants.TranslationFallback.BasketItems)</th>
+                                <th width="15%">@Html.TranslateFallback(StringResources.BasketQuantity, StringConstants.TranslationFallback.BasketQuantity)</th>
+                                <th></th>
+                                <th class="text-right" width="15%">@Html.TranslateFallback(StringResources.BasketPrice, StringConstants.TranslationFallback.BasketPrice)</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="shipment in rmCommerce.shipments">
+                            <tr ng-repeat="variant in shipment.CartItems" class="headerBasketItem" ng-fade>
+                                <td>
+                                    <span class="mb-0 mt-0 ">
+                                        @*<a class="text-slateblue bold" ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-bind="variant.DisplayName" ng-cloak></a>*@
+                                        <a class="text-slateblue bold" href="#">1 kg Gold Bar Cast</a>
+                                        @*<p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>*@
+                                        <p class="text-silver mb-0">999.9 fine gold / 24 carat gold</p>
+                                    </span>
+
+                                    <p class="text-silver mb-0"></p>
+
+                                    <!-- message personalize -->
+                                    <div ng-if="variant.CanBePersonalised" class="mt-5">
+                                        <span class="bg-lightgray p-1xs mt-1x">
+                                            @Html.TranslateFallback(StringResources.ItemPersonalised, StringConstants.TranslationFallback.ItemPersonalised)
+                                        </span>
+                                    </div>
+                                    <!-- / message personalize -->
+                                </td>
+                                <td>
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, -1)" ng-disabled="variant.Quantity <= variant.StockSummary.MinQuantity">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="{{variant.Quantity}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, 1)" ng-disabled="variant.Quantity >= variant.StockSummary.MaxQuantity">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code);">
+                                        <span class="text-danger">@Html.TranslateFallback(StringResources.BasketRemove, StringConstants.TranslationFallback.BasketRemove)</span>
+                                    </button>
+                                </td>
+                                <td class="text-right"><span ng-bind="variant.DiscountedPrice" ng-cloak></span></td>
+                            </tr>
+                            <!-- ----------------------------------------------------------- seperator --------------------------------------------------------------------- -->
+                            <tr ng-repeat="variant in shipment.CartItems" class="headerBasketItem" ng-fade>
+                                <td>
+                                    <span class="mb-0 mt-0 ">
+                                        @*<a class="text-slateblue bold" ng-href="{{ variant.Url }}" title="{{ variant.DisplayName }}" ng-bind="variant.DisplayName" ng-cloak></a>*@
+                                        <a class="text-slateblue bold" href="#">Signature Silver</a>
+                                        @*<p class="text-silver mb-0" title="{{ variant.SubTitle }}" ng-bind="variant.SubTitle" ng-cloak></p>*@
+                                        <p class="text-silver mb-0">Royal Mint Refinery silver bar</p>
+
+                                    </span>
+
+                                    <p class="text-silver mb-0"></p>
+
+                                    <!-- message personalize -->
+                                    <div ng-if="variant.CanBePersonalised" class="mt-5">
+                                        <span class="bg-lightgray p-1xs mt-1x">
+                                            @Html.TranslateFallback(StringResources.ItemPersonalised, StringConstants.TranslationFallback.ItemPersonalised)
+                                        </span>
+                                    </div>
+                                    <!-- / message personalize -->
+                                </td>
+                                <td>
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity2(variant, -1)" ng-disabled="variant.Quantity1 <= variant.StockSummary1.MinQuantity1">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="{{variant.Quantity1}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button" ng-click="updateQuantity2(variant, 1)" ng-disabled="variant.Quantity1 >= variant.StockSummary1.MaxQuantity1">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code);">
+                                        <span class="text-danger">@Html.TranslateFallback(StringResources.BasketRemove, StringConstants.TranslationFallback.BasketRemove)</span>
+                                    </button>
+                                </td>
+                                <td class="text-right"><span ng-bind="variant.DiscountedPrice" ng-cloak></span></td>
+                            </tr>
+                            <tr class="no-border">
+                                <td colspan="5">
+                                    <h3 class="text-right mt-1x">@Html.TranslateFallback(StringResources.BasketSubTotalInfo, StringConstants.TranslationFallback.BasketSubTotalInfo) {{ getSubTotal() }}</h3>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="text-right">
+                    <a class="btn btn-default" href="@basketPageUrl">@Html.TranslateFallback(StringResources.BasketFullBasketBtnText, StringConstants.TranslationFallback.BasketFullBasketBtnText)</a>
+                    <a class="btn btn-primary" href="@checkoutPageUrl">@Html.TranslateFallback(StringResources.BasketCheckoutBtnText, StringConstants.TranslationFallback.BasketCheckoutBtnText)</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="getBasketQty() == 0" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <div class="alert alert-warning">
+                    @Html.TranslateFallback(StringResources.BasketEmpty, StringConstants.TranslationFallback.BasketEmpty)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

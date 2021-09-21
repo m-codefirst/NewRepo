@@ -1,0 +1,36 @@
+﻿@using EPiServer.Find.Helpers.Text
+@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+<div class="inventory-items clear">
+    <ul class="list-unstyled">
+        <li ng-class="@((int)Model.ViewModel.StockSummary.Status )| stockClass" itemprop="availability">@Model.ViewModel.StockSummary.StatusMessage</li>
+        <meta itemprop="availability" content="@((int)Model.ViewModel.StockSummary.Status)" />
+
+        <li class="variantPageInventoryItemsShippingMessage">
+            @if (Model.ViewModel.StockSummary.Status == Enums.eStockStatus.PreOrder)
+            {
+                <text>@Model.CurrentPage.PreOrderOrBackOrderStatusMessage</text>
+            }
+            else
+            {
+                <text>@Model.ViewModel.StockSummary.ShippingMessage</text>
+            }
+        </li>
+
+        @*Supplier Message*@
+        @if (Model.CurrentPage.IsGifting)
+        {
+            <li>
+                @(!string.IsNullOrEmpty(Model.CurrentPage.SupplierMessage) ? Model.CurrentPage.SupplierMessage : Model.ViewModel.FulfilledBy)
+            </li>
+        }
+
+        <li itemprop="sku">
+            @Html.TranslateFallback(StringResources.ProductCode, @StringConstants.TranslationFallback.ProductCode) @Model.CurrentPage.Code
+        </li>
+        @if (Model.ViewModel.StockSummary.LimitedEditionPresentation > 0)
+        {
+            <li>@Html.TranslateFallback(StringResources.LimitedEdition, @StringConstants.TranslationFallback.LimitedEdition)  @Model.ViewModel.StockSummary.LimitedEditionPresentation</li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,77 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.MegaMenuViewModel
+
+
+@foreach (var tierOneItem in Model.MegaMenuDto.ChildNavigationItems.Where(i => i.VisibleInNav))
+{
+    var tierOneHasChildren = tierOneItem.ChildNavigationItems != null && tierOneItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+    var tierOneHasChildrenClass = tierOneHasChildren ? "has-children" : string.Empty;
+
+    <div class="level0 @tierOneHasChildrenClass">
+        @if (string.IsNullOrEmpty(tierOneItem.MenuItemExternalUrl) || tierOneItem.CurrentBlock.DontOutputLabelWithHyperlink)
+        {
+            <span class="fauxLink">
+                @tierOneItem.MenuItemDisplayName
+            </span>
+        }
+        else
+        {
+            <a href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? "target=_blank" : string.Empty)>@tierOneItem.MenuItemDisplayName</a>
+        }
+
+        @if (tierOneHasChildren)
+        {
+            var hasBanners = tierOneItem.CurrentBlock.MegaMenuLeftContentArea != null && tierOneItem.CurrentBlock.MegaMenuLeftContentArea.Items.Any() ? "hasBanners" : string.Empty;
+            <div class="nav-dropdown @hasBanners">
+                @if (tierOneItem.CurrentBlock.MegaMenuLeftContentArea != null && tierOneItem.CurrentBlock.MegaMenuLeftContentArea.Items.Any())
+                {
+                    <div class="banner-col hidden-xs hidden-sm">
+                        <div>
+                            @{
+                                var item = tierOneItem;
+                            }
+                            @Html.PropertyFor(x => item.CurrentBlock.MegaMenuLeftContentArea)
+                        </div>
+                    </div>
+                }
+                <div class="nav-col">
+                    <div>
+                        @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems.Where(i => i.VisibleInNav))
+                        {
+                            var tierTwoHasChildren = tierTwoItem.ChildNavigationItems != null && tierTwoItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+                            var tierTwoHasChildrenClass = tierTwoHasChildren ? "has-children" : string.Empty;
+
+                            <div class="level1 @tierTwoHasChildrenClass">
+                                @if (string.IsNullOrEmpty(tierTwoItem.MenuItemExternalUrl) || tierTwoItem.CurrentBlock.DontOutputLabelWithHyperlink)
+                                {
+                                    <span class="fauxLink">
+                                        @tierTwoItem.MenuItemDisplayName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a href="@tierTwoItem.MenuItemExternalUrl">@tierTwoItem.MenuItemDisplayName</a>
+                                }
+                                @if (tierTwoHasChildren)
+                                {
+                                    <div>
+                                        <div class="list-heading">
+                                            @tierTwoItem.CurrentBlock.RootLabel<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a>
+                                        </div>
+                                        <div class="row">
+                                            @{
+                                                var item = tierTwoItem;
+                                            }
+                                            @Html.PropertyFor(c => item.CurrentBlock.MegaMenuContent, new { Tag = StringConstants.MenuRenderingTags.MegaMenu })
+                                        </div>
+
+                                    </div>
+                                }
+                            </div>}
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+}

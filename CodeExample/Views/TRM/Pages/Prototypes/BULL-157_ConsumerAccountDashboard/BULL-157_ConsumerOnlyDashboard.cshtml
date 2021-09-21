@@ -1,0 +1,149 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var AllowCredit = false;
+	var AccountActive = false;
+}
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	<div class="container account-dashboard">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="page-header">
+					<h1>Holli, Welcome Back!</h1>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+		</div>
+		<!-- Account Menu -->
+		<div class="row">
+			<div class="account-navigation-wrapper mb-2x">
+				<div class="block stretcherBlock col-xs-12 col-sm-12">
+					<div class="block-container">
+						<div class="blockContent">
+							<div class="row stretch-items-container has-two-children">
+								<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="block-container toggle-block-container panel-box bg-gray">
+												<div class="blockContent">
+													<h3 class="title hidden-xs hidden-sm">
+														My Retail Orders
+													</h3>
+													<h3 class="title no-underline visible-xs visible-sm">
+														<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#newId1" role="button" class="">My Retail Orders</a>
+													</h3>
+													<div class="mt-1x collapse-xs collapse-sm" id="newId1">
+														<div class="row">
+															<div class="block groupLinkBlock col-xs-12 col-sm-12">
+																<div class="row grouplink-block">
+																	<div class="col-xs-12">
+																		<a class="cta-link" href="">View Open Orders</a>
+																		<a class="cta-link" href="">View Closed Orders</a>
+																		<a class="cta-link" href="">How to return an item</a>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="block toggleContainerBlock col-xs-12 col-sm-12">
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="block-container toggle-block-container panel-box bg-gray">
+												<div class="blockContent">
+													<h3 class="title hidden-xs hidden-sm">
+														My Account Information
+													</h3>
+													<h3 class="title no-underline visible-xs visible-sm">
+														<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#newId2" role="button" class="">My Account Information</a>
+													</h3>
+													<div class="mt-1x collapse-xs collapse-sm" id="newId2">
+														<div class="row">
+															<div class="block groupLinkBlock col-xs-12 col-sm-12">
+																<div class="row grouplink-block">
+																	<div class="col-xs-12">
+																		<a class="cta-link" href="">Update Personal Information</a>
+																		<a class="cta-link" href="">Manage Addresses</a>
+																		<a class="cta-link" href="">Contact Preferences</a>
+																		<a class="cta-link" href="">Change Password</a>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Account Menu -->
+		@if (!AccountActive)
+		{
+				<!-- Credit Account -->
+			<div class="row mb-2x">
+				<div class="col-xs-12">
+					<div class="panel-box bg-gray panel-bg account-activate-wrapper" style="background-image:url(/Static/img/content/banner-example.jpg)">
+						<h2 class="h2 mt-0 mb-1x question-text">Have you ever wanted to invest in Bullion Signature or Bullion Gold Bars?</h2>
+						<h6 class="h6 mt-0 mb-3x">Activate your Bullion account today!</h6>
+						<div class="cta-link-group">
+							<a href="" class="btn btn-bg-orange">Activate your account</a>
+							<a href="" class="btn btn-bg-white">Find out more</a>
+						</div>
+					</div>
+				</div>
+			</div>
+				<!-- End Credit Account -->
+		}
+		@if (AllowCredit)
+		{
+				<!-- Credit Account -->
+			<div class="row mb-2x">
+				<div class="col-xs-12">
+					<div class="panel-box bg-gray account-credit-wrapper">
+						<h3 class="title hidden-xs">Credit Account</h3>
+						<h3 class="title no-underline visible-xs">
+							<a data-collapse-xs-sm data-target="#creditAccount" href="#" class="open">Credit Account</a>
+						</h3>
+						<div class="collapse-xs in" id="creditAccount" aria-expanded="true">
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi pellentesque nibh leo, et eleifend elit.</p>
+							<div class="account-credit-actions">
+								<a href="" class="btn btn-block btn-default">Account Balance</a>
+								<a href="" class="btn btn-block btn-default">View Statement History</a>
+								<a href="" class="btn btn-block btn-secondary">Make a payment</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				<!-- End Credit Account -->
+		}
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+	</div>
+</div>

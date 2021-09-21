@@ -1,0 +1,45 @@
+﻿@using Castle.Core.Internal
+@using TRM.Web.Constants
+
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+
+@if (!Model.Value.MoreDetailCollection.IsNullOrEmpty())
+{
+
+    <tr class="sub-row">
+        <td colspan="6">
+            <div id="row@(Model.Key)" class="collapse" data-parent="#transaction-history">
+                <div class="sub-content">
+                    <div class="row">
+
+                        @switch (Model.Value.TransactionType)
+                        {
+                            case Enums.TransactionHistoryType.Purchase:
+                                @Html.Partial("TransactionHistoryItemDetailPurchase", Model)
+                                break;
+                            case Enums.TransactionHistoryType.Withdraw:
+                                @Html.Partial("TransactionHistoryItemDetailWithdrawal", Model)
+                                break;
+                            case Enums.TransactionHistoryType.DeliverFromVault:
+                                @Html.Partial("TransactionHistoryItemDeliverFromVault", Model)
+                                break;
+                            case Enums.TransactionHistoryType.SellFromVault:
+                                @Html.Partial("TransactionHistoryItemSellFromVault", Model)
+                                break;
+                            case Enums.TransactionHistoryType.FundsAddedCard:
+                            case Enums.TransactionHistoryType.StorageFee:
+                            case Enums.TransactionHistoryType.AccountActivity:
+                            case Enums.TransactionHistoryType.BalanceAdjustment:
+                            case Enums.TransactionHistoryType.BankDeposit:
+                            case Enums.TransactionHistoryType.All:
+                            default:
+                                @Html.Partial("TransactionHistoryItemDetailDefault", Model)
+                                break;
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+}

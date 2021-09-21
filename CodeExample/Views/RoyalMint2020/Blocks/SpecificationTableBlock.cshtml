@@ -1,0 +1,12 @@
+﻿@model  TRM.Web.Models.ViewModels.SpecificationTableBlockViewModel
+
+<div class="row mb-5">
+    @if (!string.IsNullOrWhiteSpace(Model.SpecificationTableName))
+    {
+        <h3 class="col-12">@Model.SpecificationTableName</h3>
+    }
+    @if (Model.SpecificationItems != null && Model.SpecificationItems.Any())
+    {
+        @Html.Partial("RoyalMint2020/_SpecificationTable", Model.SpecificationItems)
+    }
+</div>

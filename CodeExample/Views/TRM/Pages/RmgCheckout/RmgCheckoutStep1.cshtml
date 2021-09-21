@@ -1,0 +1,226 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Interfaces.Rmg
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.RmgCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.RMG.RmgCheckoutStep1ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var url = string.Empty;
+    if (Request != null && Request.Url != null)
+    {
+        var trmLayout = (TrmLayoutModel)Model.Layout;
+        url = trmLayout.CheckoutPage.GetExternalUrl_V2();
+    }
+
+}
+
+@functions
+{
+
+    public bool FieldHasErrors(string fieldName)
+    {
+        return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+    }
+
+}
+
+@helper ErrorMessage(MvcHtmlString error)
+    {
+        <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+        <span class="help-block">
+            @error
+        </span>
+}
+
+
+@helper PasswordErrorMessage(MvcHtmlString error)
+    {
+        <span class="help-block">
+            @error
+        </span>
+}
+
+@{
+    var thisFeedbackClass = string.Empty;
+
+}
+
+<div class="pageContainer">
+    <div class="content-area"></div>
+    <div class="container mb-4x mt-2x">
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+
+        <ol class="nav nav-bar nav-progress-bar mb-2x">
+            <li style="width:33%" class="active"><a href="#">1. <span>@Html.DisplayFor(m => m.CurrentPage.Step1Heading)</span></a></li>
+            <li style="width:33%">2. <span> @Html.DisplayFor(m => m.CurrentPage.Step2Heading) </span> </li>
+            <li style="width:33%">3. <span> @Html.DisplayFor(m => m.CurrentPage.Step3Heading) </span> </li>
+        </ol>
+        <main class="row">
+            <div class="hidden-lg hidden-md hidden-sm">
+                @Html.Partial("_RmgOrderSummary", @Model.ViewModel.OrderSummary)
+
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+                <h3 class="mt-0">@Html.DisplayFor(m => m.CurrentPage.Step1Heading)</h3>
+
+                @{
+                    string feedbackClass = "has-error has-feedback";
+                }
+
+                @using (Html.BeginForm("Payment", null, FormMethod.Post, new {name = "aboutYouRmg", id = "aboutYouRmg"}))
+                {
+
+                    <input type="hidden" name="ViewModel.OrderSummary.WalletId" value="@Model.ViewModel.OrderSummary.WalletId"/>
+                    <input type="hidden" id="rmgAmount" name="ViewModel.OrderSummary.Amount" value="@Model.ViewModel.OrderSummary.Amount"/>
+
+                    thisFeedbackClass = string.Empty;
+                    if (FieldHasErrors("viewModel.Title"))
+                    {
+                        thisFeedbackClass = feedbackClass;
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="Title">@Html.DisplayFor(m => m.CurrentPage.TitleLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+
+                        <div class="select-form">
+                            @Html.DropDownListFor(x => x.ViewModel.Title, new SelectList(Model.ViewModel.TitleList), new {@class = "form-control", name = "Title"})
+                        </div>
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @PasswordErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.Title))
+                        }
+                    </div>
+                    thisFeedbackClass = string.Empty;
+                    if (FieldHasErrors("viewModel.FirstName"))
+                    {
+                        thisFeedbackClass = feedbackClass;
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="checkoutFName">@Html.DisplayFor(m => m.CurrentPage.FirstNameLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        @Html.TextBoxFor(x => x.ViewModel.FirstName, new {@class = "form-control", @id = "rmgFName", @name = "FirstName"})
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.FirstName))
+                        }
+                    </div>
+                    thisFeedbackClass = string.Empty;
+
+                    if (FieldHasErrors("viewModel.LastName"))
+                    {
+                        thisFeedbackClass = feedbackClass;
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="checkoutSurname">@Html.DisplayFor(m => m.CurrentPage.LastNameLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        @Html.TextBoxFor(x => x.ViewModel.LastName, new {@class = "form-control", id = "rmgSurname"})
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.LastName))
+                        }
+                    </div>
+
+                    thisFeedbackClass = string.Empty;
+
+                    if (FieldHasErrors("viewModel.Telephone"))
+                    {
+                        thisFeedbackClass = feedbackClass;
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="checkoutTel">@Html.DisplayFor(m => m.CurrentPage.TelephoneNumberLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        @Html.TextBoxFor(x => x.ViewModel.Telephone, new {@class = "form-control", id = "rmgTel"})
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.Telephone))
+                        }
+                    </div>
+                    thisFeedbackClass = string.Empty;
+                    if (Model.ViewModel.Errors.Count > 0 || FieldHasErrors("viewModel.EmailAddress"))
+                    {
+                        thisFeedbackClass = "has-error has-feedback";
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="rmgEmail">@Html.DisplayFor(m => m.CurrentPage.EmailLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        @Html.TextBoxFor(x => x.ViewModel.EmailAddress, new {@class = "form-control", id = "rmgEmail"})
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddress))
+                        }
+                        @if (Model.ViewModel.Errors.Count > 0 && !FieldHasErrors("viewModel.EmailAddress"))
+                        {
+                            <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+                        }
+                        @foreach (var error in Model.ViewModel.Errors)
+                        {
+                            <span class="help-block">
+                                @error
+                            </span>
+                        }
+                    </div>
+                    thisFeedbackClass = string.Empty;
+                    if (FieldHasErrors("viewModel.EmailAddress2"))
+                    {
+                        thisFeedbackClass = "has-error has-feedback";
+                    }
+                    <div class="form-group @thisFeedbackClass">
+                        <label class="control-label" for="rmgEmail2">@Html.DisplayFor(m => m.CurrentPage.ConfirmEmailLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        @Html.TextBoxFor(x => x.ViewModel.EmailAddress2, new {@class = "form-control", id = "confirmEmail"})
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddress2))
+                        }
+                    </div>
+                    thisFeedbackClass = string.Empty;
+                    <div class="form-group @thisFeedbackClass">
+                        <div>
+                            <div class="wysiwyg mb-1x">
+                                <p>@Html.TranslateFallback(StringResources.CustomerContactPreferences, "Please tick if to ensure you are contacted regarding special offers and exclusive coin launch information direct from The Royal Mint")</p>
+                            </div>
+
+                            <div class="checkbox fancy checkbox-inline">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByEmail, new {@id = "rmgContactEmail"})
+                                <label class="" for="rmgContactEmail">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByEmailLabel)
+                                </label>
+                            </div>
+                            <div class="checkbox fancy checkbox-inline">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByPost, new {@id = "rmgContactPost"})
+                                <label class="checkbox-inline" for="rmgContactPost">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByPostLabel)
+                                </label>
+                            </div>
+                            <div class="checkbox fancy checkbox-inline">
+                                @Html.CheckBoxFor(a => a.ViewModel.ByTelephone, new {@id = "rmgContactPhone"})
+                                <label class="checkbox-inline" for="rmgContactPhone">
+                                    @Html.PropertyFor(a => a.CurrentPage.ByTelephoneLabel)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary mb-1x">@Html.DisplayFor(m => m.CurrentPage.NextButtonText)</button>
+
+                }
+
+            </div>
+
+            <div class="hidden-xs ">
+                @Html.Partial("_RmgOrderSummary", @Model.ViewModel.OrderSummary)
+
+            </div>
+
+
+        </main>      
+    </div>
+
+</div>
+

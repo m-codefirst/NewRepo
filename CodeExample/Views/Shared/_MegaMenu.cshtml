@@ -1,0 +1,147 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Extentions
+@using TRM.Web.Helpers
+@using TRM.Shared.Extensions 
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : CustomerContact.CreateInstance();
+    var availableToInvest = ServiceLocator.Current.GetInstance<IAmBullionContactHelper>().GetMoneyAvailableToInvest(contact);
+    var startpage = Model.GetMetalPriceSettingsPageForSiteSpecificProperties();
+}
+
+<div class="toggle-action center-items hidden-lg hidden-md pull-right">
+    @if (startpage != null)
+    {
+        if (isLoggedIn && !Model.IsPensionProviderContact)
+        {
+            if (Model.IsConsumerAccountOnly)
+            {
+                if (!string.IsNullOrEmpty(startpage.ConsumerInvestingCopy))
+                {
+                    <a href="@startpage.ConsumerInvestingLink.GetExternalUrl_V2()" name="investment-navigation" class="hidden-xs hidden-sm mr-1x mt-5 font-12">@startpage.ConsumerInvestingCopy</a>
+                }
+            }
+            else
+            {
+                if (Model.TrmMetalBlockHeader != null)
+                {
+                    <a href="@startpage.BalanceLink.GetExternalUrl_V2()" name="investment-navigation" class="balance-value mr-1x font-12">
+                        <p class="strong mb-0">@startpage.BalanceCopy</p>
+                        <span>@availableToInvest.ToString()</span>
+                    </a>
+                }
+            }
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(startpage.AnonymousInvestingCopy))
+            {
+                <a href="@startpage.AnonymousInvestingLink.GetExternalUrl_V2()" name="investment-navigation" class="hidden-xs hidden-sm mr-1x mt-5 font-12">@startpage.AnonymousInvestingCopy</a>
+            }
+        }
+    }
+
+    <a class="btn touchnav-toggle pull-right hidden-md hidden-lg menu-bars">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </a>
+</div>
+
+<nav class="rm-navbar-container pull-right">
+    <div class="button-group pull-right-md-up text-right">
+        @{
+            if (!Model.HideMegaMenuAndSearch)
+            {
+                <a class="btn hidden-md hidden-lg nav-toggle nav-active" href="#navSectionNav"><i class="trmi trmi-menu"></i></a>
+                if (!(Model.IsSippContact || Model.IsPensionProviderContact))
+                {
+                    <a class="btn nav-toggle" href="#navSectionSearch"><i class="trmi trmi-search"></i></a>
+                }
+
+            }
+        }
+        @if (!Model.HideUserAndMiniBasketFromHeader)
+        {
+            if (Request.IsAuthenticated)
+            {
+                <a id="my-account-toggle" class="btn" href="@Url.ContentUrlExtension(Model.MyAccountPage)" data-section="#navSectionAccount">
+                    <span class="btn-round user-info">
+                        <span class="text-uppercase">@(string.IsNullOrEmpty(contact.FullName) ? string.Empty : contact.FullName.Substring(0, 1))</span>
+                    </span>
+                </a>
+            }
+            else
+            {
+                <a class="btn nav-toggle" href="#navSectionAccount"><i class="trmi trmi-user"></i></a>
+            }
+
+            if (!Model.IsPensionProviderContact)
+            {
+                <a class="btn nav-toggle hidden-xs hidden-sm" ng-click="getBasketSummary()" href="#navSectionBasket">
+                    <i class="trmi trmi-basket"></i>
+                    <span ng-cloak ng-if="getBasketQty() >= 1"> (<span ng-cloak ng-show="getBasketQty() >= 1" ng-bind="getBasketQty()"></span>)</span>
+                    <div ng-if="basketLoading()" class="spinner-icon-loading-mini"></div>
+                </a>
+                <a class="btn visible-xs visible-sm" href="@Model.BasketPage.GetExternalUrl_V2()"><i class="trmi trmi-basket"></i><span ng-cloak ng-if="getBasketQty() >= 1"> (<span ng-cloak ng-show="getBasketQty() >= 1" ng-bind="getBasketQty()"></span>)</span></a>
+            }
+        }
+    </div>
+    @if (!Model.HideMegaMenuAndSearch)
+    {
+        if (Model.IsPensionContact || !Model.UseManualMegaMenu)
+        {
+            <div class="nav-section active pull-left-md pull-left-lg" id="navSectionNav">
+                <div class="rm-navbar">
+                    @if (Model.MegaMenu != null && Model.MegaMenu.MegaMenuDto != null)
+                    {
+                        @Html.Partial("_Navigation", Model.MegaMenu)
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.PropertyFor(x => x.ManualMegaMenu)
+        }
+
+
+    }
+
+    @if (!(Model.IsSippContact || Model.IsPensionProviderContact))
+    {
+        Html.RenderPartial("_SearchBox", Model);
+    }
+
+    @if (!Model.HideUserAndMiniBasketFromHeader)
+    {
+        @Html.Partial("_LoginRegister")
+     
+        if (!Model.IsPensionProviderContact)
+        {
+            @Html.Partial("_BasketMini")
+        }
+    }
+
+    @if (!Model.HideMegaMenuAndSearch)
+    {
+        <a class="btn nav-close" role="button"><i class="trmi trmi-close"></i></a>
+    }
+</nav>
+
+@if (!Model.HideUserAndMiniBasketFromHeader)
+{
+    var contactFirstName = contact.FirstName ?? string.Empty;
+    var contactLastName = contact.LastName ?? string.Empty;
+    var contactEmail = contact.Email ?? string.Empty;
+    <span ng-controller="rmLogin">
+        <div class="account-greeting hidden-xs hidden-sm" id="loggedInWelcomeText" ng-init="setupLogin('@(contactFirstName.Replace("'", "\\'"))', '@(contactLastName.Replace("'", "\\'"))', '@(contactEmail.Replace("'", "\\'"))', @isLoggedIn.ToString().ToLower())" ng-hide="!userLoggedIn" ng-cloak>
+            <a href="javascript:void(0)" ng-click="logout()" class="bold text-black ml-md-1x ml-lg-1x">Logout</a>
+        </div>
+    </span>
+}

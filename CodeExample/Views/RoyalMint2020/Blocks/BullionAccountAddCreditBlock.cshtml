@@ -1,0 +1,53 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.BullionAccountAddCreditBlockViewModel
+
+@if (!string.IsNullOrEmpty(Model.Message?.Title) && Model?.Message.MessageType == Enums.eMessageType.Success)
+{
+    <main>
+        <div class="mod-section">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="form-container">
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-md-6">
+                                <div class="form-spacing">
+                                    <h2 class="mt-0">@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulTitle, "Payment Successful")</h2>
+                                    <hr>
+                                    <p>@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSucessfulSubTitle, "")</p>
+                                    <div class="row">
+                                        <div class="col">
+                                            <strong>@Html.TranslateFallback(StringResources.BullionAddFundsReferenceNumber, "Reference Number")</strong>
+                                        </div>
+                                        <div class="col">
+
+                                            <p class="mb-1">@Model.Message.Title</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+}
+else
+{
+    <div class="row justify-content-center text-center">
+        <div class="col">
+            <div class="form-container">
+                <div class="form-spacing">
+                    @{
+                        Html.RenderPartial("AddFundMasterCard", Model);
+                        @Html.Partial("RoyalMint2020/_BankTransferDetailsBlock", Model)
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@Html.Partial("_RedirectOutsideTheIframe")
+

@@ -1,0 +1,71 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.DataLayer
+
+@model AnalyticsDigitalDataModel
+
+@if (!PageEditing.PageIsInEditMode && Model != null)
+{
+    switch (Model.Type)
+    {
+        case Enums.DataLayer.MeasuringProductImpressions:
+        case Enums.DataLayer.MeasuringViewsOfProductDetails:
+        case Enums.DataLayer.MeasuringPageViews:
+            <script>
+                var dataLayer = window.dataLayer = window.dataLayer || [];
+                dataLayer.push(@Html.Raw(Model.JsonString));
+            </script>
+            break;
+        default:
+            break;
+    }
+}
+
+<script type="text/javascript">
+    window.addEventListener("gmSellUpdate", function (e) {
+
+        var updatedProduct = e.detail;
+        var ecommerce = [];
+        var data = window.dataLayer
+        data.forEach(function (e, index) {
+            e.index = index;
+        });
+
+        data.filter(function (e) {
+            return e.hasOwnProperty('ecommerce')
+        }).forEach(function (ec) {
+            if (ec.ecommerce !== null) {
+                ec.ecommerce.index = ec.index;
+                ecommerce.push(ec.ecommerce)
+            }
+
+        })
+
+        var sellback = ecommerce.filter(function (e) { return e.hasOwnProperty('sellback') })
+      
+        if (sellback.length > 0 && updatedProduct !== null) {
+            var currentSellback = sellback[0].sellback
+            var products = currentSellback.products;
+
+            var product = products.filter(function (p) {
+                return p.id === updatedProduct.id
+            })[0]
+
+            if (product !== undefined) {
+                product.quantity = updatedProduct.quantity
+                product.price = updatedProduct.price
+             
+                var updatedProducts = products.filter(function (p) {
+                    return p.id !== updatedProduct.id
+                })
+              
+                updatedProducts.push(product);              
+            }
+                   
+            currentSellback.products = updatedProducts
+            dataLayer[sellback[0].index].ecommerce.sellback = currentSellback
+        }
+   
+    })
+
+</script>

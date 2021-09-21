@@ -1,0 +1,65 @@
+﻿@using System.Linq
+@using EPiServer.Core
+@using EPiServer.Editor
+@using TRM.Web.Models.Blocks
+@model TabContainerBlock
+
+@if (Model == null)
+{
+    return;
+}
+
+@if (Model.Content == null)
+{
+    if (PageEditing.PageIsInEditMode)
+    {
+        @Html.PropertyFor(t => t.Content)
+    }
+    return;
+}
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs collapseTabs" role="tablist">
+    @{ var currentTab = 1;}
+    @foreach (var item in Model.Content.Items)
+    {
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        var tab = item.GetContent() as TabItemBlock;
+
+        if (tab != null)
+        {
+
+            <li role="presentation" @(currentTab == 1 ? "class=active" : string.Empty )><a target="_self" data-target="#tab_@(item.ContentLink.ID)_@(currentTab)" aria-controls="tab_@(item.ContentLink.ID)_@(currentTab)" role="tab" data-toggle="tab">@tab.Label</a></li>
+            currentTab++;
+        }
+
+    }
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+    @{
+        currentTab = 1;
+        foreach (var item in Model.Content.Items)
+        {
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            var tab = item.GetContent() as TabItemBlock;
+
+            if (tab != null)
+            {
+
+                <div role="tabpanel" class="tab-pane fade  @(currentTab == 1 ? "active in" : string.Empty )" id="tab_@(tab.Property.OwnerLink.ID)_@(currentTab)">
+                    <div class="row">
+                        @{
+                            // ReSharper disable once Mvc.PartialViewNotResolved
+                            Html.RenderPartial("Blocks/TabItemBlock", tab);
+                        }
+                    </div>
+                </div>
+                currentTab++;
+            }
+
+        }
+    }
+</div>

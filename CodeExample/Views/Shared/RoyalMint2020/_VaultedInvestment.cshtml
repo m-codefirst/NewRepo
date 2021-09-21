@@ -1,0 +1,167 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels.Bullion
+@using TRM.Shared.Extensions
+@using TRM.Web.Models.Blocks
+
+@model VaultedInvestmentBlockViewModel
+
+@functions {
+    private string GetIndicator(int upOrDown)
+    {
+        return upOrDown == 0 ? string.Empty : upOrDown > 0 ? "up" : "down";
+    }
+}
+
+@{
+    string chartContainer;
+    string tableContainer;
+
+    switch (Model.CurrentBlock.BlockSize)
+    {
+        case VaultedInvestmentBlock.VaultedInvestmentBlockSize.small:
+            chartContainer = "col-8 ";
+            tableContainer = "col-12";
+            break;
+        case VaultedInvestmentBlock.VaultedInvestmentBlockSize.large:
+            chartContainer = "col-8 col-md-4 col-lg-5";
+            tableContainer = "col-12 col-md-8 col-lg-7";
+            break;
+        case VaultedInvestmentBlock.VaultedInvestmentBlockSize.medium:
+        default:
+            chartContainer = "col-8  col-xl-4";
+            tableContainer = "col-12 col-xl-8";
+            break;
+    }
+
+
+    var tableRows = new[]
+    {
+        new {Metal = Model.GoldMetal, MetalText = Model.CurrentBlock.GoldText, UpDownIndicator = GetIndicator(Model.GoldMetal.PriceChange.UpOrDown), MetalClass = "gold", },
+        new {Metal = Model.SilverMetal, MetalText = Model.CurrentBlock.SilverText, UpDownIndicator = GetIndicator(Model.SilverMetal.PriceChange.UpOrDown), MetalClass = "silver"},
+        new {Metal = Model.PlatinumMetal, MetalText = Model.CurrentBlock.PlatinumText, UpDownIndicator = GetIndicator(Model.PlatinumMetal.PriceChange.UpOrDown), MetalClass = "platinium"}
+    };
+
+}
+
+<div class="holdings-summary @Model.CurrentBlock.BlockSize">
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            @if (!String.IsNullOrEmpty(Model.CurrentBlock.PensionHeaderTitle) || !String.IsNullOrEmpty(Model.CurrentBlock.HeaderTitle))
+            {
+                <h2 class="section-head section-head--xl">
+                    <span>
+                        @(Html.IsSippContact() ? Html.PropertyFor(x => x.CurrentBlock.PensionHeaderTitle) : Html.PropertyFor(x => x.CurrentBlock.HeaderTitle))
+                    </span>
+                </h2>
+            }
+            @if (!Model.IsSippContact && Model.CurrentBlock.Description != null)
+            {
+                @Html.PropertyFor(x => x.CurrentBlock.Description)
+            }
+            else if (Model.IsSippContact && Model.CurrentBlock.PensionDescription != null)
+            {
+                @Html.PropertyFor(x => x.CurrentBlock.PensionDescription)
+            }
+
+            @if (Model.NoHoldings)
+            {
+                <div class="message p-3">
+                    <div class="row">
+                        <div class="pr-1">
+                            <span class="icon-container"><span class="icon"><svg><use xlink:href="#alert"></use></svg></span></span>
+                        </div>
+                        <div class="col text-left">@Html.DisplayFor(x => x.CurrentBlock.NoHoldingsMessage)</div>
+                    </div>
+                </div>
+            }
+
+            <div>
+                <div class="vault-contents vault-contents--investments mod-section">
+                    <div class="justify-content-end toggle-unit-row">
+                        <form action="./" method="" class="change-unit-price">
+                            <div class="custom-control custom-toggle">
+                                <input type="checkbox" id="unit-row" class="d-none">
+                                <label for="unit-row">
+                                    <span class="handle">oz</span>
+                                    <span class="toggle"></span>
+                                    <span class="handle">kg</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-secondary d-none">Change unit</button>
+                        </form>
+                    </div>
+                    <div class="row justify-content-center align-items-center">
+
+                        <div class="@chartContainer">
+                            <div class="row justify-content-center">
+                                <div class="col-12 col-lg-10 vaulted-investment-chart">
+                                    <span class="vaulted-investment-chart__title">@Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultedInvestmentBlockTotalHoldings, "Total Holdings") <span style="font-weight:bold">@Model.TotalHoldings</span> </span>
+                                    <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                    <!-- PLEASE NOTE: JS is expecting the totals to be fully formatted currency with currency symbol, thousands separator if the currency usually uses it e.g. £11,044.66 or €9387.00 and with 2 decimal places; if there's no value, we expect it to be set to zero e.g. £0 -->
+                                    <canvas class="vault vault-totals chartjs-render-monitor" width="152" height="152" data-total-gold="@Model.GoldMetal.HoldingMoneyWithUnit" data-total-silver="@Model.SilverMetal.HoldingMoneyWithUnit" data-total-platinum="@Model.PlatinumMetal.HoldingMoneyWithUnit" style="display: block; height: 139px; width: 139px;"></canvas>
+                                </div>
+
+                            </div>
+                            <div class="justify-content-center toggle-unit-column mt-4">
+                                <form action="./" method="" class="change-unit-price">
+                                    <div class="custom-control custom-toggle">
+                                        <input type="checkbox" id="unit-column" class="d-none">
+                                        <label for="unit-column">
+                                            <span class="handle">oz</span>
+                                            <span class="toggle"></span>
+                                            <span class="handle">kg</span>
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary d-none">@Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultedInvestmentBlockChangeUnit, "Change unit")</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="@tableContainer">
+                            <div class="row justify-content-center pr-sm-2 pl-sm-2">
+                                <div class="col-12 vaulted-investment-table">
+                                    <div class="row p-1 vaulted-investment-table__heading">
+                                        <div class="col ml-2 text-left">@Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultedInvestmentBlockMetal, "Metal")</div>
+                                        <div class="col">@Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultedInvestmentBlockValue, "Value")</div>
+                                        <div class="col"><span class="vault-unit">Oz</span></div>
+                                    </div>
+                                    @foreach (var row in tableRows)
+                                    {
+                                        var currentPriceOz = row.Metal.PriceChange.CurrentPrice.ToCurrencyString();
+                                        var currentPriceKg = row.Metal.PriceChange.CurrentPricePerKg.ToCurrencyString();
+
+                                        <div class="row vaulted-investment-table__item metal-unit" data-per-kg="@currentPriceKg" data-per-oz="@currentPriceOz">
+                                            <div class="col"><div class="d-flex"><span class="metal @row.MetalClass"></span>@row.MetalText</div> </div>
+                                            <div class="col">
+                                                <div class="value">
+                                                    <span class="total">@row.Metal.HoldingMoneyWithUnit</span>
+                                                    <span class="ml-1 @($"triangle-{row.UpDownIndicator}")"></span>
+                                                    <span class="percentage @($"percentage--{row.UpDownIndicator}")">@row.Metal.PriceChange.Percent%</span>
+                                                </div>
+
+                                            </div>
+                                            <div class="col"><span class="vault-unit-value">@currentPriceOz</span> per <span class="vault-unit">oz</span></div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row btns justify-content-center mt-3">
+                    @if (!Model.IsSippContact && Model.CurrentBlock.LinkTwoHyperLink != null && !string.IsNullOrEmpty(Model.CurrentBlock.LinkTwoDisplayText))
+                    {
+                        <div class="col-md-6 col-lg-2-4">
+                            <a href="@Url.ContentUrlExtension(Model.CurrentBlock.LinkTwoHyperLink)" style="font-size: 14px" class="btn btn-secondary mb-lg-0">@Html.DisplayFor(x => x.CurrentBlock.LinkTwoDisplayText)</a>
+                        </div>
+                    }
+                    @if (Model.CurrentBlock.LinkOneHyperLink != null && !string.IsNullOrEmpty(Model.CurrentBlock.LinkOneDisplayText))
+                    {
+                        <div class="col-md-6 col-lg-2-4">
+                            <a href="@Url.ContentUrlExtension(Model.CurrentBlock.LinkOneHyperLink)" style="font-size: 14px" class="btn btn-primary mb-lg-0">@Html.DisplayFor(x => x.CurrentBlock.LinkOneDisplayText)</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

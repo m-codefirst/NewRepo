@@ -1,0 +1,16 @@
+﻿@using EPiServer.Personalization.VisitorGroups
+@model TRM.Web.Business.VisitorGroups.ViewedCmsCategoriesModel
+
+
+<div class="epi-criteria-grouping">
+    <h5>This criteria apply to both CMS and Commerce pages</h5>
+    <span class="epi-criteria-inlineblock">
+        <label style="line-height: 23px; margin-right: 8px;">Category</label>
+        @Html.DojoEditorFor(x => x.SelectedCategory)
+    </span>
+
+    <span class="epi-criteria-inlineblock">
+        <label style="line-height: 23px; margin-right: 8px;">Viewed at least</label>
+        @Html.DojoEditorFor(x => x.NumberOfPageViews)
+    </span>
+</div>

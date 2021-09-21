@@ -1,0 +1,364 @@
+﻿@using System.Diagnostics
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Find
+@using TRM.Web.Models.Layouts
+@using EPiServer.Find.Helpers.Text
+@using TRM.Shared.Extensions
+@using EPiServer.Web
+@using System.Web.Optimization
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmCategory, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.CategoryViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var viewModel = Model.ViewModel;
+    var isPriceAvailable = viewModel.Filters.EntryFacets.Any(x => x.Name == "Price" && x.Terms.Any());
+
+    string copyClass = Model.CurrentPage.TextAlignment.DescriptionAttr();
+    string colClass = Model.CurrentPage.IsFullWidthContainer ? "col-12" : "col-md-9";
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+
+    var mainClass = !Model.CurrentPage.IsNewIn && Model.CurrentPage.ShowMyLeftMenu ? "col-xs-12 col-md-9 col-md-push-3" : "container";
+
+    Debug.Assert(Request.Url != null, "Request.Url != null");
+
+    var pageurl = Request.Url.AbsolutePath;
+    var url = Url.Action("GetData", "SearchPage");
+
+    var menuLabel = Html.TranslateFallback(StringResources.LeftMenuMobileText, StringConstants.TranslationFallback.Menu);
+    if (!string.IsNullOrWhiteSpace(Model.CurrentPage.MenuButtonTextXs))
+    {
+        menuLabel = Model.CurrentPage.MenuButtonTextXs;
+    }
+}
+@if (Model.ViewModel != null && Model.ViewModel.AnalyticsDigitalDataModel != null)
+{
+    <!--SEO Analytics Digital Data-->
+    @Html.Partial("RoyalMint2020/_SeoAnalyticsDigitalData", Model.ViewModel.AnalyticsDigitalDataModel)
+
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "searchCss")
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    <!-- Breadcrumbs -->
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", myLayout.Breadcrumb);
+    }
+</div>
+
+<div class="row">
+    <div class="col-12">
+        @if (myLayout.HasMessage)
+        {
+            Html.RenderPartial("_MessageBox", myLayout.Message);
+        }
+        <div class="mod-section mod-section-copy mod-section-first">
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass">
+                    @if (!Model.CurrentPage.HidePageDescription &&
+                         Model.CurrentPage.CategoryDescription != null &&
+                         !string.IsNullOrWhiteSpace(Model.CurrentPage.CategoryDescription.ToString()))
+                    {
+                        @Html.PropertyFor(x => x.CurrentPage.CategoryDescription)
+                    }
+                    @if (!Model.CurrentPage.HidePageTitle)
+                    {
+                        if (Model.CurrentPage.DisplayPageHeading)
+                        {
+                            <h1>@Html.PropertyFor(x => x.CurrentPage.Heading)</h1>
+                        }
+                        else
+                        {
+                            <h1>@Html.PropertyFor(x => x.CurrentPage.DisplayName)</h1>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Filters -->
+@if (Model.ViewModel.CanFilter)
+{<div class="mod-filters">
+        <div class="filters-trigger d-md-none" data-toggle="modal" data-target="#filters-modal" data-content="#filters">Filters <span class="icon"><svg><use xlink:href="#chevron-down"></use></svg></span></div>
+
+        <div class="filters-container d-none d-md-block">
+            <form action="./" method="post" id="filters" class="mod-form-dark">
+                <fieldset>
+                    <legend class="sr-only">Filter products</legend>
+
+                    <div class="row justify-content-center no-gutters">
+                        <div class="col-md-12 col-lg-11">
+
+                            <div class="row justify-content-center no-gutters">
+                                @foreach (var facet in viewModel.Filters.EntryFacets.Where(x => x.Terms.Any()))
+                                {
+                                    <div class="col-sm-6 col-md-2">
+                                        <div class="form-group">
+                                            <p class="form-label">@facet.Name</p>
+                                            @if (facet.Description.IsNotNullOrEmpty())
+                                            {
+                                                <p class="information">
+                                                    <span class="icon"><svg><use xlink:href="#help" /></svg></span>
+                                                    <span>@facet.Description</span>
+                                                </p>
+                                            }
+                                            @foreach (var term in facet.Terms.OrderBy(x => x.DisplayName).Take(7))
+                                            {
+                                                <div class="custom-control custom-checkbox">
+                                                    <input name="filterCheckBox" id="@facet.EncodedName.ToLower()-term-@term.EncodedTerm.ToLower()"
+                                                           class="custom-control-input" type="checkbox" EncodedValue="@facet.EncodedValue" EncodedTerm="@term.EncodedTerm" />
+                                                    <label for="@facet.EncodedName.ToLower()-term-@term.EncodedTerm.ToLower()" class="custom-control-label">@term.DisplayName</label>
+                                                </div>
+                                            }
+                                            @if (facet.ViewAllLink != null)
+                                            {
+                                                <a href="@Url.ContentUrlExtension(facet.ViewAllLink)" style="color: white;">View all</a>
+                                            }
+                                        </div>
+                                    </div><!-- /.col -->
+                                }
+                            </div><!-- /.row -->
+
+                            <div class="row justify-content-md-center justify-content-lg-around align-items-center no-gutters">
+                                @if (isPriceAvailable)
+                                {
+                                    <div class="col-md-11 col-lg-5 col-xl-6">
+                                        <p class="form-label">Price</p>
+                                        <div class="form-row">
+                                            <div class="col-sm-6 mb-1">
+                                                <div class="form-row">
+                                                    <label for="min" class="col-form-label col-1">&pound;</label>
+                                                    <div class="col-11">
+                                                        <input type="number" class="form-control" id="min" placeholder="Min" step="10">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 mb-1">
+                                                <div class="form-row">
+                                                    <label for="max" class="col-form-label col-1 text-md-center">To</label>
+                                                    <div class="col-11 col-md-10 not-gutters">
+                                                        <input type="number" class="form-control" id="max" placeholder="Max" step="10">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.col -->
+                                }
+
+                                <div class="col-md-11 col-lg-5 col-xl-4 sort">
+                                    <div class="form-row align-items-end">
+                                        @if (Model.ViewModel.CanSort)
+                                        {
+                                            <div class="col-md-8 col-lg-6 mb-1">
+                                                <label for="sort" class="col-form-label">Sort by</label>
+                                                <select id="sort-select" class="form-control custom-select">
+                                                    @foreach (EntrySortOrder order in Enum.GetValues(typeof(EntrySortOrder)))
+                                                    {
+                                                        var selected = (order == viewModel.Filters.SelectedEntrySortOrder ? "selected" : "");
+                                                        <option value="@order" @selected>@Html.TranslateFallback(order.DescriptionAttr(), order.ToString())</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        }
+                                        <div class="col-md-4 col-lg-6 mb-1 mt-2 text-center">
+                                            <button type="button" class="btn btn-light" data-dismiss="modal"
+                                                    onclick="applyFilters('@viewModel.Filters.Query', '@viewModel.Filters.ProductListingType', @(viewModel.SearchPageHeader != null ? viewModel.SearchPageHeader.TotalEntryPages : 0), @Model.CurrentPage.ContentLink.ID, @viewModel.Filters.MaxResults, @viewModel.Filters.CacheResultsForMinutes)">
+                                                Filter results
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div><!-- /.col -->
+                            </div>
+
+                        </div>
+                    </div><!-- /.row -->
+                </fieldset>
+            </form>
+        </div><!-- /.filters-container -->
+    </div><!-- /.mod-filters -->}
+
+
+<div class="product-listing row justify-content-center">
+    <div class="col-12 col-md-10">
+        <div class="product-range">
+            <h2 class="section-head"><span>Product range</span></h2>
+            <div class="row" id="productsView">
+                @foreach (var entryViewModel in viewModel.Entries)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        @{ Html.RenderPartial("PagePartials/TrmEntryPartial", entryViewModel); }
+                    </div>
+                }
+            </div>
+            <div class="js-mod-loader js-loader-category" style="height:6.25rem; display:none">
+                <div class="js-loader loading small" style="background-color:inherit"></div>
+            </div>
+            @if (viewModel != null && viewModel.SearchPageHeader != null && viewModel.SearchPageHeader.TotalEntryPages > 1)
+            {
+                <div class="text-center">
+                    @{ var filterDto = Json.Encode(viewModel.SearchPageHeader.FilterDto); }
+                    <button id="loadMoreButton" class="btn btn-primary"
+                            onclick="loadMoreProducts('@viewModel.Filters.Query',
+                            '@viewModel.Filters.ProductListingType',
+                            @viewModel.SearchPageHeader.TotalEntryPages,
+                            @Model.CurrentPage.ContentLink.ID, @viewModel.Filters.MaxResults,
+                            @viewModel.Filters.CacheResultsForMinutes);">
+                        Load more
+                    </button>
+                </div>
+            }
+        </div> <!-- /.product-range -->
+    </div>
+</div><!-- /.product-listing -->
+<!-- Middle Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div class="@copyClass @colClass">
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div class="@copyClass @colClass">
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filters Modal -->
+<div class="modal modal-dark fade" id="filters-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="icon"><svg><use xlink:href="#close"></use></svg></span>
+                </button>
+            </div><!-- /.modal-header -->
+            <div class="modal-body"></div><!-- /.modal-body -->
+        </div>
+    </div>
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+
+    function doSearch() {
+        window.location = "@(pageurl)";
+        return false;
+    }
+
+    var currentEntryPage = 1;
+    var getMoreProductsUrl = '@Url.Action("GetProductListingData", "SearchPage")';
+    function loadMoreProducts(query, type, totalPagesCount, catalogId, maxResults, cacheResultsForMinutes) {
+        currentEntryPage = currentEntryPage + 1;
+        loadProducts(true, query, type, catalogId, maxResults, cacheResultsForMinutes);
+
+        if (currentEntryPage >= totalPagesCount) {
+            $("#loadMoreButton").hide();
+        }
+
+        return false;
+    }
+    function updateView(currentResultPage) {
+        var noResultFound = $("#noResult").text();
+        var totalPageCountOnFilter = $("#totalPagesCount").val();
+        if ((typeof totalPageCountOnFilter !== 'undefined' && totalPageCountOnFilter !== null && totalPageCountOnFilter.length !== 0)) {
+            totalPagesCount = totalPageCountOnFilter;
+        }
+        if (currentResultPage >= totalPagesCount || (typeof noResultFound !== 'undefined' && noResultFound !== null && noResultFound.length !== 0)) {
+            $("#loadMoreButton").hide();
+        } else {
+            $("#loadMoreButton").show();
+        }
+    }
+
+    function loadProducts(paging, query, type, catalogId, maxResults, cacheResultsForMinutes) {
+        var checkboxes = document.getElementsByName('filterCheckBox');
+        var q = query;
+        var url = getMoreProductsUrl + "?q=" + q + "&type=" + type;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                var key = checkboxes[i].attributes["encodedvalue"].nodeValue;
+                var value = checkboxes[i].attributes["encodedterm"].nodeValue;
+                url = url + "&" + key + "=" + value;
+            }
+        }
+        var minValue = $("#min").val();
+        var maxValue = $("#max").val();
+        if ($.isNumeric(minValue) || $.isNumeric(maxValue)) {
+            if (minValue >= 0 || maxValue >= 0) {
+                if (!$.isNumeric(minValue)) {
+                    minValue = "0";
+                }
+                if (!$.isNumeric(maxValue)) {
+                    maxValue = "999999999";
+                }
+                var minMaxValue = minValue + "-" + maxValue;
+                url = url + "&" + "ProductPrices" + "=" + minMaxValue;
+            }
+        }
+
+        var data = {
+            query: q,
+            listingType: type,
+            currentPage: currentEntryPage,
+            entrySortOrder: $("#sort-select").children("option:selected").val(),
+            catalogId: catalogId,
+            cacheResultsForMinutes: cacheResultsForMinutes,
+            maxResults: maxResults,
+            checkboxUrl: url
+        };
+
+          $('.js-loader-category').show();
+
+        $.post(url, data,
+            function (response) {
+                if (paging) {
+                    $("#productsView").append(response.entryGridView);
+                }
+                else {
+                    $("#productsView").html(response.entryGridView);
+                }
+                updateView(currentEntryPage);
+             }).always(function() {
+                    $('.js-loader-category').hide();
+                });
+        }
+
+    function applyFilters(query, type, totalPagesCount, catalogId, maxResults, cacheResultsForMinutes) {
+
+        currentEntryPage = 1;
+        loadProducts(false, query, type, catalogId, maxResults, cacheResultsForMinutes);
+        if (currentEntryPage >= totalPagesCount) {
+            $("#loadMoreButton").hide();
+        }
+
+        return false;
+    }
+</script>
+
+@section JustBeforeBodyTag
+{
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "filters")
+}

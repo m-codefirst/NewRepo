@@ -1,0 +1,14 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Blocks
+@model LinkTileBlock
+
+
+    <div class="panel h-100 bg-white justify-content-between">
+        <div class="mb-1 d-flex flex-column align-items-center">
+            <div class="icon "> <img style="height: auto; width: 100%" src="@Url.GetImageUrl(Model.Icon)" /></div>
+            <p class="title">@Model.Heading</p>
+        </div>
+        <a class="btn btn-secondary m-0 w-100" style="min-width:initial" href="@Url.ContentUrlExtension(Model.LinkUrl)">@Model.LinkText</a>
+    </div>
+

@@ -1,0 +1,330 @@
+﻿@using TRM.Shared.Extensions;
+@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.ContentTypes.Business.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionSignatureLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionSignatureLandingViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+
+    var isPensionProvider = false;
+    var impertionatedByPensionProvider = false;
+    var isImpersonating = false;
+
+    if (Request.IsAuthenticated)
+    {
+        var currentContact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+        if (currentContact != null)
+        {
+            isImpersonating = myLayout.IsImpersonating;
+            isPensionProvider = myLayout.IsPensionProviderContact;
+            impertionatedByPensionProvider = myLayout.IsImpertionatedByPensionProvider;
+        }
+    }
+}
+
+<div class="pageContainer signature-page">
+    @if (Model.CurrentPage.AnnouncementContentArea != null)
+    {
+        <div class="row">
+            <div class="col-xs-12 mb-2x">
+                <!-- Content Area Here -->
+                <div class="html-content-area">
+                    @Html.PropertyFor(x => x.CurrentPage.AnnouncementContentArea)
+                </div>
+            </div>
+        </div>
+    }
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+
+    <div class="container">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-9">
+                    <h1 class="h1 mt-0">@Html.PropertyFor(x => x.CurrentPage.Name)</h1>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-3">
+                    @if (myLayout.ShowSocialShareOnSellableEntryDetails)
+                    {
+                        <div class="pull-right pull-left-xs mt-xs-1x">
+                            @Html.Raw(myLayout.SocialSharesSnippetOnEntryDetails)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas != null && Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="row">
+                <div class="col-xs-12 mb-2x">
+                    <!-- Content Area Here -->
+                    <div class="html-content-area">
+                        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel-box bg-gray annotation-box investment-block">
+                    <div class="investment-price">
+                        <h5 class="mb-xs-1x mb-0 mt-0 investment-title">@Html.PropertyFor(x => x.CurrentPage.WouldLikeToInvestText)</h5>
+                        <div class="price-input">
+                            <div class="input-group subtle">
+                                <div class="input-group-addon">@Model.ViewModel.DefaultCurrency.CurrencyCode.ToCurrencySymbol()</div>
+                                <input type="text" class="form-control form-group invest-price currency-input" maxlength="12" id="investPrice" value="@Model.ViewModel.InvestAmount.ToString("N2")" placeholder="Amount" data-original-title="" title="" />
+                            </div>
+                        </div>
+                        <a href="javascript:void(0);" onclick="showInvestmentOptions()" class="btn btn-default">@Html.PropertyFor(x => x.CurrentPage.ShowInvestmentOptionsText)</a>
+                    </div>
+                    <div class="quick-investment">
+                        <label>@Html.PropertyFor(x => x.CurrentPage.QuickInvestmentText)</label>
+                        @foreach (var item in Model.ViewModel.QuickInvestments)
+                        {
+                            <a class="quick-invest-number" data-invest-number="@item.Amount" href="javascript:void(0);" onclick="setAmountInvestment('@item.Amount')">@item.ToString()</a>
+                        }
+                    </div>
+                    <p>@Html.PropertyFor(x => x.CurrentPage.InvestmentNote)</p>
+                </div>
+            </div>
+        </div>
+        <h2 class="h2 text-center investment-inform" data-investment-amount="@(Model.ViewModel.InvestmentAmountFormatter)">@Html.Raw(Model.ViewModel.InvestmentInformText)</h2>
+        <div class="row variant-section">
+            @foreach (var item in Model.ViewModel.SignatureVariants)
+            {
+                <div class="variant-wrapper">
+                    <div class="variant-image" style="background-image: url(@item.ImageUrl)"></div>
+                    <div class="variant-info">
+                        <h3 class="mt-0 mb-2x variant-title" data-content="@item.Title">@item.Title</h3>
+                        <h2 class="mt-0 mb-0">@item.PurchaseWeightInOz oz</h2>
+                        <p class="h4 mt-0 price-unit">@item.PricePerOz.ToString() per oz</p>
+                        <span class="estimated">estimated</span>
+                    </div>
+                    @if (!impertionatedByPensionProvider || !isImpersonating && !isPensionProvider)
+                    {
+                        if (item.ShowBuyNow && !item.ShowCanNotPensionMessage)
+                        {
+                            <button type="button" class="btn btn-secondary mt-0 mb-2x"
+                                    id="item_buynow_@item.Code"
+                                    ng-click="quickCheckout({id:'@item.Code'},'@myLayout.QuickCheckoutPage.GetExternalUrl_V2()', '@Model.ViewModel.InvestAmount')">
+                                @Html.TranslateFallback(StringResources.BuyNow, "Buy Now")
+                            </button>
+                        }
+
+                        if (item.ShowAddToBasket && !item.ShowCanNotPensionMessage)
+                        {
+                            <button type="button" class="btn btn-bg-orange mt-0 mb-2x" id="item_@item.Code"
+                                    ng-disabled="!isValidToAdd({MinQuantity:@item.StockSummary.MinQuantity, MaxQuantity:@item.StockSummary.MaxQuantity, Code:'@item.Code'})"
+                                    ng-click="addToBasket({id:'@item.Code'},'', '@Model.ViewModel.InvestAmount')">
+                                @Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket")
+                            </button>
+                        }
+
+                        if (item.ShowCanNotPensionMessage)
+                        {
+                            <div class="closed-product">
+                                @Html.PropertyFor(x => startPage.UnableToBuySignatureMessage)
+                            </div>
+                        }
+
+                        if (item.ShowNotifyWhenInStock && !item.ShowAddToBasket)
+                        {
+                            <button type="button" class="btn btn-default mt-0 mb-2x">@Model.ViewModel.EmailMeWhenInStockButtonText</button>
+                        }
+
+                        if (item.ShowUnableSellProductText)
+                        {
+                            <div class="closed-product">
+                                @Html.PropertyFor(x => x.CurrentPage.UnableSellProductMessage)
+                            </div>
+                        }
+
+                        if (item.ShowUnderMinSpendMessage)
+                        {
+                            <div class="closed-product">
+                                @Html.PropertyFor(x => x.CurrentPage.UnderMinimumSpentAmountMessage)
+                            </div>
+                        }
+
+                        if (item.ShowNotAvailableMessage)
+                        {
+                            <div class="text-lunarred">
+                                @Html.TranslateFallback(StringResources.ItemNotAvailable, "This item is not available")
+                            </div>
+                        }
+                    }
+
+                </div>
+            }
+
+        </div>
+
+        @if (!Request.IsAuthenticated)
+        {
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <div class="cta-action mb-2x">
+                        <a href="#navSectionAccount" class="btn btn-secondary mr-1x nav-toggle">Log in</a>
+                        <label class="">or</label>
+                        <a href="@Model.ViewModel.BullionRegistrationPageUrl" class="btn btn-default ml-1x mr-1x">Sign up</a>
+                        
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (!Model.ViewModel.IsBullionAccount)
+            {
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <div class="cta-action mb-2x">
+                            <a href="@Model.ViewModel.BullionRegistrationPageUrl" class="btn btn-secondary mr-1x">@Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your Bullion account")</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.ViewModel.StoppedTrading)
+            {
+                <div class="row">
+                    <div class="col-xs-12 mb-2x text-center">
+                        <div class="@startPage.StopTradingMessageColour.DescriptionAttr() p-1x">
+                            <h6 class="h6 text-center">
+                                @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.ViewModel.ShowUnableToPurchasePreciousMetals)
+            {
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <div class="alert @startPage.UnableToPurchasePreciousMetalsMessageColour.DescriptionAttr()">
+                            @Html.TranslateFallback(StringResources.UnableToPurchasePreciousMetals, "Customer flagged as unable to purchase precious metals")
+                        </div>
+                    </div>
+                </div>
+
+            }
+            else if (Model.ViewModel.ShowNeedConfirmKyc)
+            {
+                <div class="row">
+                    <div class="col-xs-12 mb-1x text-center">
+                        <div class="alert @startPage.ConfirmKycMessageColour.DescriptionAttr() p-1x">
+                            <h6 class="h6 text-center">
+                                @if (myLayout.KycRefered)
+                                {
+                                    @Html.TranslateFallback(StringResources.BullionConfirmIdentity, "In order to purchase this product you'll need to confirm your identity")
+                                }
+                                @if (myLayout.KycRejected)
+                                {
+                                    @Html.TranslateFallback(StringResources.BullionKYCRejected, "In order to purchase this product you'll need to contact with customer service")
+                                }
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (!isImpersonating && isPensionProvider || impertionatedByPensionProvider)
+            {
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <div class="alert @startPage.CanNotPensionMessageColour.DescriptionAttr()">
+                            @Html.TranslateFallback(StringResources.ItemNotAvailableForPensionProvider, "This product cannot be bought within a pension provider")
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (Model.CurrentPage.ThreeContentAreas != null)
+        {
+            if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+            {
+                <div class="row">
+                    <div class="col-xs-12 mb-2x">
+                        <!-- Content Area Here -->
+                        <div class="html-content-area">
+                            <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+            {
+                <div class="row">
+                    <div class="col-xs-12 mb-2x">
+                        <!-- Content Area Here -->
+                        <div class="html-content-area">
+                            <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+@section JustBeforeBodyTag{
+    <script type="text/javascript">
+		function onPopulateSignatureVariant() {
+			var url = new URL(window.location.href);
+			var isFirstInvest = !!localStorage.getItem('firstInvest');
+			if (isFirstInvest && url.searchParams.get('amount')) {
+				$('html, body').animate({
+					scrollTop: $(".investment-inform").offset().top - ($(".investment-inform").next().find('.variant-wrapper').first().outerHeight() / 2)
+				}, 2000);
+
+				if (window.innerWidth <= 767) {
+					$('.variant-title').each(function (i) {
+						var content = $(this).data('content') + " - " + $(".investment-inform").data('investment-amount');
+						$(this).text(content);
+					});
+				} else {
+					$('.variant-title').each(function (i) {
+						var content = $(this).data('content');
+						$(this).text(content);
+					});
+				}
+				localStorage.removeItem('firstInvest');
+			}
+		}
+
+		$(document).ready(function () {
+			onPopulateSignatureVariant();
+		});
+
+		$(window).resize(function () {
+			onPopulateSignatureVariant();
+		});
+
+        function setAmountInvestment(amount) {
+            $('#investPrice').val(amount);
+            showInvestmentOptions();
+        }
+
+		function showInvestmentOptions() {
+			localStorage.setItem('firstInvest', true);
+            window.location.href = "@Model.CurrentPage.ContentLink.GetExternalUrl_V2()?amount=" + $('#investPrice').val();
+        }
+    </script>
+}

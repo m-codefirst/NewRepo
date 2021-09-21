@@ -1,0 +1,69 @@
+﻿@model TRM.Web.Models.ViewModels.AutoInvest.AutoInvestBlockPaymentDateViewModel
+@using Newtonsoft.Json
+@using TRM.Web.Models.ViewModels
+@using TRM.Web.Models.ViewModels.AutoInvest
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+
+@{
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.InvestmentStepperTitle,
+                Number = "1",
+                IsComplete= true,
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.PaymentDateStepperTitle,
+                Number = "2",
+                IsCurrent = true
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.CompleteStepperTitle,
+                Number = "3",
+            }
+        }
+    };
+
+    var viewModel = new
+    {
+        texts = new
+        {
+            nextButton = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Next, "Next"),
+            backButton = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Back, "Back"),
+            heading = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockPaymentDateStepHeading, "Choose your preferred investment date"),
+            description = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockPaymentDateStepDescription, "This is when money will be transferred from your wallet to purchase your chosen product. If your investment should fall on the weekend or a national holiday the investment will take place the following working day."),
+            paymentDayMinimumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayMinimumError, "Minimum payment day must be at least the first day of the month"),
+            paymentDayMaximumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayMaximumError, "Payment day should not be after the 28th"),
+            paymentDayTypeError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayTypeError, "Invalid payment day"),
+            paymentDayRequiredError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayRequiredError, "Select payment day"),
+        },
+        initialData = new
+        {
+            InvestmentDays = Model.InvestmentDays,
+            InvestmentDay = Model.InvestmentDay.ToString("00"),
+            MonthlyInvestmentAmount = Model.MonthlyInvestmentAmount,
+            Products = Model.Products
+        },
+
+        valiationMessages = Model.ValidationMessages,
+        actionUrl = @Request.RawUrl,
+        actionName = @AutoInvestAction.PaymentDate,
+        actionBack = @AutoInvestAction.Default,
+
+    };
+}
+
+<!-- Step bar -->
+
+<div class="mod-section">
+    <div class="form-spacing">
+        <h1>@Model.CurrentBlock.Heading</h1>
+    </div>
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+    <div data-module="monthly-payment-day" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+</div>

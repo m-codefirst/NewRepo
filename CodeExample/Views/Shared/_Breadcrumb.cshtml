@@ -1,0 +1,26 @@
+﻿@model TRM.Web.Models.ViewModels.BreadcrumbViewModel
+
+@{
+    var showOnXsClass = Model.ShowOnXs ? string.Empty : "hidden-xs";
+
+}
+<div class="container clear @showOnXsClass">
+    <ol class="breadcrumb">
+        @foreach (var crumb in Model.BreadcrumbMenuDto.ChildNavigationItems.ToList())
+        {
+
+            if (crumb.IsActiveContent)
+            {
+                <li class="active">@crumb.MenuItemDisplayName</li>
+            }
+            else if (crumb.IsContainer)
+            {
+                <li>@crumb.MenuItemDisplayName</li>
+            }
+            else
+            {
+                <li><a href="@crumb.MenuItemExternalUrl" title="@crumb.MenuItemDisplayName">@crumb.MenuItemDisplayName</a></li>
+            }
+        }
+    </ol>
+</div>

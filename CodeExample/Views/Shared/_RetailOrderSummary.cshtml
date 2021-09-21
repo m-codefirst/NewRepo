@@ -1,0 +1,114 @@
+﻿@using TRM.Web.Constants
+@{
+    var showCollapse = (bool)ViewData["ShowCollapse"];
+    var isCollapse = (bool)ViewData["IsCollapse"];
+}
+
+<div class="row" ng-init="getBasketSummary()">
+    <div class="col-xs-12">
+        <div class="order-summary" ng-if="getBasketQty() >= 1" ng-cloak>
+            <div class="summary-header">
+                <div class="title">
+                    <h5 class="h5 mt-0 mb-0">@Html.TranslateFallback(StringResources.RetailOrderSummary, "Retail order summary")</h5>
+                    @if (isCollapse)
+                    {
+                    <p class="mt-0 mb-0">@Html.TranslateFallback(StringResources.RetailTotal, "Retail Total"): {{getRetailTotal()}} <span class="small">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</span></p>
+                    }
+                </div>
+                @if (isCollapse)
+                {
+                    <div class="cta-action">
+                        <a data-toggle="collapse" href="#orderSummaryDetails" role="button" aria-expanded="@(showCollapse ? "true" : "false")" aria-controls="orderSummaryDetails" class="@(showCollapse ? "" : "collapsed")">
+                            <span class="hide-label">@Html.TranslateFallback(StringResources.HideItems, "Hide")</span>
+                            <span class="show-label">@Html.TranslateFallback(StringResources.ViewItems, "View Items")</span>
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="summary-details collapse @(showCollapse ? "in" : "")" id="orderSummaryDetails" aria-expanded="@(showCollapse ? "true" : "false")">
+                <div ng-repeat="shipment in rmCommerce.shipments | filter:{ShipmentUniqueId:'Default-1'}">
+                    <div class="row table-row" ng-repeat="variant in shipment.CartItems" ng-cloak>
+                        <div class="col-xs-12 col-md-7">
+                            <p class="h6 mt-0 strong mb-0">{{variant.DisplayName}}</p>
+                        </div>
+                        <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                            <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x{{variant.Quantity}}
+                        </div>
+                        <div class="col-xs-6 col-md-4 pl-0 text-right">
+                            <p class="mb-0">{{variant.DiscountedPrice}}</p>
+                            <p class="small">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</p>
+                        </div>
+                        <div class="col-sm-12 pt-1x pb-1x" ng-if="variant.CanBePersonalised">
+                            <span class="bg-white p-1xs mt-1x ng-binding">
+                                @Html.TranslateFallback(StringResources.ItemPersonalised, StringConstants.TranslationFallback.ItemPersonalised)
+                            </span>
+                        </div>
+                        <div class="col-sm-12">
+                            <p class="small mb-0 text-success">{{variant.StockSummary.StatusMessage}}</p>
+                            <p class="mb-0 strong">{{variant.SupplierMessage}}</p>
+                            <p class="small">{{variant.StockSummary.ShippingMessage}}</p>
+                        </div>
+                        <div class="col-xs-12">
+                            <hr class="mb-0">
+                        </div>
+                    </div>
+                </div>
+                <div class="row background-lightergray" ng-if="rmCommerce.consumerPromotions.length > 0" ng-cloak>
+                    <div class="col-xs-12">
+                        <div class="panel panel-info" >
+                            <div class="panel-heading">
+                                <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row" ng-repeat="promo in rmCommerce.consumerPromotions">
+                                    <div ng-class="!!promo.Code ? 'col-xs-6' : 'col-xs-12'">
+                                        <p>
+                                            <i class="trmi trmi-check text-success"></i> {{promo.Code || promo.Description}}
+                                        </p>
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        <a href="" title="@Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)" ng-if="!!promo.Code" ng-click="removeCoupon(promo.Code)" class="small">
+                                            @Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row table-footer">
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailBasketTotal, "Retail Basket Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        <p class="mb-0">{{getRetailSubTotal()}}</p>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailDelivery, "Retail Delivery")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        {{getRetailDeliveryTotal()}}
+                    </div>
+
+                    <div ng-show="showRetailTotalDiscount()" class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)</strong>
+                    </div>
+                    <div ng-show="showRetailTotalDiscount()" class="col-xs-4 text-right">
+                        {{getConsumerSavedAmount()}}
+                    </div>
+
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailTotal, "Retail Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        <p class="mb-0 strong">
+                            {{getRetailTotal()}}
+                        </p>
+                        <p class="small mb-0">(@Html.TranslateFallback(StringResources.IncludeVat, "inc Vat"))</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

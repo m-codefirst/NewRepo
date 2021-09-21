@@ -1,0 +1,9 @@
+﻿@using TRM.Web.Models.Layouts
+@model  TrmLayoutModel
+<div class="brand-footer">
+    <footer class="container" @Html.EditAttributes(m => m.SiteFooter)>
+        <div class="row">
+            @Html.DisplayFor(m => m.SiteFooter)
+        </div>
+    </footer>
+</div>

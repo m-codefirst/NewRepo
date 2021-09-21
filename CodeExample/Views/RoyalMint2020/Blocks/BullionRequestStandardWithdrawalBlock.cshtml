@@ -1,0 +1,90 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Bullion.RequestStandardWithdrawal
+@using Newtonsoft.Json
+
+@model RequestStandardWithdrawalViewModel
+@{
+    var viewModel = new
+    {
+        formContent = new
+        {
+            currencySymbol = Model.CurrencySymbol,
+            withdrawAmountText = Model.RequestStandardWithdrawalBlock.LabelWithdrawalAmount,
+            bankAccountText = Model.RequestStandardWithdrawalBlock.LabelBankAccountText,
+            paymentTypeText = Model.RequestStandardWithdrawalBlock.LabelPaymentTypeText,
+            withdrawFeeText = Model.RequestStandardWithdrawalBlock.LabelWithdrawalFee,
+            withdrawTotalText = Model.RequestStandardWithdrawalBlock.LabelWithdrawalTotal,
+            remainingBalance = Model.RequestStandardWithdrawalBlock.LabelRemainingBalance,
+            submitButton = Model.RequestStandardWithdrawalBlock.ButtonSubmitRequest,
+            fundsError = Html.TranslateFallback(StringResources.MoreThanAvailable, "You do not have sufficient funds to proceed with this withdrawal request. Please reduce the withdrawal amount."),
+            minFundError = Html.TranslateFallback(StringResources.PositiveValue, "Amount to withdraw needs to be a positive value"),
+            availableAmountForWithdrawal = Model.AvailableCashForWithdrawal,
+            availableAmountForWithdrawalLabel = Model.RequestStandardWithdrawalBlock.LabelAvailableCashTodayText,
+            hasNoFundsAvailable = Model.NoFundsAvailable,
+            hasNoFundsAvailableIconMessage = "No funds available",
+            hasNoFundsAvailableMessage = Model.RequestStandardWithdrawalBlock.NoFundsAvailableMessage,
+            hasNoLinkedAccount = Model.NoLinkedAccount,
+            hasNoLinkedAccountIconMessage = !string.IsNullOrWhiteSpace(Model.RequestStandardWithdrawalBlock.NoLinkedAccountIconMessage) ? Model.RequestStandardWithdrawalBlock.NoLinkedAccountIconMessage : "No bank accounts currently linked to your account",
+            hasNoLinkedAccountMessage = Model.RequestStandardWithdrawalBlock.NoLinkedAccountMessage,
+            hasNoLinkedAccountButtonLink = !string.IsNullOrEmpty(Model.BullionCustomerBankAccountLink) ? Model.BullionCustomerBankAccountLink : string.Empty,
+            hasNoLinkedAccountButtonText = Model.RequestStandardWithdrawalBlock.ManageLinkedBankAccountLabel,
+            bankAccountList = Model.BankAccounts.Select(x => new
+            {
+                bankAccountId = x.CustomerBankAccountId,
+                bankAccountInformation = x.BankAccountInformation,
+                nickname = x.Nickname,
+                fastWithdrawalFee = new
+                {
+                    amount = x.FastWithdrawalFee.Amount
+                },
+                standardWithdrawalFee = new
+                {
+                    amount = x.StandardWithdrawalFee.Amount
+                },
+            }),
+            paymentTypeList = Model.RequestWithdrawalPaymentTypes.Select(x => new
+            {
+                displayName = x.DisplayName,
+                isQuickPayment = x.IsQuickPayment,
+            }),
+        },
+        formValues = new
+        {
+            bankAccountId = Model.BankAccountId,
+            withdrawAmount = Model.WithdrawAmount,
+            availableCash = Model.AvailableCashValue,
+            paymentType = Model.PaymentType,
+        }
+    };
+}
+
+@if (Model.RequestStandardWithdrawalBlock.MiddleContent != null || PageEditing.PageIsInEditMode)
+{
+    @Html.PropertyFor(x => x.RequestStandardWithdrawalBlock.MiddleContent)
+}
+
+<div class="form-container">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <h2 class="section-head"><span>@Model.RequestStandardWithdrawalBlock.HeaderText</span></h2>
+            @Html.Raw(Model.RequestStandardWithdrawalBlock.IntroText)
+
+            <div data-module="wallet-withdrawal" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+            <div class="row mb-2x">
+                <div class="col-xs-12">
+                    <hr />
+                    @Html.Raw(Model.RequestStandardWithdrawalBlock.FooterText)
+                </div>
+            </div>
+            @if (Model.RequestStandardWithdrawalBlock.NewContent != null || PageEditing.PageIsInEditMode)
+            {
+                <div class="row mt-1x">
+                    @Html.PropertyFor(x => x.RequestStandardWithdrawalBlock.NewContent)
+                </div>
+            }
+        </div>
+    </div>
+</div>

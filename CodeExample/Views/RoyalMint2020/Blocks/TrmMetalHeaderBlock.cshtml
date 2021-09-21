@@ -1,0 +1,46 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@model TRM.Web.Models.Blocks.Bullion.TrmMetalBlock
+
+@{
+    var elementId = Guid.NewGuid();
+    var tooltipFormatId = string.Format("{0}_Tooltip_Format", elementId);
+    var tooltip = string.Format("{0}_Tooltip", elementId);
+    var isLoggedIn = Request.IsAuthenticated;
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : CustomerContact.CreateInstance();
+}
+
+@if (Model.TrmMetalBlockPartial != null && Model.ShouldDisplay)
+{
+    <div class="live-prices-bar order-1">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col col-lg-10">
+                    <div class="row">
+                        <div class="col-lg-8 live-prices">
+                            <ul>
+                                @foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.PampMetalPriceItems)
+                                {
+                                    string metalNameClass = item.Metal.Name.ToLower();
+                                    <li>
+                                        <a class="@metalNameClass" data-toggle="modal" data-target="#@metalNameClass-price-graph">
+                                            <span class="text">@Html.TranslateFallback(string.Format("{0}/{1}", StringResources.TrmMetalBlockMetalName, item.Metal.Name), item.Metal.Name)</span>
+                                            <div>
+                                                <span class="value">@item.BuyPriceChange.CurrentPrice.ToString()</span>
+                                                <span class="change">@string.Format("{0:+;-;#}", item.BuyPriceChange.UpOrDown)@item.BuyPriceChange.Percent%</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="col-lg-4 satellite d-none d-lg-block ml-auto">
+                            @Html.PropertyFor(m => m.Links)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

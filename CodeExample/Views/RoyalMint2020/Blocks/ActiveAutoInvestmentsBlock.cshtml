@@ -1,0 +1,149 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.ActiveAutoInvestmentsBlockViewModel
+
+<div class="digi-investments">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            @if (!String.IsNullOrEmpty(Model.CurrentBlock.Title))
+            {<h2 class="section-head section-head--xl"><span>@Model.CurrentBlock.Title</span></h2>}
+
+            <div class="desktop-only">
+                <div class="row pb-2">
+                    <div class="col text-center text-uppercase font-dark pl-2 pr-2" style="font-size: 16px"><div><span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockAutoProduct, "product")</span></div></div>
+                    <div class="col text-center text-uppercase font-dark pl-2 pr-2" style="font-size: 16px">
+                        <div>
+                            <span>
+                                @Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockCurrentHoldings, "current holdings")
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col text-center text-uppercase font-dark pl-2 pr-2" style="font-size: 16px"><div><span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockAutoMonthlyInvestment, "Monthly investment")</span></div></div>
+                    <div class="col text-center text-uppercase font-dark pl-2 pr-2" style="font-size: 16px"><div><span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.ProductStatusLabel, "status")</span></div></div>
+                </div>
+            </div>
+            <div class="row">
+
+                @foreach (var item in Model.Products)
+                {
+                    string activeString = item.Active ?
+                        Html.TranslateFallback(TRM.Web.Constants.StringResources.Active, "Active")
+                        : string.Empty;
+
+                    <div class="col-12 desktop-only only">
+                        <div class="row product product--table mb-1 pt-1 pb-1 pl-0 pr-0">
+                            <div class="col-3 product--table__item"><span class="icon"><img src="@item.ImageUrl" /></span><span>@item.Name</span></div>
+                            <div class="col-3 product--table__item justify-content-center"><span>@item.CurrentInvestment</span></div>
+                            <div class="col-3 product--table__item justify-content-center"><span>@item.MonthlyInvestment</span></div>
+                            <div class="col-3 product--table__item justify-content-between">
+                                <div style="flex-basis:50%" class="text-center"> <span class="active-text active-text--active">@activeString</span></div>
+                                <div style="flex-basis:50%">
+                                    <a href="@Url.ContentUrlExtension(item.ProductReference)" class="btn btn-secondary m-0 w-100">
+                                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockTopUp, "top up")
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-3 pb-2 mobile-only ">
+                        <div class="product product--flex">
+                            <div class="heading d-flex flex-column align-items-center mb-1">
+                                <div class="mb-1"> <span class="icon"><img src="@item.ImageUrl" /></span></div>
+                                <div class="heading__name mb-1"> <span>@item.Name</span></div>
+                                <div class="font-dark text-uppercase heading__label"> <span class=""> @Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockCurrentHoldings, "current holdings")</span></div>
+                                <div><span>@item.CurrentInvestment</span></div>
+
+                            </div>
+                            <div class="details">
+                                <div class="details__item">
+                                    <div class="d-flex align-items-center mr-1">
+                                        <span class="icon icon-small mr-1"><svg><use xlink:href="#calendar" /></svg></span>
+                                        <span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockAutoMonthlyInvestment, "Monthly investment")</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-dark">@item.MonthlyInvestment</span>
+                                    </div>
+
+                                </div>
+                                <div class="details__item">
+                                    @if (item.Active)
+                                    {
+                                        <div class="d-flex align-items-center mr-1">
+                                            <span class="icon icon-small mr-1"><svg><use xlink:href="#tick" /></svg></span>
+                                            <span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockAutoInvestStatus, "Auto-invest status")</span>
+                                        </div>
+                                        <div><span class="active-text active-text--active">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Active, "Active")</span></div>
+                                    }
+                                    else
+                                    {
+                                        <text>&nbsp;</text>
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="row justify-content-center mt-2">
+                                <a href="@Url.ContentUrlExtension(item.ProductReference)" class="btn btn-secondary">
+                                    @Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockTopUp, "top up")
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="desktop-only ">
+                <div class="row product product--total product--table mb-1 pt-1 pb-1 pl-0 pr-0">
+                    <div class="col product--table__item"><div><span class="pl-3">  @Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockTotals, "Totals")</span></div></div>
+                    <div class="col product--table__item justify-content-center"><div><span class="font-dark">@Model.TotalCurrentInvestments</span></div></div>
+                    <div class="col product--table__item justify-content-center"><div><span class="font-dark">@Model.TotalMonthlyInvestments</span></div></div>
+                    <div class="col product--table__item justify-content-center"><div><span></span></div></div>
+                </div>
+            </div>
+            <div class="row mobile-only">
+                <div class="col-12 pb-2 ">
+                    <div class="product product--flex  product--total">
+                        <div><span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockTotals, "Totals")</span></div>
+                        <div class="details">
+                            <div class="details__item">
+                                <div class="d-flex align-items-center mr-1">
+                                    <span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockCurrentHoldings, "Current holdings")</span>
+                                </div>
+                                <div>
+                                    <span class="font-dark">@Model.TotalCurrentInvestments</span>
+                                </div>
+
+                            </div>
+                            <div class="details__item">
+                                <div class="d-flex align-items-center mr-1">
+                                    <span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.DigitalInvestmentBlockAutoMonthlyInvestment, "Monthly investment")</span>
+                                </div>
+                                <div>
+                                    <span class="font-dark">@Model.TotalMonthlyInvestments</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.CurrentBlock.EditInvestmentsUrl != null)
+            {
+                <div class="row justify-content-center mt-3 btns">
+                    <div class="col-md-6 col-lg-2-4">
+                        <a href="@Url.ContentUrlExtension(Model.CurrentBlock.EditInvestmentsUrl)" class="btn btn-primary ml-0 mr-0" style="font-size: 14px">
+                            @Model.CurrentBlock.EditInvestmentsLabel
+                        </a>
+                    </div>
+                </div>
+            }
+            <p class="mb-3 text-center" style="font-size: 14px">
+                @Html.TranslateFallBack(TRM.Web.Constants.StringResources.DigitalInvestmentBlockLastUpdated, "* Prices updated at {0} at {1}.", Model.LastUpdatedPricesDate, Model.LastUpdatedPricesTime)
+            </p>
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,563 @@
+﻿@model TRM.Web.Models.Layouts.TrmLayoutModel
+<a class="btn touchnav-toggle pull-right hidden-md hidden-lg menu-bars">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</a>
+<nav class="rm-navbar-container pull-right">
+    <div class="button-group pull-right-md-up text-right">
+        <a class="btn hidden-md hidden-lg nav-toggle nav-active" href="#navSectionNav"><i class="trmi trmi-bars"></i></a>
+        <a class="btn nav-toggle" href="#navSectionSearch"><i class="trmi trmi-search"></i></a>
+        <a class="btn nav-toggle" href="#navSectionAccount"><i class="trmi trmi-user"></i></a>
+        <a class="btn nav-toggle hidden-xs hidden-sm" href="#navSectionBasket" id="miniBaksetButton"><i class="trmi trmi-shopping-cart"></i><span ng-cloak ng-if="basketQuantity >= 1"> (<span ng-cloak ng-show="basketQuantity >= 1" ng-bind="basketQuantity"></span>)</span></a>
+        <a class="btn nav-toggle visible-xs visible-sm" href="/basket" id="miniBaksetButton"><i class="trmi trmi-shopping-cart"></i><span ng-cloak ng-if="basketQuantity >= 1"> (<span ng-cloak ng-show="basketQuantity >= 1" ng-bind="basketQuantity"></span>)</span></a>
+    </div>
+    <div class="nav-section active pull-left-md pull-left-lg" id="navSectionNav">
+        <div class="rm-navbar">
+            <div class="level0 has-children">
+                <a href="#">Shop</a>
+                <div class="nav-dropdown">
+                    <div class="nav-col">
+                        <div>
+                            <div class="level1 has-children">
+                                <a href="#">Commemorative coin</a>
+                                <div>
+                                    <div class="list-heading">Commemorative coin<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Events</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Queen's 90th Birthday</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="level3"><a href="#">Queen's 90th Birthday</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Range</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Type</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Range</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Type</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="level1 has-children">
+                                <a href="#">Bullion / Invest</a>
+                                <div>
+                                    <div class="list-heading">Bullion / Invest<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="level1 has-children">
+                                <a href="#">Gifts</a>
+                                <div>
+                                    <div class="list-heading">Gifts<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="level0">
+                <a href="#">Invest</a>
+            </div>
+            <div class="level0">
+                <a href="#">Visit</a>
+            </div>
+            <div class="level0 has-children">
+                <a href="#">Discover</a>
+                <div class="nav-dropdown hasBanners">
+                    <div class="banner-col hidden-xs hidden-sm">
+                        <div>
+                            <div>
+                                <a class="nav-banner" href="#" title="Silver Coins">
+                                    <span class="banner-content">Silver Coins</span>
+                                    <span class="banner-bg"><img alt="Silver Coins" src="/Static/img/content/nav-banner-bg-1.jpg"></span>
+                                </a>
+                            </div><div>
+                                <a class="nav-banner" href="#" title="The Britannia 2015">
+                                    <span class="banner-content">The Britannia 2015</span>
+                                    <span class="banner-bg"><img alt="The Britannia 2015" src="/Static/img/content/nav-banner-bg-2.jpg"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nav-col">
+                        <div>
+                            <div class="level1 has-children">
+                                <a href="#">Commemorative coin</a>
+                                <div>
+                                    <div class="list-heading">Commemorative coin<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Events</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Queen's 90th Birthday</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="level3"><a href="#">Queen's 90th Birthday</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Range</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Type</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Range</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Type</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Soverign</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="level1 has-children">
+                                <a href="#">Bullion / Invest</a>
+                                <div>
+                                    <div class="list-heading">Bullion / Invest<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="level1 has-children">
+                                <a href="#">Gifts</a>
+                                <div>
+                                    <div class="list-heading">Gifts<a class="btn nav-close pull-right visible-md visible-lg" role="button"><i class="trmi trmi-close"></i></a></div><div class="row">
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Gold</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Gold Bars</a></div>
+                                                <div class="level3"><a href="#">The Last Round Pound Coin</a></div>
+                                                <div class="level3"><a href="#">Team GB</a></div>
+                                                <div class="level3"><a href="#">The 1966 FIFA World Cup England</a></div>
+                                                <div class="level3"><a href="#">400th Anniversary of the Life of Shakespeare</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="block col-xs-12 col-md-3 level2 has-children">
+                                            <a href="#">Silver</a>
+                                            <div class="">
+                                                <div class="level3"><a href="#">Silver Bars</a></div>
+                                                <div class="level3"><a href="#">Britannia</a></div>
+                                                <div class="level3"><a href="#">Annual Sets</a></div>
+                                                <div class="level3"><a href="#">Collectors Albums</a></div>
+                                                <div class="level3"><a href="#">Stamp &amp; Coin</a></div>
+                                                <div class="level3"><a href="#">Premium Range</a></div>
+                                                <div class="level3"><a href="#">Best Sellers</a></div>
+                                                <div class="levelParent mt-1x mb-1x strong"><a href="#" title="View all">View all</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="level0">
+                <a href="#">Business</a>
+            </div>
+            <div class="level0">
+                <a href="#">Blog</a>
+            </div>
+            <div class="level0 has-children">
+                <a href="#">About</a>
+                <div class="nav-dropdown">
+                    <div class="nav-col">
+                        <div>
+                            <div class="level1">
+                                <a href="#">Our Vision</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">Our History</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">Advisory Committee</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">The Royal Mint Museum</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">The Royal Mint Blog</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">Job Vacancies</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">Annual Report</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">News</a>
+                            </div>
+                            <div class="level1">
+                                <a href="#">The Royal Mint's 'Mint Marque' service</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @{
+        Html.RenderPartial("_SearchBox", Model);
+    }
+
+    <div class="nav-section" id="navSectionAccount">
+        <div class="section-body">
+            <div class="row" ng-hide="userLoggedIn == true" ng-cloak>
+                <div class="col-xs-12 col-md-5 col-lg-4 col-lg-offset-1">
+                    <div class="mb-2x" id="loginForm-header">
+                        <h4 class="mt-0 mb-0">Already registered</h4>
+                        <h6 class="mt-0">Log in to your account</h6>
+                        <p>If you are an existing customer and have not used The Royal Mint website to place or track your order, please <a href="#" title="Activate your account" class="strong">activate your account today</a>.</p>
+                        <form action="" class="" autocomplete="off">
+                            <div class="form-group mb-1x input-subtle">
+                                <label class="sr-only" for="loginEmail1-header">Email address</label>
+                                <input type="email" class="form-control" id="loginEmail1-header" placeholder="Email address*">
+                            </div>
+                            <div class="form-group input-subtle mb-1x">
+                                <label class="sr-only" for="loginUsrPW1-header">Password</label>
+                                <input type="password" class="form-control" id="loginUsrPW1-header" placeholder="Password*">
+                            </div>
+                            <p class="text-right"><a href="" data-show="#forgottenPW-header" data-hide="#loginForm-header" class="pw-link">Forgotten password?</a></p>
+                            <div class="row">
+                                <div class="col-xs-12 col-md-6">
+                                    <button class="btn btn-secondary btn-block" type="submit" ng-click="loginUser($event)">Log in</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>								<div class="hidden mb-2x" id="forgottenPW-header">
+                        <h4 class="mt-0 mb-0">Forgotten your password?</h4>
+                        <h6 class="mt-0">Request a reset link</h6>
+                        <form action="" class="">
+                            <div class="form-group mb-2x input-subtle">
+                                <label class="sr-only" for="Email1">Email address</label>
+                                <input type="email" class="form-control" id="Email1" placeholder="Email address*">
+                            </div>
+                            <div class="row mb-1x">
+                                <div class="col-xs-12 col-md-8">
+                                    <button class="btn btn-secondary btn-block" type="submit">Reset Password</button>
+                                </div>
+                            </div>
+                            <p><a href="#" data-hide="#forgottenPW-header" data-show="#loginForm-header" class="pw-link">Cancel</a></p>
+                        </form>
+                    </div>								<div class="mb-2x hidden" id="activateForm-header">
+                        <h4 class="mt-0 mb-0">Placed an offline order?</h4>
+                        <h6 class="mt-0">Activate your account</h6>
+                        <p>Please fill in the form below to turn your account into an online account.</p>
+                        <form action="" class="" autocomplete="off">
+
+                            <div class="row mb-3x mt-2x">
+                                <div class="col-xs-6">
+                                    <button class="btn btn-secondary btn-block" type="submit">Activate</button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button class="btn btn-default btn-block" type="submit">Cancel</button>
+                                </div>
+                            </div>
+                            <p><a href="#" data-hide="#activateForm-header" data-show="#loginForm-header" class="pw-link">Return to login</a></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-1 col-lg-1 hidden-xs hidden-sm">
+                    <div class="separator">
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-5 col-lg-4 col-md-offset-1  ">
+                    <h4 class="mt-0 mb-0">New to The Royal Mint</h4>
+                    <h6 class="mt-0">Create your account</h6>
+                    <a href="#" class="btn btn-secondary btn-block hidden-lg hidden-md">Register</a>
+                    <div class="hidden-xs hidden-sm" ng-app="PasswordStrength">
+                        <form autocomplete="off" ng-controller="FormController">
+                            <div class="form-group input-subtle mb-1x">
+                                <label class="sr-only" for="registerFirstName-header">First Name</label>
+                                <input type="text" class="form-control" id="registerFirstName-header" placeholder="First Name*">
+                            </div>
+                            <div class="form-group input-subtle mb-1x">
+                                <label class="sr-only" for="registerLastName-header">Last Name</label>
+                                <input type="text" class="form-control" id="registerLastName-header" placeholder="Last Name*">
+                            </div>
+                            <div class="form-group input-subtle mb-1x">
+                                <label class="sr-only" for="registerEmail1-header">Email address</label>
+                                <input type="email" class="form-control" id="registerEmail1-header" placeholder="Email address*">
+                            </div>
+                            <div class="alert alert-danger" ng-show="regError == true" ng-cloak>
+                                This email address is already in use, please try logging in or if you've forgotten your password, try resetting your password
+                            </div>
+                            <div class="row mt-2x">
+                                <div class="col-xs-12 col-md-6">
+                                    <button class="btn btn-default" type="submit" ng-click="regError = true">Continue</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-cloak ng-show="userLoggedIn == true">
+                <div class="col-xs-12 col-sm-6 hidden-xs hidden-sm">
+                    <ul class="rm-account-nav">
+                        <li class="level0 has-children">
+                            <a href="#">Your Orders</a>
+                            <ul class="">
+                                <li class="level1"><a href="#">View Open Orders</a></li>
+                                <li class="level1"><a href="#">View Closed Orders</a></li>
+                                <li class="level1"><a href="#">How to return an item</a></li>
+                            </ul>
+                        </li>
+                        <li class="level0 has-children">
+                            <a href="#">Credit Account</a>
+                            <ul class="">
+                                <li class="level1"><a href="#">Account Balance</a></li>
+                                <li class="level1"><a href="#">Make a Payment</a></li>
+                                <li class="level1"><a href="#">View Statement History</a></li>
+                            </ul>
+                        </li>
+                        <li class="level0 has-children">
+                            <a href="#">Contact and Delivery Details</a>
+                            <ul class="">
+                                <li class="level1"><a href="#">Edit Personal Details</a></li>
+                                <li class="level1"><a href="#">Manage Addresses</a></li>
+                                <li class="level1"><a href="#">Contact Preferences</a></li>
+                                <li class="level1"><a href="#">Change Password</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12 col-md-5 col-md-push-1">
+                    <h3>Hello Alison</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit  In dignissim dui a leo venenatis, vestibulum sagittis purus aliquam. Phasellus tempor at orci non dictum. Donec dignissim elit vel suscipit fringilla. </p>
+                    <button class="btn btn-default" ng-click="logoutUser($event)">Log Out</button>
+                    <a class="visible-xs-inline-block visible-sm-inline-block btn btn-secondary" href="#" title="Go to My Account">Go to My Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_MiniBasket")
+    <a class="btn nav-close" role="button"><i class="trmi trmi-close"></i></a>
+</nav>
+<div class="account-greeting hidden-xs hidden-sm" ng-if="userLoggedIn == true" ng-cloak>
+    Hello 
+</div>

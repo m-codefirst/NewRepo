@@ -1,0 +1,30 @@
+﻿@using Newtonsoft.Json
+@using Hephaestus.CMS
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.ContentTypes.Business.Extensions
+@model TRM.Web.Models.ViewModels.ArticleListingViewModel
+
+@if (Model == null) { return; }
+
+@{
+    var ViewModel = new
+    {
+        initialRequestData = new
+        {
+            ContentReference = Model.ThisBlock.ArticlesReference,
+            ResultsPerPage = Model.ThisBlock.NumberOfArticlesToShow,
+            Page = 1
+        },
+        url = @Url.Action("LoadMore", "ArticleListingBlock"),
+        totalArticles = Model.TotalArticles,
+        showLoadMore = Model.ThisBlock.ShowLoadMore,
+        showArticles = Model.Articles != null,
+        noArticlesMessage = "No articles where found",
+        enoughArticles = (Model.ThisBlock.ShowLoadMore && Model.ThisBlock.NumberOfArticlesToShow < Model.TotalArticles),
+        moreButtonText = Model.ThisBlock.LoadMoreButtonText,
+        initialArticles = Model.Articles != null ? Model.Articles : null,
+        readMore = @Html.TranslateFallBack(StringResources.ReadMore, "Read more")
+    };
+}
+
+<div data-module='article-list' data-settings="@JsonConvert.SerializeObject(ViewModel)"></div>

@@ -1,0 +1,29 @@
+﻿@using EPiServer.Core
+@model TRM.Web.Models.Blocks.AccordionItemBlock
+
+@{
+    //ReSharper disable once SuspiciousTypeConversion.Global
+    var parentId = ((IContent)Model).ParentLink.ID;
+
+    //ReSharper disable once UseStringInterpolation
+    var accordionId = string.Format("acc{0}{1}", parentId, Model.Property.OwnerLink.ID);
+    var openOnLoad = Model.OpenOnLoad ? "True" : "False";
+    var openCssClass = Model.OpenOnLoad ? "in" : "";
+    var titleOpenCssClass = Model.OpenOnLoad ? "" : "collapsed";
+}
+
+
+<div class="blockContainer blockContent">
+    <h2>
+        <a role="button" title="@Model.AccordionLabel" data-toggle="collapse" data-target="#@accordionId" aria-expanded="@openOnLoad" aria-controls="@accordionId" class="@titleOpenCssClass">
+            @Html.PropertyFor(m => m.AccordionLabel)
+        </a>
+    </h2>
+    
+    <div id="@accordionId" class="collapse fade @openCssClass" role="tabpanel">
+        <div class="row">
+        @Html.PropertyFor(x => x.Content)
+        </div>
+    </div>
+</div>
+       

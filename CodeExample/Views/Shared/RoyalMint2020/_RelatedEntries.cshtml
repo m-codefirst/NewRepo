@@ -1,0 +1,20 @@
+﻿@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+<div class="mod-section related row justify-content-center">
+    <h2 class="section-head"><span>@Html.TranslateFallback(StringResources.RelatedProducts, "Related Products")</span></h2>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <div  role="contentinfo" aria-label="carousel" class="mod-carousel mod-panels row" data-small="yes" data-small-break="576" data-small-options='{"slidesToShow": 1, "adaptiveHeight": true, "centerMode": true, "centerPadding": "25px"}' data-medium="yes" data-medium-break="900" data-medium-options='{"slidesToShow": 2, "adaptiveHeight": true,  "centerMode": false}' data-large="yes" data-large-break="900" data-large-options='{"slidesToShow": 3, "adaptiveHeight": true, "centerMode": false}'>
+                    @foreach (var relatedEntry in Model.ViewModel.RelatedEntries)
+                    {
+                        <div class="panel col-10 col-sm-6 col-md-4" itemprop="isRelatedTo">
+                            @{ Html.RenderPartial("PagePartials/TrmEntryPartial", relatedEntry); }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

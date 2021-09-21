@@ -1,0 +1,182 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.MixedCheckout.InvestmentPurchaseOrder
+@{
+    var isBullionOnly = ViewData["IsBullionOnly"] != null ? (bool)ViewData["IsBullionOnly"] : false;
+}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="investment-order-summary">
+            <div class="summary-header">
+                <div class="title">
+                    <h5 class="h5 mt-0 mb-0">@Html.TranslateFallback(StringResources.InvestmentOrderSummary, "Investment order summary")</h5>
+                </div>
+            </div>
+            <div class="summary-details collapse in" id="investmentSummaryDetails" aria-expanded="true" style="">
+                @if (Model.DeliveredItems != null && Model.DeliveredItems.Any())
+                {
+                    <div class="row table-row">
+                        <div class="col-xs-12">
+                            <p class="h6 header-font-color strong">@Html.TranslateFallback(StringResources.BullionCheckOutDeliverHeader, "Items being Delivered")</p>
+                        </div>
+                    </div>
+                    foreach (var deliveredItem in Model.DeliveredItems)
+                    {
+                        <div class="row table-row">
+
+                            <div class="col-xs-12 col-md-7">
+                                <p class="h6 mt-0 strong mb-0">@deliveredItem.DisplayName</p>
+                            </div>
+                            <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                                <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x@((int)deliveredItem.Quantity)
+                            </div>
+                            <div class="col-xs-6 col-md-4 text-right ">
+                                @{
+                                    var price = !string.IsNullOrEmpty(deliveredItem.DiscountedPrice) ? deliveredItem.DiscountedPrice : deliveredItem.PlacedPrice;
+                                }
+                                <p class="mb-0 ellipsis-word">@price</p>
+                                <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                            </div>
+                            <div class="col-xs-6 col-sm-8">
+                                <p class="small mb-0 text-success">@deliveredItem.StockSummary.StatusMessage</p>
+                                <p class="mb-0 strong">@deliveredItem.SupplierMessage</p>
+                                <p class="small mb-0">@deliveredItem.StockSummary.ShippingMessage</p>
+                            </div>
+                            <div class="col-xs-6 col-sm-4 mt-1x text-right ellipsis-word">
+                            </div>
+                            <div class="col-xs-12">
+                                <hr class="mb-0">
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (Model.VaultItems != null && Model.VaultItems.Any())
+                {
+                    <div class="row table-row">
+                        <div class="col-xs-12">
+                            <p class="h6 header-font-color strong">@Html.TranslateFallback(StringResources.BullionCheckOutVaultedHeader, "Items to be stored in The Royal Mint Vault")</p>
+                        </div>
+                    </div>
+                    foreach (var vaultItem in Model.VaultItems)
+                    {
+                        if (vaultItem.BullionCartItem.IsSignatureVariant)
+                        {
+                            <div class="row table-row">
+                                <div class="col-xs-12 col-md-7">
+                                    <p class="h6 mt-0 strong mb-0">@vaultItem.DisplayName</p>
+                                </div>
+                                <div class="col-xs-6 col-md-8">
+                                    <p class="mb-0">@Html.TranslateFallback(StringResources.ApproxWeight, "Weight"): @vaultItem.BullionCartItem.Weight oz</p>
+                                </div>
+                                <div class="col-xs-6 col-md-4 text-right">
+                                    @{
+                                        var price = !string.IsNullOrEmpty(vaultItem.DiscountedPrice) ? vaultItem.DiscountedPrice : vaultItem.PlacedPrice;
+                                    }
+                                    <p class="mb-0 ellipsis-word">@price</p>
+                                    <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                                </div>
+                                <div class="col-sm-12">
+                                    <p class="small mb-0 text-success">@vaultItem.StockSummary.StatusMessage</p>
+                                </div>
+                                <div class="col-xs-12">
+                                    <hr class="mb-0">
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row table-row">
+
+                                <div class="col-xs-12 col-md-7">
+                                    <p class="h6 mt-0 strong mb-0">@vaultItem.DisplayName</p>
+                                </div>
+                                <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                                    <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x@((int)vaultItem.Quantity)
+                                </div>
+                                <div class="col-xs-6 col-md-4 text-right ">
+                                    @{
+                                        var price = !string.IsNullOrEmpty(vaultItem.DiscountedPrice) ? vaultItem.DiscountedPrice : vaultItem.PlacedPrice;
+                                    }
+                                    <p class="mb-0 ellipsis-word">@price</p>
+                                    <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                                </div>
+                                <div class="col-xs-6 col-sm-8">
+                                    <p class="small mb-0 text-success">@vaultItem.StockSummary.StatusMessage</p>
+                                    <p class="mb-0 strong">@vaultItem.SupplierMessage</p>
+                                    @*<p class="small mb-0">@vaultItem.StockSummary.ShippingMessage</p>*@
+                                </div>
+                                <div class="col-xs-6 col-sm-4 mt-1x text-right ellipsis-word">
+                                </div>
+                                <div class="col-xs-12">
+                                    <hr class="mb-0">
+                                </div>
+                            </div>
+                        }
+
+                    }
+                }
+
+                @if (Model.Promotions.Any())
+                {
+                    <div class="row background-lightergray">
+                        <div class="col-xs-12">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+                                </div>
+                                <div class="panel-body">
+                                    @foreach (var promo in Model.Promotions)
+                                    {
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <p>
+                                                    <i class="trmi trmi-check text-success"></i> @Html.Raw(string.IsNullOrEmpty(promo.Code) ? promo.Description : promo.Code)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                    <div class="row table-footer">
+                        <div class="col-xs-8 text-right">
+                            <strong>
+                                @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutBasketTotalLabel, "Basket Total") : Html.TranslateFallback(StringResources.InvestmentBasketTotal, "Investment Basket Total"))
+                            </strong>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            @Model.SubTotal
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <strong>
+                                @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutDeliveryLabel, "Delivery") : Html.TranslateFallback(StringResources.MixedCheckoutDelivery, "Delivery"))
+                            </strong>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            @Model.DeliveryCost
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <strong>
+                                @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutVATLabel, "VAT") : Html.TranslateFallback(StringResources.InvestmentVat, "Investment VAT"))
+                            </strong>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            @Model.InvestmentVat
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <strong>
+                                @(isBullionOnly ? Html.TranslateFallback(StringResources.BullionOnlyCheckoutTotalLabel, "Total") : Html.TranslateFallback(StringResources.InvestmentTotal, "Investments Total"))
+                            </strong>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            <span class="strong">
+                                @Model.Total
+                            </span>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

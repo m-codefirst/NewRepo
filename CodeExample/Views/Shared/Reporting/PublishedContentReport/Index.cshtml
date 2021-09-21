@@ -1,0 +1,169 @@
+﻿@using EPiServer.Framework.Web.Resources
+@model TRM.Web.Models.Reporting.PublishedContentReport.PublishedContentReportViewModel
+@{
+    Layout = null;
+    const string datePickerDateFormat = "yyyy-MM-dd";
+    var languages = new string[] { null, "en-GB", "cy-GB", "en-US" };
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    @Html.Raw(ClientResources.RenderResources("ShellCore"))
+    @Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+
+    <style>
+        .criteria-container > div {
+            margin: 8px 0;
+        }
+
+        .date-links-container a {
+            color: blue;
+            margin-right: 8px;
+        }
+
+        .row-title {
+            min-width: 150px;
+            display: inline-block;
+        }
+
+        .form-action {
+            padding: 8px;
+            margin-right: 8px;
+            border-radius: 3px;
+            background-color: rgb(239, 239, 239);
+            border: 1px solid rgb(118, 118, 118);
+            font-family: Myriad, Helvetica, Tahoma, Arial, clean, sans-serif;
+        }
+
+            .form-action:hover {
+                background-color: #E5E5E5;
+            }
+    </style>
+
+</head>
+<body>
+    @Html.Raw(Html.ShellInitializationScript())
+
+    <div class="epi-padding">
+        <div class="epi-contentArea">
+            <div class="EP-systemImage">
+                <h1 class="EP-prefix">
+                    Published Content Report
+                </h1>
+                <p class="EP-systemInfo">
+                    Presents both CMS and Commerce data (all content items from int the system). <br />Shows date of saving the latest published version of the content item.
+                    <br />
+                    <br />
+                    Generated at: @DateTime.Now.ToString("G")
+                    <br />
+                    Please refresh the page to regenerate.
+                </p>
+            </div>
+        </div>
+
+        @using (Html.BeginForm("Index", "PublishedContentReport", FormMethod.Get))
+        {
+
+            <div class="epi-contentArea epi-clear epi-marginVertical-small criteria-container">
+                <div>
+                    <h4>Report Criteria</h4>
+                </div>
+                <div class="date-links-container">
+                    <span class="row-title">Last Published</span>
+                    <a href="#" data-from="@DateTime.Now.AddDays(-30).ToString(datePickerDateFormat)" data-to="@DateTime.Now.ToString(datePickerDateFormat)">Last 30 days</a>
+                    <a href="#" data-from="@DateTime.Now.AddDays(-7).ToString(datePickerDateFormat)" data-to="@DateTime.Now.ToString(datePickerDateFormat)">Last 7 days</a>
+                    <a href="#" data-from="@DateTime.Now.AddDays(-1).ToString(datePickerDateFormat)" data-to="@DateTime.Now.ToString(datePickerDateFormat)">Yesterday</a>
+                    <a href="#" data-from="@DateTime.Now.ToString(datePickerDateFormat)" data-to="@DateTime.Now.AddDays(1).ToString(datePickerDateFormat)">Today</a>
+                </div>
+                <div>
+                    <span class="row-title">Last Publication date</span>
+                    <label for="from">From</label>
+                    <input type="date" name="from" value="@Model.From.ToString(datePickerDateFormat)" id="from" style="margin-right: 24px;" />
+                    <label for="from">To</label>
+                    <input type="date" name="to" value="@Model.To.ToString(datePickerDateFormat)" id="to" style="margin-right: 24px;" />
+                </div>
+                <div>
+                    <label class="row-title" for="byme">Published by me</label>
+                    @Html.CheckBox("byme", Model.PublishedByMe)
+                </div>
+                <div>
+                    <label class="row-title" for="byme">Language</label>
+                    @Html.DropDownList("language", languages.Select(x => new SelectListItem { Text = x ?? "All", Value = x ?? "", Selected = Model.SelectedLanguage == x }))
+                </div>
+                <div style="margin-top: 16px;">
+                    <input type="submit" id="refreshreport" value="Show Report" class="form-action" @*style="padding: 2px 8px; cursor: pointer;"*@ />
+                    <a target="_blank" id="export-link" href="@Model.ExportUrl" class="form-action">Export Report</a>
+                </div>
+            </div>
+            <br />
+
+            @Html.Partial("Reporting/ReportTable", Model.ReportTableViewModel)
+        }
+    </div>
+
+    <script type="text/javascript">
+
+        let elements = document.querySelectorAll('.date-links-container a');
+
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+
+            element.addEventListener("click",
+                (function (e) {
+                    return function () {
+                        document.getElementById("from").value = e.dataset.from;
+                        document.getElementById("to").value = e.dataset.to;
+
+                        //export url
+                        UpdateExportUrl("from", e.dataset.from);
+                        UpdateExportUrl("to", e.dataset.to);
+                    }
+                })(element),
+                false);
+        }
+
+        document.getElementById("refreshreport").addEventListener("click",
+            function () {
+                this.form.currentPage.value = 1;
+                return false;
+            });
+
+        //Updating the export link with filter values
+        var filters = ["from", "to", "language"];
+
+        for (var i = 0; i < filters.length; i++) {
+            var filter = filters[i];
+
+            document.getElementById(filter).addEventListener("change",
+                (function(f) {
+                    return function(e) {
+                        var value = e.target.value;
+                        UpdateExportUrl(f, value);
+                    };
+                })(filter));
+        }
+
+
+        document.getElementById("byme").addEventListener("change",
+            function (e) {
+                var checked = e.target.checked;
+                UpdateExportUrl("byme", !!checked);
+            });
+
+        function UpdateExportUrl(key, value) {
+            var exportLink = document.getElementById("export-link");
+            var href = exportLink.href;
+            var url = new URL(href);
+            var searchParams = url.searchParams;
+            searchParams.set(key, value);
+            url.search = searchParams.toString();
+
+            exportLink.href = url.toString();
+        }
+    </script>
+</body>
+</html>

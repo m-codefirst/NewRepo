@@ -1,0 +1,5 @@
+﻿@model TRM.Web.Models.Blocks.StandardCarouselBlock
+
+<div role="contentinfo" aria-label="carousel" class="mod-carousel mod-carousel-fluid row p-0" @Html.EditAttributes(m => m.Content) data-autoplay="true" data-autoplaySpeed="4000" data-infinite="true">
+    @Html.DisplayFor(m => m.Content)
+</div>

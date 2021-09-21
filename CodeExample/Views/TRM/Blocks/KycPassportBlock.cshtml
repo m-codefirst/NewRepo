@@ -1,0 +1,82 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycPassportBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycPassportViewModel>
+
+<div class="col-xs-12 col-sm-12">
+	<div class="row mb-1x">
+		@Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+	</div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-7">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="form-group col-xs-6 col-sm-8 col-md-8">
+                            <label class="control-label" for="">
+                                @Html.PropertyFor(x => x.CurrentBlock.CountryOfIssueTitle)
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="select-form">
+                                @Html.CustomDropDownListFor(x => x.ViewModel.CountryCode, Model.ViewModel.Countries, new { @class = "form-control countryCode", data_required = "true", @value = "@Model.ViewModel.CountryCode", @id = "kyc_passportCountryCode" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-2x" id="kyc_passportId_formGroup">
+                <label class="control-label" for="">
+                    @Html.PropertyFor(x => x.CurrentBlock.PassportTitle)
+                    <span class="text-danger">*</span>
+                    <small class="text-greyblue text-nowrap display-inline-block display-block-sm">@Html.PropertyFor(x => x.CurrentBlock.PassportTooltip)</small>
+                </label>
+                <input type="text" class="form-control tooltip-input" placeholder="@Html.PropertyFor(x => x.CurrentBlock.PassportPlaceholder)" id="kyc_passportId">
+                <p class="alert alert-danger alert-dismissble mt-1x mb-0 text-left hidden" id="kyc_InvalidPassportCode" role="alert">
+                    @Html.TranslateFallback(StringResources.InvalidPassportCode, "Invalid Passport Code")
+                </p>
+                @if (Model.CurrentBlock.PassportNumberHelperText != null)
+                {
+                    <p class="tooltip-info alert alert-info alert-dismissble mt-1x mb-0 text-left hidden" role="alert">
+                        @Html.PropertyFor(x => x.CurrentBlock.PassportNumberHelperText)
+                    </p>
+                }
+            </div>
+            <div class="form-group mb-2x" id="kyc_expiryDate_formGroup">
+                <label class="control-label" for="dobDay">
+                    @Html.PropertyFor(x => x.CurrentBlock.ExpiryDateTitle)
+                    <span class="text-danger">*</span>
+                    <small class="text-greyblue text-nowrap"></small>
+                </label>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <div class="select-form">
+                            @Html.DropDownListFor(x => x.ViewModel.DayOfExpiryDate, new SelectList(Model.ViewModel.DayList), "DD", new { @class = "form-control", @name = "dobDay", data_required = "true", @id = "kyc_passportDay" , @onchange = "BullionKycFurtherDetails.ResetValidate('#kyc_InvalidPassportExpiryDate', '#kyc_expiryDate_formGroup');" })
+                        </div>
+                    </div>
+
+                    <div class="col-xs-4">
+                        <div class="select-form">
+                            @Html.DropDownListFor(x => x.ViewModel.MonthOfExpiryDate, new SelectList(Model.ViewModel.MonthList), "MM", new { @class = "form-control", @name = "dobMonth", data_required = "true", @id = "kyc_passportMonth", onchange = "BullionKycFurtherDetails.ResetValidate('#kyc_InvalidPassportExpiryDate', '#kyc_expiryDate_formGroup');" })
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="select-form">
+                            @Html.DropDownListFor(x => x.ViewModel.YearOfExpiryDate, new SelectList(Model.ViewModel.YearList), "YYYY", new { @class = "form-control", @name = "dobYear", data_required = "true", @id = "kyc_passportYear" , onchange = "BullionKycFurtherDetails.ResetValidate('#kyc_InvalidPassportExpiryDate', '#kyc_expiryDate_formGroup');" })
+                        </div>
+                    </div>
+                </div>
+                <p class="alert alert-danger mt-1x mb-0 text-left hidden" id="kyc_InvalidPassportExpiryDate">
+                    @Html.TranslateFallback(StringResources.InvalidPassportExpiryDate, "Invalid Passport Expiry Date")
+                </p>
+            </div>
+            <button id="kyc_validatePassport" type="button" data-dismiss="alert" class="btn btn-secondary btn-200 mr-2x" onclick="BullionKycFurtherDetails.ValidatePassport();">@Html.PropertyFor(x => x.CurrentBlock.ConfirmDetailsButtonText)</button>
+            <a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="display-block-xs display-inline-block mt-xs-2x mt-md-2x mb-xs-2x">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+        </div>
+        <div class="col-xs-12 col-sm-5">
+            <div class="row">
+                @Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+            </div>
+        </div>
+    </div>
+</div>
+

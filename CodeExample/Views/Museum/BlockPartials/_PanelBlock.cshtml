@@ -1,0 +1,71 @@
+﻿@using EPiServer.Core
+@using TRM.Shared.Extensions 
+@model TRM.Web.Models.ViewModels.PanelViewModel
+@if (Model == null) { return; }
+
+<div class="block-background @Model.DefaultBgColour">
+    @(Model.ThisBlock.ParallaxEnabled ? Html.Raw("<div class=\"parallax-container\" data-scroll=" + (int)Model.ThisBlock.ParallaxOffset + ">"): Html.Raw(string.Empty))
+    @if (Model.ThisBlock.BackgroundImage != null && !ContentReference.IsNullOrEmpty(Model.ThisBlock.BackgroundImage.LgImage))
+    {
+        @Html.DisplayFor(a => a.ThisBlock.BackgroundImage)
+    }
+    <div class="bgHover @Model.HoverBgColour"></div>
+    @(Model.ThisBlock.ParallaxEnabled ? Html.Raw("</div>") : Html.Raw(string.Empty))
+</div>
+
+<div class="block-container">
+    <!-- Block Content -->
+    <div class="blockContent">
+        @if (Model.HasDefaultContent)
+        {
+            <!-- Default Content -->
+            <div class="defaultContent @Model.DefaultFgColour @Model.Padding @Model.DefaultAlignment @Model.DefaultWidth @Model.DefaultTextAlignment @Model.ContentBorder">
+                <div class="content ">
+                    @if (!string.IsNullOrWhiteSpace(Model.ThisBlock.Heading))
+                    {
+                        <!-- Default Heading -->
+                        <div class="borders">
+                            <h3>@Model.ThisBlock.Heading</h3>
+                        </div>
+                    }
+                    <div class="borders">
+                        @Html.PropertyFor(x => x.ThisBlock.Content)
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.HasHoverContent)
+        {
+            <!-- Hover Content -->
+            <div class="hoverContent @Model.HoverFgColour @Model.Padding @Model.HoverAlignment @Model.HoverWidth @Model.HoverTextAlignment @Model.HoverContentBorder">
+
+                <div class="content">
+                    @if (!string.IsNullOrWhiteSpace(Model.ThisBlock.HoverContentHeading))
+                    {
+                        <!-- Hover Heading -->
+                        <div class="borders">
+                            <h3>@Html.DisplayFor(m => m.ThisBlock.HoverContentHeading)</h3>
+                        </div>
+                    }
+                    <!-- WYSIWYG XHMTL Content -->
+                    @Html.PropertyFor(x => x.ThisBlock.HoverContent)
+
+                    @if (!string.IsNullOrWhiteSpace(@Url.ContentUrlExtension(Model.ThisBlock.LinkHyperlink)))
+                    {
+                        <!-- Hover Link -->
+                        <div class="borders mb-1x">
+                            <a href="@Url.ContentUrlExtension(Model.ThisBlock.LinkHyperlink)" class="btn-arrow" title="@Model.ThisBlock.LinkText">@Model.ThisBlock.LinkText</a>
+                        </div>
+                    }
+
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.HoverImage))
+                {
+                    <!-- Hover Image -->
+                    <img src="@Model.HoverImage" class="img-responsive @Model.ThisBlock.CustomImage.CssClass" alt="@Model.ThisBlock.CustomImage.Description" title="@Model.ThisBlock.CustomImage.Description">
+                }
+            </div>
+        }
+    </div>
+</div>

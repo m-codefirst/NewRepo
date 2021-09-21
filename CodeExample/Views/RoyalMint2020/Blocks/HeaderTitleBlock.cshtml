@@ -1,0 +1,87 @@
+﻿@using Hephaestus.ContentTypes.Business.Enums
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.HeaderTitleBlock
+
+@{
+    var css = string.Format("{0} {1} {2}",
+        Model.IsSectionHead ? string.Empty : Model.TextPosition.DescriptionAttr(),
+        Model.IsSectionHead ? "section-head" : "header-title",
+        Model.HeadingCssClass);
+
+    switch (Model.HeadingType)
+    {
+        case Enumerators.eHeaders.H1:
+            <h1 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)" itemprop="url"><span itemprop="name">@Model.Text</span></a>
+                }
+            </h1>
+            break;
+        case Enumerators.eHeaders.H2:
+            <h2 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)"><span>@Model.Text</span></a>
+                }
+            </h2>
+            break;
+        case Enumerators.eHeaders.H3:
+            <h3 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)"><span>@Model.Text</span></a>
+                }
+            </h3>
+            break;
+        case Enumerators.eHeaders.H4:
+            <h4 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)"><span>@Model.Text</span></a>
+                }
+            </h4>
+            break;
+        case Enumerators.eHeaders.H5:
+            <h5 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)"><span>@Model.Text</span></a>
+                }
+            </h5>
+            break;
+        case Enumerators.eHeaders.H6:
+            <h6 class="@css" @Html.EditAttributes(x => x.Text)>
+                @if (Model.TextHyperlink == null)
+                {
+                    <span>@Model.Text</span>
+                }
+                else
+                {
+                    <a href="@Url.ContentUrlExtension(Model.TextHyperlink)"><span>@Model.Text</span></a>
+                }
+            </h6>
+            break;
+    }
+}

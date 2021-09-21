@@ -1,0 +1,24 @@
+﻿@using Mediachase.Commerce
+@using TRM.Web.Constants
+
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+@{
+    var withdrawalFee = new Money(Model.Value.TransactionRecord.WithdrawalFee, Model.Value.Currency);
+}
+
+<div class="col-lg-3">
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistorySubmittedBy, StringConstants.TranslationFallback.TransactionHistorySubmittedBy)</span>
+    @Model.Value.SubmittedBy
+</div>
+
+<div class="col-lg-3">
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryBankAccount, StringConstants.TranslationFallback.TransactionHistoryBankAccount)</span>
+    @Model.Value.TransactionRecord.BankAccount
+</div>
+
+<div class="col-lg-6">
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryPaymentType, StringConstants.TranslationFallback.TransactionHistoryPaymentType)</span>
+    @Model.Value.TransactionRecord.WithdrawalMethod
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryWithdrawalFee, StringConstants.TranslationFallback.TransactionHistoryWithdrawalFee)</span>
+    @withdrawalFee.ToString()
+</div>

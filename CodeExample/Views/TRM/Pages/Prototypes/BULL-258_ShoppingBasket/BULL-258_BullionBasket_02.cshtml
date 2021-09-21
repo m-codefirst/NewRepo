@@ -1,0 +1,140 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    <div class="container">
+        @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    </div>
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+            @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    @*@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)*@
+    @*@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)*@
+
+</div>
+
+<div class="container bullion-basket">
+    <main class="col-xs-12">
+        <div class="header-wrapper">
+            <div class="page-header">
+                <h1>Your Basket</h1>
+            </div>
+        </div>
+
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+
+        <div class="row">
+            <div class="col-xs-2 hidden-xs">
+                @*<strong">Items to be delivered</strong>*@
+            </div>
+            <div class="col-xs-10 hidden-xs">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-3">
+                    <strong>Quantity</strong>
+                </div>
+                <div class="col-sm-2">
+                    <strong>Item Price</strong>
+                </div>
+                <div class="col-sm-2">
+                    <strong>Sub Total</strong>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <h3 class="h3 mt-0">Items to be delivered</h3>
+                <p class="text-silver"><span class="strong header-font-color">Delivered to your investment account address </span>- Investment purchases will only be delivered to your registered account address. Any amendments are to be requested via customer services on <a href="0161 946 0000">0161 946 0000</a> before checkout</p>
+            </div>
+        </div>
+        <!-- row starts here -->
+        @Html.Partial("ShoppingBasket/_BullionMixedBasket")
+
+        <div class="row">
+            <div class="col-xs-12 mt-1x">
+                <h3 class="h3">Items for storage at the royal mint</h3>
+                <p class="text-silver"><span class="strong header-font-color">Store in Vault </span>- Storage fees applied, to be paid quarterly! <i class="trmi trmi-question text-slateblue" data-toggle="tooltip" title="" data-original-title="We charge a monthly storage fee that is invoiced and debited from your wallet"></i></p>            </div>
+        </div>
+
+        @Html.Partial("ShoppingBasket/_BullionMixedBasket_01")
+        @Html.Partial("ShoppingBasket/_BullionMixedBasket_02")
+        @Html.Partial("ShoppingBasket/_BullionMixedBasket_03")
+        @Html.Partial("ShoppingBasket/_BullionMixedBasket_04")
+		<div class="row">
+			<div class="col-xs-12 col-sm-5 col-lg-4 mb-2x">
+				@*@Html.Partial("_Promotions")*@
+			</div>
+
+			<div class="col-xs-12 col-sm-7 col-lg-8">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-8 col-md-9 col-lg-10 text-right">
+								<strong>Basket Total<span class="mini-basket-vat mobile-basket-vat">:</span></strong>
+							</div>
+							<div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+								£1,850.00
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-8 col-md-9 col-lg-10 text-right">
+								<strong>VAT</strong>
+							</div>
+							<div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+								£470.00
+							</div>
+						</div>
+
+
+					</div>
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-8 col-md-9 col-lg-10 text-right">
+								<strong>Delivery:</strong>
+							</div>
+							<div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+								<span>calculated at checkout</span>
+							</div>
+						</div>
+
+					</div>
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-8 col-md-9 col-lg-10 text-right">
+								<strong>Total:</strong>
+							</div>
+							<div class="col-xs-4 col-md-3 col-lg-2 text-right ng-binding">
+								£88,799.22
+								<p class="basket-total-vat">(Inc VAT)</p>
+							</div>
+						</div>
+
+					</div>
+					<footer class="col-xs-12 mb-2x mt-2x">
+						<div class="row">
+							<div class="col-xs-6 pull-right">
+								<a class="btn btn-primary btn-block" href="">Checkout Now</a>
+							</div>
+						</div>
+					</footer>
+				</div>
+			</div>
+		</div>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </main>
+</div>

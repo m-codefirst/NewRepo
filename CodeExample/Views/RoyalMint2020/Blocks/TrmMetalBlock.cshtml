@@ -1,0 +1,168 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.Bullion.TrmMetalBlock
+
+@{
+    var elementId = Guid.NewGuid();
+    var tooltipFormatId = string.Format("{0}_Tooltip_Format", elementId);
+    var tooltip = string.Format("{0}_Tooltip", elementId);
+    var updatedTimeDesc = string.Format("{0}_UpdatedTimeDesc", elementId);
+}
+
+@functions {
+    private string GetIndicator(int upOrDown)
+    {
+        return upOrDown == 0 ? string.Empty : upOrDown > 0 ? "up" : "down";
+    }
+}
+
+@if (Model.ShouldDisplay && Model.TrmMetalBlockPartial != null && Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems != null && Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems.Any())
+{
+    <input type="hidden" id="@elementId" value="@Model.IntervalUpdateTime" />
+
+    <div class="metal-block bg-beige-light">
+        <div class="row justify-content-center">
+            <div class="col-12 metal-block-contents">
+                <div class="justify-content-center">
+                    <div class="bg-white p-2 p-md-0">
+                        <div class="col-12 metal-block-table col-container py-sm-3">
+                            <div class="metal-col col--sticky">
+                                <div class="p-2 metal-block-table__heading text-center">@Html.TranslateFallback(StringResources.TrmMetalBlockMetalLabel, "Metal")</div>
+                                @foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                                {
+                                    <div class="col pl-0 pr-0 metal-block-table__item row-item d-flex flex-row align-items-center"><span class="metal @item.Metal.Name.ToLower()"></span>@item.Metal.Name</div>
+                                }
+                            </div>
+
+                            <div class="metal-col">
+                                <div class="p-2 metal-block-table__heading text-center">@Html.TranslateFallback(StringResources.TrmMetalBlockBuyLabel, "Buy")</div>
+                                @foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                                {
+                                    if (Model.TrmMetalBlockPartial.DisplayBuy)
+                                    {
+                                        <div class="col p-2 metal-block-table__item row-item d-flex flex-column justify-content-center align-items-center">
+                                            <span>@item.BuyPriceChange.CurrentPrice.ToString()<span class="d-md-none">*</span><span class="d-none d-md-inline"> per oz</span></span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <div class="metal-col">
+                                <div class="p-2 metal-block-table__heading text-center">@Html.TranslateFallback(StringResources.TrmMetalBlockSellLabel, "Sell")</div>
+                                @foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                                {
+                                    if (Model.TrmMetalBlockPartial.DisplaySell)
+                                    {
+                                        <div class="col p-2 metal-block-table__item row-item d-flex flex-column justify-content-center align-items-center">
+                                            <span>@item.SellPriceChange.CurrentPrice.ToString()<span class="d-md-none">*</span><span class="d-none d-md-inline"> per oz</span></span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <div class="metal-col last-col">
+                                <div class="py-2 px-0 metal-block-table__heading text-center">@Html.TranslateFallback(StringResources.TrmMetalBlockChangeLabel, "Change")</div>
+                                @foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                                {
+                                    var upDownIndicator = @GetIndicator(item.BuyPriceChange.UpOrDown);
+
+                                    <div class="col p-2 metal-block-table__item row-item d-flex flex-column justify-content-center align-items-center">
+                                        <div class="value">
+                                            <span class="mr-1 @($"triangle-{@upDownIndicator}")" style="align-self: center"></span>
+                                            <span class="percentage @($"percentage--{@upDownIndicator}")" style="font-size: 18px">@item.BuyPriceChange.Percent%</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center metal-table-slider-circle-container bg-beige-light pt-1">
+                        <span id="metal-table-slider-1" class="metal-table-slider-circle active"></span>
+                        <span id="metal-table-slider-2" class="metal-table-slider-circle"></span>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center align-items-center mt-3">
+                        <div class="row justify-content-center bg-beige-light d-sm-none">
+                            <span style="font-size:14px">* per oz</span>
+                        </div>
+                        <div class="row justify-content-center bg-beige-light">
+                            <input id="@tooltipFormatId" type="hidden" value="@Model.Tooltip" />
+                            @if (Model.Tooltip != null)
+                            {
+                                <div style="font-size:14px">
+                                    <i id="@tooltip" class="trmi trmi-info mr-5 d-none" data-toggle="tooltip" data-placement="top" data-original-title="@Model.Tooltip.Replace("#datetime#", Model.TrmMetalBlockPartial.UpdatedTime)"></i>
+                                    <span id="@updatedTimeDesc" class="small-text">*@Model.Tooltip.Replace("#datetime#", Model.TrmMetalBlockPartial.UpdatedTime)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function docReady(fn) {
+                // see if DOM is already available
+                if (document.readyState === "complete" || document.readyState === "interactive") {
+                    // call on next available tick
+                    setTimeout(fn, 1);
+                } else {
+                    document.addEventListener("DOMContentLoaded", fn);
+                }
+            }
+            
+            function init() {
+                var circle1 = document.getElementById('metal-table-slider-1');
+                var circle2 = document.getElementById('metal-table-slider-2');
+
+                var tableContainer = document.getElementsByClassName('col-container')[0];
+
+                circle1.addEventListener('click', () => {
+                    tableContainer.scrollLeft = 0;
+                    circle1.classList.add("active");
+                    circle2.classList.remove("active");
+                });
+
+                circle2.addEventListener('click', () => {
+                    var maxScrollLeft = tableContainer.scrollWidth - tableContainer.clientWidth;
+                    tableContainer.scrollLeft = maxScrollLeft;
+                    circle2.classList.add("active");
+                    circle1.classList.remove("active");
+                });
+
+                const initObserver = () => {
+                    const lastCol = document.getElementsByClassName('last-col')[0];
+                    
+                    let observer = new IntersectionObserver((entries, observer) => {
+                        var sliderCircleContainer = document.getElementsByClassName('metal-table-slider-circle-container')[0];
+                        var style = getComputedStyle(sliderCircleContainer);
+
+                        if (style.display == 'none') return;
+
+                        entries.forEach(entry => {
+                            if (entry.target.classList.contains('last-col')) {
+                                if (entry.intersectionRatio > 0.9) {
+                                    circle2.classList.add("active");
+                                    circle1.classList.remove("active");
+                                }
+                                else {
+                                    circle1.classList.add("active");
+                                    circle2.classList.remove("active");
+                                }
+                            }
+                            
+                        });
+                    }, {threshold: [0.9]});
+                    
+                    observer.observe(lastCol);
+                }
+                initObserver();
+            }
+
+            docReady(init);
+        </script>
+    </div>
+
+    {
+        EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"TrmMetalPriceBlock.addBlockId('" + elementId + "')").AtFooter();
+    }
+}

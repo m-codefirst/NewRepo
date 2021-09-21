@@ -1,0 +1,10 @@
+﻿@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.FooterBlock
+
+@if (Model.DisplayPageHeading)
+{
+    <h6 @Html.Raw(!Model.DisplayHeadingBorder ? "class=\"no-border\"" : string.Empty)>@Html.PropertyFor(x => x.Heading)</h6>
+}
+
+@{ var content = Html.ParseXhtmlString(Model.Content); }
+@Html.PropertyFor(x => content)

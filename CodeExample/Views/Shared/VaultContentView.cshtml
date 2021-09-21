@@ -1,0 +1,123 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.VaultContentViewModel
+
+@{
+    var heading = Model.LegacyHeading ? @Html.TranslateFallback(StringResources.PortfolioVaultContentsHeader, "Your Vault Contents") : Model.Heading;
+}
+
+<div>
+    <h2 class="section-head section-head--xl"><span>@heading</span></h2>
+    <div class="mod-section vault-contents vault-contents-spacing">
+        <div class="row no-gutters justify-content-end sort mb-4">
+            <div class="col-12 col-md-6 col-lg-5 col-xl-4">
+                <form class="d-flex justify-content-end align-items-center" action="./" method="post">
+                    <label for="filterType" class="d-block d-md-inline-block mr-1 mb-0 font-weight-bold" style="text-transform:none">@Html.TranslateFallback(StringResources.PortfolioFilterByLabel, "Filter by"):</label>
+                    <select id="filterType" class="form-control custom-select" style="border: none">
+                        <option value="-1" selected="">All</option>
+                        <option value="01" disabled>Category</option>
+                        @foreach (var category in Model.CategoriesFilter)
+                        {
+                            <option value="@category.Key" data-type="metalCategory">- @category.Value</option>
+                        }
+                        <option value="05" disabled>Metal</option>
+                        @foreach (var metal in Model.MetalTypesFilter)
+                        {
+                            <option value="@metal.Key" data-type="metalType">- @metal.Value</option>
+                        }
+                    </select>
+                </form>
+            </div>
+        </div><!-- /.sort -->
+
+        <div class="row no-gutters d-none d-lg-flex align-items-end headings font-weight-bold p-lg-1 pr-lg-2 border-1-solid-e2e2e2">
+            <div class="col-5"><span class="ml-n1">@Html.TranslateFallback(StringResources.PortfolioColumnHeader1Label, "Item")</span></div>
+            <div class="col-2 text-lg-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader2Label, "Quantity")</div>
+            <div class="col-3 text-lg-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader3Label, "Valuation")</div>
+            <div class="col-2 text-lg-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader4Label, "Actions")</div>
+        </div>
+        <div class="items">
+            @if (Model != null && Model.PortfolioVariantItems != null && Model.PortfolioVariantItems.Any())
+            {
+                foreach (var item in Model.PortfolioVariantItems)
+                {
+
+                    var upOrDownColor = item.DifferencePrice < 0 ? "#e1261c" : item.DifferencePrice > 0 ? "#28a745" : "inherit";
+
+                    <div class="product-item row no-gutters mb-2 mb-lg-1 p-lg-1 pr-lg-2" data-bullionType="@((int)item.BullionType)" data-metalType="@((int)item.MetalType)">
+                        <div class="col-12 col-lg-5">
+                            <div class="product d-flex align-items-start align-items-sm-center">
+                                <a href="@item.EntryUrl" class="asset fluid-image">
+                                    <img src="@item.ImageUrl" alt="">
+                                </a>
+                                <div class="details">
+                                    <p class="product-name"><a class="text-decoration-none" href="@item.EntryUrl">@item.DisplayName</a></p>
+                                    <p class="product-auxiliary">@item.SubDisplayName</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5 col-sm-5 col-lg-2 text-center text-sm-left quantity text-lg-center">
+                            <span class="label mt-1 d-lg-none font-weight-bold">@Html.TranslateFallback(StringResources.PortfolioColumnHeader2Label, "Quantity")</span>
+                            @if (item.BullionType == Enums.BullionVariantType.Signature)
+                            {
+                                @(string.Format("{0} oz", item.TotalWeightInVault));
+                            }
+                            else
+                            {
+                                @((int)item.QuantityInVault);
+                            }
+                        </div>
+                        <div class="col-7 col-sm-7 col-lg-3 valuation text-center text-sm-left text-lg-center">
+                            <span class="label mt-1 d-lg-none font-weight-bold">@Html.TranslateFallback(StringResources.PortfolioColumnHeader3Label, "Valuation")</span>
+                            <span class="d-block">@item.CurrentPrice.ToString()</span>
+                            <small><span style="color:@upOrDownColor">@item.DifferencePrice.ToString() (@item.DifferencePercentage.ToString("N")%) </span><span class="help-popover" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Html.TranslateFallback(StringResources.PortfolioChangeInValueLabel, "Change in value since purchase")" data-original-title="" title=""><span class="icon"><svg><use xlink:href="#help" /></svg></span></span></small>
+                        </div>
+                        <div class="col-12 col-lg-2 actions">
+                            <div class="form-row btns mb-0">
+                                @if (item.CanSellBack && !Model.ShowNeedConfirmKyc)
+                                {
+                                    <div class="col-12 col-sm-12 col-lg-12">
+                                        <a href="@string.Format("{0}?code={1}", Model.SellBackUrl, item.VariantCode)" class="btn btn-secondary">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</a>
+                                    </div>
+                                }
+
+                                @if (item.CanDeliver && !Model.ShowNeedConfirmKyc)
+                                {
+                                    <div class="col-12 col-sm-12 col-lg-12">
+                                        <a href="@string.Format("{0}?code={1}", Model.DeliverFromVaultUrl, item.VariantCode)" class="btn btn-primary">@Html.TranslateFallback(StringResources.PortfolioDeliveryToMeButtonLabel, "Deliver to me")</a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div>
+                    <p class="text-center">@Html.TranslateFallback(StringResources.NoItemData, "There are no items")</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $('#filterType').change(function (e) {
+                var $this = $(this);
+                var selectedVal = $this.val();
+                var selectedType = $this.find('option:selected').data('type');
+                if (selectedVal && selectedVal != -1) {
+                    if (selectedType == 'metalCategory') {
+                        $('.product-item').addClass('d-none');
+                        $(".product-item[data-bulliontype='" + selectedVal + "']").removeClass('d-none');
+                    } else {
+                        $('.product-item').addClass('d-none');
+                        $(".product-item[data-metaltype='" + selectedVal + "']").removeClass('d-none');
+                    }
+                } else {
+                    $('.product-item').removeClass('d-none');
+                }
+            });
+        })
+</script>
+<!-- /.vault-content -->

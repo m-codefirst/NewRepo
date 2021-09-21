@@ -1,0 +1,74 @@
+﻿@using TRM.Web.Models.ViewModels.Bullion
+@using Castle.Core.Internal
+@using TRM.Shared.Extensions 
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+
+@helper RenderOrderLineItemTitle(TransactionHistoryOrderLineItemViewModel orderline)
+{
+    if (orderline.IsSignatureVariant)
+    {
+        var quantityString = string.Format(" - {0} oz", orderline.QuantityInOz);
+        <a href="@Url.ContentUrlExtension(orderline.Reference)">@orderline.Name </a> @quantityString
+    }
+    else
+    {
+        var quantityString = string.Format("{0} x", orderline.Quantity);
+        @quantityString <a href="@Url.ContentUrlExtension(orderline.Reference)">@orderline.Name</a>
+    }
+}
+
+@if (!Model.Value.MoreDetailCollection.IsNullOrEmpty())
+{
+    var columnnIdx = 0;
+    <div id="collapse-@Model.Key" class="collapse" aria-labelledby="headingOne" style="">
+        <div class="card-body">
+            <div class="row justify-content-center">
+
+                @foreach (var item in Model.Value.MoreDetailCollection)
+                {
+                    columnnIdx++;
+
+                    if (columnnIdx != 3)
+                    {
+                        <div class="col-xs-6 @(columnnIdx==1?"col-sm-2":"col-sm-3")">
+                            <p class=" mt-0 mb-0 text-uppercase">@item.Key</p>
+                            <p class=" mt-0 mb-0">@item.Value</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="row">
+                                <p class="col-xs-12 mt-0 mb-0">@item.Key</p>
+                                @if (item.Value is string)
+                                {
+                                    <p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">@item.Value</p>
+                                }
+                                else if (item.Value is TransactionHistoryOrderDetailViewModel)
+                                {
+                                    var orderLIneItemViewModel = item.Value as TransactionHistoryOrderDetailViewModel;
+                                    <p class="col-xs-6 col-sm-8 mt-0 mb-1x pr-sm-up-3x">@orderLIneItemViewModel.DeliveryType</p>
+                                    <div class="clearfix"></div>
+                                    if (!orderLIneItemViewModel.OrderLineViewModels.IsNullOrEmpty())
+                                    {
+                                        foreach (var orderline in orderLIneItemViewModel.OrderLineViewModels)
+                                        {
+                                            <p class="col-xs-6 col-sm-8 mt-0 mb-0">
+                                                @RenderOrderLineItemTitle(orderline)
+                                            </p>
+                                            <p class="col-xs-6 col-sm-4 mt-0 mb-0">
+                                                @orderline.Status
+                                            </p>
+                                            <div class="clearfix"></div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+}

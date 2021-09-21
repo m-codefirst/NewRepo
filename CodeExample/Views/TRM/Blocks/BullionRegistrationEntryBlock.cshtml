@@ -1,0 +1,55 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Shared.Extensions
+
+@model TRM.Web.Models.Blocks.Bullion.BullionRegistrationEntryBlock
+@{
+    var contentGuid = Guid.NewGuid();
+}
+
+<div class="banner-bg block-background">
+    @if (Model.BackgroundImage != null)
+    {
+        <picture>
+            <source media="(min-width: 1200px)" data-srcset="@Url.ContentUrlExtension(Model.BackgroundImage)" srcset="@Url.ContentUrlExtension(Model.BackgroundImage)">
+            <img class="lazy" data-src="@Url.ContentUrlExtension(Model.BackgroundImage)" src="@Url.ContentUrlExtension(Model.BackgroundImage)">
+        </picture>
+    }
+</div>
+<div class="block-container @(Model.BackgroundImage == null ? Model.BackgroundColour.DescriptionAttr() : "") @Model.ContentCopyColour.DescriptionAttr()">
+    <div class="blockContent content-leftmiddle p-@Model.Padding.DescriptionAttr()">
+        <div class="overlay">
+            <form action="" method="post" id="registrationentryblock_@contentGuid" class="registrationentryblock">
+                <div class="row">
+                    <div class="col-xs-12">
+                        @Html.PropertyFor(x => x.ContentCopy)
+                    </div>
+                </div>
+                <div class="row mb-1x">
+                    <div class="block-input">
+                        <div class="form-group">
+                            <input class="form-control" type="email" id="registrationEntryBlockEmail_@contentGuid" name="email" placeholder="@Url.ContentUrlExtension(Model.EmailPlaceHolder)">
+                            <div class="hide bold text-warm-red invalidMessage" id="invalidMessage_@contentGuid">@Html.TranslateFallback(StringResources.InvalidEmail, StringConstants.TranslationFallback.InvalidEmail)</div>
+                        </div>
+                    </div>
+                    <div class="block-btn">
+                        <button onclick="BullionRegistration.getStart('@contentGuid');" class="btn-white-ww @Model.GetStartButtonColour.DescriptionAttr() btn-block btn-submit" type="button">
+                            @Html.PropertyFor(x => x.GetStartButtonText)
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <a href="#navSectionAccount" class="bold nav-toggle @Model.LoginButtonTextColour.DescriptionAttr()">@Html.PropertyFor(x => x.LoginButtonText)</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "eventEmitter").AtHeader();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"var emitter; if(typeof emitter === 'undefined'){emitter = new eventEmitter();}").AtHeader();
+}

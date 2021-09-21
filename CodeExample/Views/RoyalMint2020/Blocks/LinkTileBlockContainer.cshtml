@@ -1,0 +1,10 @@
+﻿@using TRM.Web.Models.Blocks
+@model LinkTileBlockContainer
+
+@if (!String.IsNullOrEmpty(Model.Heading)) {
+<h2 class="section-head section-head--xl"><span>@Model.Heading</span></h2>
+}
+
+<div class="row justify-content-center your-funds">
+    @Html.PropertyFor(x => x.LinkTiles)
+</div>

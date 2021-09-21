@@ -1,0 +1,127 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+
+    <!-- BULL-147 - Bullion Registration Step 1b - Account Details -->
+        <div class="container mb-4x mt-2x">
+            
+            <!-- Step bar -->
+            <ol class="nav nav-bar nav-progress-bar mb-2x">
+                <li class="active"><a href="/prototypes/bullion/registration/populated/AccountDetails_01a/">1.&nbsp;<span>Account Details</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/populated/PersonalDetails_02/">2.&nbsp;<span>Personal Details</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/populated/VerifyYourIdentity_03a/">3.&nbsp;<span>Verify your identity</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/populated/SecurityQuestion_04/">4.&nbsp;<span>Security Question</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/populated/ApplicationSuccessful_05/" class="text-nowrap">5.&nbsp;<span>Application Successful</span>&nbsp;</a></li>
+            </ol>
+            <!-- / Step bar -->
+            <!-- Sub Headline -->
+            @if (Model.CurrentPage.DisplayPageHeading)
+            {
+                <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+            }
+            <!-- / Sub Headline -->            
+            
+            <!-- Content Area -->
+            @*<div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>*@
+            <!-- / Content Area -->
+            
+            <!-- Form -->
+            <main class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+                    <div class="form-group">
+                        <label class="control-label" for="">
+                            E-mail
+                            <span class="">*</span>
+                            @*<small class="text-greyblue">(Please enter your email address)</small>*@
+                        </label>
+                        <input type="text" class="form-control" id="" placeholder="Enter your email address here" value="Max@Mustermann.de" data-original-title="" title="">
+                        <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="">
+                            Password
+                            <span class="text-danger">*</span>
+                            <small class="text-greyblue">(Please enter a secure password that's unique to you)</small>
+                        </label>
+                        <input type="text" class="form-control" id="" placeholder="Enter a secure password that's unique to you here" data-original-title="" title="">
+                    </div>
+
+                    <p>
+                        We would like to keep you up to date with information about our competitions, products, services,
+                        offers and news that may interest you – if thats of please select the box below.
+                        By doing so you are acknoledging that you are above the age of 16 and consent to being contacted
+                        in the manner described.
+                    </p>
+
+                    <div class="mt-2x">
+                        <div class="pull-left">
+                            <!-- Due to from the second child checkbox gets a -5px margin I cannot override -->
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="checkbox__email" title="" class="" style="">
+                                <label class="" for="checkbox__email">
+                                    By email
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="checkbox__post" title="" class="" style="">
+                                <label class="" for="checkbox__post">
+                                    By post
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="checkbox__phone" title="" class="" style="">
+                                <label class="" for="checkbox__phone">
+                                    By phone
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="checkbox small fancy clear">
+                            <input type="checkbox" name="" value="" id="checkbox__terms" title="" class="" style="">
+                            <label class="" for="checkbox__terms">
+                                Please tick to confirm you have read The Royal Mint's
+                                <a href="#" class="text-nowrap">Terms & Conditions</a>
+                                and
+                                <a href="#" class="text-nowrap">Privacy and Cookies Policy</a>.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- toolbar -->
+                <div class="col-xs-12 mb-2x">
+                    <a href="#" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                    <a href="/prototypes/bullion/registration/populated/PersonalDetails_02/" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+                </div>
+                <!-- / toolbar -->
+            </main>
+            <!-- / Form -->            
+            
+                <!-- Content Area -->
+            @*<div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>*@
+                <!-- / Content Area -->
+
+            <!-- / BULL-147 - Bullion Registration Step 1b - Account Details -->
+
+        </div>
+
+    </div>

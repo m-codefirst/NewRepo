@@ -1,0 +1,31 @@
+﻿@using Mediachase.Commerce
+@using TRM.Web.Constants
+
+@model KeyValuePair<int, TRM.Web.Models.ViewModels.Bullion.TransactionHistoryItemViewModel>
+
+<div class="col-lg-3">
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistorySubmittedBy, StringConstants.TranslationFallback.TransactionHistorySubmittedBy)</span>
+    @Model.Value.SubmittedBy
+</div>
+
+<div class="col-lg-3">
+    <div class="p-0 mb-2">
+        <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryReferenceNumber, StringConstants.TranslationFallback.TransactionHistoryReferenceNumber)</span>
+        <span>@Model.Value.TransactionRecord.OrderNumber</span>
+    </div>
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryOrderDelivery, StringConstants.TranslationFallback.TransactionHistoryOrderDelivery)</span>
+    @Model.Value.DeliveryFee.ToString()
+</div>
+
+<div class="col-lg-6">
+    <span class="title">@Html.TranslateFallback(StringResources.TransactionHistoryOrderSummary, StringConstants.TranslationFallback.TransactionHistoryOrderSummary)</span>
+
+    @foreach (var prod in Model.Value.OrderDetailViewModel.OrderLineViewModels)
+    {
+        <ul class="summary">
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderProduct, StringConstants.TranslationFallback.TransactionHistoryOrderProduct): @prod.Name</li>
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryQuantity, StringConstants.TranslationFallback.TransactionHistoryQuantity): @prod.Quantity</li>
+            <li>@Html.TranslateFallback(StringResources.TransactionHistoryOrderStatus, StringConstants.TranslationFallback.TransactionHistoryOrderStatus): @prod.Status</li>
+        </ul>
+    }
+</div>

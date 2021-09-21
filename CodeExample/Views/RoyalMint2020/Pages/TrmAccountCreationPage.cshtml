@@ -1,0 +1,530 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using EPiServer.ServiceLocation
+@using TRM.Web.Helpers
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TRMAccountCreationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.TrmAccountCreationPageViewModel>
+
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var recaptchaHelper = ServiceLocator.Current.GetInstance<IGoogleRecaptchaHelper>();
+
+}
+
+@functions
+{
+
+    public bool FieldHasErrors(string fieldName)
+    {
+        return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+    }
+
+}
+
+@helper ErrorMessage(MvcHtmlString error)
+    {
+        <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+        <span class="help-block">
+            @error
+        </span>
+}
+
+@helper PasswordErrorMessage(MvcHtmlString error)
+    {
+        <span class="help-block">
+            @error
+        </span>
+}
+
+
+@if (!string.IsNullOrWhiteSpace(myLayout.PostcodeAnywhereLicense))
+{
+    <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@myLayout.PostcodeAnywhereLicense" />
+    <script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@myLayout.PostcodeAnywhereLicense"></script>
+}
+
+@{ string feedbackClass = "has-error has-feedback"; }
+
+<main class="container mb-4x">
+    <div class="page-header">
+        <h1>@Html.PropertyFor(a => a.CurrentPage.PageHeading)</h1>
+    </div>
+    <div class="row">
+        @if (Model.CurrentPage.ActivateAccountEditorial != null)
+        {
+            <aside class="col-xs-12 col-md-4 pull-right-md-up">
+                <div class="row" id="activateBlock">
+                    <div class="block containerBlock col-xs-12 pt-2x">
+                        <div class="block-background bg-lightgray"></div>
+                        <div class="blockContent">
+                            <div class="row">
+                                @Html.DisplayFor(a => a.CurrentPage.ActivateAccountEditorial)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        }
+        @using (Html.BeginForm("Index", null, FormMethod.Post, new { @class = "form-horizontal col-xs-12 col-sm-10 col-md-8", @ng_controller = "FormController", name = "registrationForm", id = "registrationForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <!-- lass="form-horizontal col-xs-12 col-sm-10 col-md-8" ng-controller="FormController" -->
+            <h3 class="mt-0">@Html.PropertyFor(a => a.CurrentPage.AboutYouHeading)</h3>
+
+            var thisFeedbackClass = string.Empty;
+
+            if (FieldHasErrors("viewModel.Title"))
+            {
+                thisFeedbackClass = feedbackClass;
+            }
+
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 control-label" for="formGroupInputLarge">@Html.PropertyFor(a => a.CurrentPage.TitleLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-4 col-md-3">
+                    <div class="select-form">
+                        @Html.DropDownListFor(x => x.ViewModel.Title, new SelectList(Model.ViewModel.TitleList), new { @class = "form-control", name = "Title", data_required = "true", data_notequal = "Select" })
+                    </div>
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @PasswordErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.Title))
+                    }
+                </div>
+            </div>
+            thisFeedbackClass = string.Empty;
+
+            if (FieldHasErrors("viewModel.FirstName"))
+            {
+                thisFeedbackClass = feedbackClass;
+            }
+
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 control-label" for="registerFName">@Html.PropertyFor(a => a.CurrentPage.FirstNameLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.TextBoxFor(x => x.ViewModel.FirstName, new { @class = "form-control", @id = "registerFName", @name = "FirstName", data_required = "true", data_notequal = "" })
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.FirstName))
+                    }
+                </div>
+            </div>
+
+            thisFeedbackClass = string.Empty;
+
+            if (FieldHasErrors("viewModel.LastName"))
+            {
+                thisFeedbackClass = feedbackClass;
+            }
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 control-label" for="registerSurname">@Html.PropertyFor(a => a.CurrentPage.LastNameLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.TextBoxFor(x => x.ViewModel.LastName, new { @class = "form-control", id = "registerSurname", data_required = "true", data_notequal = "" })
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.LastName))
+                    }
+                </div>
+            </div>
+
+            thisFeedbackClass = string.Empty;
+
+            if (FieldHasErrors("viewModel.DateOfBirth"))
+            {
+                thisFeedbackClass = feedbackClass;
+            }
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 control-label" for="dobDay">@Html.PropertyFor(a => a.CurrentPage.DateOfBirthLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <div class="select-form dob">
+                                @Html.DropDownListFor(x => x.ViewModel.DateOfBirthDay, new SelectList(Model.ViewModel.DayList), new { @class = "form-control", @name = "dobDay", data_required = "true", data_notequal = "Day" })
+                            </div>
+                        </div>
+
+                        <div class="col-xs-4">
+                            <div class="select-form dob">
+                                @Html.DropDownListFor(x => x.ViewModel.DateOfBirthMonth, new SelectList(Model.ViewModel.MonthList), new { @class = "form-control", @name = "dobMonth", data_required = "true", data_notequal = "Month" })
+                            </div>
+                        </div>
+
+                        <div class="col-xs-4">
+                            <div class="select-form dob">
+                                @Html.DropDownListFor(x => x.ViewModel.DateOfBirthYear, new SelectList(Model.ViewModel.YearList), new { @class = "form-control", @name = "dobYear", data_required = "true", data_notequal = "Year" })
+                            </div>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @PasswordErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.DateOfBirth))
+                    }
+                </div>
+            </div>
+            <h3>@Html.PropertyFor(a => a.CurrentPage.AccountAddressHeading)</h3>
+            <div ng-controller="rmCheckoutController as rmAddInfo" ng-cloak>
+                <div>
+                    <div ng-cloak>
+                        @{
+
+                            thisFeedbackClass = string.Empty;
+                            if (FieldHasErrors("viewModel.PostalCode"))
+                            {
+                                thisFeedbackClass = feedbackClass;
+                            }
+                        }
+
+                        <div class="form-group @thisFeedbackClass" ng-init="setupAddress('@(Model.ViewModel.AddressLine1)', '@(Model.ViewModel.AddressLine2)', '@(Model.ViewModel.County)', '@(Model.ViewModel.City)', '@(Model.ViewModel.PostalCode)', '@(Model.ViewModel.CountryCode)', '@(Model.ViewModel.Telephone)', '')"
+                             ng-hide="manualAddress == true">
+
+                            <label class="col-sm-4 col-md-3 control-label" for="checkoutFName">Post/Zip Code&nbsp;<span class="text-danger">*</span></label>
+                            <div class="col-sm-8 col-md-7">
+                                <input type="text" class="form-control pcaPredictInput" name="inputPCAnywhere" id="inputPCAnywhere" ng-model="Postcode" placeholder="Post/Zip Code" capitalize = "">
+                                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                {
+                                    @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.PostalCode))
+                                }
+
+                                @if (FieldHasErrors("viewModel.AddressLine1") ||
+                                     FieldHasErrors("viewModel.City"))
+                                {
+                                    <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+                                    <div class="has-error">
+                                        <span class="help-block">
+                                            <span class="field-validation-error">@Html.TranslateFallBack(TRM.Shared.Constants.StringResources.AddressIncomplete, "Address is incomplete, please enter manually")</span>
+                                        </span>
+                                    </div>
+                                }
+                                <input type="hidden" name="registerAddressLine1" id="registerAddressLine1"/>
+                                <input type="hidden" name="registerAddressLine2" id="registerAddressLine2" />
+                                <input type="hidden" name="registerAddressLine5" id="registerAddressLine5" />
+                                <input type="hidden" name="registerCity" id="registerCity" />
+                                <input type="hidden" name="registerPCode" id="registerPCode" />
+                            </div>
+                        </div>
+                        <div class="form-group" ng-hide="manualAddress == true">
+                            <div class="col-xs-12 col-sm-8 col-md-9 col-sm-push-4 col-md-push-3">
+                                <a class="" href="javascript:;" ng-click="manualAddress = true; selectedAddress = []">Enter Manually</a>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="manualAddress == true" ng-cloak>
+                            <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                                <a class="" href="javascript:;" ng-click="manualAddress = false">Cancel</a>
+                            </div>
+                        </div>
+                        <div ng-hide="manualAddress == false">
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.AddressLine1"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+                            <div class="form-group @thisFeedbackClass">
+                                <label class="col-sm-4 col-md-3" for="manDelAdd1">@Html.PropertyFor(a => a.CurrentPage.Address1Label)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.TextBoxFor(x => x.ViewModel.AddressLine1, new { @class = "form-control", ng_model = "AddressLine1", data_required = "true", data_notequal = "" })
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.AddressLine1))
+                                    }
+                                </div>
+
+
+                            </div>
+
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.AddressLine2"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+
+                            <div class="form-group @thisFeedbackClass">
+                                <label class="col-sm-3" for="manDelAdd2">@Html.PropertyFor(a => a.CurrentPage.Address2Label)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.TextBoxFor(x => x.ViewModel.AddressLine2, new { @class = "form-control", ng_model = "AddressLine2" })
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.AddressLine2))
+                                    }
+                                </div>
+                            </div>
+
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.County"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+
+                            <div class="form-group @thisFeedbackClass">
+                                <label class="col-sm-3" for="manDelAddCounty">@Html.PropertyFor(a => a.CurrentPage.Address3Label)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.TextBoxFor(x => x.ViewModel.County, new { @class = "form-control", ng_model = "AddressLine5" })
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.County))
+                                    }
+                                </div>
+                            </div>
+
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.City"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+                            <div class="form-group @thisFeedbackClass">
+                                <label class="col-sm-3" for="manDelCounty">@Html.PropertyFor(a => a.CurrentPage.CityLabel)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.TextBoxFor(x => x.ViewModel.City, new { @class = "form-control", ng_model = "Town", data_required = "true", data_notequal = "" })
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.City))
+                                    }
+                                </div>
+                            </div>
+
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.PostalCode"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+                            <div class="form-group @thisFeedbackClass" ng-class="{'has-error':registrationForm['ViewModel.PostalCode'].$invalid}">
+                                <label class="col-sm-3" for="manDelPostcode">@Html.PropertyFor(a => a.CurrentPage.PostcodeLabel)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.TextBoxFor(x => x.ViewModel.PostalCode, new { @class = "form-control", @ng_model = "Postcode", @ng_blur = "checkPostCodeFormat(CountryCode)", @postcode_disable = "!manualAddress", @postcode_validator = "CountryCode", @capitalize = "" })
+                                    <span class="help-block" ng-show="registrationForm['ViewModel.PostalCode'].$invalid && registrationForm['ViewModel.PostalCode'].$dirty">@Html.TranslateFallback(StringResources.InvalidPostcode, "Postcode is invalid")</span>
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.PostalCode))
+                                    }
+                                </div>
+                            </div>
+
+                            @{
+                                thisFeedbackClass = string.Empty;
+                                if (FieldHasErrors("viewModel.CountryCode"))
+                                {
+                                    thisFeedbackClass = feedbackClass;
+                                }
+                            }
+
+                            <div class="form-group">
+                                <label class="col-sm-3" for="manDelCountry">@Html.PropertyFor(a => a.CurrentPage.CountryLabel)</label>
+                                <div class="col-sm-8 col-md-7">
+                                    @Html.DropDownListFor(m => m.ViewModel.CountryCode, new SelectList(Model.ViewModel.CountryList, "Key", "Value", Model.ViewModel.CountryCode), "Select", new { @id="countryCode", @class = "form-control", @ng_model = "CountryCode" })
+                                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                                    {
+                                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.CountryCode))
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div ng-show="hasSelectedAddress" ng-cloak>
+                            <div class="form-group">
+                                <div class="col-xs-12 col-sm-9 col-md-7 col-sm-push-3">
+                                    <h5>@Html.TranslateFallback(StringResources.YourDeliveryAddress, "Your delivery address")</h5>
+                                    <div class="panel panel-default mb-0">
+                                        <div class="panel-body">
+                                            {{AddressLine1}}<br ng-if="AddressLine1">
+                                            {{AddressLine2}}<br ng-if="AddressLine2">
+                                            {{AddressLine3}}<br ng-if="AddressLine3">
+                                            {{AddressLine4}}<br ng-if="AddressLine4">
+                                            {{Town}}<br ng-if="Town">
+                                            {{AddressLine5}}<br ng-if="AddressLine5">
+
+                                            {{Postcode}}<br ng-if="Postcode">
+                                            {{Country}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @{
+                    thisFeedbackClass = string.Empty;
+
+                    if (FieldHasErrors("viewModel.Telephone"))
+                    {
+                        thisFeedbackClass = feedbackClass;
+                    }
+                }
+                <div class="form-group @thisFeedbackClass">
+                    <label class="col-sm-4 col-md-3 clear control-label" for="registerTel">@Html.PropertyFor(a => a.CurrentPage.TelephoneLabel) <span class="text-danger">*</span></label>
+                    <div class="col-sm-8 col-md-7">
+                        @Html.TextBoxFor(x => x.ViewModel.Telephone, new { @class = "form-control", id = "registerTel", data_required = "true", data_notequal = "", @ng_model = "Telephone", @phonecharacter = "" })
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.Telephone))
+                        }
+                    </div>
+                </div>
+            </div>
+            thisFeedbackClass = string.Empty;
+            if (Model.ViewModel.Errors.Count > 0 || FieldHasErrors("viewModel.EmailAddress"))
+            {
+                thisFeedbackClass = "has-error has-feedback";
+            }
+            <div class="form-group @thisFeedbackClass">
+                <!--has-success has-feedback-->
+                <label class="col-sm-4 col-md-3 control-label" for="registerEmail">@Html.PropertyFor(a => a.CurrentPage.EmailLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.TextBoxFor(x => x.ViewModel.EmailAddress, new { @class = "form-control", id = "registerEmail", data_required = "true", data_notequal = "" })
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddress))
+                    }
+                    @if (Model.ViewModel.Errors.Count > 0 && !FieldHasErrors("viewModel.EmailAddress"))
+                    {
+                        <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+                    }
+                    @foreach (var error in Model.ViewModel.Errors)
+                    {
+                        <span class="help-block">
+                            @error
+                        </span>
+                    }
+                </div>
+            </div>
+            thisFeedbackClass = string.Empty;
+            if (FieldHasErrors("viewModel.EmailAddress2"))
+            {
+                thisFeedbackClass = "has-error has-feedback";
+            }
+            <div class="form-group @thisFeedbackClass">
+                <!--has-error has-feedback-->
+                <label class="col-sm-4 col-md-3 control-label" for="registerEmail2">@Html.PropertyFor(a => a.CurrentPage.ConfirmEmailLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.TextBoxFor(x => x.ViewModel.EmailAddress2, new { @class = "form-control", id = "confirmEmail", data_required = "true", data_notequal = "" })
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddress2))
+                    }
+                </div>
+            </div>
+            thisFeedbackClass = string.Empty;
+            if (FieldHasErrors("viewModel.Password1"))
+            {
+                thisFeedbackClass = "has-error has-feedback";
+            }
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 control-label" for="registerUsrPW1-main">@Html.PropertyFor(a => a.CurrentPage.PasswordLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.PasswordFor(x => x.ViewModel.Password1, new { @class = "form-control ok-password", @id = "registerUsrPW1-main", @ng_model = "password", data_required = "true", data_notequal = "" })
+                    <div class="label password-count" ng-class="password.length > 7 ? 'label-success' : 'label-danger'" ng-show="password.length > 0" ng-cloak>{{pwStrengthLabel}} ({{ password | passwordCount:7 }})</div>
+                    <div class="strength-meter" ng-show="password.length > 0" ng-cloak>
+                        <div class="strength-meter-fill" data-strength="{{passwordStrength}}"></div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @PasswordErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.Password1))
+                    }
+                </div>
+            </div>
+            thisFeedbackClass = string.Empty;
+            if (FieldHasErrors("viewModel.Password2"))
+            {
+                thisFeedbackClass = "has-error has-feedback";
+            }
+            <div class="form-group @thisFeedbackClass">
+                <label class="col-sm-4 col-md-3 clear control-label" for="registerPassword">@Html.PropertyFor(a => a.CurrentPage.ConfirmPasswordLabel) <span class="text-danger">*</span></label>
+                <div class="col-sm-8 col-md-7">
+                    @Html.PasswordFor(x => x.ViewModel.Password2, new { @class = "form-control", id = "registerPassword2", data_required = "true", data_notequal = "" })
+                    @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                    {
+                        @PasswordErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.Password2))
+                    }
+                    <p class="mb-0">@Html.TranslateFallback(StringResources.PasswordRequirements, "Password info - Your password should include at least one uppercase alpha numeric character, one number and one character and a minimum length of 8 characters")</p>
+                </div>
+            </div>
+            <div>
+            </div>
+            <div class="form-group mb-2x">
+                <div class="col-xs-12 col-sm-9 col-sm-push-3">
+
+                    <div class="wysiwyg mb-1x">
+                        <p>@Html.TranslateFallback(StringResources.CustomerContactPreferences, "Please tick if to ensure you are contacted regarding special offers and exclusive coin launch information direct from The Royal Mint")</p>
+                    </div>
+
+                    <div class="checkbox fancy checkbox-inline">
+                        @Html.CheckBoxFor(a => a.ViewModel.ByEmail, new { @id = "registerContactEmail" })
+                        <label class="" for="registerContactEmail">
+                            @Html.PropertyFor(a => a.CurrentPage.ByEmailLabel)
+                        </label>
+                    </div>
+                    <div class="checkbox fancy checkbox-inline">
+                        @Html.CheckBoxFor(a => a.ViewModel.ByPost, new { @id = "registerContactPost" })
+                        <label class="checkbox-inline" for="registerContactPost">
+                            @Html.PropertyFor(a => a.CurrentPage.ByPostLabel)
+                        </label>
+                    </div>
+                    <div class="checkbox fancy checkbox-inline">
+                        @Html.CheckBoxFor(a => a.ViewModel.ByTelephone, new { @id = "registerContactPhone" })
+                        <label class="checkbox-inline" for="registerContactPhone">
+                            @Html.PropertyFor(a => a.CurrentPage.ByTelephoneLabel)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            Html.RenderPartial("_AccountOptionsOutWarning", Model.CurrentPage);
+            thisFeedbackClass = string.Empty;
+            if (FieldHasErrors("viewModel.AcceptTnC"))
+            {
+                thisFeedbackClass = "has-error has-feedback";
+            }
+            <div class="form-group mb-2x @thisFeedbackClass">
+                <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                    <div class="checkbox small fancy">
+                        @Html.CheckBoxFor(a => a.ViewModel.AcceptTnC, new { @id = "tandcs", data_required = "true", data_notequal = "true" })
+                        <label class="" for="tandcs">
+                            @Html.PropertyFor(a => a.CurrentPage.TermsAndConditionsContent)
+                        </label>
+                        @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                        {
+                            @ErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.AcceptTnC))
+                        }
+                    </div>
+                </div>
+            </div>
+
+            if (recaptchaHelper.IsEnabled())
+            {
+                <div class="form-group @thisFeedbackClass @(!string.IsNullOrEmpty(Model.ViewModel.RecaptchaVerificationErrors)?"has-error":"")">
+                    <label class="col-sm-4 col-md-3 clear control-label"></label>
+                    <div class="col-sm-8 col-md-7">
+                        <div id="registrationRecaptcha"></div>
+                        @if (!string.IsNullOrEmpty(Model.ViewModel.RecaptchaVerificationErrors))
+                        {
+                            <span class="help-block">
+                                <span class="field-validation-error" >@Html.Raw(Model.ViewModel.RecaptchaVerificationErrors)</span>
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                    <button disableonclick type="submit" onclick="return RegistrationPage.gdprFieldsValidation();" class="btn btn-primary">@Html.PropertyFor(a => a.CurrentPage.RegisterButtonText)</button>
+                </div>
+            </div>
+
+        }
+
+    </div>
+</main>

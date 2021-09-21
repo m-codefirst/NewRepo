@@ -1,0 +1,100 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Helpers
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+<a class="btn touchnav-toggle pull-right hidden-md hidden-lg menu-bars">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</a>
+<nav class="rm-navbar-container pull-right">
+    <div class="button-group pull-right-md-up text-right">
+        @{
+            if (!Model.HideMegaMenuAndSearch)
+            {
+                <a class="btn hidden-md hidden-lg nav-toggle nav-active" href="#navSectionNav"><i class="trmi trmi-menu"></i></a>
+                //<a class="btn nav-toggle" href="#navSectionSearch"><i class="trmi trmi-search"></i></a>
+            }
+        }
+        @if (!Model.HideUserAndMiniBasketFromHeader)
+        {
+            if (Request.IsAuthenticated)
+            {
+                <a class="btn" href="@Url.ContentUrlExtension(Model.MyAccountPage)"><i class="trmi trmi-user"></i></a>
+            }
+            else
+            {
+                <a class="btn nav-toggle" href="#navSectionAccount"><i class="trmi trmi-user"></i></a>
+            }
+
+            <a class="btn nav-toggle hidden-xs hidden-sm" ng-click="getBasketSummary()" href="#navSectionBasket" id="miniBaksetButton"><i class="trmi trmi-basket"></i><span ng-cloak ng-if="getBasketQty() >= 1"> (<span ng-cloak ng-show="getBasketQty() >= 1" ng-bind="getBasketQty()"></span>)</span></a>
+            <a class="btn visible-xs visible-sm" href="@Model.BasketPage.GetExternalUrl_V2()" id="miniBaksetButton"><i class="trmi trmi-basket"></i><span ng-cloak ng-if="getBasketQty() >= 1"> (<span ng-cloak ng-show="getBasketQty() >= 1" ng-bind="getBasketQty()"></span>)</span></a>
+        }
+    </div>
+    
+
+    @if (!Model.HideMegaMenuAndSearch)
+    {
+        <div class="nav-section active pull-left-md pull-left-lg" id="navSectionNav">
+            <div class="rm-navbar">
+                <div class="level0 ">
+                    <span class="fauxLink">
+                        Bars and Coins
+                    </span>
+                </div>
+                <div class="level0 ">
+                    <span class="fauxLink">
+                        Signature
+                    </span>
+                </div>
+                <div class="level0 ">
+                    <span class="fauxLink">
+                        My Account Dashboard
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.HideUserAndMiniBasketFromHeader)
+    {
+        Html.RenderPartial("_SearchBox", Model);
+        @Html.Partial("_LoginRegister")
+        @Html.Partial("_BasketMini")
+    }
+
+    @if (!Model.HideMegaMenuAndSearch)
+    {
+        <a class="btn nav-close" role="button"><i class="trmi trmi-close"></i></a>
+    }
+</nav>
+
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : CustomerContact.CreateInstance();
+
+    var contactFirstName = contact.FirstName ?? string.Empty;
+    var contactLastName = contact.LastName ?? string.Empty;
+    var contactEmail = contact.Email ?? string.Empty;
+}
+
+@if (!Model.HideUserAndMiniBasketFromHeader)
+{
+    <span ng-controller="rmLogin">
+        <div class="account-greeting hidden-xs hidden-sm" id="loggedInWelcomeText" ng-init="setupLogin('@(contactFirstName.Replace("'", "\\'"))', '@(contactLastName.Replace("'", "\\'"))', '@(contactEmail.Replace("'", "\\'"))', @isLoggedIn.ToString().ToLower())" ng-hide="!userLoggedIn" ng-cloak>
+            Hello {{user.user.FirstName;}}
+            <a href="javascript:void(0)" ng-click="logout()" class="bold text-black ml-md-1x ml-lg-1x">Logout</a>
+            @if (Model.CustomerIsBullionAccount)
+            {
+                <span class="ml-md-1x ml-lg-1x" ng-init="getBalanceInHeader()">Available to invest: <span class="strong text-success wallet-balance-amount" ng-bind = "Balance"></span></span>
+            }
+        </div>
+    </span>
+}
+

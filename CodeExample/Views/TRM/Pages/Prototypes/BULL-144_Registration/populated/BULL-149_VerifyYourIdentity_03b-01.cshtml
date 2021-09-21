@@ -1,0 +1,168 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer bull-registration">
+
+    <!-- BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                <!-- Step bar -->
+                <ol class="nav nav-bar nav-progress-bar">
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/AccountDetails_01b-01/"><span>1.</span></a></li>
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/"><span>2.</span></a></li>
+                    <li class="active"><a href="/prototypes/bullion/registration/populated/VerifyYourIdentity_03b-01/"><span>3.</span></a></li>
+                    <li><a href="/prototypes/bullion/registration/populated/SecurityQuestion_04-01/"><span>4.</span></a></li>
+                </ol>
+                <!-- / Step bar -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <!-- Sub Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+            {
+                    <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+                }
+                <!-- / Sub Headline -->
+                <!-- Content Area -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                    </div>
+                </div>
+                <!-- / Content Area -->
+                <!-- Form -->
+                <main class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+                        <div class="form-group">
+                            <label class="control-label" for="">
+                                Address
+                                <span class="text-danger">*</span>
+                                <span class="text-nowrap">
+                                    <small class="text-greyblue">
+                                        (Please provide your permanent residential address)
+                                    </small>
+                                    <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" title="" data-original-title="Tooltip for please provide your permanent residential address"></i>
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" id="" placeholder="Please enter your Postcode" value="FL 33127" data-original-title="" title="">
+                        </div>
+
+                        <div class="registered-address">
+                            <p>2390 NW 2nd Ave,</p>
+                            <p>Miami,</p>
+                            <p>FL 33127,</p>
+                            <p>USA</p>
+                            <!-- / text - address -->
+                            <!-- button - Enter Manually -->
+                            <div class="mt-1x">
+                                <a href="javascript:void(0)" class="link">Enter Manually</a>
+                            </div>
+                        </div>
+                        <!-- text - address -->
+                       
+                        <!-- / button - Enter Manually -->
+
+                        <div class="manual-address" style="">
+                            <div class="mb-2x">
+                                <a href="javascript:void(0)" class="link">Cancel</a>
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelAdd1">Address Line 1 <span class="text-danger">*</span></label>
+                                <input class="form-control ng-pristine ng-valid ng-empty ng-touched" type="text" name="manDelAdd1" id="manDelAdd1" value="" ng-model="selectedAddress.line1" data-original-title="" title="" style="">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelAdd2">Address Line 2 <span class="text-danger">*</span></label>
+                                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="text" name="manDelAdd2" id="manDelAdd2" value="" ng-model="selectedAddress.line2" data-original-title="" title="">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelAdd3">Address Line 3</label>
+                                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="text" name="manDelAdd3" id="manDelAdd3" value="" ng-model="selectedAddress.line3" data-original-title="" title="">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelCounty">County</label>
+                                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="text" name="manDelCounty" id="manDelCounty" value="" ng-model="selectedAddress.county" data-original-title="" title="">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelPostcode">Post/Zip code <span class="text-danger">*</span></label>
+                                <input class="form-control ng-pristine ng-untouched ng-valid ng-empty" type="text" name="manDelPostcode" id="manDelPostcode" value="" ng-model="selectedAddress.postcode" data-original-title="" title="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <!-- Input - Telephone -->
+                        <div class="form-group">
+                            <label class="control-label" for="">
+                                Telephone
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue text-nowrap">(Please provide your primary contact number)</small>
+                            </label>
+                            <input type="number" class="form-control" id="" placeholder="+1" data-original-title="" title="">
+                        </div>
+                        <!-- / Input - Telephone -->
+                        <!-- Input - Mobile Phone -->
+                        <div class="form-group">
+                            <label class="control-label" for="">
+                                Mobile Phone
+                                <small class="text-greyblue text-nowrap">(Please provide your mobile contact number)</small>
+                            </label>
+                            <input type="number" class="form-control" id="" placeholder="Provide your mobile contact number here" data-original-title="" title="">
+                        </div>
+                        <!-- / Input - Mobile Phone -->
+                        <!-- Select - Currency -->
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label col-xs-12" for="">
+                                    Choose currency
+                                    <span class="text-danger">*</span>
+                                    <span class="text-nowrap">
+                                        <small class="text-greyblue">
+                                            (This will be the currency used to trade)
+                                        </small>
+                                        <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" title="" data-original-title="Tooltip for this will be the currency used to trade"></i>
+                                    </span>
+                                </label>
+
+                                <div class="select-form col-xs-5 col-sm-4 col-md-3 col-lg-3 pr-0">
+                                    <select class="form-control" id="" name="" " style="">
+                                        <option selected="selected" value="$ USD">$ USD</option>
+                                        <option value="£ Pound">£ Pound</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / Select - Currency -->
+                    </div>
+
+                    <!-- toolbar -->
+                    <div class="col-xs-12 mt-2x mb-2x">
+                        <a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                        <a href="/prototypes/bullion/registration/populated/SecurityQuestion_04-01/" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+                    </div>
+                    <!-- / toolbar -->
+                </main>
+                <!-- / Form -->
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+        <!-- / Content Area -->
+        <!-- / BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+
+    </div>
+
+</div>

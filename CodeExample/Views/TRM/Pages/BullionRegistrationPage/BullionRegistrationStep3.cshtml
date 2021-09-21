@@ -1,0 +1,346 @@
+﻿@using TRM.Shared.Extensions;
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep3ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+}
+
+@functions
+{
+    public string Visible(string value)
+    {
+        return string.IsNullOrEmpty(value) ? "hide" : "";
+    }
+    public string GetFeedbackClass(string fieldName, string classes = null)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return string.IsNullOrEmpty(classes) ? "has-feedback ValidationFail" : classes;
+        }
+        return string.Empty;
+    }
+}
+
+@helper ErrorMessage(string fieldName, bool isShowFeedbackIcon = true)
+{
+    var fieldKey = string.Format("viewModel.{0}", fieldName);
+    if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+    {
+        <span id="bull-email__helpBlock2" class="help-block">@Html.ValidationMessage(fieldKey)</span>
+        if (isShowFeedbackIcon)
+        {
+            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+        }
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(myLayout.PostcodeAnywhereLicense))
+{
+    <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@myLayout.PostcodeAnywhereLicense" />
+    <script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@myLayout.PostcodeAnywhereLicense"></script>
+}
+
+<div class="container-fluid no-padding">
+    <!-- Content Area -->
+    <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+    <!-- / Content Area -->
+</div>
+
+<div class="container bull-registration">
+
+    <!-- BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+    <div class="container mb-4x mt-2x">
+        <!-- page header -->
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        <!-- / page header -->
+        @if (!Model.CurrentPage.HideStepProgressBar)
+        {
+            <!-- Step bar -->
+            <div class="row">
+                <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                    <!-- Step bar -->
+                    <ol class="nav nav-bar nav-progress-bar">
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}", currentUrl)"><span>1</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step2", currentUrl)"><span>2</span></a></li>
+                        <li class="col-xs-3 no-padding active"><a href="javascript:void(0);"><span>3</span></a></li>
+                        <li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step4", currentUrl)"><span>4</span></a></li>
+                    </ol>
+
+                    <!-- / Step bar -->
+                </div>
+            </div>
+            <!-- / Step bar -->
+        }
+        <!-- Form -->
+        <main class="row">
+            @using (Html.BeginForm("Step3", null, FormMethod.Post, new { name = "formVerifyYourIdentity", id = "formVerifyYourIdentity" }))
+            {
+                <div ng-controller="rmCheckoutController as rmAddInfo">
+                    <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10" ng-cloak>
+                        <!-- Sub Headline -->
+                        <h1 class="h3 mt-0 mb-2x">@Model.CurrentPage.Step3Heading</h1>
+                        <!-- / Sub Headline -->
+                        @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                        {
+                            <div class="row">
+                                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                            </div>
+                        }
+
+                        @if (Model.CurrentPage.MiddleContentStep3 != null)
+                        {
+                            <div class="row">
+                                @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep3)
+                            </div>
+                        }
+                        <div class="@GetFeedbackClass("General")">
+                            @ErrorMessage("General")
+                        </div>
+                        <div class="form-group  @GetFeedbackClass("PostalCode")" ng-init="setupAddress('@(Model.ViewModel.AddressLine1)', '@(Model.ViewModel.AddressLine2)', '@(Model.ViewModel.County)', '@(Model.ViewModel.City)', '@(Model.ViewModel.PostalCode)', '@(Model.ViewModel.CountryCode)', '@(Model.ViewModel.Telephone)', '@(Model.ViewModel.MobilePhone)')"
+                             ng-hide="manualAddress == true"
+                             ng-class="{'ValidationFail': (formVerifyYourIdentity.inputPCAnywhere.$touched && !formVerifyYourIdentity.inputPCAnywhere.$valid), 'ValidationSuccess': (formVerifyYourIdentity.inputPCAnywhere.$touched && formVerifyYourIdentity.inputPCAnywhere.$valid)}">
+                            <label class="control-label">
+                                @Html.PropertyFor(a => a.CurrentPage.AddressLabel)
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue">
+                                    @Model.CurrentPage.AddressMessage
+                                </small>
+                                @if (!string.IsNullOrEmpty(Model.CurrentPage.AddressQuestionText))
+                                {
+                                    <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" title="@Model.CurrentPage.AddressQuestionText"></i>
+                                }
+                            </label>
+                            <input type="text" class="form-control pcaPredictInput" capitalize name="inputPCAnywhere" id="inputPCAnywhere" ng-model="Postcode" placeholder="@Html.PropertyFor(x => x.CurrentPage.AddressPostalCodePlaceholder)" ng-required="manualAddress == false" />
+                            <span ng-if="!formVerifyYourIdentity.inputPCAnywhere.$valid">
+                                @ErrorMessage("PostalCode", false)
+                            </span>
+                            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                            @if (!string.IsNullOrEmpty(GetFeedbackClass("AddressLine1")) || !string.IsNullOrEmpty(GetFeedbackClass("City")))
+                            {
+                                <div class="has-error">
+                                    <span class="help-block">
+                                        <span class="field-validation-error">@Html.TranslateFallBack(TRM.Shared.Constants.StringResources.AddressIncomplete, "Address is incomplete, please enter manually")</span>
+                                    </span>
+                                </div>
+                            }
+
+                            <input type="hidden" name="registerAddressLine1" id="registerAddressLine1" />
+                            <input type="hidden" name="registerAddressLine2" id="registerAddressLine2" />
+                            <input type="hidden" name="registerAddressLine5" id="registerAddressLine5" />
+                            <input type="hidden" name="registerCity" id="registerCity" />
+                            <input type="hidden" name="registerPCode" id="registerPCode" />
+                        </div>
+
+                        <div class="mb-2x" ng-show="hasSelectedAddress && manualAddress == false" ng-cloak>
+                            <p ng-if="AddressLine1">{{AddressLine1}}</p>
+                            <p ng-if="AddressLine2">{{AddressLine2}}</p>
+                            <p ng-if="AddressLine3">{{AddressLine3}}</p>
+                            <p ng-if="AddressLine4">{{AddressLine4}}</p>
+                            <p ng-if="AddressLine5">{{AddressLine5}}</p>
+                            <p ng-if="Town">{{Town}}</p>
+                            <p ng-if="Postcode">{{Postcode}}</p>
+                            <p ng-if="Country">{{Country}}</p>
+                        </div>
+
+                        <div class="mt-1x mb-2x" ng-hide="manualAddress == true">
+                            <a class="link" ng-click="manualAddress = true; selectedAddress = []">Enter Manually</a>
+                        </div>
+
+                        <div class="form-group" ng-show="manualAddress == true" ng-cloak>
+                            <div class="">
+                                <a class="" href="javascript:void(0)" ng-click="manualAddress = false">Cancel</a>
+                            </div>
+                        </div>
+
+                        <div ng-hide="manualAddress == false">
+                            <div class="form-group @GetFeedbackClass("AddressLine1")"
+                                 ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.AddressLine1'].$touched && !formVerifyYourIdentity['ViewModel.AddressLine1'].$valid), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.AddressLine1'].$touched && formVerifyYourIdentity['ViewModel.AddressLine1'].$valid)}">
+                                <label class="control-label" for="manDelAdd1">
+                                    @Html.PropertyFor(a => a.CurrentPage.Address1Label)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="has-feedback">
+                                    @Html.TextBoxFor(x => x.ViewModel.AddressLine1, new { @class = "form-control", ng_model = "AddressLine1", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.Address1Placeholder })
+                                    <span ng-if="!formVerifyYourIdentity['ViewModel.AddressLine1'].$touched">
+                                        @ErrorMessage("AddressLine1", false)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group @GetFeedbackClass("AddressLine2")">
+                                <label class="control-label" for="manDelAdd2">@Html.PropertyFor(a => a.CurrentPage.Address2Label)</label>
+                                <div class="has-feedback">
+                                    @Html.TextBoxFor(x => x.ViewModel.AddressLine2, new { @class = "form-control", ng_model = "AddressLine2", placeholder = Model.CurrentPage.Address2Placeholder })
+                                    @ErrorMessage("AddressLine2")
+                                </div>
+                            </div>
+
+                            <div class="form-group @GetFeedbackClass("County")">
+                                <label class="control-label" for="manDelAdd2">@Html.PropertyFor(a => a.CurrentPage.CountyLabel)</label>
+                                <div class="has-feedback">
+                                    @Html.TextBoxFor(x => x.ViewModel.County, new { @class = "form-control", ng_model = "AddressLine5", placeholder = Model.CurrentPage.CountyPlaceholder })
+                                    @ErrorMessage("County")
+                                </div>
+                            </div>
+
+                            <div class="form-group @GetFeedbackClass("City")"
+                                 ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.City'].$touched && !formVerifyYourIdentity['ViewModel.City'].$valid), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.City'].$touched && formVerifyYourIdentity['ViewModel.City'].$valid)}">
+                                <label class="control-label" for="manDelCounty">
+                                    @Html.PropertyFor(a => a.CurrentPage.CityLabel)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="has-feedback">
+                                    @Html.TextBoxFor(x => x.ViewModel.City, new { @class = "form-control", ng_model = "Town", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.CityPlaceholder })
+                                    <span ng-if="!formVerifyYourIdentity['ViewModel.City'].$touched">
+                                        @ErrorMessage("City", false)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group @GetFeedbackClass("PostalCode")"
+                                 ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.PostalCode'].$touched && !formVerifyYourIdentity['ViewModel.PostalCode'].$valid), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.PostalCode'].$touched && formVerifyYourIdentity['ViewModel.PostalCode'].$valid)}">
+                                <label class="control-label" for="manDelPostcode">
+                                    @Html.PropertyFor(a => a.CurrentPage.PostcodeLabel)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="has-feedback">
+                                    @Html.TextBoxFor(x => x.ViewModel.PostalCode, new { @class = "form-control", @ng_model = "Postcode", @ng_blur = "checkPostCodeFormat(PostalCode)", @postcode_disable = "!manualAddress", @postcode_validator = "CountryCode", @capitalize = "" })
+                                    <span ng-if="!formVerifyYourIdentity['ViewModel.PostalCode'].$touched">
+                                        @ErrorMessage("PostalCode", false)
+                                    </span>
+                                    <span class="help-block" ng-show="registrationForm['ViewModel.PostalCode'].$invalid && registrationForm['ViewModel.PostalCode'].$dirty">@Html.TranslateFallback(StringResources.InvalidPostcode, "Postcode is invalid")</span>
+                                </div>
+                            </div>
+                            <div class="form-group @GetFeedbackClass("CountryCode")"
+                                 ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.CountryCode'].$touched && (!formVerifyYourIdentity['ViewModel.CountryCode'].$valid || Title == 'Select')), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.CountryCode'].$touched && formVerifyYourIdentity['ViewModel.CountryCode'].$valid && Title != 'Select')}">
+                                <label class="control-label" for="manDelCountry">
+                                    @Html.PropertyFor(a => a.CurrentPage.CountryLabel)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="has-feedback">
+                                    @Html.DropDownListFor(m => m.ViewModel.CountryCode, new SelectList(Model.ViewModel.CountryList, "Key", "Value"), "Select", new { @id = "countryCode", @class = "form-control country-ddl", @ng_model = "CountryCode", data_required = "true", data_notequal = "Select" })
+                                    <span ng-if="!formVerifyYourIdentity['ViewModel.CountryCode'].$touched">
+                                        @ErrorMessage("CountryCode", false)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                        <!-- Input - Telephone -->
+                        <div class="form-group @GetFeedbackClass("Telephone")  bullion-phone-group @Visible(Model.ViewModel.CountryCode)"
+                             ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.Telephone'].$touched && !formVerifyYourIdentity['ViewModel.Telephone'].$valid), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.Telephone'].$touched && formVerifyYourIdentity['ViewModel.Telephone'].$valid)}">
+                            <label class="control-label" for="">
+                                @Model.CurrentPage.TelephoneLabel
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue">@Model.CurrentPage.TelephoneMessage</small>
+                            </label>
+                            <div class="has-feedback">
+                                @Html.TextBoxFor(x => x.ViewModel.Telephone, new { @class = "form-control phone-number", @type = "tel", @placeholder = Model.CurrentPage.TelephonePlaceholder, data_required = "true", data_notequal = "", @ng_model = "Telephone", @phonecharacter = "" })
+                                <span ng-if="!formVerifyYourIdentity['ViewModel.Telephone'].$touched">
+                                    @ErrorMessage("Telephone", false)
+                                </span>
+                                <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <!-- / Input - Telephone -->
+                        <!-- Input - Mobile Phone -->
+                        <div class="form-group @GetFeedbackClass("MobilePhone")  bullion-phone-group @Visible(Model.ViewModel.CountryCode)">
+                            <label class="control-label" for="">
+                                @Model.CurrentPage.MobileLabel
+                                <small class="text-greyblue">@Model.CurrentPage.MobileMessage</small>
+                            </label>
+                            <div class="has-feedback">
+                                @Html.TextBoxFor(x => x.ViewModel.MobilePhone, new { @class = "form-control", @type = "tel", @placeholder = Model.CurrentPage.MobilePlaceholder, data_required = "true", data_notequal = "", @ng_model = "MobilePhone", @phonecharacter = "" })
+                                @ErrorMessage("MobilePhone")
+                            </div>
+                        </div>
+                        <!-- / Input - Mobile Phone -->
+                        <!-- Select - Currency -->
+                        <div class="form-group bullion-currency-group @Visible(Model.ViewModel.CountryCode) @GetFeedbackClass("Currency")"
+                             ng-class="{'ValidationFail': (formVerifyYourIdentity['ViewModel.Currency'].$touched && (!formVerifyYourIdentity['ViewModel.Currency'].$valid || Currency == 'Select')), 'ValidationSuccess': (formVerifyYourIdentity['ViewModel.Currency'].$touched && formVerifyYourIdentity['ViewModel.Currency'].$valid && Currency != 'Select')}">
+                            <div class="row">
+                                <label class="control-label col-xs-12" for="">
+                                    @Model.CurrentPage.CurrencyLabel
+                                    <span class="text-danger">*</span>
+                                    <span class="text-nowrap">
+                                        <small class="text-greyblue">
+                                            @Model.CurrentPage.CurrencyMessage
+                                            @if (!string.IsNullOrEmpty(Model.CurrentPage.CurrencyHoveringMessage))
+                                            {
+                                                <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" title="@Model.CurrentPage.CurrencyHoveringMessage"></i>
+                                            }
+                                        </small>
+                                    </span>
+                                </label>
+
+                                <div class="select-form col-xs-5 col-sm-4 col-md-3 col-lg-3 pr-0">
+                                    @{
+                                        if (Model.ViewModel.IsConsumerAccount)
+                                        {
+                                            @Html.DropDownList("ViewModel_Currency_disabled", new SelectList(Model.ViewModel.CurrencyList, "Key", "Value"), new { @class = "form-control", name = "Currency", data_required = "true", data_notequal = "Select", @disabled = "disabled" })
+                                            @Html.HiddenFor(x => x.ViewModel.Currency, new { @class = "consumerCurrency" })
+                                            @Html.HiddenFor(x => x.ViewModel.IsConsumerAccount)
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(x => x.ViewModel.Currency, new SelectList(Model.ViewModel.CurrencyList, "Key", "Value"), new { @class = "form-control bullion-currency-ddl", name = "Currency", data_required = "true", data_notequal = "Select" })
+                                        }
+                                    }
+
+                                    <span ng-if="!formVerifyYourIdentity['ViewModel.Currency'].$touched">
+                                        @ErrorMessage("Currency", false)
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- / Select - Currency -->
+                    </div>
+                </div>
+                <!-- toolbar -->
+                <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 mb-2x">
+                    <a href="@string.Format("{0}Step2", currentUrl)" type="" class="btn btn-default mb-1x p-1x">@Model.CurrentPage.Step3BackButtonText</a>
+                    <input type="submit" class="btn btn-secondary mb-1x ml-1x" value="@Model.CurrentPage.Step3ContinueButtonText" />
+                </div>
+                <!-- / toolbar -->
+            }
+        </main>
+        <!-- / Form -->
+        <!-- / BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+
+    </div>
+
+</div>
+
+<div class="container-fluid no-padding">
+    <div class="contentArea row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <!-- Content Area -->
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        <!-- / Content Area -->
+    </div>
+</div>
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "eventEmitter").AtHeader();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"var emitter; if(typeof emitter === 'undefined'){emitter = new eventEmitter();}").AtHeader();
+}

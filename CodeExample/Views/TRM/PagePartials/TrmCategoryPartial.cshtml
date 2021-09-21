@@ -1,0 +1,23 @@
+﻿@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmCategory, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.CategoryPartialViewModel>
+
+
+    <article class="blockContent">
+        <div class="thumb p-1x">
+            <a title="@Model.ViewModel.TeaserDto.TeaserTitle" href="@Model.ViewModel.CategoryUrl">
+                <img class="img-responsive" src="@Model.ViewModel.TeaserDto.TeaserImageUrl?width=500&format=jpg&quality=85" alt="@Model.ViewModel.TeaserDto.TeaserTitle">
+            </a>
+        </div>
+        <div class="mainContent">
+            <h3 class="h4 h5-md">
+                <a href="@Model.ViewModel.CategoryUrl" title="@Model.ViewModel.TeaserDto.TeaserTitle">
+                    @Html.DisplayFor(x => x.ViewModel.TeaserDto.TeaserTitle)
+                </a>
+            </h3>
+            <p class="hidden-xs">
+                @Html.DisplayFor(x => x.ViewModel.TeaserDto.TeaserDescription)
+            </p>
+            <a class="btn btn-default" href="@Model.ViewModel.CategoryUrl">@Html.TranslateFallback(StringResources.CategoryShopNow, "Shop Now")</a>
+        </div>
+    </article>
+

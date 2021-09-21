@@ -1,0 +1,69 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Cart
+@using TRM.Web.Models.ViewModels
+@model PurchaseOrderViewModel
+
+@{
+    var shipment = Model.Shipments.FirstOrDefault();
+    var items = new List<CartItemViewModel>();
+    if (shipment != null)
+    {
+        items = shipment.CartItems;
+    }
+}
+@if (items.Any())
+{
+    foreach (var item in items)
+    {
+        Html.RenderPartial("RoyalMint2020/_ProductSummaryCard", new ProductSummaryCardViewModel { Item = item });
+
+    }
+}
+
+
+<div class="order-totals page-break-print">
+    @if (Model.Promotions.Any())
+    {
+        <div>
+            @Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)
+            <span>
+                @foreach (var promo in Model.Promotions)
+                {
+                    @Html.Raw(string.IsNullOrEmpty(promo.Code) ? promo.Description : promo.Code)<br />
+                }
+            </span>
+        </div>
+    }
+    <div>
+        @Html.TranslateFallback(StringResources.RetailBasketTotal, "Retail Basket Total")
+        <span>@Model.SubTotal</span>
+    </div>
+    @if (Model.IsFreeDelivery)
+    {
+        <div class="order-free-delivery">
+            <span>
+                @Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery)
+            </span>
+        </div>
+    }
+    else
+    {
+        <div>
+            @Html.TranslateFallback(StringResources.RetailDelivery, "Retail Delivery")
+            <span>@Model.TotalDeliveryWithoutDiscount</span>
+        </div>
+    }
+    @if (Model.TotalDiscountDecimal > 0)
+    {
+        <div>
+            @Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)
+            <span>
+                @Model.TotalDiscount
+            </span>
+        </div>
+    }
+    <div class="order-total border-top-thick-print font-weight-bold-print">
+        <span>@Html.TranslateFallback(StringResources.RetailTotal, "Retail Total")</span>
+        @Model.Total (@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))
+    </div>
+</div>

@@ -1,0 +1,55 @@
+﻿@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.EcomPrototypeBlock
+
+<div class="banner-bg block-background @Model.BackgroundColour.DescriptionAttr()">
+    @if (Model.Image != null && !ContentReference.IsNullOrEmpty(Model.Image.LgImage))
+    {
+        @Html.PropertyFor(a => a.Image)
+
+    }
+</div>
+
+@if (Model.ShowContent())
+{
+    <div class="block-container">
+        <div class="blockContent @Model.ContentPosition.DescriptionAttr() @Model.ContentPadding.DescriptionAttr()">
+            <div class="overlay">
+
+                @if (Model.Heading != null && !string.IsNullOrEmpty(Model.Heading))
+                {
+                    <h3 class="heading">@Html.PropertyFor(a => a.Heading)</h3>
+                }
+
+                @{
+                    var bodyClass = string.Empty;
+
+
+                    if (Model.HideBannerContentOnXs)
+                    {
+                        bodyClass = string.Format("{0} {1}", "hidden-xs", bodyClass);
+                    }
+
+
+                    if (Model.HideBannerContentOnSm)
+                    {
+                        bodyClass = string.Format("{0} {1}", "hidden-sm", bodyClass);
+                    }
+                }
+
+                <div class="xhtml @(bodyClass)">
+                    @{ var content = Html.ParseXhtmlString(Model.Content); }
+                    @Html.PropertyFor(a => content)
+                </div>
+
+                @if (Model.Hyperlink != null)
+                {
+                    <a href="@Url.ContentUrlExtension(Model.Hyperlink)" class="btn-arrow" title="@Model.LinkText">
+                        @Html.PropertyFor(a => a.LinkText)
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+}

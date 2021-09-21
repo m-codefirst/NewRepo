@@ -1,0 +1,201 @@
+﻿@using EPiServer.Core
+@using EPiServer.Find.Helpers
+@using EPiServer.Find.Helpers.Text
+@using TRM.Web.Extentions
+@model TRM.Web.Models.Reporting.ReportTableViewModel
+@{
+    var itemsPerPageOptions = new int[] { 10, 20, 50, 100 };
+}
+
+<style>
+    .greybackground {
+        background: #f1f1f1 url(../../shell/Resources/Gradients.png) repeat-x scroll left -2200px;
+    }
+
+    .episortascending a {
+        background-image: url(/app_themes/default/Images/General/Ascending.gif);
+        background-repeat: no-repeat;
+        background-position: 0px 2px;
+        padding-left: 12px;
+    }
+
+    .episortdescending a {
+        background-image: url(/app_themes/default/Images/General/Descending.gif);
+        background-repeat: no-repeat;
+        background-position: 0px 2px;
+        padding-left: 12px;
+    }
+
+    .pagerItem {
+        padding-right: 12px;
+        color: blue !important;
+    }
+</style>
+
+<input type="hidden" name="currentPage" id="currentPage" value="@Model.CurrentPage" />
+<input type="hidden" name="orderBy" id="orderBy" value="@Model.OrderByProperty" />
+<input type="hidden" name="asc" id="asc" value="@Model.OrderAscending.ToString()" />
+
+<div class="epi-floatRight epi-marginVertical-small">
+    <label for="FullRegion_MainRegion_PageSizeSelector">Number of items per page</label>
+    <select name="itemsPerPage" id="FullRegion_MainRegion_PageSizeSelector" onchange="onPerPageChange(this.form)">
+        @foreach (var perPage in itemsPerPageOptions)
+        {
+            <option @Html.Raw(Model.ItemsPerPage == perPage ? "selected='selected'" : "") value="@perPage">@perPage</option>
+        }
+    </select>
+</div>
+<div class="epi-floatLeft epi-marginVertical-small">
+    Number of Hits: @Model.TotalMatching
+</div>
+<div class="epi-contentArea epi-clear">
+    <div>
+        <table class="epi-default epi-default-legacy"
+               cellspacing="0"
+               id="FullRegion_MainRegion_ReportView"
+               style="border-style: None; width: 100%; border-collapse: collapse;">
+            @Pager()
+            <tr>
+                @foreach (var heading in Model.Headings)
+                {
+                    <th scope="col" class="@(Model.OrderByProperty == heading.PropName ? (Model.OrderAscending ? "episortascending" : "episortdescending") : "")">
+                        <a href="@GetActionUrl("orderBy", heading.PropName)">
+                            @heading.DisplayName
+                        </a>
+                    </th>
+                }
+            </tr>
+
+            @if (Model.Values != null)
+            {
+                foreach (var row in Model.Values)
+                {
+                    <tr>
+                        @for (int i = 0; i < row.Count; i++)
+                        {
+                            var value = row[i];
+                            if (value is ContentReference)
+                            {
+                                <td>
+                                    <a style="color: blue;" href="@Url.ContentUrl(value as ContentReference)" target="_blank">
+                                        @value
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@value</td>
+                            }
+
+                        }
+                    </tr>
+                }
+                @Pager()
+            }
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function onPerPageChange(form) {
+        form.currentPage.value = 1;
+        form.submit();
+    }
+</script>
+
+@functions {
+    private string GetActionUrl(string paramKey, object paramValue)
+    {
+        var routeValueDictionary = new RouteValueDictionary();
+        routeValueDictionary.AddRange(Model.IncomingFormParams);
+        routeValueDictionary["currentPage"] = Model.CurrentPage;
+        routeValueDictionary["itemsPerPage"] = Model.ItemsPerPage;
+        routeValueDictionary["orderBy"] = Model.OrderByProperty;
+        routeValueDictionary["asc"] = Model.OrderAscending;
+
+        if (paramKey == "orderBy")
+        {
+            routeValueDictionary["currentPage"] = 1;
+
+            if (Model.OrderByProperty == paramValue.ToString())
+            {
+                routeValueDictionary["asc"] = !Model.OrderAscending;
+            }
+            else
+            {
+                routeValueDictionary["asc"] = false;
+            }
+        }
+
+        if (!paramKey.IsNullOrWhiteSpace() && paramValue != null)
+        {
+            routeValueDictionary[paramKey] = paramValue;
+        }
+
+        return Url.Action(Model.ActionName, Model.ControllerName, routeValueDictionary);
+    }
+}
+
+@helper Pager()
+{
+    if (Model.PageNumbersToRender.Any())
+    {
+        <tr class="epipager greybackground">
+            <td colspan="@Model.Headings.Count">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="greybackground">
+                                <a href="@GetActionUrl("currentPage", Model.CurrentPage - 1 >= 1 ? Model.CurrentPage - 1 : 1)" class="pagerItem">
+                                    <
+                                </a>
+                            </td>
+                            @for (int i = 0; i < Model.PageNumbersToRender.Count; i++)
+                            {
+                                if (i == Model.PageNumbersToRender.Count - 1 && Model.PageNumbersToRender[i - 1] != Model.TotalPages - 1)
+                                {
+                                    <td class="greybackground" style="padding-right: 12px;">
+                                        ...
+                                    </td>
+                                }
+
+                                @RenderPageLink(Model.PageNumbersToRender[i])
+                                if (i == 0 && Model.PageNumbersToRender[1] != 2)
+                                {
+                                    <td class="greybackground" style="padding-right: 12px;">
+                                        ...
+                                    </td>
+                                }
+                            }
+                            <td class="greybackground">
+                                <a href="@GetActionUrl("currentPage", Model.CurrentPage + 1 <= Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)" class="pagerItem">
+                                    >
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    }
+}
+
+@helper RenderPageLink(int i)
+{
+    if (i == Model.CurrentPage)
+    {
+        <td class="greybackground">
+            <span style="padding-right: 8px; font-weight: bold;">
+                @i
+            </span>
+        </td>
+    }
+    else
+    {
+        <td class="greybackground">
+            <a href="@GetActionUrl("currentPage", i)" class="pagerItem">
+                @i
+            </a>
+        </td>
+    }
+}

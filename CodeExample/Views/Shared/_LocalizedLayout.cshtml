@@ -1,0 +1,24 @@
+﻿@using System.Web.Optimization
+@using EPiServer.Core
+@model  Hephaestus.CMS.ViewModels.IPageViewModel<PageData, Hephaestus.CMS.ViewModels.ILayoutModel>
+<!doctype html>
+<html lang="en" class="noJs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+    @Scripts.Render("~/bundles/headscripts")
+    <!--[if LT IE 9]>@Scripts.Render("~/bundles/html5shiv")<![endif]-->
+    <title>@Model.CurrentPage.Name</title>
+</head>
+<body>
+    @Html.RenderEPiServerQuickNavigator()
+    @Html.FullRefreshPropertiesMetaData()
+    <div class="container">
+        @RenderBody()
+    </div>
+
+</body>
+</html>

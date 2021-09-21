@@ -1,0 +1,221 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	<div class="container mb-4x mt-2x">
+		<div class="page-header">
+			<h1 class="h1">Step 1: Fix Price and Buy - Add Funds</h1>
+		</div>
+		<div class="row">
+			<div class="col-xs-12">
+				<ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+					<li class="active"><a href="">1.<span>Fix Price and Buy</span></a></li>
+					<li><a href="">2. <span>Order Confirmation</span></a> </li>
+				</ol>
+			</div>
+			<div class="col-xs-12 col-md-9 mb-1x">
+				<h3 class="mt-0">Pay By Credit/Debit Card</h3>
+				<p class="mb-2x">Based on your last 'live price' you are need an additional £1000 to complete the checkout, we recommend you deposit £1100.00 minimum to account for potential fluctuation in price.</p>
+
+				<div class="panel panel-default panel-secondary">
+					<div class="panel-body">
+						<form id="checkoutForm" method="post" name="checkoutForm">
+							<div class="row">
+								<div class="col-xs-12 col-sm-8">
+									<div class="row card-info">
+										<div class="col-xs-12 col-sm-6 col-lg-5">
+											<div class="mb-0 mb-xs-1x">
+												<label>I'd like to fund... <span class="text-danger">*</span></label>
+												<div class="input-group subtle  mb-0">
+													<div class="input-group-addon">£</div>
+													<input type="number" class="form-control" id="fundQuanity" value="1100.00" placeholder="Amount" data-original-title="" title="">
+												</div>
+												<div class="fundQuanityErrorMessage form-group has-error mb-0 hidden" id="fundQuanityErrorMessage">
+													<span class="help-block">Please enter your fund quantity.</span>
+												</div>
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6">
+											<div class="card-logo">
+												<label class="hidden-xs" style="opacity:0">
+													Card logo
+												</label>
+												<img class="img-responsive mb-1x mb-xs-2x mt-xs-2x pb-1x ml-0" src="Static/img/global/credit-cards-horizontal-1.png">
+											</div>
+										</div>
+									</div>
+									<hr>
+									<div class="choose-card row">
+										<div class="col-xs-12">
+											<div class="card-options mb-2x">
+												<h4>Choose a Card</h4>
+												<div class="checkbox small fancy">
+													<input type="radio" name="cardType" id="chkDel0" value="Existing" checked>
+													<label for="chkDel0">
+														Visa ending 1019 <a class="ml-1x">Remove</a>
+													</label>
+												</div>
+												<div class="checkbox small fancy">
+													<input type="radio" name="cardType" value="New" id="chkDel1">
+													<label for="chkDel1">
+														New Visa or MasterCard
+													</label>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="newCard hidden" id="newCard">
+										<div class="row gutter-sm">
+											<div class="col-xs-12 col-md-6">
+												<div class="form-group" id="cardNo">
+													<label for="card-number">
+														Card Number
+														<span class="text-danger">
+															*
+														</span>
+													</label>
+													<input type="text" class="form-control gw-proxied" id="card-number" placeholder="eg.1111 2222 3333 4444">
+													<span class="cardNoSpan trmi form-control-feedback hidden" id="cardNoSpan" aria-hidden="true"></span>
+													<div class="cardNoErrorMessage form-group has-error mb-0 hidden" id="cardNoErrorMessage">
+														<span class="help-block"><i class="trmi trmi-times"></i>Please enter your card number.</span>
+													</div>
+												</div>
+											</div>
+											<div class="col-xs-12 col-md-6">
+												<label>End date</label>
+											</div>
+											<div class="col-xs-6 col-md-3">
+												<div class="select-form expiryMonth" id="expiryMonth">
+													<select class="form-control" id="expiry-month">
+														<option value="" selected="">MM</option>
+														<option value="01">01</option>
+														<option value="02">02</option>
+														<option value="03">03</option>
+														<option value="04">04</option>
+														<option value="05">05</option>
+														<option value="06">06</option>
+														<option value="07">07</option>
+														<option value="08">08</option>
+														<option value="09">09</option>
+														<option value="10">10</option>
+														<option value="11">11</option>
+														<option value="12">12</option>
+													</select>
+													<div class="cardExpiryMonthErrorMessage form-group has-error mb-0 hidden" id="cardExpiryMonthErrorMessage">
+														<span class="help-block"><i class="trmi trmi-times"></i> "Please enter the expiry month on your card."</span>
+													</div>
+												</div>
+											</div>
+											<div class="col-xs-6 col-md-3">
+												<div class="select-form expiryYear" id="expiryYear">
+													<select class="form-control " id="expiry-year" onchange="PaymentSession.updateSessionFromForm('card');">
+														<option value="" selected="">YYYY</option>
+														<option value="2018">2018</option>
+														<option value="2019">2019</option>
+														<option value="2020">2020</option>
+														<option value="2021">2021</option>
+														<option value="2022">2022</option>
+														<option value="2023">2023</option>
+														<option value="2024">2024</option>
+														<option value="2025">2025</option>
+														<option value="2026">2026</option>
+														<option value="2027">2027</option>
+														<option value="2028">2028</option>
+														<option value="2029">2029</option>
+														<option value="2030">2030</option>
+														<option value="2031">2031</option>
+														<option value="2032">2032</option>
+														<option value="2033">2033</option>
+														<option value="2034">2034</option>
+														<option value="2035">2035</option>
+														<option value="2036">2036</option>
+														<option value="2037">2037</option>
+														<option value="2038">2038</option>
+													</select>
+													<div class="cardExpiryYearErrorMessage form-group has-error mb-0 hidden" id="cardExpiryYearErrorMessage">
+														<span class="help-block"><i class="trmi trmi-times"></i>"Please enter the expiry year on your card."</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-group has-feedback">
+											<label for="nameOnCard">
+												Name on Card<small> (Exactly as it appears on the card)</small><span class="text-danger">*</span>
+											</label>
+											<input type="text" class="form-control" id="nameOnCard" name="nameOnCard" placeholder="Name on Card" required="required">
+											<span class="trmi form-control-feedback"></span>
+											<div class="form-group has-error hidden mb-0">
+												<span class="help-block"><i class="trmi trmi-times"></i>Please enter your card name exactly as it appears on the card.</span>
+											</div>
+										</div>
+										<div class="row center-items">
+											<div class="col-xs-6 col-sm-4">
+												<div class="form-group has-feedback securityCode" id="securityCode">
+													<label for="security-code">
+														CCV Number
+														<span class="text-danger">
+															*
+														</span>
+													</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control gw-proxied" id="security-code">
+                                                        <i class="trmi trmi-question input-group-tooltip" data-toggle="tooltip" title="" data-original-title="The last 3 digits on, the back of your card."></i>
+                                                    </div>
+
+													<span class="securityCodeSpan trmi form-control-feedback hidden" id="securityCodeSpan" aria-hidden="true"></span>
+													<div class="securityCodeErrorMessage form-group has-error mb-0 hidden" id="securityCodeErrorMessage">
+														<span class="help-block"><i class="trmi trmi-times"></i>Please enter your 3 digit security code.</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="checkbox fancy">
+												<input type="checkbox" name="gift" id="saveForFuture">
+												<label class="checkbox-inline" for="saveForFuture">Save card for future use?</label>
+											</div>
+										</div>
+									</div>
+									<button type="button" class="btn btn-default mb-1x mr-1x">Cancel</button>
+									<button type="button" class="btn btn-secondary mb-1x">Make Payment</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="panel-body hidden">
+						<h2 class="mt-0">Payment Sucessful</h2>
+						<hr>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit  In dignissim </p>
+						<h5> Order Number: </h5>
+						IN-105950443
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-3 mb-1x">
+				<div class="alert alert-info">
+					<h5 class="h5 strong mt-0 mb-0 text-black">Investment Order Total:</h5>
+					<h6 class="h6 strong mt-0 mb-1x text-black">£2034.00</h6>
+					<h5 class="h5 strong mt-0 mb-0 text-black">Current Wallet Balance:</h5>
+					<h6 class="h6 strong mt-0 mb-1x text-danger">£1034.00</h6>
+					<h5 class="h5 strong mt-0 mb-0 text-black">Recommended Top Up:</h5>
+					<h6 class="h6 strong mt-0 mb-0 text-success">£1100.00</h6>
+
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<div class="col-xs-12 col-md-9 mb-2x">
+				<h6 class="h6 mt-0">Prefer to pay by Bank Transfer?</h6>
+				<p>Funding by bank transfer will take 3 - 5 working days for your funds to clear and become available within your account. If you would like to fund by bank transfer visit the funding page. I just means you won't be able to checkout today</p>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,26 @@
+﻿@model TRM.Web.Models.ViewModels.BreadcrumbViewModel
+
+@{
+    var className = Model.IsWide ? "col-12" : "col-12 col-md-9";
+}
+
+
+<nav aria-label="breadcrumb" id="breadcrumb" class="@className">
+    <ol class="breadcrumb">
+        @foreach (var crumb in Model.BreadcrumbMenuDto.ChildNavigationItems.ToList())
+        {
+            if (crumb.IsActiveContent)
+            {
+                <li class="breadcrumb-item active" aria-current="page">@crumb.MenuItemDisplayName</li>
+            }
+            else if (crumb.IsContainer)
+            {
+                <li class="breadcrumb-item">@crumb.MenuItemDisplayName</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item"><a href="@crumb.MenuItemExternalUrl" title="@crumb.MenuItemDisplayName">@crumb.MenuItemDisplayName</a></li>
+            }
+        }
+    </ol>
+</nav>

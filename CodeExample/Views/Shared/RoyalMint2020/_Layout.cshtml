@@ -1,0 +1,190 @@
+﻿@using System.Web.Optimization
+@using EPiServer.Editor
+@using EPiServer.Framework.Web
+@using EPiServer.Framework.Web.Mvc.Html
+@using StackExchange.Profiling
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Models.Pages
+@using EPiServer.ServiceLocation
+@using EPiServer.Web
+@using TRM.Web.Services;
+@using TRM.Web.Helpers;
+@using TRM.Shared.Helpers
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<EPiServer.Core.IContent, Hephaestus.CMS.ViewModels.ILayoutModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var pageTypeCss = string.Empty;
+
+    if (Model.CurrentPage != null && Model.CurrentPage.Property.Keys.Contains("PageTypeName"))
+    {
+        pageTypeCss = Model.CurrentPage.Property["PageTypeName"].ToString().ToCssClassName();
+    }
+
+    var userService = ServiceLocator.Current.GetInstance<IUserService>();
+        
+    var lang = EPiServer.Globalization.ContentLanguage.PreferredCulture?.Name ?? "en";
+}
+
+<!DOCTYPE html>
+<html lang="@lang" dir="ltr">
+<head>
+    @{ Html.RenderPartial("RoyalMint2020/_GoogleTagManagerDataLayer", myLayout); }
+    @if (!PageEditing.PageIsInEditMode && !string.IsNullOrWhiteSpace(myLayout.GoogleTagManagerHeaderSnippet))
+    {
+        @Html.Raw(myLayout.GoogleTagManagerHeaderSnippet)
+    }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @{
+        Html.RenderPartial("_Seo");
+        Html.RenderPartial("_Icons");
+    }
+
+    @Html.RequiredClientResources(RenderingTags.Header)
+
+    @* Typekit *@
+    <link rel="stylesheet" href="https://use.typekit.net/fng5diq.css">
+
+    @* Global styles *@
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "globalCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "checkoutCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "littleTreasuresCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "digiInvestmentsCss")
+
+    @if (myLayout.EnableCustomerCss && !string.IsNullOrWhiteSpace(myLayout.CustomerCssUrl))
+    {
+        <link href="@myLayout.CustomerCssUrl" rel="stylesheet" media="all" type="text/css" />
+    }
+
+    @* Page specific additional styles *@
+    @RenderSection("PageStyles", false)
+
+    @* TODO: Remove blocking JS from head *@
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "jQuery")
+
+    <script type="text/javascript">
+		var currencySymbol = '@Html.Raw(myLayout.DefaultCurrencySymbol)';
+    </script>
+
+
+
+        @if (IsSectionDefined("HeaderScripts"))
+        {
+            @RenderSection("HeaderScripts");
+        }
+
+</head>
+
+<body class="js-disabled page-@(Model.CurrentPage != null ? Model.CurrentPage.Name.ToCssClassName() : "checkoutreceipt") @pageTypeCss" id="pageTop">
+    <div class="d-none" data-module="svg-source"></div>
+    <div class="loader--bg1-preloading"></div>
+    <div class="loader--bg2-preloading"></div>
+    @if (!PageEditing.PageIsInEditMode && !string.IsNullOrWhiteSpace(Model.Layout.GoogleTagManagerSnippet))
+    {
+        @Html.Raw(Model.Layout.GoogleTagManagerSnippet)
+    }
+
+    @Scripts.RenderFormat("<script type=\"text/javascript\" src=\"{0}\" async></script>", "~/bundles/" + SiteDefinition.Current.Name + "init")
+
+    @Html.RenderEPiServerQuickNavigator()
+    @{
+        var page = Model.CurrentPage as ErrorPage;
+        if (page == null)
+        {
+            @Html.AntiForgeryToken()
+        }
+    }
+
+    @if (!Model.Layout.HideSiteHeader)
+    {
+        if (Model.CurrentPage is IControlCustomHeaderView && myLayout.HasCustomHeaderView)
+        {
+            Html.RenderPartial(myLayout.CustomHeaderView, myLayout);
+        }
+        else
+        {
+            Html.RenderPartial("RoyalMint2020/_Header", myLayout);
+        }
+    }
+
+    @{
+        Html.RenderPartial("RoyalMint2020/_AMLStatusMessage", myLayout);
+        Html.RenderPartial("RoyalMint2020/_ImpersonationMessage", myLayout);
+    }
+
+    <main id="content" class="container">
+        @RenderBody()
+    </main>
+
+    @if (!Model.Layout.HideSiteFooter)
+    {
+        if (Model.CurrentPage is IControlCustomFooterView && myLayout.HasCustomFooterView)
+        {
+            Html.RenderPartial(myLayout.CustomFooterView, myLayout);
+        }
+        else
+        {
+            Html.RenderPartial("RoyalMint2020/_Footer", myLayout);
+        }
+    }
+
+    <div class="navigation-backdrop"></div>
+
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "bootstrap")
+    @Scripts.RenderFormat("<script type=\"text/javascript\" src=\"{0}\" async></script>", "~/bundles/" + SiteDefinition.Current.Name + "vendorsAsync")
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "vendors")
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "modules")
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "global")
+
+    @RenderSection("JustBeforeBodyTag", false)
+
+    @Html.RenderPartialViewScripts()
+    @Html.RequiredClientResources(RenderingTags.Footer)
+
+    @if (!string.IsNullOrWhiteSpace(myLayout.FooterScriptSnippet))
+    {
+        @Html.Raw(myLayout.FooterScriptSnippet)
+    }
+
+    <!--Cookie Policy component-->
+    @{
+        if (myLayout.DisableCookieLaw == false)
+        {
+            Html.RenderPartial("RoyalMint2020/_CookieLawAlert", myLayout);
+        }
+        else
+        {
+            @Html.Raw(myLayout.CookiebotScripte)
+        }
+    }
+
+    @Html.Partial("RoyalMint2020/_OpenScriptsLayout")
+
+    @MiniProfiler.RenderIncludes()
+
+    @* React *@
+    @if (Html.IsDebug())
+    {
+        @Scripts.Render("~/Static/royalmint2020/common.bundle.js")
+        @Scripts.Render("~/Static/royalmint2020/index.bundle.js")
+        @Scripts.Render("~/Static/royalmint2020/svgSource.bundle.js")
+    }
+    else
+    {
+        @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "common")
+        @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "react")
+        @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "svg")
+    }
+
+    @Html.Partial("RoyalMint2020/_SharedAnalyticsDigitalData", myLayout)
+</body>
+</html>

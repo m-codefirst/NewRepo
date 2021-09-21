@@ -1,0 +1,33 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycPhotoIdBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycPhotoIdViewModel>
+
+@{
+    var viewModel = new {
+        countryOfIssueTitle = Model.CurrentBlock.CountryOfIssueTitle,
+        countries = Model.ViewModel.Countries,
+        documentNumberTitle = Model.CurrentBlock.DocumentNumberTitle,
+        documentNumberPlaceholder = Model.CurrentBlock.DocumentNumberPlaceholder,
+        invalidDocumentNumber = @Html.TranslateFallback(StringResources.InvalidDocumentNumber, "Invalid Document Number"),
+        confirmDetailsButtonText = Model.CurrentBlock.ConfirmDetailsButtonText,
+        formRequiredText = @Html.TranslateFallback(StringResources.FormRequiredText, "This field is required"),
+    };
+}
+
+<div class="form-spacing text-right">
+    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="btn btn-default pl-0 pr-0 mb-0">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+</div>
+
+@if (Model.CurrentBlock.MiddleTopContent != null)
+{
+    <div class="form-spacing">
+        @Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+    </div>
+}
+<div data-module="kyc-verification-photo-id" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+<div class="form-spacing">
+    @Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+</div>

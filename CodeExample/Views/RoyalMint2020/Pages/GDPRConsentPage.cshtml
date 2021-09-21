@@ -1,0 +1,169 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.GdprConsentPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.GdprConsentPageViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var inEditMode = PageEditing.PageIsInEditMode;
+}
+
+@if (!string.IsNullOrWhiteSpace(myLayout.PostcodeAnywhereLicense))
+{
+    <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@myLayout.PostcodeAnywhereLicense" />
+    <script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@myLayout.PostcodeAnywhereLicense"></script>
+}
+
+<script type="text/javascript">
+    function handleGdprButtonSubmit() {
+        var canEmail = $('#canEmail').is(':checked');
+        var canPost = $('#canPost').is(':checked');
+        var canPhone = $('#canPhone').is(':checked');
+        var isShowAreYouSureMessage = !canEmail && !canPost && !canPhone;
+        if (isShowAreYouSureMessage) {
+            $('#gdprMessagesModal').addClass('in');
+            $('#gdprMessagesModal').show();
+        } else {
+            $('#gdprForm').submit();
+        }
+    }
+
+    function closeGdprModal() {
+        $('#gdprMessagesModal').removeClass('in');
+        $('#gdprMessagesModal').hide();
+    }
+
+    function submitGdprForm() {
+        $('#gdprForm').submit();
+    }
+
+</script>
+
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    Html.RenderPartial("_Breadcrumb", myLayout.Breadcrumb);
+}
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+
+<main class="container mb-4x">
+    <div class="page-header">
+        <h1>@Html.PropertyFor(a => a.CurrentPage.Heading)</h1>
+    </div>
+    <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+        </div>
+    </div>
+    <div class="row">
+        @if (inEditMode)
+        {
+            <form class="form-horizontal col-xs-12 col-sm-10 col-md-8">
+                @{
+                    // ReSharper disable once Mvc.PartialViewNotResolved
+                    Html.RenderPartial("GDPROfflineCustomerPage", Model);
+                }
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                        <button type="button" class="btn btn-primary">@Html.PropertyFor(a => a.CurrentPage.SubmitButtonText)</button>
+                    </div>
+                </div>
+            </form>
+        }
+        else
+        {
+            using (Html.BeginForm("Index", null, FormMethod.Post, new { @class = "form-horizontal col-xs-12 col-sm-10 col-md-8", @id = "gdprForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(x => x.ViewModel.Scenario)
+                @Html.HiddenFor(x => x.ViewModel.UniqueId)
+                @Html.HiddenFor(x => x.ViewModel.CustomerType)
+                switch (Model.ViewModel.Scenario)
+                {
+                    case StringConstants.GdprScenario.ConfirmEmail:
+                        break;
+
+                    case StringConstants.GdprScenario.KnownCustomer:
+                        // ReSharper disable once Mvc.PartialViewNotResolved
+                        Html.RenderPartial("GDPRKnownCustomerPage", Model);
+                        break;
+
+                    case StringConstants.GdprScenario.QuickConsent:
+                        break;
+
+                    case StringConstants.GdprScenario.OfflineCustomer:
+                        // ReSharper disable once Mvc.PartialViewNotResolved
+                        Html.RenderPartial("GDPROfflineCustomerPage", Model);
+                        break;
+
+                    case StringConstants.GdprScenario.UnknownCustomer:
+                        // ReSharper disable once Mvc.PartialViewNotResolved
+                        Html.RenderPartial("GDPRUnknownCustomerPage", Model);
+                        break;
+                }
+                if (Model.CurrentPage.ContentBelowCheckBoxes != null && !Model.CurrentPage.ContentBelowCheckBoxes.IsEmpty)
+                {
+                    <div class="wysiwyg clear">
+                        @Html.DisplayFor(a => a.CurrentPage.ContentBelowCheckBoxes)
+                    </div>
+                }
+                if (Model.ViewModel.Scenario.Equals(StringConstants.GdprScenario.KnownCustomer) ||
+                    Model.ViewModel.Scenario.Equals(StringConstants.GdprScenario.OfflineCustomer))
+                {
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                            <button type="button" class="btn btn-primary" onclick="handleGdprButtonSubmit();">@Html.PropertyFor(a => a.CurrentPage.SubmitButtonText)</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <div class="col-xs-12 col-sm-9 col-sm-push-3">
+                            <button type="submit" class="btn btn-primary">@Html.PropertyFor(a => a.CurrentPage.SubmitButtonText)</button>
+                        </div>
+                    </div>
+                }
+            }
+        }
+
+        <div class="modal fade" id="gdprMessagesModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close trmi trmi-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                        <h4 class="modal-title">Are you sure?</h4>
+                    </div>
+                    <div class="modal-body">
+                        @Html.PropertyFor(x => x.CurrentPage.AreYouSureMessage)
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeGdprModal();">No</button>
+                        <button type="button" class="btn btn-primary" onclick="submitGdprForm();">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <div class="row">
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

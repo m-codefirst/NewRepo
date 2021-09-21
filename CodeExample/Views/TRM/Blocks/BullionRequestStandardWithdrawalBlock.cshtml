@@ -1,0 +1,195 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using EPiServer.Editor
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Models.ViewModels.Bullion.RequestStandardWithdrawal
+
+@model RequestStandardWithdrawalViewModel
+@{
+    var isQuickPayment = true;
+}
+
+@if (Model.RequestStandardWithdrawalBlock.MiddleContent != null || PageEditing.PageIsInEditMode)
+{
+    @Html.PropertyFor(x => x.RequestStandardWithdrawalBlock.MiddleContent)
+}
+<div class="col-xs-12 mb-xs-2x request-funds">
+    <div class="panel panel-default panel-secondary">
+        <div class="panel-body">
+            <h2 class="mt-0">@Model.RequestStandardWithdrawalBlock.HeaderText</h2>
+            @Html.Raw(Model.RequestStandardWithdrawalBlock.IntroText)
+            <hr />
+            <h3>@(Model.RequestStandardWithdrawalBlock.LabelAvailableCashTodayText): <span class="available-cash-text @(Model.AvailableCashValue < 0 ? "text-danger" : "text-success")">@Model.AvailableCashForWithdrawal</span></h3>
+            @{
+                var msgCss = "hidden";
+
+                if (Model.NoFundsAvailable)
+                {
+                    <div class="row">
+                        <div class="col-xs-12 mt-2x">
+                            <div class="alert alert-warning">
+                                @Html.Raw(Model.RequestStandardWithdrawalBlock.NoFundsAvailableMessage)
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (Model.NoLinkedAccount)
+                {
+                    <div class="row">
+                        <div class="col-xs-12 mt-2x">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Model.RequestStandardWithdrawalBlock.NoLinkedAccountMessage)
+                                <a class="btn btn-secondary mt-1x mb-1x" href="@(!string.IsNullOrEmpty(Model.BullionCustomerBankAccountLink)?Model.BullionCustomerBankAccountLink: string.Empty)">@Model.RequestStandardWithdrawalBlock.ManageLinkedBankAccountLabel</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row hidden">
+                        <div class="col-xs-12 mt-2x">
+                            <div class="alert @msgCss text-cente messageBoard hidden">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 mt-2x">
+                        <div class="row mb-1x">
+                            <div class="col-xs-12 col-md-3 text-left text-right-md-up ">
+                                <label class="control-label">@Model.RequestStandardWithdrawalBlock.LabelWithdrawalAmount <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-lg-3">
+                                <div class="input-group subtle mb-0">
+                                    <div class="input-group-addon" id="currencySymbol">@Model.CurrencySymbol</div>
+                                    @Html.TextBoxFor(x => x.WithdrawAmount, new { @class = "form-control form-group requestAmount", type = "text", placeholder = "Amount", title = "", min = 0, @floating_number_only = "true", @ng_model = "Amount", @maxlength = "9" })
+                                </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+                        <div class="row mb-1x">
+                            <div class="col-xs-12 col-md-3 text-left text-right-md-up">
+                                <label class="control-label">@Model.RequestStandardWithdrawalBlock.LabelBankAccountText <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-xs-12 col-md-6">
+                                <div class="select-form">
+                                    <select name="@Html.NameFor(x => x.BankAccountId)"
+                                            id="bankAccount"
+                                            class="pull-right form-control w-100 bankAccount">
+                                        @foreach (var bank in Model.BankAccounts)
+                                        {
+                                            <option value="@bank.CustomerBankAccountId"
+                                                    data-account-information="@bank.BankAccountInformation"
+                                                    data-fast-fee="@bank.FastWithdrawalFee.Amount"
+                                                    data-standard-fee="@bank.StandardWithdrawalFee.Amount">
+                                                @bank.Nickname
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-3">
+                                <div class="alert alert-info custom-account-alert-info p-5 mb-0">
+                                    <p class="custom-margins mt-0" id="bankAccountInformation"></p>
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model.RequestWithdrawalPaymentTypes != null && Model.RequestWithdrawalPaymentTypes.Any())
+                        {
+                            isQuickPayment = Model.RequestWithdrawalPaymentTypes.FirstOrDefault().IsQuickPayment;
+
+                            <div class="row mb-1x">
+                                <div class="col-xs-12 col-md-3 text-left text-right-md-up">
+                                    <label class="control-label">@Model.RequestStandardWithdrawalBlock.LabelPaymentTypeText <span class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-xs-12 col-md-6">
+                                    <div class="select-form">
+                                        <select class="pull-right form-control w-100 withdrawalPaymentType" id="withdrawalPaymentType" name="@Html.NameFor(x => x.PaymentType)">
+                                            @foreach (var type in Model.RequestWithdrawalPaymentTypes)
+                                            {
+                                                <option data-isquickpayment="@type.IsQuickPayment" @(Model.PaymentType != null && Model.PaymentType.DisplayName.Equals(type.DisplayName) ? "selected" : "")>@type.DisplayName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <p class="text-left text-right-md-up strong ">@(Model.RequestStandardWithdrawalBlock.LabelWithdrawalAmount):</p>
+                            </div>
+                            <div class="col-xs-4 col-sm-3">
+                                <p class="pull-right withdrawAmmount">@Model.CurrencySymbol@Model.WithdrawAmount</p>
+                            </div>
+                        </div>
+                        @{
+                            var firstBank = Model.BankAccounts.FirstOrDefault();
+                        }
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <p class="text-left text-right-md-up strong">@(Model.RequestStandardWithdrawalBlock.LabelWithdrawalFee):</p>
+                            </div>
+                            <div class="col-xs-4 col-sm-3">
+                                <p class="pull-right withdraw-fee">@(isQuickPayment ? firstBank.FastWithdrawalFee.ToString() : firstBank.StandardWithdrawalFee.ToString())</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <p class="h4 h3-lg-down text-left text-right-md-up mt-0 mb-0">@(Model.RequestStandardWithdrawalBlock.LabelWithdrawalTotal):</p>
+                            </div>
+                            <div class="col-xs-4 col-sm-3">
+                                <p class="h4 h3-lg-down pull-right mt-0 mb-0 withdrawTotalAmmount ">@(isQuickPayment ? firstBank.FastWithdrawalFee.ToString() : firstBank.StandardWithdrawalFee.ToString())</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-9">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-6">
+                                <p class="text-left text-right-md-up strong">@(Model.RequestStandardWithdrawalBlock.LabelRemainingBalance):</p>
+                            </div>
+                            <div class="col-xs-4 col-sm-3">
+                                <p class="pull-right remainingBalance">@Model.AvailableCash</p>
+                            </div>
+                        </div>
+                        <div class="row hidden" id="error-message">
+                            <div class="col-xs-12 col-sm-9">
+                                <div class="alert alert-danger mt-1x mb-1x content">
+                                    @Html.TranslateFallback(StringResources.MoreThanAvailable, "You do not have sufficient funds to process with this withdrawal request. Please reduce the withdrawal amount.")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <button class="btn btn-secondary pull-right mt-1x mb-1x btnSubmitRequest" id="btnSubmitRequest">@Model.RequestStandardWithdrawalBlock.ButtonSubmitRequest</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    @Html.HiddenFor(x => x.NoLinkedAccount)
+                    @Html.HiddenFor(x => x.AvailableCashValue, new { @class = "availableCash" })
+                    @Html.HiddenFor(x => x.NoFundsAvailable)
+                    <input class="reachedLimitMessage" type="hidden" value="@Html.TranslateFallback(StringResources.MoreThanAvailable, "You cannot withdraw more than your available cash!")" data-original-title="" title="">
+                    <input class="positiveMessage" type="hidden" value="@Html.TranslateFallback(StringResources.PositiveValue, "Amount To Withdraw need to be Positive Value")" data-original-title="" title="">
+                }
+            }
+            <div class="row mb-2x">
+                <div class="col-xs-12">
+                    <hr />
+                    @Html.Raw(Model.RequestStandardWithdrawalBlock.FooterText)
+                </div>
+            </div>
+
+            @if (Model.RequestStandardWithdrawalBlock.NewContent != null || PageEditing.PageIsInEditMode)
+            {
+                <div class="row mt-1x">
+                    @Html.PropertyFor(x => x.RequestStandardWithdrawalBlock.NewContent)
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "bullionRequestWithdrawal").AtFooter();
+}

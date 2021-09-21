@@ -1,0 +1,117 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels
+@using Resources = TRM.Web.Constants.StringResources
+@using Newtonsoft.Json
+@using TRM.Web.Constants
+
+@model IEnumerable<OrderListViewModel>
+@{ 
+    var orderPage = ViewData["orderPage"];
+    var isImpersonating = ViewData["isImpersonating"]; 
+}
+
+@foreach (var order in Model)
+{
+    var orderUrl = string.Format("{0}?oid={1}", orderPage, Html.Encode(order.OrderNumber));
+
+    var viewModel = new
+    {
+        content = new
+        {
+            closeButtonText = @Html.TranslateFallBack(StringResources.CloseOrder, "Close Order"),
+            openButtonText = @Html.TranslateFallBack(StringResources.OpenOrder, "Open Order"),
+            closeTitle = @Html.TranslateFallBack(StringResources.CloseOrder, "Close Order"),
+            openTitle = @Html.TranslateFallBack(StringResources.OpenOrder, "Open Order"),
+        },
+        orderId = order.OrderId,
+        orderNumber = order.OrderNumber,
+        isOpenOrder = order.IsOpenOrder,
+    };
+
+    <div class="order">
+        <div class="row justify-content-center">
+            <table class="table col-11 col-md-10 mb-5">
+                <tbody>
+                    <tr>
+                        <th>@Html.TranslateFallback(Resources.OrderPlaced, "Order placed")</th>
+                        <td>@order.OrderDate.ToString("dd MMMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.TranslateFallback(Resources.OrderTotal, "Order total")</th>
+                        <td>@order.SalesTotal.ToString("C2")</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.TranslateFallback(Resources.DispatchedTo, "Dispatched to")</th>
+                        <td>@order.OrderDispatchedTo</td>
+                    </tr>
+                    <tr>
+                        <th>@Html.TranslateFallback(Resources.OrderReference, "Order reference")</th>
+                        <td>
+                            @if (orderPage != null && !string.IsNullOrWhiteSpace(orderPage.ToString()))
+                            {
+                                <a href="@orderUrl">@order.OrderNumbers.ToCommaSeparatedString()</a> 
+                            }
+                            else
+                            {
+                                @:  @order.OrderNumbers.ToCommaSeparatedString()
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        @if (order.OrderItems != null)
+        {
+            foreach (var item in order.OrderItems)
+            {
+                <div class="product-card product-card-horizontal product-order product-consumer container">
+
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-sm-4 col-lg-3">
+                            <div class="asset"><img src="@item.ImageUrl" alt="@item.DisplayName"></div>
+                        </div><!-- /.asset -->
+
+                        <div class="col-12 col-sm-8 col-lg-9">
+
+                            <div class="row">
+                                <div class="col-12 col-lg-8 product-information">
+                                    <h3 class="product-name mb-0">@item.DisplayName</h3>
+                                    <h4 class="h3">@item.SubTitle</h4>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <p class="product-quantity">Quantity <span>@item.Quantity.ToString("0.#")</span></p>
+                                        </div>
+
+                                    </div>
+                                </div><!-- /.product-information -->
+                                <div class="col-12 col-lg-4 product-total">
+                                    <div class="totals">
+                                        <p class="total">Total @((item.PlacedPriceDecimal * item.Quantity).ToString("C2"))</p>
+                                        <p class="unit-price">@item.PlacedPriceDecimal.ToString("C2") per unit</p>
+                                    </div>
+                                </div><!-- /.product-total -->
+
+                            </div><!-- /.row -->
+                        </div><!-- /.product-container -->
+
+                    </div><!-- /.row -->
+                </div><!-- /.product-card -->
+            }
+        }
+        <div class="row btns justify-content-center justify-content-xl-end">
+            @if (orderPage != null && !string.IsNullOrWhiteSpace(orderPage.ToString()))
+            {
+                <div class="col-md-6 col-lg-4 col-xl-3">
+                    <a href="@orderUrl" class="btn btn-primary mb-lg-0">More details</a>
+                </div> 
+                
+                if (isImpersonating != null && isImpersonating.ToString() == "True")
+                {
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div data-module="open-close-order" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+                    </div>
+                }
+            }
+        </div><!-- /.btns -->
+    </div><!-- /.order -->
+}

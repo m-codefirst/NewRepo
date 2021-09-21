@@ -1,0 +1,21 @@
+﻿@model  Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.LocalizedString, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    Layout = "~/Views/Shared/_LocalizedLayout.cshtml";
+}
+<h3>Localized String</h3>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Path</th>
+            <th>Key Name</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.CurrentPage.LookupKey</td>
+            <td>@Html.PropertyFor(m => m.CurrentPage.Keyname, new { CustomTag = "span" })</td>
+            <td>@Html.PropertyFor(m => m.CurrentPage.Translation, new { CustomTag = "span" })</td>
+        </tr>
+    </tbody>
+</table>

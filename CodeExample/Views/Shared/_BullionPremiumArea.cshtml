@@ -1,0 +1,50 @@
+﻿@using EPiServer.Core
+@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.Blocks
+@using TRM.Web.Models.Blocks.Bullion
+@model IList<TRM.Web.Models.ViewModels.QuantityBreakModel>
+
+@{
+	var items = Model.ToList();
+}
+
+@{
+	if (Model != null && items.Count > 0)
+	{
+		<div class="pdp-price-table">
+			<div class="cta-action mt-2x mb-1x text-ochre">
+				<a class="h6" data-toggle="collapse" href="#pdp-price-table" role="button" aria-expanded="false" aria-controls="collapseExample">
+					<span class="mr-5">
+						<i class="trmi trmi-angle-down"></i>
+						<i class="trmi trmi-angle-up"></i>
+					</span>
+					<span class="hide-label">Hide Bulk Discount</span>
+					<span class="show-label">View Bulk Discount</span>
+				</a>
+			</div>
+			<div class="variantTable collapse" id="pdp-price-table" aria-expanded="true" style="">
+				<table class="table">
+					<tbody>
+						<tr class="bg-pearl">
+							<th>@Html.TranslateFallback(StringResources.QuantityBreakQuantity, "Quantity")</th>
+							<td>@Html.TranslateFallback(StringResources.QuantityBreakUnitPrice, "Unit Price")</td>
+						</tr>
+						@{
+							foreach (var quantityBreak in items)
+							{
+								var index = items.IndexOf(quantityBreak);
+								var isLast = items.LastOrDefault().Equals(quantityBreak);
+								<tr ng-class="{'bg-warning': isHighLightQuantityBreak(@quantityBreak.Quantity, @(isLast ? -1 : items[index+1].Quantity), @index == 0)}">
+									<th>@quantityBreak.Quantity+</th>
+									<td>@quantityBreak.PriceString</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+							}
+}

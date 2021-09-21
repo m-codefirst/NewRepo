@@ -1,0 +1,30 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.CreditAccountBlockViewModel
+
+<div class="mod-section">
+    @if (!Model.CurrentBlock.HideHeading && Model.CurrentBlock.HeaderTitle != null)
+    {
+        <div class="section-head">
+            <span>@Html.PropertyFor(x => x.CurrentBlock.HeaderTitle)</span>
+        </div>
+    }
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-9">
+            @Html.PropertyFor(x => x.CurrentBlock.Description)
+            <div class="row btns justify-content-center">
+                @if (Model.CurrentBlock.Navigations != null && Model.CurrentBlock.Navigations.Any())
+                {
+                    var lastItem = Model.CurrentBlock.Navigations.LastOrDefault();
+                    foreach (var item in Model.CurrentBlock.Navigations)
+                    {
+                        <div class="col-md-4">
+                            <a href="@Url.ContentUrlExtension(item.Href)" class="btn @(item.Equals(lastItem) ? "btn-primary" : "btn-secondary")" target="@item.Target">@item.Text</a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

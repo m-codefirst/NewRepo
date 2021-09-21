@@ -1,0 +1,36 @@
+﻿@using EPiServer.Editor
+@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Business.Gtm
+@using TRM.Shared.Constants
+
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+@{
+    if (!PageEditing.PageIsInEditMode && !string.IsNullOrWhiteSpace(Model.GoogleTagManagerHeaderSnippet))
+    {
+        <script type="text/javascript">
+            var dataLayer = [
+                @{
+                    var gtmReader = ServiceLocator.Current.GetInstance<IReadGtmDataLayer>();
+                    if (gtmReader != null)
+                    {
+                        var dataLayer = gtmReader.Read(new HttpContextWrapper(HttpContext.Current));
+                        if (!string.IsNullOrWhiteSpace(dataLayer))
+                        {
+                            @Html.Raw(dataLayer)
+                        }
+                    }
+                }
+            ];
+        </script>
+
+        <script type="application/ld+json">
+            @{
+                var searchLayer = new HttpContextWrapper(HttpContext.Current).Items[StringConstants.GoogleSearch.Article] as Newtonsoft.Json.Linq.JObject;
+                if (searchLayer != null)
+                {
+                    @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(searchLayer));
+                }
+            }
+        </script>
+    }
+}

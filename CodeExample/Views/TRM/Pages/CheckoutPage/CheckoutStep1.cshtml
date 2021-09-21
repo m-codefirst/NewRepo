@@ -1,0 +1,181 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep1ViewModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	var url = string.Empty;
+	if (Request != null && Request.Url != null)
+	{
+		url = Request.Url.AbsoluteUri.ToLowerInvariant();
+	}
+	var isLoggedIn = Request.IsAuthenticated;
+}
+
+<div class="pageContainer">
+	<div class="content-area"></div>
+	<div class="container mb-4x mt-2x">
+		@if (Model.CurrentPage.DisplayPageHeading)
+		{
+			<div class="page-header">
+				<h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+			</div>
+		}
+		<ol class="nav nav-bar nav-progress-bar mb-2x">
+			<li class="active"><a href="#">@Html.DisplayFor(m => m.CurrentPage.Step1Number) <span>@Html.DisplayFor(m => m.CurrentPage.Step1Heading)</span></a></li>
+			@if (!isLoggedIn)
+			{
+				<li>@Html.DisplayFor(m => m.CurrentPage.Step2Number) <span> @Html.DisplayFor(m => m.CurrentPage.Step2Heading) </span> </li>
+			}
+			<li>@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step2Number) : Html.DisplayFor(m => m.CurrentPage.Step3Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step3Heading) </span> </li>
+			<li>@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step3Number) : Html.DisplayFor(m => m.CurrentPage.Step4Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step4Heading) </span> </li>
+			<li>@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step4Number) : Html.DisplayFor(m => m.CurrentPage.Step5Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step5Heading) </span> </li>
+		</ol>
+		<main class="row mb-4x" ng-controller="rmLogin">
+			<div id="checkout-login-form-main">
+				<div class="col-xs-12 col-sm-5 col-lg-4 col-lg-offset-1">
+
+					<div class="mb-2x" id="loginForm-main" ng-show="showCheckOutTwoStepAuthentication == false">
+						@if (!string.IsNullOrEmpty(Model.CurrentPage.Step1LeftPanelHeading))
+						{
+							<h4 class="mt-0 mb-5">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelHeading)</h4>
+						}
+						@if (!string.IsNullOrEmpty(Model.CurrentPage.Step1LeftPanelSubHeading))
+						{
+							<h6 class="mt-0">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelSubHeading)</h6>
+						}
+						@if (Model.CurrentPage.Step1LeftPanelEditorialContent != null && !Model.CurrentPage.Step1LeftPanelEditorialContent.IsEmpty)
+						{
+							@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelEditorialContent)
+						}
+						<form class="ng-pristine ng-valid" autocomplete="off" ng-submit="checkoutLogin()">
+							<div class="form-group mb-1x input-subtle">
+								<label class="sr-only" for="loginEmail1-main">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelEmailAddressPrompt)</label>
+								<input type="text" class="form-control" id="loginEmail1-main" placeholder="@Model.CurrentPage.Step1LeftPanelEmailAddressPrompt" data-original-title="" title="">
+							</div>
+						    <div class="form-group input-subtle mb-1x">
+						        <label class="sr-only" for="loginUsrPW1-main">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelPasswordPrompt)</label>
+						        <input type="password" class="form-control" id="loginUsrPW1-main" placeholder="@Model.CurrentPage.Step1LeftPanelPasswordPrompt" data-original-title="" title="">
+						    </div>
+						    <div ng-if="enhancedMessage" class="row" ng-bind-html="enhancedMessage">
+						    </div>
+							<p ng-cloak ng-hide="!hasError" class="has-error">
+								{{ loginMessage }}
+							</p>
+							<div class="row mb-2x">
+								<div class="col-xs-12 col-sm-8">
+									<button class="btn btn-secondary btn-block" id="login-main" type="submit">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelLoginButtonText)</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-12">
+									<a href="" data-show="#forgottenPW-main" data-hide="#loginForm-main" class="pw-link">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelForgottenPasswordPrompt)</a>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="mb-2x" id="twoAuthenticationQuestionAndAnwser-main" autocomplete="off" ng-show="showCheckOutTwoStepAuthentication == true">
+						<h4 class="mt-0 mb-0">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelTwoStepAuthenticationQuestionHeading)</h4>
+						<form class="ng-pristine ng-valid" autocomplete="off" id="checkOutFormSecurityQuestion" name="formSecurityQuestion" ng-submit="checkoutLogin()">
+							<div class="form-group">
+								<h6 class="mt-0">{{checkoutSecurityQuestion}}</h6>
+								<input class="form-control" ng-required="true" type="text" value="" ng-model="checkoutSecurityAnswer" id="securityAnswer-header" placeholder="@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelTwoStepAuthenticationQuestionPlaceHolder)">
+							</div>
+
+							<p ng-cloak ng-hide="!hasError" class="has-error">
+								<span class="help-block">{{ loginMessage }}</span>
+							</p>
+							<div ng-cloak ng-show="showSuccessMsg" class="help-block">
+								{{ loginMessage }}
+							</div>
+
+							<div class="row">
+								<div class="col-xs-12 col-md-8">
+									<button class="btn btn-secondary btn-block" id="checkoutLogin-securityQuestion" type="submit">@Html.DisplayFor(m => m.CurrentPage.Step1LeftPanelTwoStepAuthenticationQuestionButtonText)</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="hidden mb-2x" id="forgottenPW-main">
+						<h4 class="mt-0 mb-5">@Html.PropertyFor(m => m.CurrentPage.Step1LeftPanelForgottenPasswordHeading)</h4>
+						<h6 class="mt-0">@Html.PropertyFor(m => m.CurrentPage.Step1LeftPanelForgottenPasswordSubHeading)</h6>
+						<form class="" name="forgtternPWform" ng-submit="resetPassword('#showResetConfirmation-checkout', '#showLoginForm-checkout', true)">
+						    <div class="form-group mb-2x input-subtle">
+						        <label class="sr-only" for="Emailcheckout">@Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddress, "Email address or username")</label>
+						        <input type="email" class="form-control" id="Emailcheckout" ng-required="true" validate-email ng-model="resetEmail" placeholder="@Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressPlaceholder, "Please enter your email")">
+						    </div>
+						    <div class="form-group mb-2x">
+						        <div id="recaptchaForgotPasswordOnCheckoutPageDiv"></div>
+						    </div>
+						    <div class="form-group mb-2x has-error" ng-if="resetPasswordError!=''">
+						        <span class="help-block">
+						            <span class="field-validation-error">{{resetPasswordError}}</span>
+						        </span>
+						    </div>
+							<div class="row mb-2x">
+								<div class="col-xs-12 col-md-8">
+									<button disableonclick class="btn btn-secondary btn-block" type="submit">@Html.TranslateFallback(StringResources.ResetPassword, "Reset Password")</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-12"><a href="" data-hide="#forgottenPW-main" data-show="#loginForm-main" class="pw-link">@Html.TranslateFallback(StringResources.Cancel, "Return to login")</a></div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-1 col-lg-1 hidden-xs">
+					<div class="separator">
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-5 col-lg-4 col-sm-offset-1">
+					@if (Model.ViewModel.ShouldHideGuestCheckoutOption)
+					{
+						<div>@Html.PropertyFor(x => x.CurrentPage.ContentWhenHideGuestCheckoutOption)</div>
+					}
+					else
+					{
+						if (!string.IsNullOrEmpty(Model.CurrentPage.Step1RightPanelHeading))
+						{
+							<h4 class="mt-0 mb-5">@Html.DisplayFor(m => m.CurrentPage.Step1RightPanelHeading)</h4>
+						}
+						if (!string.IsNullOrEmpty(Model.CurrentPage.Step1RightPanelSubHeading))
+						{
+							<h6 class="mt-0">@Html.DisplayFor(m => m.CurrentPage.Step1RightPanelSubHeading)</h6>
+						}
+						if (Model.CurrentPage.Step1RightPanelEditorialContent != null && !Model.CurrentPage.Step1RightPanelEditorialContent.IsEmpty)
+						{
+							@Html.DisplayFor(m => m.CurrentPage.Step1RightPanelEditorialContent)
+						}
+						<a class="btn btn-secondary" href="@(string.Format("{0}{1}", url, "checkoutstep2"))">Proceed with checkout</a>
+					}
+				</div>
+			</div>
+			<div class="row hidden" id="passwordResetConfirmation-checkout">
+				<a id="showResetConfirmation-checkout" class="hidden" data-show="#passwordResetConfirmation-checkout" data-hide="#checkout-login-form-main"></a>
+				<a id="showLoginForm-checkout" class="hidden" data-show="#loginForm-main" data-hide="#forgottenPW-main"></a>
+				<div class="mb-2x col-xs-12 col-md-11 col-lg-offset-1">
+					<h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationHeading, "Password reset sent")</h4>
+					<h6>@Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationSubHeading, "You will receive an email shortly with instructions on how to reset your password.")</h6>
+					<div class="row mb-3x mt-2x">
+						<div class="contentArea clear col-xs-12 col-md-11" @Html.EditAttributes(m => m.CurrentPage.Step1ForgottenPasswordConfirmationContentArea)>
+							<div class="row">
+								@Html.DisplayFor(m => m.CurrentPage.Step1ForgottenPasswordConfirmationContentArea)
+							</div>
+						</div>
+					</div>
+					<div class="row col-xs-3 col-md-3">
+						<a href="" data-hide="#passwordResetConfirmation-checkout" data-show="#checkout-login-form-main" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.GoToLogin, "Go to login")</a>
+					</div>
+					<div class="row col-xs-12 col-md-12">
+						<a href="/" class="pw-link" style="position: relative;">@Html.TranslateFallback(StringResources.ReturnToHomePage, "Return to our homepage")</a>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>

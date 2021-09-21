@@ -1,0 +1,100 @@
+﻿@using System.Web.Mvc.Html
+@model TRM.Web.Models.ViewModels.MyAccountCreditPaymentViewModel
+
+@if (!Request.IsAuthenticated)
+{
+    <div class="panel panel-default panel-secondary col-xs-12">
+        <div class="panel-body">
+            @Html.PropertyFor(m => m.ThisBlock.NoCreditAccountMessage)
+        </div>
+    </div>
+}
+else if (!Model.CustomerHasCreditAccount)
+{
+    <div class="panel panel-default panel-secondary col-xs-12">
+        <div class="panel-body">
+            @Html.PropertyFor(m => m.ThisBlock.NoCreditAccountMessage)
+        </div>
+    </div>
+}
+else
+{
+    <div class="panel panel-default panel-secondary" ng-controller="rmCheckoutController as rmAddInfo">
+        
+        <input type="hidden" ng-model="selectedAddress.CountryCode" ng-init="selectedAddress.CountryCode='@Model.BillingAddressCountyCode'" />
+        <div class="panel-body">
+            @{
+    var ngSnippet = "";
+    if (string.IsNullOrWhiteSpace(Model.AccountPaymentOrderId))
+    {
+        ngSnippet = "ng-if=\"accPayOrderNumber !== ''\"";
+    }
+            }
+
+            <div @Html.Raw(ngSnippet)>
+                @Html.PropertyFor(x => x.ThisBlock.PaymentSuccessfullMessage)
+
+
+                <h5>@Html.PropertyFor(m => m.ThisBlock.OrderNumberLabel)</h5>
+                @Model.AccountPaymentOrderId {{accPayOrderNumber}}
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.AccountPaymentOrderErrorMessage))
+            {
+                @Model.AccountPaymentOrderErrorMessage
+            }
+            {{accPayErrorMessage}}
+
+            <div ng-if="accPayOrderNumber === '' && accPayErrorMessage === ''">
+                @Html.PropertyFor(x => x.ThisBlock.PaymentInformation)
+            </div>
+            @if (Model.PaymentProviders != null)
+            {
+                <div class="row" ng-show="accPayOrderNumber === '' && accPayErrorMessage === ''">
+                    <div class="col-xs-12 col-sm-8">
+                        @if (Model.PaymentProviders.Any(x => x.IsActive))
+                        {
+                            var payMethod = Model.PaymentProviders.FirstOrDefault(x => x.PaymentMethodId.Equals(Model.MastercardPaymentMethodId));
+                            if (payMethod != null)
+                            {
+                                var vm = new TRM.Web.Models.ViewModels.PaymentMethodViewModel()
+                                {
+                                    PaymentMethodRow = payMethod,
+                                    AllowSavedCards = Model.ThisBlock.EnableSavedCards
+                                };
+                                var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, payMethod.SystemKeyword);
+                                if (result != null && result.View != null)
+                                {
+                                    Html.RenderPartial(payMethod.SystemKeyword, vm);
+                                }
+                            }
+                        }
+                        <hr>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6 col-lg-5">
+                                <div class="form-group mb-0 mb-xs-1x">
+                                    <label>Amount to pay <span class="text-danger">*</span></label>
+                                    <div class="input-group subtle  mb-0">
+                                        <div class="input-group-addon">£</div>
+                                        <input type="number" class="form-control" id="exampleInputAmount" ng-model="paymentAmount" placeholder="Amount">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 pull-right">
+                                <div class="form-group  mb-0">
+                                    <label class="hidden-xs">&nbsp;</label>
+                                    <button type="submit" class="btn btn-secondary btn-block" ng-disabled="!SelectedCard || paymentAmount == NaN || paymentAmount <=0" ng-click="postPayment()">@Model.ThisBlock.MakePaymentLabel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+
+        </div>
+        <div id="paymentDiv"></div>
+
+    </div>
+} 

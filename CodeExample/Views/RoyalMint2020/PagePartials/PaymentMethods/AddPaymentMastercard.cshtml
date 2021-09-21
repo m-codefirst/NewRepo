@@ -1,0 +1,171 @@
+﻿@using DocumentFormat.OpenXml.Vml.Spreadsheet
+@using EPiServer.Business.Commerce.Payment.BarclaysCardPayment.Barclays
+@using EPiServer.Business.Commerce.Payment.Mastercard.Mastercard
+@using TRM.Web.Models.ViewModels
+@using TRM.Shared.Extensions
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using Newtonsoft.Json
+@using TRM.Web.Helpers
+@using TRM.Web.Models.ViewModels.Bullion
+
+@using TRMStringResources = TRM.Shared.Constants.StringResources
+@model TRM.Web.Models.ViewModels.MyAccountCreditPaymentViewModel
+
+@{
+    var vm = new PaymentMethodViewModel();
+    if (Model.PaymentProviders != null && Model.PaymentProviders.Any(x => x.IsActive))
+    {
+        var payMethod = Model.PaymentProviders.FirstOrDefault(x => x.IsBarclaysPayment())
+                        ?? Model.PaymentProviders.FirstOrDefault(x => x.PaymentMethodId.Equals(Model.MastercardPaymentMethodId));
+
+        if (payMethod != null)
+        {
+            vm = new TRM.Web.Models.ViewModels.PaymentMethodViewModel()
+            {
+                PaymentMethodRow = payMethod,
+                AllowSavedCards = Model.ThisBlock.EnableSavedCards,
+                MakePaymentPostData = new MakePaymentPostData
+                {
+                    ReturnUrl = Request.Url?.AbsoluteUri ?? Request.RawUrl
+                }
+            };
+            var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, payMethod.SystemKeyword);
+        }
+    }
+    var paymentMethodParameters = vm.PaymentMethodRow != null ? vm.PaymentMethodRow.GetPaymentMethodParameterRows() : null;
+
+    var sessionJsUrl = paymentMethodParameters != null && paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl).Value : string.Empty;
+
+    var amexSessionJsUrl = paymentMethodParameters != null && paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl).Value : string.Empty;
+
+    var countryCodes = paymentMethodParameters != null && paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter).Value.Split(',') : null;
+
+    var countryCodesJsArray = string.Empty;
+    if (countryCodes != null && countryCodes.Any())
+    {
+        countryCodesJsArray = string.Join(",", countryCodes.Select(x => string.Format("'{0}'", x.Trim())));
+    }
+
+    var paymentMethodId = Model.Disabled ? Guid.NewGuid() : (vm.PaymentMethodRow != null ? vm.PaymentMethodRow.PaymentMethodId : Guid.NewGuid());
+    var mthodParams = vm.PaymentMethodRow != null ? vm.PaymentMethodRow.GetPaymentMethodParameterRows() : null;
+
+    var countryHelper = new CountryHelper();
+    var countryList = countryHelper.GetCountries().CastToDictionary();
+
+    var isBarclaysProviderActive = vm.PaymentMethodRow?.IsBarclaysPayment() ?? false;
+
+    var ViewModel = new
+    {
+        showAmountAndMakePayment = true,
+        nextButtonText = Html.TranslateFallback(StringResources.Next, "Next"),
+        modifyAmountButtonText = Html.TranslateFallback(StringResources.ModifyAmount, "Modify Amount"),
+        youHaveChosenToFundText = Html.TranslateFallback(StringResources.YouHaveChosenToFund, "You have chosen to fund:"),
+        enterPaymentDetailsUrl = "/mvcapi/accountpayment/makepaymentaddcredits",
+        enterPaymentDetailsPostData = vm.MakePaymentPostData,
+        dontResetFormWhenSelectCreditCard = true,
+        isBarclaysProviderActive = isBarclaysProviderActive,
+        barclaysPaymentMethodId = vm.PaymentMethodRow.GetBarclaysPaymentMethodIdOrDefault(),
+        antiForgeryTokenValue = Html.AntiForgeryTokenValue(),
+
+        message = Model.Message != null ? Model.Message.Message : "",
+        makePaymentButtonText = Html.TranslateFallback(StringResources.BullionAddPaymentsSubmitButton, "Submit payment"),
+        paymentHeading = Html.TranslateFallback(StringResources.BullionAddPaymentsHeader, "Payment against credit balance"),
+        paymentDescription = Model.ThisBlock.FundWithCardDescription,
+        mainContent = Model.ThisBlock.MainContent != null ? Html.ParseXhtmlString(Model.ThisBlock.MainContent).ToString() : "",
+        cancelButtonText = "cancel",
+        cancelLink = "",
+        bankTransferDescription = Html.PropertyFor(x => x.ThisBlock.MiddleContentArea).ToString(),
+        amountTitle = @Html.TranslateFallback(StringResources.BullionAddPaymentsAmountToPay, "Amount to pay"),
+        recomendedTopUp = "",
+        recommendedPriceTopUp = "",
+        completedLink = "",
+        paymentMethodId = paymentMethodId,
+        orderNumberPrefix = "", //Model.ThisBlock.OrderNumberPrefix,
+        currencySymbol = Model.CurrencyCode.ToCurrencySymbol(),
+        investmentOrderTotal = "",
+        currentWalletBallance = "",
+        invalidAmountOfPayments = Html.TranslateFallback(TRM.Shared.Constants.StringResources.InvalidAmountOfFunds, "Invalid amount."),
+        isAuthenticated = Request.IsAuthenticated,
+        paymentSuccessfullHeader = Html.TranslateFallback(StringResources.BullionAddFundsPaymentSuccessHeader, "Payment Sucessful"),
+        paymentSuccessfullDescription = Html.TranslateFallback(StringResources.BullionPaymentSuccessfully, "Your payment has been received, Thanks!"),
+        orderNumber = Html.TranslateFallback(StringResources.BullionAddFundsOrderNumber, "Order Number:"),
+        showInvestBalance = false,
+        address = "", //Model.Address,
+        addressLabel = @Html.TranslateFallback(StringResources.CustomerCurrentAddress, "Your current address is"),
+        bottomContentArea = @Html.PropertyFor(x => x.ThisBlock.Accordion2BottomContentArea).ToString(),
+        bankAccountDetail = "", //Model.BankAccountDetail != null ? Model.BankAccountDetail : null,
+        kyc = new
+        {
+            modalTitle = Html.TranslateFallback(StringResources.AmlReapplicationModalTitle, "KYC"),
+            title = Html.TranslateFallback(StringResources.AmlReapplicationTitle, "Your Bullion Details"),
+            firstName = Html.TranslateFallback(StringResources.AmlReapplicationFirstName, "First Name"),
+            firstNameRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrFirstNameRequired, "Your first name is required!"),
+            middleName = Html.TranslateFallback(StringResources.AmlReapplicationMiddleName, "Middle Name"),
+            lastName = Html.TranslateFallback(StringResources.AmlReapplicationLastName, "Last Name"),
+            lastNameRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrLastNameRequired, "Your last name is required!"),
+            gender = Html.TranslateFallback(StringResources.AmlReapplicationGender, "Gender"),
+            genderRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrGenderRequired, "Your gender is required!"),
+            genderList = TRM.Web.Extentions.EnumExtensions.GetGenderList(),
+            birth = Html.TranslateFallback(StringResources.AmlReapplicationDateOfBirth, "Date of Birth"),
+            birthRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrDateOfBirthRequired, "Your date of birth is required!"),
+            addressTitle = Html.TranslateFallback(StringResources.AmlReapplicationAddressTitle, "Your Bullion Address"),
+            addressFirstLine = Html.TranslateFallback(StringResources.AmlReapplicationAddressFirstLineLabel, "First Line"),
+            addressSecondLine = Html.TranslateFallback(StringResources.AmlReapplicationAddressSecondLineLabel, "Second Line"),
+            city = Html.TranslateFallback(StringResources.AmlReapplicationAddressCityLabel, "City"),
+            state = Html.TranslateFallback(StringResources.AmlReapplicationAddressStateLabel, "State/County"),
+            //  stateRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrStateRequired, "Your state/county is required!"),
+            country = Html.TranslateFallback(StringResources.AmlReapplicationAddressCountryLabel, "Country"),
+            postcode = Html.TranslateFallback(StringResources.AmlReapplicationAddressPostcodeLabel, "Postal Code"),
+            line1Required = Html.TranslateFallback(StringResources.AmlReapplicationErrFirstAddressLineRequired, "Your first line of address is required!"),
+            line1MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            line2MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            countryRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrCountryRequired, "Your country is required!"),
+            postcodeRequired = Html.TranslateFallback(StringResources.ErrorPostCode, "Postal Code is required"),
+            postcodeMaxLength = string.Format(Html.TranslateFallback(StringResources.MaxlengthError, "Postal Code is over {0} signs"), 11),
+            postcodeInvalid = Html.TranslateFallback(StringResources.ErrorPostCodeInvalid, "Postal Code is invalid"),
+            cityRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrCityRequired, "Your city is required!"),
+            cityMaxLength = string.Format(Html.TranslateFallback(StringResources.CityMaxlengthError, "City cannot be longer than {0} characters"), 64),
+            countyMaxLength = string.Format(Html.TranslateFallback(StringResources.CountyMaxlengthError, "County cannot be longer than {0} characters"), 64),
+            countryList = countryList,
+            button = Html.TranslateFallback(StringResources.AmlReapplicationButtonText, "Re-Apply for Kyc"),
+        }
+    };
+}
+
+<script type="text/javascript">
+    var globals = globals || {};
+    globals.paymentMethodParameters = '@mthodParams';
+    globals.sessionJsUrl = '@sessionJsUrl';
+    globals.amexSessionJsUrl = '@amexSessionJsUrl';
+    globals.countryCodes = '@countryCodes';
+    globals.countryCodesJsArray = '@countryCodesJsArray';
+    globals.paymentMethodId = '@paymentMethodId';
+    globals.chooseACard = '@Html.TranslateFallback(TRMStringResources.MastercardChooseACard, "Choose a card")';
+    globals.allowSavedCards = '@vm.AllowSavedCards';
+    globals.expiredMessage = '@vm.ExpiredMessage';
+    globals.cardEnding = '@Html.TranslateFallback(TRMStringResources.MastercardEnding, "Ending")';
+    globals.cardRemove = '@Html.TranslateFallback(TRMStringResources.MastercardRemoveCard, "Remove")';
+    globals.inputName = '@TRM.Shared.Constants.StringConstants.Payments.SelectedCard"';
+    globals.newCard = '@Html.TranslateFallback(TRMStringResources.MastercardNewCard, "New card")';
+    globals.newCardSubtitle = "",
+    globals.newAmexCard = '@Html.TranslateFallback(TRMStringResources.MastercardNewAmexCard, "New Amex Card")';
+    globals.cardNumber = '@Html.TranslateFallback(TRMStringResources.MastercardCardNumber, "Card Number")';
+    globals.endDate = '@Html.TranslateFallback(TRMStringResources.MastercardEndDate, "End date")';
+    globals.monthPlaceholder = '@Html.TranslateFallback(TRMStringResources.MastercardMonthPlaceholder, "MM")';
+    globals.yearPlaceholder = '@Html.TranslateFallback(TRMStringResources.MastercardYearPlaceholder, "YYYY")';
+    globals.name = '@Html.TranslateFallback(TRMStringResources.MastercardNameOnCard, "Name on Card")';
+    globals.nameSuffix = '@Html.TranslateFallback(TRMStringResources.MastercardNameOnCardSuffix, "(Exactly as it appears on the card)")';
+    globals.namePlaceholder = '@Html.TranslateFallback(TRMStringResources.MastercardNameOnCardPlaceholder, "Name on Card")';
+    globals.cvc = '@Html.TranslateFallback(TRMStringResources.MastercardCcvNumber, "CCV Number")';
+    globals.cvcHelp4Digits = '@Html.TranslateFallback(TRMStringResources.MastercardCcvHelpMessageAmex, "Last 4 digits on the back of the card")';
+    globals.cvcHelp3Digits = '@Html.TranslateFallback(TRMStringResources.MastercardCcvHelpMessage, "Last 3 digits on the back of the card")';
+    globals.saveCard = '@Html.TranslateFallback(TRMStringResources.MastercardSaveCard, "Save card for future use?")';
+</script>
+
+<div data-module="add-payments" data-settings="@JsonConvert.SerializeObject(ViewModel)"></div>
+
+@Html.Partial("_RedirectOutsideTheIframe")

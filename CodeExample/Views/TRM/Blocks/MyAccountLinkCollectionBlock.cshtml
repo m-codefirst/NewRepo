@@ -1,0 +1,14 @@
+﻿@using TRM.Shared.Extensions 
+@model TRM.Web.Models.ViewModels.MyAccountLinkCollectionBlockViewModel
+
+<div class="row ">
+    <div class="col-xs-12">
+        @if (Model.CurrentBlock.LinkCollection != null && Model.CurrentBlock.LinkCollection.Any())
+        {
+            foreach (var item in Model.CurrentBlock.LinkCollection)
+            {
+                <a class="cta-link" target="@item.Target" href="@Url.ContentUrlExtension(item.Href)" title="@item.Title">@item.Text</a>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,29 @@
+﻿@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+@{
+    var layout = Model.Layout as TrmLayoutModel;
+}
+
+
+<div class="variantQuickInfo">
+    @if (Model.ViewModel.BulletPoints.Any())
+    {
+        <a class="visible-xs collapseHeading collapsed" role="button" data-toggle="collapse" data-target="#variantinfocollapse" aria-expanded="false" aria-controls="collapseExample">Product details</a>
+        <div class="collapse in" ng-class="showClass" id="variantinfocollapse" variantinfocollapse="">
+            <ul class="unordered-list pl-0">
+                @foreach (var bullet in Model.ViewModel.BulletPoints)
+                {
+                    <meta itemprop="disambiguatingDescription" content="@bullet" />
+                    <li>@bullet</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.CurrentPage.IsNonRefundable)
+    {
+        @Html.PropertyFor(x => layout.NonRefundableMessage)
+    }
+
+</div>

@@ -1,0 +1,39 @@
+﻿@model TRM.Web.Models.ViewModels.ProgressBarViewModel
+
+<div class="row justify-content-center d-print-none">
+    <ol class="progress-tracker step-@Model.Steps.FirstOrDefault(x => x.IsCurrent).Number.Replace(".","")">
+        @foreach (var item in Model.Steps)
+        {
+            <li class="@(item.IsComplete ? "complete" : "") @(item.IsCurrent ? "current" : "") ">
+                @if (item.IsComplete)
+                {
+                    <div>
+                        <span class="circle">
+                            <span class="icon">
+                                <svg>
+                                    <use xlink:href="#check"></use>
+                                </svg>
+                            </span>
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <span class="circle">
+                        </span>
+                    </div>
+                }
+                @if (!String.IsNullOrEmpty(item.Url))
+                {
+                    <a href="@item.Url">@item.Heading</a>
+                }
+                else
+                {
+                    <span style="background:inherit;color:inherit">@item.Heading</span>
+                }
+
+            </li>
+        }
+    </ol>
+</div>

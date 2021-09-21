@@ -1,0 +1,60 @@
+﻿@using Mediachase.Commerce.Customers
+@using EPiServer.ServiceLocation
+@using TRM.Web.Extentions
+@using EPiServer
+@using EPiServer.Core
+@using EPiServer.AddOns.Helpers
+@using TRM.Web.Services
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.ViewModels.Bullion.PensionDetailsModel
+
+<div class="row">
+    <div class="col-xs-12">
+        <ul class="list-unstyled pl-1x">
+            @if (!string.IsNullOrEmpty(Model.CompanyName))
+            {
+                <li><b>@Html.PropertyFor(x => x.CurrentBlock.CompanyTitle):</b> @Model.CompanyName</li>
+            }
+            @if (!string.IsNullOrEmpty(Model.CompanyPhone))
+            {
+                <li><b>@Html.PropertyFor(x => x.CurrentBlock.CompanyPhoneTitle):</b> @Model.CompanyPhone</li>
+            }
+            @{
+                var delivery = Model.CompanyAddress;
+                if (delivery != null)
+                {
+                    <li>
+                        <b>@Html.PropertyFor(x => x.CurrentBlock.CompanyAddressTitle):</b>
+                        @(!string.IsNullOrEmpty(delivery.Line1) ? delivery.Line1 + ", " : "")
+                        @(!string.IsNullOrEmpty(delivery.Line2) ? delivery.Line2 + ", " : "")
+                        @delivery.City, @delivery.PostalCode
+                    </li>
+                }
+            }
+            @if (!string.IsNullOrEmpty(Model.SchemeType))
+            {
+                <li><b>@Html.PropertyFor(x => x.CurrentBlock.SchemeTypeTitle):</b> @Model.SchemeType</li>
+            }
+            @if (!string.IsNullOrEmpty(Model.HMRCRef) && Model.IsPensionProvider)
+            {
+                <li><b>@Html.PropertyFor(x => x.CurrentBlock.HRMCRefTitle):</b> @Model.HMRCRef</li>
+            }
+
+            <li>
+                @if (Model.IsPensionProvider)
+                {
+                    var sippSassAdminPageUrl = ServiceLocator.Current.GetInstance<IContentLoader>()
+                        .Get<TRM.Web.Models.Pages.StartPage>(ContentReference.StartPage)
+                        .SIPPSSASAdminPage.GetPublicUrl();
+                <a class="btn btn-secondary mt-0 mt-10" href="@sippSassAdminPageUrl">@Html.TranslateFallBack(StringResources.PensionDetailsSchemeCustomers, StringConstants.TranslationFallback.PensionDetailsSchemeCustomers)</a>
+                }
+
+                @if (Model.AccountBeforeImpersonatingIsCustomerServiceAccount && (Model.IsPensionProvider || Model.IsSippCustomer))
+                {
+                    <button class="btn btn-secondary mt-0 mt-10 btn-bg-orange" onclick="sendSIPPSSASWelcomeEmail()">@Html.TranslateFallBack(StringResources.SendWelcomeEmail, StringConstants.TranslationFallback.SendWelcomeEmail)</button>
+                }
+            </li>
+        </ul>
+    </div>
+</div>

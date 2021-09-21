@@ -1,0 +1,73 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TrmActivateAccountPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.ActivateAccountViewModel>
+
+<div class="content-area"></div>
+
+<div class="container mt-2x mb-4x">
+    <div class="page-header">
+        <h1>@Html.DisplayFor(a => a.CurrentPage.Heading)</h1>
+    </div>
+    <!-- WYSIWYG -->
+
+    <div class="contentArea">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+    @if ((Model.CurrentPage.MainBody != null && !Model.CurrentPage.MainBody.IsEmpty) || PageEditing.PageIsInEditMode)
+    {
+        <div class="xhtmlArea clear" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+
+            @{ var content = Html.ParseXhtmlString(Model.CurrentPage.MainBody); }
+            @Html.DisplayFor(m => content)
+
+        </div>
+    }
+    <div class="wysiwyg">
+        @Html.DisplayFor(a => a.CurrentPage.PageIntroduction)
+    </div>
+    <!-- WYSIWYG End -->
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-4">
+            <div class="row">
+                <div class="col-xs-12" ng-controller="FormController">
+                    @using (Html.BeginForm("VerifyCustomerCodeAndPostcode", null, FormMethod.Post, new { ng_controller = "FormController" }))
+                    {
+                        <div class="form-group mb-1x input-subtle">
+                            <label class="sr-only" for="activateCCode">@Html.PropertyFor(a => a.CurrentPage.CustomerCodePlaceholder)</label>
+                            @Html.TextBoxFor(a => a.ViewModel.CustomerCode, new { placeholder = Model.CurrentPage.CustomerCodePlaceholder, @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.ViewModel.CustomerCode)
+                        </div>
+
+                        <div class="form-group mb-1x input-subtle">
+                            <label class="sr-only" for="activatePCode">@Html.PropertyFor(a => a.CurrentPage.PostcodePlaceholder)</label>
+                            @Html.TextBoxFor(a => a.ViewModel.Postcode, new { placeholder = Model.CurrentPage.PostcodePlaceholder, @class = "form-control" })
+                            @Html.ValidationMessageFor(x => x.ViewModel.Postcode)
+                        </div>
+                        if (!Model.ViewModel.ShowFullForm)
+                        {
+                            <div class="form-group activate-hide mb-0">
+                                <button class="btn btn-default  mt-2x" type="submit">@Model.CurrentPage.ActivateButtonText</button>
+                            </div>
+                        }
+                    }
+
+                    @Html.Partial("~/Views/TRM/Pages/AccountActivation/_CompleteActivationForm.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="contentArea">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+        </div>
+    </div>
+    <div class="contentArea">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    </div>
+</div>

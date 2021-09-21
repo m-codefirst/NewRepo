@@ -1,0 +1,51 @@
+﻿@using EPiServer.Framework.Web.Resources
+@model TRM.Web.Models.Reporting.StockReport.StockReportViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    @Html.Raw(ClientResources.RenderResources("ShellCore"))
+    @Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+</head>
+<body>
+    @Html.Raw(Html.ShellInitializationScript())
+
+    <div class="epi-padding">
+        <div class="epi-contentArea">
+            <div class="EP-systemImage">
+                <h1 class="EP-prefix">
+                    Stock Report
+                </h1>
+                <p class="EP-systemInfo">
+                    Generated at: @DateTime.Now.ToString("G")
+                    <br />
+                    Please refresh the page to regenerate.
+                </p>
+            </div>
+            <div id="FullRegion_ValidationSummary" class="EP-validationSummary" style="color: Black; display: none;"></div>
+
+            <h3 class="epi-marginVertical-small">
+                <a target="_blank" href="@Model.ExportUrl" style="color: blue; text-decoration: underline;">Download full report in CSV format</a>
+            </h3>
+        </div>
+
+        @using (Html.BeginForm("Index", "StockReport", FormMethod.Get))
+        {
+            <div class="epi-contentArea epi-clear epi-marginVertical-small">
+                <label for="term">Search for specific SKU</label>
+                <input type="text" name="term" value="@Model.Term" id="term" />
+                <input type="submit" value="Search" />
+            </div>
+            
+            @Html.Partial("Reporting/ReportTable", Model.ReportTableViewModel)
+        }
+    </div>
+
+</body>
+</html>

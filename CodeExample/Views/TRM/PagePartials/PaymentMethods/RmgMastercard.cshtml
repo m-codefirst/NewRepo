@@ -1,0 +1,196 @@
+﻿@using EPiServer.Business.Commerce.Payment.Mastercard.Mastercard
+@using StringResources = TRM.Shared.Constants.StringResources
+@model Mediachase.Commerce.Orders.Dto.PaymentMethodDto.PaymentMethodRow
+
+@{
+    var paymentMethodParameters = Model.GetPaymentMethodParameterRows();
+
+    var sessionJsUrl = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl).Value : string.Empty;
+}
+
+<input type="hidden" id="paymentMethodId" name="paymentMethodId" value="@Model.PaymentMethodId" />
+<input type="hidden" id="paymentSessionId" name="paymentSessionId" />
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <div class="form-group has-feedback" id="cardNo">
+            <label for="card-number">
+                @Html.TranslateFallback(StringResources.MastercardCardNumber, "Card Number")
+                <span class="text-danger">
+                    @Html.TranslateFallback(StringResources.MastercardMandatoryFieldAsterix, "*")
+                </span>
+            </label>
+            <input type="number" class="form-control" id="card-number" placeholder="@Html.TranslateFallback(StringResources.MastercardCardNumberPlaceholder, "eg.1111 2222 3333 4444")" readonly>
+            <span class="cardNoSpan trmi form-control-feedback hidden" id="cardNoSpan" aria-hidden="true"></span>
+            <div class="cardNoErrorMessage form-group mb-0 hidden" id="cardNoErrorMessage">
+                <span class="help-block"><i class="trmi trmi-times"></i>Please enter your card number.</span>
+            </div>
+        </div>
+    </div>
+  
+        <div class="col-xs-12 col-md-6">
+            <label>@Html.TranslateFallback(StringResources.MastercardEndDate, "End date")</label>
+        </div>
+        <div class="col-xs-6 col-md-3">
+            <div class="select-form expiryMonth" id="expiryMonth">
+                <select class="form-control" id="expiry-month">
+                    <option value="" selected="">@Html.TranslateFallback(StringResources.MastercardMonthPlaceholder, "MM")</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+                <div class="cardExpiryMonthErrorMessage form-group mb-0 hidden" id="cardExpiryMonthErrorMessage">
+                    <span class="help-block"><i class="trmi trmi-times"></i> "Please enter the expiry month on your card."</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-3">
+            <div class="select-form expiryYear" id="expiryYear">
+                <select class="form-control " id="expiry-year">
+                    <option value="" selected="">@Html.TranslateFallback(StringResources.MastercardYearPlaceholder, "YYYY")</option>
+                    @for (int i = 0; i < 21; i++)
+                    {
+                        var yr = DateTime.UtcNow.Year + i;
+                        <option value="@yr">@yr</option>
+                    }
+                </select>
+                <div class="cardExpiryYearErrorMessage form-group has-error mb-0 hidden" id="cardExpiryYearErrorMessage">
+                    <span class="help-block"><i class="trmi trmi-times"></i>"Please enter the expiry year on your card."</span>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <div class="form-group has-feedback" ng-class="{'ValidationFail': (checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !nameOnCard.length), 'ValidationSuccess': (checkoutForm.nameOnCard.$touched && checkoutForm.nameOnCard.$valid && nameOnCard.length)}">
+        <label for="nameOnCard">
+            @Html.TranslateFallback(StringResources.MastercardNameOnCard, "Name on Card")<small>@Html.TranslateFallback(StringResources.MastercardNameOnCardSuffix, "(Exactly as it appears on the card)")</small><span class="text-danger">@Html.TranslateFallback(StringResources.MastercardMandatoryFieldAsterix, "*")</span>
+        </label>
+        <input type="text" class="form-control" ng-pattern="NameOnCardPattern" capitalize ng-trim="true" ng-minlength="2" ng-maxlength="40" ng-model="nameOnCard" id="nameOnCard" name="nameOnCard" placeholder="@Html.TranslateFallback(StringResources.MastercardNameOnCardPlaceholder, "Name on Card")" ng-required="!nameOnCard.length">
+        <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !nameOnCard.length), 'ValidationSuccess': (checkoutForm.nameOnCard.$touched && checkoutForm.nameOnCard.$valid && nameOnCard.length)}" aria-hidden="true"></span>
+        <div class="form-group has-error mb-0 " ng-show="checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !nameOnCard.length">
+            <span class="help-block"><i class="trmi trmi-times"></i>Please enter your card name exactly as it appears on the card.</span>
+        </div>
+    </div>
+
+    <div class="form-group has-feedback securityCode" id="securityCode">
+        <label for="security-code">
+            @Html.TranslateFallback(StringResources.MastercardCcvNumber, "CCV Number")
+            <span class="text-danger">
+                @Html.TranslateFallback(StringResources.MastercardMandatoryFieldAsterix, "*")
+            </span>
+        </label>
+        <input type="text" class="form-control" id="security-code" placeholder="@Html.TranslateFallback(StringResources.MastercardCcvPlaceHolder, "XXX")" readonly>
+        <span class="securityCodeSpan trmi form-control-feedback hidden" id="securityCodeSpan" aria-hidden="true"></span>
+        <div class="securityCodeErrorMessage form-group has-error mb-0 hidden" id="securityCodeErrorMessage">
+            <span class="help-block"><i class="trmi trmi-times"></i>Please enter your 3 digit security code.</span>
+        </div>
+    </div>
+
+    <script src="@sessionJsUrl" type="text/javascript"></script>
+
+    @if (!string.IsNullOrWhiteSpace(sessionJsUrl))
+    {
+        <script type="text/javascript">
+
+            PaymentSession.configure({
+                fields: {
+                    card: {
+                        number: "#card-number",
+                        securityCode: "#security-code",
+                        expiryMonth: "#expiry-month",
+                        expiryYear: "#expiry-year"
+                    }
+                },
+                frameEmbeddingMitigation: ["javascript"],
+                callbacks: {
+                    initialized: function (response) {
+                        console.log("initialized.");
+                    },
+                    formSessionUpdate: function (response) {
+
+                        if (response.status) {
+                            if ("ok" === response.status) {
+
+                                $("#paymentSessionId").val(response.session.id);
+                                $("#rmgPaymentSubmit").prop('disabled', false);
+                                angular.element("#paymentSessionId").scope().mastercardSessionId = response.session.id;
+
+                                if (response.sourceOfFunds.provided.card.number) {
+                                    $('#cardNo').addClass('has-success');
+                                    $('#cardNo').removeClass('has-error');
+                                    $('#cardNoSpan').removeClass('hidden');
+                                    $('#cardNoSpan').addClass('trmi-check');
+
+                                }
+								if (response.sourceOfFunds.provided.card.securityCode) {
+									$('#securityCode').addClass('has-success');
+									$('#securityCodeSpan').removeClass('hidden');
+									$('#securityCodeSpan').addClass('trmi-check');
+                                }
+                                if (response.sourceOfFunds.provided.card.expiry.year) {
+									$('#expiryYear').addClass('has-success');
+                                }
+								if (response.sourceOfFunds.provided.card.expiry.month) {
+									$('#expiryMonth').addClass('has-success');
+                                }
+                            } else if ("fields_in_error" === response.status) {
+
+                                console.log("Session update failed with field errors.");
+								if (response.errors.cardNumber && response.errors.cardNumber === 'invalid') {
+									$('#cardNo').removeClass('has-success');
+                                    $('#cardNo').addClass('has-error');
+                                    $('#cardNoSpan').removeClass('hidden');
+                                    $('#cardNoSpan').removeClass('trmi-check');
+                                    $('#cardNoSpan').addClass('trmi-close');
+                                    $('#cardNoErrorMessage').removeClass('hidden');
+                                }
+
+								if (response.errors.expiryYear && response.errors.expiryYear === 'invalid') {
+									$('#expiryYear').removeClass('has-success');
+                                    $('#expiryYear').addClass('has-error');
+                                    $('#cardExpiryYearErrorMessage').removeClass('hidden');
+                                }
+								if (response.errors.expiryMonth && response.errors.expiryMonth === 'invalid') {
+									$('#expiryMonth').removeClass('has-success');
+                                    $('#expiryMonth').addClass('has-error');
+                                    $('#cardExpiryMonthErrorMessage').removeClass('hidden');
+                                }
+								if (response.errors.securityCode && response.errors.securityCode === 'invalid') {
+									$('#securityCode').removeClass('has-success');
+                                    $('#securityCode').addClass('has-error');
+                                    $('#securityCodeSpan').removeClass('hidden');
+                                    $('#securityCodeSpan').removeClass('trmi-check');
+                                    $('#securityCodeSpan').addClass('trmi-close');
+                                    $('#securityCodeErrorMessage').removeClass('hidden');
+                                }
+
+                            } else if ("request_timeout" === response.status) {
+                                console.log("Session update failed with request timeout: " + response.errors.message);
+                            } else if ("system_error" === response.status) {
+                                console.log("Session update failed with system error: " + response.errors.message);
+                            }
+                        } else {
+                            console.log("Session update failed: " + response);
+                        }
+                    }
+                }
+            });
+            PaymentSession.onChange(['card.number', 'card.securityCode'], function (selector) {
+                $('#card-number').removeClass('ValidationFail');
+                $('#cardNoErrorMessage').addClass('hidden');
+                $('#expiry-month').removeClass('ValidationFail');
+                $('#expiry-year').removeClass('ValidationFail');
+                $('#security-code').removeClass('ValidationFail');
+                PaymentSession.updateSessionFromForm('card');
+            });
+        </script>
+    }

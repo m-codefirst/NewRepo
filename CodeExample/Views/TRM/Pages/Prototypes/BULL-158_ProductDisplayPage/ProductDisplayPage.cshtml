@@ -1,0 +1,309 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+
+	@if (Model.CurrentPage.DisplayPageHeading)
+	{
+		<div class="page-header">
+			@Html.PropertyFor(m => m.CurrentPage.Heading)
+		</div>
+	}
+	@Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+	<div class="variantContentArea mt-1x">
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+		</div>
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+
+	<div class="container productTemplate">
+		<div class="row">
+			<div class="col-xs-12 col-lg-7">
+				<div class="row">
+					@Html.Partial("BullionPDPCarousel")
+
+					<div class="variantCTA">
+						@Html.Partial("BullionPDPCallToAction")
+					</div>
+
+					<div class="variantContentArea">
+						<div class="col-xs-12 pt-4x mt-1x">
+							<div class="row">
+								@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="col-xs-12 col-lg-5">
+				<div class="variantHeading">
+					<p class="promoTag">Tag Message</p>
+					<h1 class="h2 mt-0 mb-0" itemprop="name">Page Title to be placed</h1>
+					<h1 class="h2 mt-0" itemprop="name">Over two lines max</h1>
+					<h2 class="mb-0 h4 text-ochre">Secondary Product Title</h2>
+				</div>
+
+				<div class="variantRating mt-1x mb-1x">
+					@Html.Partial("BullionPDPReviews")
+				</div>
+
+				<div class="variantSubHeading mb-1x">
+					<div class="row">
+						<span class="col-xs-3 text-success">In Stock</span>
+						<p class="font-small  text-warmred">Out of stock</p>
+						<span class="col-xs-5 text-info">Shipping within 24 hours</span>
+						<span class="col-xs-4">Product Code XXXXX</span>
+
+					</div>
+				</div>
+
+				<div class="variant-prod-info mt-1x">
+					<div class="row">
+						<div class="col-xs-4">
+							<span class="text-silver h5">Unit Price</span>
+							<span class="h4">£287.93</span>
+							<span class="text-silver small">Single unit £299.99 <i class="fa fa-question-circle"></i></span>
+						</div>
+						<div class="col-xs-4">
+							<p class="text-silver h5">Quantity</p>
+							<div class="">
+								<span class="display-inline-block pl-1x">-</span>
+								<input type="type" name="name" placeholder="1" size="4" class="display-inline-block" />
+								<span class="display-inline-block pr-1x">+</span>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<span class="text-silver h5">Sub Total</span>
+							<span class="h4">£287.93 </span>
+							<span class="text-silver small">Estimated <i class="fa fa-question-circle"></i></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="variantCTA mt-1x">
+					<div class="row">
+						<div class="col-xs-6">
+							<button class="btn btn-block btn-secondary">Buy Now</button>
+						</div>
+						<div class="col-xs-6">
+							<button class="btn btn-block btn-primary">Add to Basket</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="variantDropdown mt-1x">
+					<div class="col-xs-12 mb-1x">
+						<div class="row">
+							<span class="display-inline-block text-ochre"><i class="fa fa-chevron-down"></i></span>
+							<span class="display-inline-block text-ochre">View Bulk Discount</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="variantBullionMessage">
+					@Html.Partial("BullionPDPBullionMessage")
+				</div>
+
+				<div class="social-items mb-1x pull-right">
+					@Html.Partial("BullionPDPSocialShare")
+				</div>
+			</div>
+
+			<div class="col-xs-12">
+				<div class="">
+					<div class="variantContentArea">
+						<div class="col-xs-12 mb-1x pl-0 pr-0">
+							<div class="row">
+								@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+							</div>
+						</div>
+					</div>
+
+					<div class="variantDescription">
+						<h2>Product Description</h2>
+						<p>
+							For the very first time The Royal Mint has chosen to feature the Tower of London on a series of UK coins. Starting with The Legend of the Ravens, the collection continues with coins featuring The Crown Jewels, Yeoman Warders and The Ceremony of the Keys. Together the coins tell the story of this mighty stone fortress and the ancient ceremonies that still take place within these walls.
+							Make sure you complete the whole set. For a limited time only you will be able to reserve the next three Brilliant Uncirculated £5 coins ahead of their official release dates:
+						</p>
+						<p>
+							For the very first time The Royal Mint has chosen to feature the Tower of London on a series of UK coins. Starting with The Legend of the Ravens, the collection continues with coins featuring The Crown Jewels, Yeoman Warders and The Ceremony of the Keys. Together the coins tell the story of this mighty stone fortress and the ancient ceremonies that still take place within these walls.
+							Make sure you complete the whole set. For a limited time only you will be able to reserve the next three Brilliant Uncirculated £5 coins ahead of their official release dates:
+						</p>
+						<p>
+							For the very first time The Royal Mint has chosen to feature the Tower of London on a series of UK coins. Starting with The Legend of the Ravens, the collection continues with coins featuring The Crown Jewels, Yeoman Warders and The Ceremony of the Keys. Together the coins tell the story of this mighty stone fortress and the ancient ceremonies that still take place within these walls.
+							Make sure you complete the whole set. For a limited time only you will be able to reserve the next three Brilliant Uncirculated £5 coins ahead of their official release dates:
+						</p>
+					</div>
+
+					<div class="variantSpecifications">
+						<div class="col-xs-12">
+							<div class="row">
+								<div class="">
+									<h2 class="">Specifications</h2>
+									<table class="table table-spec mb-0">
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+										<tr>
+											<th>Spec Item</th>
+											<td>Item Description</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row variantReviews">
+						<div class="block tabContainerBlock tabHorizontal equalize-group col-xs-12" id="detailTabs">
+							<h2 class="title hidden-xs hidden-sm">
+								Reviews
+							</h2>
+							<h2 class="title no-underline visible-xs visible-sm">
+								<a data-toggle="collapse" data-collapse-xs-sm="" data-target="#pdpReview" role="button">Reviews</a>
+							</h2>
+							<hr class="mt-1x visible-xs visible-sm" />
+							<div class="mt-1x collapse-xs collapse-sm collapse" id="pdpReview">
+								<div class="row">
+									<div class="block reviewBlock col-xs-12 ng-scope">
+										<div class="blockContent bb-dotted-gray pb-2x">
+											<div class="row">
+												<div class="reviewTitle col-xs-12">
+													<h3>
+														Reviewed
+														<time class="ng-binding">
+															20-Feb-2019
+														</time>
+													</h3>
+												</div>
+												<div class="reviewSubtitle col-xs-12">
+													<h4 class="h5">Product Review</h4>
+												</div>
+												<div class="reviewStars col-xs-4 col-sm-2">
+													<p class="text-slateblue ng-scope">
+														<span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span>
+														<br>
+														Excellent
+													</p>
+												</div>
+												<div class="reviewContent col-xs-8 col-sm-10">
+													<p class="ng-binding">GOOD SERVICE EASY WEBSITE GOOD PRESENTATION</p>
+												</div>
+
+												<div class="reviewSubtitle col-xs-12 ng-scope">
+													<h4 class="h5">Service Review</h4>
+												</div>
+												<div class="reviewStars col-xs-4 col-sm-2">
+
+												</div>
+												<div class="reviewContent col-xs-8 col-sm-10">
+													<p class="ng-binding">GOOD SERVICE EASY WEBSITE GOOD PRESENTATION</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="block reviewBlock col-xs-12 ng-scope">
+										<div class="blockContent bb-dotted-gray pb-2x">
+											<div class="row">
+												<div class="reviewTitle col-xs-12">
+													<h3>
+														Reviewed
+														<time class="ng-binding">
+															15-Feb-2019
+														</time>
+													</h3>
+												</div>
+												<div class="reviewSubtitle col-xs-12">
+													<h4 class="h5">Product Review</h4>
+												</div>
+												<div class="reviewStars col-xs-4 col-sm-2">
+													<p class="text-slateblue ng-scope">
+														<span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span><span class="trmi trmi-star-full text-ochre ng-scope"></span>
+														<br>
+														Excellent
+													</p>
+												</div>
+												<div class="reviewContent col-xs-8 col-sm-10">
+													<p class="ng-binding">The item was as expected, well presented, well packed and arrived in good condition, within a few days of ordering.</p>
+												</div>
+
+												<div class="reviewSubtitle col-xs-12 ng-scope">
+													<h4 class="h5">Service Review</h4>
+												</div>
+												<div class="reviewStars col-xs-4 col-sm-2">
+
+												</div>
+												<div class="reviewContent col-xs-8 col-sm-10">
+													<p class="ng-binding">The item was as expected, well presented, well packed and arrived in good condition, within a few days of ordering.</p>
+												</div>
+
+												<div class="reviewContent col-xs-12 mt-1x ng-scope">
+													<div class="well">
+														<h4 class="h5">Royal Mint response</h4>
+														<p class="ng-binding ng-scope">Thank you for your great 5 star product review and feedback. Your feedback is hugely beneficial to The Royal Mint and our customers.</p><!-- end ngIf: review.MerchantComment -->
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-xs-12 text-center">
+										<a class="btn btn-default" id="reviewsLoadMoreButton" role="button" data-show="#resultsSet80">Load more Reviews</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="variantContentArea mt-1x">
+						<div class="col-xs-12 mb-1x pl-0 pr-0">
+							<div class="row">
+								@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="content-area">
+			<div class="row">
+				@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+			</div>
+		</div>
+	</div>

@@ -1,0 +1,166 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.Bullion.MetalChartBlockViewModel
+@{
+	var newGuild = Guid.NewGuid();
+}
+@if (Model.MetalAndProductTypeHoldingPercentage.Any() && Model.MetalHoldingPercentage.Any() && Model.ProductTypeHoldingPercentage.Any())
+{
+	<div class="row metal-chart-block">
+		<div class="col-xs-12">
+			<div class="row chart-wrapper">
+				<div class="col-xs-12">
+					<div class="panel-group" id="chartWrapper@(newGuild)">
+						<div class="panel panel-default">
+							<div id="collapseOne@(newGuild)" class="chart-item collapse in">
+								<div id="metalChart@(newGuild)" class="chart-content">
+								</div>
+							</div>
+							<div id="collapseTwo@(newGuild)" class="chart-item collapse">
+								<div id="productChart@(newGuild)" class="chart-content"></div>
+							</div>
+							<div id="collapseThree@(newGuild)" class="chart-item collapse">
+								<div id="summaryChart@(newGuild)" class="chart-content"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="chart-filter text-center">
+						<div class="checkbox fancy checkbox-inline">
+							<input type="radio" class="chart-filter-button" name="chartFilter" id="chkDel" data-toggle="collapse" data-parent="#chartWrapper@(newGuild)" data-target="#collapseOne@(newGuild)" aria-expanded="true" checked>
+							<label for="chkDel">
+								Metal Type
+							</label>
+						</div>
+						<div class="checkbox fancy checkbox-inline">
+							<input type="radio" class="chart-filter-button" name="chartFilter" id="chkDe2" data-toggle="collapse" data-parent="#chartWrapper@(newGuild)" data-target="#collapseTwo@(newGuild)">
+							<label for="chkDe2">
+								Product Type
+							</label>
+						</div>
+						<div class="checkbox fancy checkbox-inline">
+							<input type="radio" class="chart-filter-button" name="chartFilter" id="chkDe3" data-toggle="collapse" data-parent="#chartWrapper@(newGuild)" data-target="#collapseThree@(newGuild)">
+							<label for="chkDe3">
+								Metal & Product Type
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	@Html.Script(
+	@<script type="text/javascript">
+		$(document).ready(function () {
+			google.charts.load("current", { packages: ["corechart"] });
+			google.charts.setOnLoadCallback(drawChart);
+			var isSMDown = window.innerWidth <= 767;
+
+			function drawChart() {
+					var metalData = google.visualization.arrayToDataTable([
+						['Task', 'Metal type'],
+						['Gold', { v: @Model.MetalHoldingPercentage.TryGet("Gold"), f: "@Html.Raw(Model.MetalHoldingFormatted.TryGet("Gold"))" }],
+						['Silver', { v: @Model.MetalHoldingPercentage.TryGet("Silver"), f: "@Html.Raw(Model.MetalHoldingFormatted.TryGet("Silver"))" }],
+						['Platinum', { v: @Model.MetalHoldingPercentage.TryGet("Platinum"), f: "@Html.Raw(Model.MetalHoldingFormatted.TryGet("Platinum"))" }]
+					]);
+
+					var productData = google.visualization.arrayToDataTable([
+						['Task', 'Product type'],
+						['Coins',{ v: @Model.ProductTypeHoldingPercentage.TryGet("Coin"), f: "@Html.Raw(Model.ProductTypeHoldingFormatted.TryGet("Coin"))" }],
+						['Bars',{ v: @Model.ProductTypeHoldingPercentage.TryGet("Bar"), f: "@Html.Raw(Model.ProductTypeHoldingFormatted.TryGet("Bar"))" }],
+						['Signature', { v: @Model.ProductTypeHoldingPercentage.TryGet("Signature"), f: "@Html.Raw(Model.ProductTypeHoldingFormatted.TryGet("Signature"))" }]
+					]);
+
+					var summaryData = google.visualization.arrayToDataTable([
+						['Task', 'Metal and Product'],
+						['Gold coins', { v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Coin_Gold"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Gold"))" }],
+						['Gold Bars',{ v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Bar_Gold"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Gold"))" } ],
+						['Signature Gold', { v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Signature_Gold"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Gold"))" }],
+						['Silver coins',{ v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Coin_Silver"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Silver"))" }],
+						['Silver Bars',{ v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Bar_Silver"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Silver"))" }],
+						['Signature Silver', { v:@Model.MetalAndProductTypeHoldingPercentage.TryGet("Signature_Silver"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Silver"))" }],
+						['Platinum coins', { v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Coin_Platinum"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Platinum"))" }],
+						['Platinum Bars',{ v: @Model.MetalAndProductTypeHoldingPercentage.TryGet("Bar_Platinum"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Platinum"))" } ],
+						['Signature Platinum',{ v:  @Model.MetalAndProductTypeHoldingPercentage.TryGet("Signature_Platinum"), f: "@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Platinum"))" }],
+					]);
+
+				var options = {
+					chartArea: {
+						height: isSMDown ? '85%' : '92%'
+					},
+					legend: {
+						position: isSMDown ? 'bottom' : 'right',
+						alignment: 'center'
+					},
+					backgroundColor: {
+						fill: 'transparent',
+					},
+					slices: {
+
+					},
+					tooltip: {
+					}
+				};
+
+				var metalSlices = {
+					slices: {
+						0: { color: '#B59D5F' },
+						1: { color: '#808083' },
+						2: { color: '#D6D6D6' },
+					}
+				};
+
+				var productSlices = {
+					slices: {
+						0: { color: '#5D285F' },
+						1: { color: '#009681' },
+						2: { color: '#0085AD' },
+					}
+				};
+
+				var summarySlices = {
+					slices: {
+						0: { color: '#5D285F' },
+						1: { color: '#253746' },
+						2: { color: '#B59D5F' },
+						3: { color: '#0085AD' },
+						4: { color: '#5B7F95' },
+						5: { color: '#808083' },
+						6: { color: '#006F62' },
+						7: { color: '#009681' },
+						8: { color: '#D6D6D6' },
+					}
+				};
+
+				var metalOptions = Object.assign({}, options, metalSlices);
+				var productOptions = Object.assign({}, options, productSlices);
+				var summaryOptions = Object.assign({}, options, summarySlices);
+
+				var chartMetal = new google.visualization.PieChart(document.getElementById('metalChart@(newGuild)'));
+				var chartProduct = new google.visualization.PieChart(document.getElementById('productChart@(newGuild)'));
+				var chartSummary = new google.visualization.PieChart(document.getElementById('summaryChart@(newGuild)'));
+
+				$('#chartWrapper@(newGuild)').find('.chart-item').removeClass('collapse');
+				chartMetal.draw(metalData, metalOptions);
+				chartProduct.draw(productData, productOptions);
+				chartSummary.draw(summaryData, summaryOptions);
+				$('#chartWrapper@(newGuild)').find('.chart-item').addClass('collapse');
+			}
+
+			$(window).resize(function () {
+				drawChart();
+			});
+        })
+	</script>
+)
+}
+else
+{
+	<div class="row">
+		<p class="text-center">@Html.TranslateFallback(StringResources.NoItemData, "There is no item")</p>
+	</div>
+}
+

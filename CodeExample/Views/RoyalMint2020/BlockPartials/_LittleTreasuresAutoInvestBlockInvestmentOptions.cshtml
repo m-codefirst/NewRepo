@@ -1,0 +1,79 @@
+﻿@model TRM.Web.Models.ViewModels.LittleTreasures.AutoInvest.LittleTreasuresAutoInvestBlockInvestmentOptionsViewModel
+@using Newtonsoft.Json
+@using TRM.Web.Controllers.Blocks.LittleTreasures
+@using TRM.Web.Models.ViewModels
+@using TRM.Web.Models.ViewModels.LittleTreasures.AutoInvest
+
+@{
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.InvestmentOptionsStepperTitle,
+                IsCurrent = true,
+                Number = "1",
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.SummaryAndPaymentStepperTitle,
+                Number = "2",
+            }
+        }
+    };
+
+    var viewModel = new
+    {
+        texts = new
+        {
+            heading = Model.CurrentBlock.InvestmentOptionsHeading,
+            investmentProductHeading = Model.CurrentBlock.InvestmentProductHeading,
+            investmentProductDescription = Model.CurrentBlock.InvestmentProductDescription,
+            investAmountHeading = Model.CurrentBlock.InvestAmountHeading,
+            investAmountDescription = string.Format(@Html.TranslateFallback(TRM.Web.Constants.StringResources.InvestmentAmountDescription, "A minimum investment of {0}{1} per month required, pause anytime, no long-term agreement."), Model.CurrencySymbol, "25.00"),
+            specifyAmountLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.SpecifyAmountLabel, "Specify amount"),
+            investmentAmountRequiredError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.InvestmentAmountRequiredError, "Specify amount"),
+            investmentAmountMinimumdError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.InvestmentAmountMinimumError, "A minimum investment of £25.00 per month required"),
+            investmentAmountTypeError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.InvestmentAmountTypeError, "Invalid amount"),
+            investmentProductRequiredError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.InvestmentProductRequiredError, "Select investment product"),
+            paymentDayHeading = Model.CurrentBlock.PaymentDayHeading,
+            paymentDayDescription = Model.CurrentBlock.PaymentDayDescription,
+            paymentDayMinimumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayMinimumError, "Minimum payment day must be at least the first day of the month"),
+            paymentDayMaximumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayMaximumError, "Payment day should not be after the 28th"),
+            paymentDayTypeError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayTypeError, "Invalid payment day"),
+            paymentDayRequiredError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayRequiredError, "Select payment day"),
+            paymentDayLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDayLabel, "Please select a day of the month"),
+            paymentDayHelpText = Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryOfEachMonthLabel,
+            saveAutoInvestments = @Html.TranslateFallback(TRM.Web.Constants.StringResources.SaveAutoInvestments, "save auto investments"),
+            stopAutoInvestments = @Html.TranslateFallback(TRM.Web.Constants.StringResources.StopAutoInvestments, "stop auto investments"),
+
+        },
+        initialData = new
+        {
+            selectedProduct = Model.ProductCode,
+            investmentAmount = Model.Amount,
+            paymentDay = Model.PaymentDay.ToString("00"),
+            availableProducts = Model.AvailableProducts,
+            stopMessage = Model.StoppedMessage,
+            currencySymbol = Model.CurrencySymbol
+        },
+
+        actionUrl = Request.RawUrl,
+        actionName = LittleTreasuresAutoInvestBlockController.ActionVar,
+        actionUpdate = LtAutoInvestAction.InvestmentSummaryAndPayment.ToString(),
+        actionStop = LtAutoInvestAction.StopInvestment.ToString(),
+        maxAmountValue = Int32.MaxValue
+
+    };
+}
+
+<!-- Step bar -->
+@{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+@if (Model.Amount <= 0 || string.IsNullOrWhiteSpace(Model.ProductCode))
+{
+    @Html.PropertyFor(m => m.CurrentBlock.NewUserContent)
+}
+
+<div class="little-treasures" data-module="auto-invest-investment-options" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+

@@ -1,0 +1,54 @@
+﻿@using Castle.Core.Internal
+@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Bullion
+
+@model TRM.Web.Models.ViewModels.TransactionHistoryViewModel
+
+@if (!Model.TransactionItems.IsNullOrEmpty())
+{
+    <table class="table table-mobile table-accordion">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Transaction</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th><span class="sr-only">Action</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var idx = 0;
+
+                foreach (var transactionItem in Model.TransactionItems)
+                {
+                    idx++;
+                  
+                    <tr data-toggle="collapse" data-target="#row@(idx)" aria-expanded="false" aria-controls="row@(idx)" role="button" class="collapsed">
+                        <td data-label="Date">
+                            @(transactionItem.CreatedDate != default(DateTime) ? transactionItem.CreatedDate.ToString("MMM d yyyy hh:mm tt") : "-")
+                        </td>
+                        <td class="transaction" data-label="Transaction">
+                            @(!transactionItem.TransactionTypeString.IsNullOrEmpty() ? transactionItem.TransactionTypeString : "-")
+                        </td>
+                        <td data-label="Amount">
+                            @(!transactionItem.Amount.Amount.Equals(null) ? transactionItem.Amount.ToString() : "-")
+                        </td>
+                        <td class="status" data-label="Status">
+                            @(!transactionItem.TransactionStatus.IsNullOrEmpty() ? transactionItem.TransactionStatus.ToString() : "-")
+                        </td>
+                        <td class="more"><span class="d-lg-none">View more</span> <span class="icon icon-arrow"><svg><use xlink:href="#chevron-down"></use></svg></span></td>
+                    </tr>
+                    if (!transactionItem.MoreDetailCollection.IsNullOrEmpty())
+                    {
+                        @Html.Partial("TransactionHistoryItemDetail", new KeyValuePair<int, TransactionHistoryItemViewModel>(idx, transactionItem))
+                    }
+                }
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="text-center">@Html.TranslateFallback(StringResources.NoItemData, "There are no items.")</div>
+}

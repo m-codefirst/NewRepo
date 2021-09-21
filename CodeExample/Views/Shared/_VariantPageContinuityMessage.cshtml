@@ -1,0 +1,14 @@
+﻿@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+@if (!string.IsNullOrWhiteSpace(Model.CurrentPage.RecurringDetailsMessage)){ 
+    <div class="well well-sm clear">
+        <label class='@(Model.CurrentPage.RecurrenceType == TRM.Shared.Constants.Enums.eRecurrenceType.Mandatory ? "icon-label " : string.Empty)mb-0'>
+            @if (Model.CurrentPage.RecurrenceType == TRM.Shared.Constants.Enums.eRecurrenceType.Mandatory)
+            {
+            <i class="trmi trmi-check"></i>
+            } 
+            @Model.CurrentPage.RecurringDetailsMessage
+        </label>
+    </div>
+}

@@ -1,0 +1,26 @@
+﻿@using Hephaestus.ContentTypes.Business.Constants
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.EnhancedCarouselSlideBlock
+@if (Model == null || string.IsNullOrWhiteSpace(Model.Label)) { return; }
+<div class="panel panel-default @((bool)ViewData["FirstSlide"] ? "active" : string.Empty)">
+    <div class="panel-heading">
+        <h4 class="panel-title">@Html.DisplayFor(t => t.Label)</h4>
+    </div>
+    <div class="panel-collapse collapse @((bool)ViewData["FirstSlide"] ? "in" : string.Empty) @Model.ForeColour.DescriptionAttr() " style="@((bool)ViewData["FirstSlide"] ? string.Empty:"height: 0px;")">
+        <div class="panel-body">
+            <h2 class="heading">@Html.PropertyFor(t => t.Heading)</h2>
+            @if (Model.Content != null)
+            {
+                <div class="xhtml @(Model.HideContentOnXs ? StringConstants.ViewportHiddenClasses.HiddenXs : string.Empty) @(Model.HideContentOnSm ? StringConstants.ViewportHiddenClasses.HiddenSm : string.Empty)">
+                    @{ var content = Html.ParseXhtmlString(Model.Content); }
+                    @Html.PropertyFor(m => content)
+                </div>
+            }
+            @if (Model.LinkUrl != null && !Model.LinkUrl.IsEmpty())
+            {
+                <a href="@Url.ContentUrlExtension(Model.LinkUrl)" class="btn-arrow" title="@Model.LinkText">@Html.DisplayFor(m => m.LinkText)</a>
+            }
+        </div>
+    </div>
+</div>

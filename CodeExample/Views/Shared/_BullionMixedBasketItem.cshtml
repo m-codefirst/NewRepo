@@ -1,0 +1,146 @@
+﻿@using System.Globalization
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.BasketPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var deliveryMethod = ViewData.ContainsKey("CanDeliverCanVault") ? ViewData["CanDeliverCanVault"].ToString() : string.Empty;
+    var switchDeliveryMethodText = deliveryMethod.Equals("Vault") ? Html.TranslateFallback(StringResources.WouldLikeDelivered, "I would like this delivered") : (deliveryMethod.Equals("Deliver") ? Html.TranslateFallback(StringResources.WouldLikeToVault, "I would like to vault this"): string.Empty);
+}
+<div class="col-xs-12 mb-xs-1x ">
+    <div class="row">
+
+        <div class="col-xs-4 col-sm-2">
+            <a class="text-slateblue" ng-href="{{variant.Url}}" title="{{variant.DisplayName}}" ng-cloak>
+                <img ng-src="{{variant.ImageUrl}}?width=300" title="{{variant.DisplayName}}" alt="" class="img-responsive">
+            </a>
+        </div>
+
+        <div class="col-xs-8 col-sm-10">
+            <div class="row">
+                <div class="col-xs-12 col-sm-5">
+                    <div class="product-title">
+                        <p class="strong mt-xs-0x mt-sm-0x mb-0">
+                            <a class="text-slateblue" href="#" title="{{variant.DisplayName}}" ng-href="{{variant.Url}}" ng-bind="variant.DisplayName"></a>
+                            <a href="" class="hidden-close-wrapper hidden-sm hidden-md hidden-lg pull-right" ng-click="removeFromBasket(variant.ShipmentId, variant.Code, variant.UniqueId)">
+                                <span class="text-danger"><i class="trmi trmi-close small-text"></i></span>
+                            </a>
+                        </p>
+                        <p class="text-silver mb-0x" ng-bind="variant.SubTitle"></p>
+                        @if (deliveryMethod.Equals("Vault"))
+                        {
+                            <button ng-if="variant.BullionCartItem && variant.BullionCartItem.CanDeliver" ng-click="changeShipment(variant.Code)" class="btn btn-default btn-xs mb-1x">
+                                <small>@switchDeliveryMethodText</small>
+                            </button>
+                        }
+                        else if(deliveryMethod.Equals("Deliver"))
+                        {
+                            <button ng-if="variant.BullionCartItem && variant.BullionCartItem.CanVault" ng-click="changeShipment(variant.Code)" class="btn btn-default btn-xs mb-1x">
+                                <small>@switchDeliveryMethodText</small>
+                            </button>
+                        }
+
+                        <div ng-if="variant.BullionCartItem && variant.BullionCartItem.IsSignatureVariant" id="invest_input_{{variant.Code}}" class="text-slateblue invest-mobile-basket">
+                            I want to Invest<span class="invest-amount1"> {{variant.BullionCartItem.RequestedInvestmentString}} </span>
+
+                            <span class="basket-input-wrapper">
+                                <input type="text" floating-number-only name="name" value="{{variant.BullionCartItem.RequestedInvestment.Amount |  number : '1.2'}}" class="mini-basket-input input1 invest-input" data-original-title="" title="" ng-model="RequestedInvestment"/>
+
+                                <button class="btn btn-default gold-edit-btn invest-edit-btn" ng-click="beginEditInvestmentValue(variant.Code)">
+                                    <span class="edit-personalisation">
+                                        <small>@Html.TranslateFallback(StringResources.Edit, "Edit")</small>
+                                    </span>
+                                </button>
+                                
+                                <button class="btn btn-default gold-edit-btn invest-save-btn hidden" ng-click="editInvestmentValue(variant.Code)">
+                                    <span class="edit-personalisation">
+                                        <small>@Html.TranslateFallback(StringResources.Save, "Save")</small>
+                                    </span>
+                                </button>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-3 basket-padding-top">
+                    <div ng-if="!variant.BullionCartItem || (variant.BullionCartItem && !variant.BullionCartItem.IsSignatureVariant)" class="input-group qty-group">
+                        <span class="input-group-btn">
+                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, -1)" ng-disabled="variant.Quantity <= variant.StockSummary.MinQuantity">
+                                <i class="trmi trmi-minus"></i>
+                            </button>
+                        </span>
+                        <input type="text" class="form-control text-center qty-input" placeholder="2" value="{{variant.Quantity}}" data-qty-min="1" data-qty-max="10" data-qty-step="1" disabled="" data-original-title="" title="">
+                        <span class="input-group-btn">
+                            <button class="btn qty-btn" type="button" ng-click="updateQuantity(variant, 1)" ng-disabled="variant.Quantity >= variant.StockSummary.MaxQuantity">
+                                <i class="trmi trmi-plus"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-2 basket-padding-top hidden-xs">
+                    <div class="" ng-if="!variant.BullionCartItem || (variant.BullionCartItem && !variant.BullionCartItem.IsSignatureVariant)">
+                        <span ng-bind="getUnitPrice(variant)" ng-cloak></span>
+						<p ng-if="!variant.BullionCartItem" class="mini-basket-vat">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</p>
+						<p ng-if="variant.BullionCartItem" class="mini-basket-vat">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+						<span ng-if="variant.BullionCartItem" class="estimated">@Html.TranslateFallback(StringResources.Estimated, "estimated")</span>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-2 basket-padding-top">
+                    <div class="" ng-cloak>
+                        <span class="hidden-sm hidden-md hidden-lg">@Html.PropertyFor(m => m.CurrentPage.ProductSubTotalLabel)</span>
+                        <span ng-bind="variant.DiscountedPrice"></span>
+                        <p ng-if="!variant.BullionCartItem" class="mini-basket-vat">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</p>
+                        <p ng-if="variant.BullionCartItem" class="mini-basket-vat">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+						<span ng-if="variant.BullionCartItem" class="estimated">@Html.TranslateFallback(StringResources.Estimated, "estimated")</span>
+                    </div>
+                    <div class="col-xs-12 mb-1x ng-scope" ng-if="variant.HasbeenPersonalised">
+
+                        <!-- message personalize -->
+                        <span class="bg-lightgray p-1xs mr-1x ng-binding" style="display:inline-block">
+                            @Html.TranslateFallBack(StringResources.HasBeenPersonalised, StringConstants.TranslationFallback.HasBeenPersonalised, CultureInfo.CurrentCulture)
+                        </span>
+                        <!-- ngIf: variant.personaliseEdit -->
+                        <button ng-if="variant.HasbeenPersonalised && (variant.isGiftingSesstionTimeout === undefined || variant.isGiftingSesstionTimeout === false)" 
+                                class="btn btn-default btn-xs mt-xs-1x mt-lg-0x ng-scope edit-me" 
+                                style="white-space: nowrap" 
+                                data-id="{{variant.PrintzwareVariantId}}" 
+                                data-unique="{{variant.UniqueId}}" 
+                                data-edit-url="{{variant.PrintzwareEditUrl}}">
+                            @Html.PropertyFor(x => x.CurrentPage.EditPersonalizationText)
+                        </button><!-- end ngIf: variant.personaliseEdit -->
+                        <!-- / message personalize -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-5">
+                    @if (!deliveryMethod.Equals("Vault"))
+                    {
+                        <div class="product-status">
+                            <p class="text-success small mb-1x">{{variant.StockSummary.StatusMessage}}<span class="text-black" ng-if="variant.StockSummary.ShippingMessage"> - {{variant.StockSummary.ShippingMessage}}</span>
+                            </p>
+                        </div>
+                    }
+
+                    <a href="" class="product-removal mb-xs-1x hidden-xs" ng-click="removeFromBasket(variant.ShipmentId, variant.Code, variant.UniqueId)">
+                        <span class="text-danger"><i class="trmi trmi-close small-text"></i></span>
+                        <span class="text-danger">@Html.TranslateFallback(StringResources.RemoveFromBasket , "remove")</span>
+                    </a>
+                </div>
+                
+                <div class="col-xs-12 col-sm-7" ng-if="variant.RecurrenceType == 1">
+                    <div class="form-group checkbox fancy">
+                        <input type="checkbox" ng-click="changeSubscription(variant)" ng-model="variant.Subscribed" name="subscription" id="subscription-{{variant.Code | makeSlug | lowercase}}">
+                        <label for="subscription-{{variant.Code | makeSlug | lowercase}}">@Model.CurrentPage.AnnualSubscriptionText</label>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-7" ng-if="variant.RecurrenceType == 2">
+                    <label class="icon-label"><i class="trmi trmi-check"></i>@Model.CurrentPage.ContinuityProductText</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

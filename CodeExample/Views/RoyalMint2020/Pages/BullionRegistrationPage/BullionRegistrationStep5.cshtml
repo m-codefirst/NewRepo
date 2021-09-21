@@ -1,0 +1,136 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Models.ViewModels
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep5ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem {
+                Heading = "Account",
+                Number = "1",
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Personal",
+                Number = "2",
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Verify",
+                Number = "3",
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Security",
+                Number = "4",
+                IsComplete = true
+            },
+            new ProgressBarItem {
+                Heading = "Complete",
+                Number = "5",
+                IsCurrent = true
+            }
+        }
+    };
+
+}
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="mod-section">
+    @if (!Model.CurrentPage.HideStepProgressBar)
+    {
+        Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel);
+    }
+
+    <div class="row justify-content-center text-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container">
+                <!-- page header -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <h1>@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+                }
+                <!-- / page header -->
+
+                <div class="row justify-content-center">
+                    <div class="col-10 col-md-9">
+                        <h2 class="section-head">
+                            <span>
+                                @(Model.ViewModel.IsSuccess ? Html.PropertyFor(m => m.CurrentPage.Step5SuccessfullyHeading) : Html.PropertyFor(m => m.CurrentPage.Step5FailHeading))
+                            </span>
+                        </h2>
+                        <div class="form-spacing">
+                            @if (Model.ViewModel.IsSuccess && Model.ViewModel.RegisterSuccessfullyMessage != null)
+                            {
+                                <div role="alert">
+                                    @Html.Raw(Model.ViewModel.RegisterSuccessfullyMessage)
+                                </div>
+                            }
+
+                            @if (Model.CurrentPage.RegisterFailMessage != null && !Model.ViewModel.IsSuccess)
+                            {
+                                <div role="alert">
+                                    @Html.PropertyFor(m => m.CurrentPage.RegisterFailMessage)
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-spacing">
+                            @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                            {
+                                <div class="row">
+                                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                                </div>
+                            }
+
+                            @if (Model.CurrentPage.MiddleContentStep5 != null)
+                            {
+                                <div class="row">
+                                    @Html.PropertyFor(m => m.CurrentPage.MiddleContentStep5)
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-10 col-md-9">
+                        <div class="form-spacing">
+                            @Html.PropertyFor(m => m.CurrentPage.MainBody)
+                        </div>
+                    </div>
+
+                    <div class="col-10 col-md-6 col-lg-5 col-xl-4">
+                        <div class="row btns justify-content-center">
+                            <div class="col-12">
+                                <a href="@Url.ContentUrlExtension(Model.CurrentPage.BrowseTheSiteButtonLink)" type="" class="btn btn-secondary">@Html.PropertyFor(x => x.CurrentPage.BrowseTheSiteButtonText)</a>
+                            </div>
+                            <div class="col-12">
+                                <a href="@Url.ContentUrlExtension(myLayout.BullionAccountPaymentPage)" type="" class="btn btn-primary">@Html.PropertyFor(x => x.CurrentPage.FundYourWalletNowButtonText)</a>
+                            </div>
+                            <div class="col-12">
+                                <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" type="" class="btn btn-primary">@Html.PropertyFor(x => x.CurrentPage.OpenYourAccountDashboardText)</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

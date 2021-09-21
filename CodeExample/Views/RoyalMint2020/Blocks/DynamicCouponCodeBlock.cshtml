@@ -1,0 +1,37 @@
+﻿@using TRM.Web.Models.ViewModels
+
+@model DynamicCouponCodeBlockViewModel
+@{
+    var couponCode = !string.IsNullOrWhiteSpace(Model?.CouponCode?.Code) ? Model.CouponCode.Code : string.Empty;
+}
+
+@if (Model?.CouponCode != null)
+{
+    <div class="d-flex flex-column justify-content-center">
+        <p id="CouponCodeId" class="coupon-code text-center font-weight-bold text-purple-mid m-1">@Html.DisplayFor(model => couponCode)</p>
+
+        <button onclick="copyToClipboard('CouponCodeId')" class="btn btn-primary bg-purple-mid">Copy Code</button>
+    </div>
+
+    <script>
+  function copyToClipboard(elementId) {
+    // Create a "hidden" input
+    var hiddenInput = document.createElement("input");
+
+    // Assign it the value of the specified element
+    hiddenInput.setAttribute("value", document.getElementById(elementId).innerHTML);
+
+    // Append it to the body
+    document.body.appendChild(hiddenInput);
+
+    // Highlight its content
+    hiddenInput.select();
+
+    // Copy the highlighted text
+    document.execCommand("copy");
+
+    // Remove it from the body
+    document.body.removeChild(hiddenInput);
+  }
+    </script>
+}

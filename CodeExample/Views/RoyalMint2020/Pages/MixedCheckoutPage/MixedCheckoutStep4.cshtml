@@ -1,0 +1,311 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.Commerce.Shared.Models
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.MixedCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.MixedCheckout.MixedCheckoutStep4ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var deliveryAddress = new AddressModel();
+
+    var retailOrder = Model.ViewModel.RetailPurchaseOrder;
+    var shipment = retailOrder.Shipments.FirstOrDefault();
+
+    if (shipment != null)
+    {
+        deliveryAddress = shipment.Address;
+    }
+
+    var billingAddress = new AddressModel();
+    var firstPayment = retailOrder.Payments.FirstOrDefault();
+
+    if (firstPayment != null)
+    {
+        billingAddress = firstPayment.Address;
+    }
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step1TabHeading,
+                Number = "1",
+                IsComplete = true
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step2TabHeading,
+                Number = "2",
+                 IsComplete = true
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step3TabHeading,
+                Number = "3",
+                 IsComplete = true
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step4TabHeading,
+                Number = "4",
+                IsCurrent = true
+            }
+        }
+    };
+}
+<div class="mod-section">
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+    <div class="row justify-content-center">
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="col-12 form-spacing d-print-none">
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>
+            </div>
+        }
+
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container">
+                <div class="row justify-content-center mb-2 d-none d-print-flex">
+                    <img style="height:150px" class="img-responsive" src="Static/img/global/RM_Logo_Full_Landscape_Purple.jpg">
+                </div>
+                <div class="form-spacing d-print-none">
+                    <h1>@Html.PropertyFor(x => x.CurrentPage.Step4PageHeading)</h1>
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-sm-8 col-md-7 col-lg-6">
+                            <div class="text-danger">
+                                @Html.ValidationSummary(false)
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    }
+                </div>
+                <div class="row justify-content-center d-print-none">
+                    <div class="col-10 col-md-6">
+                        <div class="form-spacing">
+                            @Html.PropertyFor(x => x.CurrentPage.Step4SuccessfulMessage)
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.CurrentPage.Step4TopContentArea != null)
+                {
+                    <div class="row justify-content-center d-print-none">
+                        <div class="col-md-10 col-lg-8">
+                            <div class="form-container">
+                                <div class="form-spacing">
+                                    @Html.DisplayFor(x => x.CurrentPage.Step4TopContentArea)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row justify-content-center d-print-block">
+                    <div class="col-10 col-md-6 col-12-print">
+                        <div class="form-spacing mb-print">
+                            <h2 class="section-head text-left-print"><span>Order Summary</span></h2>
+                            <div class="mb-3">@Html.PropertyFor(x => x.CurrentPage.Step4RetailOrderNote)</div>
+                            <div>@Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderDescription)</div>
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-9  col-12-print">
+                        <div class="form-spacing">
+                            <div class="order-ref p-1 p-sm-2 border-bottom-print padding-left-none-print page-break-print">
+                                <div class="col-8-print">
+                                    <div class="row">
+                                        <div class="col">
+                                            <strong class="font-weight-normal-print">@Html.PropertyFor(x => x.CurrentPage.Step4RetailOrderText) - @retailOrder.Total</strong>
+                                        </div>
+                                        <div class="col">
+                                            @foreach (var orderNumber in retailOrder.OrderNumbers)
+                                            {
+                                                <p class="mb-1">#@orderNumber</p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <strong class="font-weight-normal-print">@Html.TranslateFallback(StringResources.BullionCheckOutOrderDateLabel, "Order Date:")</strong>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-1">@Model.ViewModel.OrderDate.ToString("dd/MM/yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @Html.Partial("RoyalMint2020/_RetailOrderSummaryConfirmation", Model.ViewModel.RetailPurchaseOrder)
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-8 col-xl-6 col-12-print">
+                        <div class="form-spacing">
+                            <div class="order-details page-break-print">
+                                <div class="row justify-content-center">
+                                    <div class="col-12 col-sm-6">
+                                        <p class="form-label font-weight-bold-print">@Html.PropertyFor(x => x.CurrentPage.Step4DeliveryToTitle)</p>
+                                        @{Html.RenderPartial("RoyalMint2020/_Address", new AddressViewModel { Address = deliveryAddress });}
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <p class="form-label font-weight-bold-print">@Html.PropertyFor(x => x.CurrentPage.Step4BillingAddressTitle)</p>
+                                        @{ Html.RenderPartial("RoyalMint2020/_Address", new AddressViewModel { Address = billingAddress });}
+                                    </div>
+                                    <div class="col-12 font-weight-bold-print">
+                                        <p class="form-label">@Html.PropertyFor(x => x.CurrentPage.Step4PaymentTitle)</p>
+                                        <ul class="payment-details list-unstyled">
+                                            @foreach (var payment in retailOrder.Payments)
+                                            {
+                                                <li>
+                                                    @if (payment.MethodName == TRM.Shared.Constants.StringConstants.Payments.Mastercard && !string.IsNullOrEmpty(payment.CardType))
+                                                    {
+                                                        <div>
+                                                            <span class="d-inline">@payment.CardType &nbsp;</span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="d-inline mr-1">
+                                                                @Model.CurrentPage.Step4LastFourDigitsLabel
+                                                            </span> @payment.Last4Digits
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="d-inline">@payment.MethodName</span>
+                                                    }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-9 col-12-print">
+                        <div class="form-spacing">
+                            <div class="order-ref p-1 p-sm-2 border-bottom-print padding-left-none-print page-break-print">
+                                <div class="col-8-print">
+                                    <div class="row">
+                                        @{
+                                            var investmentOrder = Model.ViewModel.InvestmentPurchaseOrder;
+                                        }
+                                        <div class="col">
+                                            <strong class="font-weight-normal-print">@Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderText) - @investmentOrder.Total</strong>
+                                        </div>
+                                        <div class="col">
+                                            @foreach (var orderNumber in investmentOrder.OrderNumbers)
+                                            {
+                                                <p class="mb-1">@orderNumber</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @Html.Partial("RoyalMint2020/_InvestmentSummaryConfirmation", Model.ViewModel.InvestmentPurchaseOrder)
+                        </div>
+                    </div>
+                    <div class="col-10 col-md-8 col-xl-6 col-12-print">
+                        <div class="form-spacing">
+                            <div class="order-details page-break-print">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6">
+                                        @{
+                                            var investmentDelivery = investmentOrder.DeliveryAddress;
+                                            var investmentPayment = investmentOrder.Payment;
+                                        }
+
+                                        @if (investmentDelivery.Name.Equals("VaultShippingAddress"))
+                                        {
+                                            <p class="form-label">@Html.TranslateFallBack(StringResources.BullionDeliveryToVault, "Vault")</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="form-label font-weight-bold-print">@Html.PropertyFor(x => x.CurrentPage.Step4BillingAddressTitle)</p>
+                                            Html.RenderPartial("RoyalMint2020/_Address", new AddressViewModel { Address = investmentDelivery });
+                                        }
+                                    </div>
+                                    @if (investmentPayment != null)
+                                    {
+                                        <div class="col-12 col-sm-6">
+                                            <ul class="list-unstyled">
+                                                <li>@investmentPayment.MethodName</li>
+                                            </ul>
+                                        </div>
+                                    }
+                                    <div class="col-12"><div class="payment-details"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 border-top-thick-print font-weight-bold-print">
+                        <div class="row justify-content-center d-print-block">
+                            <div class="col-10 col-md-8 col-xl-6 col-12-print">
+                                <div class="form-spacing">
+                                    <div class="invest-balance text-center p-1 p-md-2 mt-5 mb-5 page-break-print">
+                                        <p class="title">
+                                            @Html.PropertyFor(x => x.CurrentPage.Step4CombinedOrderTotalTitle)
+                                            <span>@Model.ViewModel.CombinedOrderTotal</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 d-print-none">
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-md-8 col-xl-6">
+                                <div class="row btns form-spacing justify-content-center">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-secondary" type="button" onclick="window.print();">Print</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="/" class="btn btn-primary">Continue shopping</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.CurrentPage.Step4MiddleContentArea != null)
+                    {
+                        <div class="col-12 d-print-none">
+                            <div class="form-spacing">
+                                @Html.DisplayFor(x => x.CurrentPage.Step4MiddleContentArea)
+                            </div>
+                        </div>
+                    }
+
+                    <div class="col-12 d-print-none">
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-md-8 col-xl-6">
+                                <div class="row btns form-spacing justify-content-center">
+                                    <div class="col-md-6">
+                                        <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" class="btn btn-secondary">@Html.PropertyFor(x => x.CurrentPage.Step4OpenDashboardButtonText)</a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="@Url.ContentUrlExtension(myLayout.StartPageReference)" class="btn btn-secondary">@Html.PropertyFor(x => x.CurrentPage.Step4VisitHomepageButtonText)</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+                    {
+                        <div class="col-12 d-print-none">
+                            <div class="form-spacing">
+                                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Six })

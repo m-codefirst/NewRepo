@@ -1,0 +1,65 @@
+﻿@using TRM.Web.Models.ViewModels
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.LittleTreasures.AutoInvest.LittleTreasuresAutoInvestBlockInvestmentSummaryAndPaymentViewModel
+
+@{
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.InvestmentOptionsStepperTitle,
+                IsComplete = true,
+                Number = "1",
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.SummaryAndPaymentStepperTitle,
+                IsCurrent = true,
+                Number = "2",
+            }
+        }
+    };
+
+    var backButtonText = @Html.TranslateFallback(StringResources.BackToAutoInvestment, "Back to Auto Investment");
+    var paymentInformation = Model.CurrentBlock.SummaryAndPaymentInvestmentPaymentInformation.ToHtmlString().Replace("##beneficiary_reference##", Model.BeneficiaryReference);
+
+}
+
+@{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+<div class="form-container">
+    <div class="row justify-content-center">
+        <div class="col-10 col-sm-8">
+            <div class="form-spacing">
+                <p class="text-center">@Model.CurrentBlock.SummaryAndPaymentSummary</p>
+            </div>
+
+            <div class="form-spacing">
+                <h2 class="section-head"><span>@Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryHeading</span></h2>
+                <div class="order-totals">
+                    <div class="order-header">@Model.CurrentBlock.SummaryAndPaymentInvestmentSummarySelectedProductLabel</div>
+                    <div class="order-item-with-icon"><span class="icon"><svg><use xlink:href="#minty" /></svg></span> @Model.ProductName</div>
+                    <div class="order-header">@Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryDayLabel</div>
+                    <div class="order-item-with-icon"><span class="icon"><svg><use xlink:href="#calendar" /></svg></span> @Model.PaymentDay@Model.PaymentDay.GetOrdinalSuffix() @Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryOfEachMonthLabel</div>
+                    <div class="order-header">@Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryAmountLabel</div>
+                    <div class="order-item-with-icon"><span class="icon"><svg><use xlink:href="#coins-alt" /></svg></span> @Model.Amount.ToString(Model.Amount.Currency.Format) @Model.CurrentBlock.SummaryAndPaymentInvestmentSummaryPerMonthLabel</div>
+                </div>
+            </div>
+
+            <div class="form-spacing">
+                <p class="text-center">
+                    @Html.PropertyFor(m => m.CurrentBlock.SummaryAndPaymentInvestmentStandingOrderDescription)
+                </p>
+            </div>
+
+            @Html.Raw(paymentInformation)
+
+            <div class="text-center">
+                <a class="btn btn-primary" href="@Request.RawUrl">@backButtonText</a>
+            </div>
+        </div>
+    </div>
+</div>
+

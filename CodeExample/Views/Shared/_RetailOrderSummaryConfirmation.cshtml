@@ -1,0 +1,119 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Cart
+@model PurchaseOrderViewModel
+<div class="row">
+    <div class="col-xs-12">
+        <div class="order-summary">
+            <div class="summary-header">
+                <div class="title">
+                    <h5 class="h5 mt-0 mb-0">@Html.TranslateFallback(StringResources.RetailOrderSummary, "Retail order summary")</h5>
+                </div>
+            </div>
+            <div class="summary-details collapse in" id="orderSummaryDetails">
+                @{
+                    var shipment = Model.Shipments.FirstOrDefault();
+                    var items = new List<CartItemViewModel>();
+                    if (shipment != null)
+                    {
+                        items = shipment.CartItems;
+                    }
+                }
+                @if (items.Any())
+                {
+                    foreach (var item in items)
+                    {
+                        <div class="row table-row">
+                            <div class="col-xs-12 col-md-7">
+                                <p class="h6 mt-0 strong mb-0">@item.DisplayName</p>
+                            </div>
+                            <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                                <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x@((int)item.Quantity)
+                            </div>
+                            <div class="col-xs-6 col-md-4 pl-0 text-right">
+                                @{
+                                    var price = !string.IsNullOrEmpty(item.DiscountedPrice) ? item.DiscountedPrice : item.PlacedPrice;
+                                }
+                                <p class="mb-0">@price</p>
+                                <p class="small">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</p>
+                            </div>
+                            @if (item.CanBePersonalised)
+                            {
+                                <div class="col-sm-12 pt-1x pb-1x">
+                                    <span class="bg-white p-1xs mt-1x">
+                                        @Html.TranslateFallback(StringResources.ItemPersonalised, StringConstants.TranslationFallback.ItemPersonalised)
+                                    </span>
+                                </div>
+                            }
+
+                            <div class="col-sm-12">
+                                <p class="small mb-0 text-success">@item.StockSummary.StatusMessage</p>
+                                <p class="mb-0 strong">@item.SupplierMessage</p>
+                                <p class="small">@item.StockSummary.ShippingMessage</p>
+                            </div>
+                            <div class="col-xs-12">
+                                <hr class="mb-0">
+                            </div>
+                        </div>
+                    }
+                }
+                @if (Model.Promotions.Any())
+                {
+                    <div class="row background-lightergray">
+                        <div class="col-xs-12">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+                                </div>
+                                <div class="panel-body">
+                                    @foreach (var promo in Model.Promotions)
+                                    {
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <p>
+                                                    <i class="trmi trmi-check text-success"></i> @Html.Raw(string.IsNullOrEmpty(promo.Code) ? promo.Description : promo.Code)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row table-footer">
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailBasketTotal, "Retail Basket Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        <p class="mb-0">@Model.SubTotal</p>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailDelivery, "Retail Delivery")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        @Model.TotalDeliveryWithoutDiscount
+                    </div>
+                    @if (Model.TotalDiscountDecimal > 0)
+                    {
+                        <div class="col-xs-8 text-right">
+                            <strong>@Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)</strong>
+                        </div>
+                        <div class="col-xs-4 text-right">
+                            @Model.TotalDiscount
+                        </div>
+                    }
+
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.RetailTotal, "Retail Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        <p class="mb-0 strong">
+                            @Model.Total
+                        </p>
+                        <p class="small mb-0">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

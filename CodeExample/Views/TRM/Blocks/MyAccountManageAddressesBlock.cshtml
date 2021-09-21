@@ -1,0 +1,74 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.ViewModels.MyAccountManageAddressesViewModel
+<div class="row">
+    <div class="col-xs-12">
+        <!-- WYSIWYG -->
+
+        <div class="wysiwyg">
+            @Html.PropertyFor(a => a.CurrentBlock.IntroductionText)
+        </div>
+
+        <!-- WYSIWYG Ends -->
+        <div class="panel panel-secondary">
+            <div class="panel-body">
+                <div class="panel panel-transparent mb-0">
+                    <div class="panel-heading hidden-xs">
+                        <div class="row">
+
+                            <div class="col-xs-12 col-sm-3">
+                                @Html.TranslateFallback(TRM.Web.Constants.StringResources.AddressNickname, "Address Nickname")
+                            </div>
+                            <div class="col-xs-12 col-sm-3">
+                                @Html.TranslateFallback(TRM.Web.Constants.StringResources.Name, "Name")
+                            </div>
+                            <div class="col-xs-12 col-sm-4">
+                                @Html.TranslateFallback(TRM.Web.Constants.StringResources.Address, "Address")
+                            </div>
+                            <div class="col-xs-12 col-sm-2">
+
+                            </div>
+                        </div>
+                    </div>
+                    @foreach (var address in Model.Addresses)
+                    {
+                        <div class="panel-body">
+                            <div class="row">
+
+                                <div class="col-xs-6 col-sm-3 mb-xs-1x">
+                                    <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.AddressNickname, "Address Nickname") <br /></span> @address.Name
+                                </div>
+                                <div class="col-xs-6 col-sm-3">
+                                    <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Name, "Name") <br /></span>  @address.FirstName @address.LastName
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">@Html.TranslateFallback(TRM.Web.Constants.StringResources.Address, "Address") <br /></span>
+                                    <dl>
+                                        <dd>@address.Line1</dd>
+                                        <dd>@address.Line2</dd>
+                                        <dd>@address.City</dd>
+                                        <dd>@address.CountryRegion.Region</dd>
+                                        <dd>@address.CountryName</dd>
+                                        <dd>@address.PostalCode</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-xs-12 col-sm-2 text-right">
+                                    @if ((!address.BillingDefault || !address.ShippingDefault) && !Model.KYCAddressIds.Contains(address.AddressId))
+                                    {
+                                        var editLink = Model.CurrentBlock.AddEditAddressesPage.GetExternalUrl_V2() + "?address=" + address.AddressId;
+                                        <a class="mr-1x" href="@editLink">Edit </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        @if (!Model.IsBullionAccountOnly)
+        {
+            <a href="@Model.CurrentBlock.AddEditAddressesPage.GetExternalUrl_V2()" class="btn btn-default mb-2x">@Html.TranslateFallback(TRM.Web.Constants.StringResources.AddNewAddress, "Add New Address")</a>
+        }
+    </div>
+</div>

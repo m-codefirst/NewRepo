@@ -1,0 +1,269 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.ViewModels.Bullion.QuickCheckout
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions 
+
+@model QuickCheckoutViewModel
+@{
+    var deliveryAddress = Model.DeliveryAddress;
+    var firstItem = Model.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems).FirstOrDefault();
+
+    var canVault = false;
+    var canDeliver = false;
+    var isSignatureVariant = false;
+
+    if (firstItem != null)
+    {
+        canVault = firstItem.BullionCartItem.CanVault;
+        canDeliver = firstItem.BullionCartItem.CanDeliver;
+        isSignatureVariant = firstItem.BullionCartItem.IsSignatureVariant;
+    }
+    var items = Model.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems);
+    var isExistsItem = items.Any(x => x != null);
+
+    var storageCost = string.Empty;
+    var firstShipment = Model.OrderGroupViewModel.Shipments.FirstOrDefault();
+    if (firstShipment != null)
+    {
+        storageCost = firstShipment.EstimatedStorageCost;
+    }
+    var showAddFund = Model.OrderGroupViewModel.TotalDecimal > Model.AvailableToInvest.Amount;
+    var deliver = Model.DeliveryOption.Equals(DeliveryOption.Delivered);
+}
+
+<script type="text/javascript">
+    window.PampResult = {
+        isSyncWithPampError: @Json.Encode(Model.IsSyncWithPampError),
+        isShowInsufficientFunds: @Json.Encode(Model.ShowInsufficientFunds),
+        isValidForPayment: @Json.Encode(Model.ValidForPayment),
+        isNotEnoughMoney: @Json.Encode(Model.IsNotEnoughMoney),
+        showFixedPriceButton: @Json.Encode(Model.Shipping != null && isExistsItem && !Model.ShowInsufficientFunds)
+    }
+</script>
+
+<!-- alert top up your funds -->
+<div class="hidden validation-errors-update">
+    @Html.ValidationSummary(false)
+</div>
+<div class="quick-checkout-addfund alert alert-info @(showAddFund ? "" : "hidden" )">
+    <h3 class="mt-0">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutInsufficientfundsHeader, "You have Insufficient Funds in your Wallet")</h3>
+    <span class="mb-1x inline">
+        @Html.TranslateFallBack(StringResources.BullionQuickCheckOutInsufficientfundsSubHeader, "If you would like to checkout with this investment item today please top up wallet.")
+    </span>
+    <div>
+        <div class="">
+            @if (!Model.IsSippContact)
+            {
+                <a class="btn btn-secondary pull-right-sm-up mb-1x" href="@(Model.GetQuickCheckoutPageUrl() + "AddFunds")">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds")</a>
+            }
+            <p class="mb-0">
+                <span class="h4 strong">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutInvestmentOrderTotal, "Investment Total: ") </span><span class="h4">@Model.OrderGroupViewModel.Total</span>
+            </p>
+            <p class="mb-0">
+                <span class="h4 strong">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutAvailableFunds, "Available Funds: ") </span><span class="h4 text-danger">@Model.AvailableToInvest.ToString()</span>
+                <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div>
+    <h2 class="h3 mt-0 mb-1x">
+        @if (isSignatureVariant)
+        {
+            @Html.TranslateFallBack(StringResources.BullionQuickCheckOutSignatureHeader, "Our Signature Investment are stored in The Royal Mint Vault")
+        }
+        else
+        {
+            if (canDeliver && canVault)
+            {
+                @Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultOrShipmentHeader, "Would you like to Vault this investment or have it Delivered?")
+            }
+            else if (canDeliver)
+            {
+                @Html.TranslateFallBack(StringResources.BullionQuickCheckOutShipmentHeader, "This investment is not available for storage in the Vault")
+            }
+            else if (canVault)
+            {
+                @Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultHeader, "This investment is not available for home delivery")
+            }
+        }
+    </h2>
+    <div class="checkout-options">
+        @Html.HiddenFor(x => x.CanDeliverAndVault, new { Value = canDeliver && canVault })
+        @if (isSignatureVariant)
+        {
+            <div class="signature-variant-checkout mb-xs-2x mb-sm-2x mb-0">
+                <p>
+                    @Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultedSubHeader, "Storage fees apply to be billed in arrears and paid quarterly.")
+                    <a href="@Url.ContentUrlExtension(Model.GetAppropriateStartPageForSiteSpecificProperties().StorageFeesPage)">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutFindoutMoreLinkText, "Find out more")</a>
+                    @if (!string.IsNullOrEmpty(storageCost))
+                    {
+                    <p>@Html.TranslateFallBack(StringResources.EstimatedStorageFee, "Estimated storage fee"): @storageCost @Html.TranslateFallBack(StringResources.PerAnnum, "p.a.") (@Html.TranslateFallBack(StringResources.BullionQuickCheckOutExVat, "ex VAT"))</p>
+                }
+                    </p>
+                </div>
+            }
+            else
+            {
+                if (canDeliver && canVault)
+                {
+                    <div class="checkbox small fancy">
+                        <input id="radioOne" name="DeliveryOption" type="radio" value="Vault" @(deliver ? "" : "checked") onclick="quickCheckoutJs.updateShippingMethod('Vault')">
+                        <label for="radioOne">
+                            <span class="strong inline header-font-color">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultedHeader, "Store in The Royal Mint Vault")</span> <br>
+                            <span class="inline">
+                                @Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultedSubHeader, "Storage fees apply to be billed in arrears and paid quarterly.")
+                                <a href="@Url.ContentUrlExtension(Model.GetAppropriateStartPageForSiteSpecificProperties().StorageFeesPage)">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutFindoutMoreLinkText, "Find out more")</a>
+                                @if (!string.IsNullOrEmpty(storageCost))
+                                {
+                                    <p>@Html.TranslateFallBack(StringResources.EstimatedStorageFee, "Estimated storage fee"): @storageCost @Html.TranslateFallBack(StringResources.PerAnnum, "p.a.") (@Html.TranslateFallBack(StringResources.BullionQuickCheckOutExVat, "ex VAT"))</p>
+                                }
+                            </span>
+                            <br>
+                        </label>
+                    </div>
+                    <div class="checkbox small fancy">
+                        <input id="radioTwo" name="DeliveryOption" type="radio" value="Delivered" @(deliver ? "checked" : "") onclick="quickCheckoutJs.updateShippingMethod('Delivered')">
+                        <label for="radioTwo">
+                            <span class="strong inline header-font-color">@(Model.DeliverShipping != null ? Model.DeliverShipping.FriendlyName : string.Empty) @Html.TranslateFallBack(StringResources.BullionQuickCheckOutDeliverHeader, "delivery to registered investment address")</span> <br>
+                            @if (deliveryAddress != null)
+                            {
+                                <span class="inline">
+                                    @(!string.IsNullOrEmpty(deliveryAddress.Line1) ? deliveryAddress.Line1 + ", " : "")
+                                    @(!string.IsNullOrEmpty(deliveryAddress.Line2) ? deliveryAddress.Line2 + ", " : "")
+                                    @deliveryAddress.City, @deliveryAddress.PostalCode
+                                </span><br>
+                                if (Model.DeliverShipping != null)
+                                {
+                                    <span class="inline">
+                                        @Html.TranslateFallBack(StringResources.BullionQuickCheckOutDeliveryCost, "Delivery Cost:")
+                                        @if (!string.IsNullOrEmpty(Model.DeliverShipping.DeliveryCost))
+                                        {
+                                            <strong>@Model.DeliverShipping.DeliveryCost</strong>
+                                        }
+
+                                    </span>
+                                }
+                            }
+                        </label>
+                    </div>
+                }
+                else if (canVault)
+                {
+                    @Html.HiddenFor(x => x.DeliveryOption, new { Value = DeliveryOption.Vault })
+                    <div class="vault-only mb-xs-2x mb-sm-2x mb-0">
+                        <p class="strong header-font-color mb-0">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultedHeader, "Store in The Royal Mint Vault")</p>
+                        <p>
+                            @Html.TranslateFallBack(StringResources.BullionQuickCheckOutVaultedSubHeader, "Storage fees apply to be billed in arrears and paid quarterly.")
+                            <a href="@Url.ContentUrlExtension(Model.GetAppropriateStartPageForSiteSpecificProperties().StorageFeesPage)">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutFindoutMoreLinkText, "Find out more")</a>
+                            @if (!string.IsNullOrEmpty(storageCost))
+                            {
+                            <p>@Html.TranslateFallBack(StringResources.EstimatedStorageFee, "Estimated storage fee"): @storageCost @Html.TranslateFallBack(StringResources.PerAnnum, "p.a.") (@Html.TranslateFallBack(StringResources.BullionQuickCheckOutExVat, "ex VAT"))</p>
+                        }
+                            </p>
+                        </div>
+                    }
+                    else if (canDeliver)
+                    {
+                        @Html.HiddenFor(x => x.DeliveryOption, new { Value = DeliveryOption.Delivered })
+                        <div class="deliver-only mb-xs-2x mb-sm-2x mb-0">
+                            <p class="strong header-font-color mb-0">@(Model.DeliverShipping != null ? Model.DeliverShipping.FriendlyName : string.Empty) @Html.TranslateFallBack(StringResources.BullionQuickCheckOutDeliverHeader, "delivery to registered investment address")</p>
+                            @if (deliveryAddress != null)
+                            {
+                                <span class="inline">
+                                    @(!string.IsNullOrEmpty(deliveryAddress.Line1) ? deliveryAddress.Line1 + ", " : "")
+                                    @(!string.IsNullOrEmpty(deliveryAddress.Line2) ? deliveryAddress.Line2 + ", " : "")
+                                    @deliveryAddress.City, @deliveryAddress.PostalCode
+                                </span><br>
+                                if (Model.DeliverShipping != null)
+                                {
+                                    <span class="inline">
+                                        @Html.TranslateFallBack(StringResources.BullionQuickCheckOutDeliveryCost, "Delivery Cost:")
+                                        <strong>@Model.DeliverShipping.DeliveryCost</strong>
+                                    </span>
+                                }
+                            }
+                        </div>
+                    }
+                }
+        <!-- .radio -->
+
+    </div>
+    <!--/ .radio -->
+</div>
+<p class="alert alert-info pull-right-md-up text-slateblue text-center pl-4x pr-4x mb-1x">
+    @Html.TranslateFallBack(StringResources.BullionQuickCheckOutRefreshEverySeconds, "Price is LIVE")
+    <i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="Title"></i>
+</p>
+<div class="clearfix"></div>
+<!-- Quick Checkout item information -->
+@foreach (var item in Model.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems))
+{
+    @Html.Partial("_BullionVariantCartItem", item)
+}
+
+<!-- Quick Checkout total -->
+<div class="checkout-total">
+    <div class="row">
+        @if (Model.OrderGroupViewModel.SavedAmount != null)
+        {
+            <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+                <strong class="pull-right">Saved Amount</strong>
+            </div>
+            <div class="col-xs-6 col-sm-3 text-right-sm-up quick-checkout-subTotal">
+                @Model.OrderGroupViewModel.SavedAmount
+            </div>
+        }
+        <div class="clearfix"></div>
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutSubTotal, "Sub Total")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up quick-checkout-subTotal">
+            @Model.OrderGroupViewModel.SubTotal
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutBullionDelivery, "Bullion Delivery")</strong>
+        </div>
+
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            <span class="strong quick-checkout-totalDelivery">
+                @Model.OrderGroupViewModel.TotalDelivery
+            </span>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-xs-6 col-sm-3 col-sm-offset-6 text-right-sm-up">
+            <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutVAT, "VAT")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up quick-checkout-vat">
+            @Model.OrderGroupViewModel.TaxTotal
+        </div>
+        <div class="clearfix"></div>
+        <hr>
+    </div>
+    <div class="row center-items-sm-up reorder-sm">
+        <div class="col-xs-12 col-sm-6">
+            @if (!Model.ShowInsufficientFunds)
+            {
+                <span class="h6 mt-0 mb-0 coundown-timer inline alert alert-info text-slateblue">
+                    LIVE Prices valid for <span class="h5" id="coundown-timer">0</span> seconds
+                </span>
+            }
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="row">
+                <div class="col-xs-6">
+                    <p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutInvestmentTotal, "Investment Total")</p>
+                </div>
+                <div class="col-xs-6 text-right-sm-up">
+                    <p class="h4 h3-lg-down strong mt-0 mb-0 quick-checkout-total">@Model.OrderGroupViewModel.Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_BullionSyncWithPampErrorInformTemplate")

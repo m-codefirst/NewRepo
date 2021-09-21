@@ -1,0 +1,28 @@
+﻿@using EPiServer.Core
+@using Newtonsoft.Json
+@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.FooterSignUpBlock
+
+@{
+    var contentId = ((IContent)Model).ContentLink.ID;
+    
+    var viewModel = new {
+        emailLabelPlaceholder = Model.EmailLabelPlaceholder,
+        submitButton = Model.SubmitButton,
+        contentId = contentId,
+        successMessage = Model.SuccessMessage,
+        formRequiredText = Html.TranslateFallback(StringResources.FormRequiredText, "This field is required"),
+        formInvalidEmailText = Html.TranslateFallback(StringResources.FormInvalidEmailText, "Please enter a valid email address"),
+    };
+}
+
+<div class="newsletter">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h6 @Html.EditAttributes(a => a.Heading)>@Html.DisplayFor(m => m.Heading)</h6>
+            <p>@Html.DisplayFor(m => m.SupportingMessaging)</p>
+            <div data-module="footer-sign-up" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+            @Html.AntiForgeryToken()
+        </div>
+    </div>
+</div>

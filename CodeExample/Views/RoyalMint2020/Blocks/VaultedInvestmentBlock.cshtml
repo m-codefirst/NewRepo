@@ -1,0 +1,15 @@
+﻿@using EPiServer.Web
+@using System.Web.Optimization
+@using TRM.Web.Models.ViewModels.Bullion
+
+@model VaultedInvestmentBlockViewModel
+
+@if (!Model.CurrentBlock.IsDetailInvestment)
+{
+    @Html.Partial("RoyalMint2020/_VaultedInvestment", Model);
+}
+else
+{
+    @Html.Partial("RoyalMint2020/_VaultedInvestmentDetail", Model);
+
+}

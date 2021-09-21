@@ -1,0 +1,169 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.SellBullionDefaultLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+}
+
+<div class="pageContainer sell-vault-user">
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2 mb-1x">
+                <div>
+                    @Html.ValidationSummary(false)
+                </div>
+                <!-- Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <div class="page-header">
+                        <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Heading)</h1>
+                    </div>
+                }
+
+                @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                {
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                }
+                
+                <p>@Html.TranslateFallback(StringResources.PleaseConfirmWhatYouWouldLikeToSellToday, "Please confirm what you would like to sell today"):</p>
+                <div id="sell-options" class="sell-options mb-2x">
+                    <div class="checkbox small fancy">
+                        <input type="radio" name="sellOption" id="chkDel2" value="Value" checked>
+                        <label for="chkDel2">
+                            <span class="strong inline text-midblue">@Html.TranslateFallback(StringResources.DefineAnApproxValueToSell, "Define an approx value to sell")</span>
+                        </label>
+                    </div>
+                    <div id="calculate-value" class="calculate-form">
+                        <form id="sell-value-calculation">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-4">
+                                    <strong>@Html.TranslateFallback(StringResources.AvailableToSellOz, "Available to sell (oz)"):</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-2 text-right">
+                                    @Model.ViewModel.SellVariant.AvailableToSell
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-sm-4 mb-1x">
+                                    <strong>@Html.TranslateFallback(StringResources.ApproxValuation, "Approx Valuation"):</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-2 mb-1x text-right">
+                                    @Model.ViewModel.SellTotal.ToString()
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-12 col-sm-6 mb-1x">
+                                    <div class="input-group border-gray mb-0">
+                                        <div class="input-group-addon">@Model.ViewModel.SellTotal.Currency.CurrencyCode.ToCurrencySymbol()</div>
+                                        <input type="text" data-min="1" class="form-control only-number" id="sell-money" value="@Model.ViewModel.SellTotal.Amount" placeholder="Amount" data-original-title="" title="" floating-number-only ng-model="amountToSell" ng-init="amountToSell = @Model.ViewModel.SellTotal.Amount.ToString()">
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-3 mb-1x">
+                                    <button type="button" class="btn btn-default" onclick="TrmWalletModule.onSellMoneyChange()">@Html.TranslateFallback(StringResources.Calculate, "Calculate")</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="checkbox small fancy">
+                        <input type="radio" name="sellOption" id="chkDel1" value="Weight">
+                        <label for="chkDel1">
+                            <span class="strong inline text-midblue">@Html.TranslateFallback(StringResources.DefineAWeightOzToSell, "Define a weight (oz) to sell")</span>
+                        </label>
+                    </div>
+                    <div id="calculate-weight" class="calculate-form hidden">
+                        <form id="sell-weight-calculation">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-4">
+                                    <strong>@Html.TranslateFallback(StringResources.AvailableToSellOz, "Available to sell (oz)"):</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-2 text-right">
+                                    @Model.ViewModel.SellVariant.AvailableToSell
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-sm-4 mb-1x">
+                                    <strong>@Html.TranslateFallback(StringResources.ApproxPricePerOz, "Approx price per oz"):</strong>
+                                </div>
+                                <div class="col-xs-6 col-sm-2 mb-1x text-right">
+                                    @Model.ViewModel.PremiumPricePerOzIncludingPremium.ToString()
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-12 col-sm-6 mb-1x">
+                                    <div class="input-group border-gray mb-0">
+                                        <input type="text" data-min="1" data-max="10" class="form-control only-number" id="sell-quantity" value="@Model.ViewModel.SellVariant.AvailableToSell" placeholder="Amount" data-original-title="" title="" floating-number-only ng-model="weightToSell" ng-init="weightToSell = @Model.ViewModel.SellVariant.AvailableToSell">
+                                        <div class="input-group-addon">ounces</div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-3 mb-1x">
+                                    <button type="button" class="btn btn-default" onclick="TrmWalletModule.onSellQuantityChange()">@Html.TranslateFallback(StringResources.Calculate, "Calculate")</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="checkbox small fancy">
+                        <input type="radio" name="sellOption" id="chkDel0" value="Default" onclick="TrmWalletModule.onSellAll(@Model.ViewModel.SellVariant.AvailableToSell)">
+                        <label for="chkDel0">
+                            <span class="strong inline text-midblue">@Html.TranslateFallback(StringResources.SellAllMyVaultHoldingForThisMetal, "Sell all my Vault Holding for this Metal")</span>
+                        </label>
+                    </div>
+                </div>
+               
+                @using (Html.BeginForm("Index", null, FormMethod.Post, new { @id = "sell-back-form" }))
+                {
+                    <input type="hidden" name="VariantCode" id="variant-code" value="@Model.ViewModel.SellVariant.Code" />
+                    for (var i = 0; i < Model.ViewModel.WalletItems.Count; i++)
+                    {
+                        <input type="hidden" name="WalletItems[@i].Id" value="@Model.ViewModel.WalletItems[i].Id" />
+                        <input type="hidden" name="WalletItems[@i].RowVersion" value="@Convert.ToBase64String(Model.ViewModel.WalletItems[i].RowVersion)" />
+                    }
+                    <h2 class="h3">@Html.TranslateFallback(StringResources.SellBackDetails, "Sell back details")</h2>
+                    <div id="sell-back-detail">
+                        @Html.Partial("_SellSignatureFromVault", Model.ViewModel)
+                    </div>
+                    if (startPage.StopTrading)
+                    {
+                        <div class="col-xs-12">
+                            <div class="alert @startPage.StopTradingMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.UnableToSell)
+                    {
+                        <div class="col-xs-12">
+                            <div class="alert no-margins-v mb-0">
+                                @Html.TranslateFallback(StringResources.UnableToSellOrDeliverFromVault, "Customer flagged as unable to sell from vault or deliver from vault")
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.SellVariant.AvailableToSell > 0)
+                    {
+                        <button type="submit" class="btn btn-secondary pull-right-sm-up mt-2x mb-1x">@Html.TranslateFallback(StringResources.SellNow, "Sell Now")</button>
+                    }
+                }
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "sellOrDeliverFromVault").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"$(function () {TrmWalletModule.init(" + Model.CurrentPage.IntervalUpdateTime + "); TrmWalletModule.onSellMoneyChange();});").AtFooter();
+}

@@ -1,0 +1,127 @@
+﻿@using EPiServer.Editor
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionSIPPSSASAdminPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionSIPPSSASAdminViewModel>
+
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+@section JustBeforeBodyTag{
+    <script src="~/Static/trm/js/app/rmCustomerServiceController.js"></script>
+}
+<div class="container mt-2x mb-4x" ng-controller="rmSIPPSSASAdmin as vm" ng-init="vm.searchUsers();">
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        var displayLinkInHeader = Model.CurrentPage.HeaderLink != null && !string.IsNullOrEmpty(Model.CurrentPage.HeaderLinkText);
+
+        <div class="page-header">
+            <div class="row center-items-sm-up">
+                <div class="col-xs-12 @(displayLinkInHeader ? "col-md-8" :"")">
+                    <h1 class="h1 mt-0 text-capitalize">@Html.DisplayFor(a => a.CurrentPage.Heading)</h1>
+                </div>
+                @if (displayLinkInHeader)
+                {
+                    <div class="col-xs-12 col-md-4">
+                        <div class="pull-right-sm-up">
+                            <a href="@Url.ContentUrlExtension(Model.CurrentPage.HeaderLink)">
+                                @Html.PropertyFor(x => x.CurrentPage.HeaderLinkText)
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    <!-- WYSIWYG -->
+
+    @if ((Model.CurrentPage.MainBody != null && !Model.CurrentPage.MainBody.IsEmpty) || PageEditing.PageIsInEditMode)
+    {
+        <div class="xhtmlArea clear" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+            @{ var content = Html.ParseXhtmlString(Model.CurrentPage.MainBody); }
+            @Html.DisplayFor(m => content)
+        </div>
+    }
+    <!-- WYSIWYG End -->
+    <div class="row" ng-show="vm.userList.length > 10 || (vm.totalPages && vm.totalPages > 1) || vm.onSearch">
+        <div class="col-xs-12 col-md-9">
+            <form ng-submit="vm.onSearchUsers()" method="get">
+                <div class="input-group mb-1x">
+                    <input type="text" class="form-control"
+                           ng-model="vm.searchText"
+                           placeholder="Please enter users email, account number or name..." data-original-title="" title="">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default mb-1x" ng-disabled="vm.isLoading">
+                            Search Users
+                            <span class="btn-mask-loading" style="top:0px; left:0px; background-color:transparent;" ng-if="vm.isLoading"></span>
+                        </button>
+                    </span>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default panel-secondary">
+        <div class="panel-body item-row">
+            <div class="panel panel-default panel-order">
+                <div class="panel-body item-row hidden-xs">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-3">
+                            <span class="bold">User Name </span>
+                        </div>
+                        <div class="col-xs-12 col-sm-3">
+                            <span class="bold">Email </span>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="bold">Currency </span>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="bold">Beneficiary Reference </span>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="bold">Action </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body item-row" ng-repeat="user in vm.userList track by $index">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-3">
+                            <span class="visible-xs-inline strong">User Name: </span>{{user.fullName}}
+                        </div>
+                        <div class="col-xs-12 col-sm-3">
+                            <span class="visible-xs-inline strong">Email: </span>{{user.email}}
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="visible-xs-inline strong">Currency: </span>
+                            <span ng-class="{'text-red': user.accountStatus=='Locked'}">{{user.preferredCurrency}}</span>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="visible-xs-inline strong">Beneficiary Reference: </span>{{user.beneficiaryReference}}
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <span class="visible-xs-inline strong">Action: </span><a ng-class="{disabled: '@Model.ViewModel.IsImpersonating'}" href="javascript:void(0)" ng-click="vm.impersonateUser(user.userName)">Impersonate User </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-5 mb-xs-1x"></div>
+        <div class="col-xs-12 col-sm-7 text-right-sm-up">
+            <pagination ng-if="vm.totalPages && vm.totalPages > 1" options="vm.pagingOptions" current-page="vm.currentPage" total-items="vm.totalItems"></pagination>
+        </div>
+    </div>
+    <div class="contentArea">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+        </div>
+    </div>
+</div>
+
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

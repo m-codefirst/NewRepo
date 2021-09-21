@@ -1,0 +1,126 @@
+﻿@model TRM.Web.Plugins.ImpersonationLogging.Models.ImpersonationLogViewModel
+@{
+    Layout = null;
+}
+
+@using EPiServer.Framework.Web.Resources
+
+@*
+    - Renders necessary Episerver system styles
+    ----------------------------------------------------- *@
+
+@Html.Raw(ClientResources.RenderResources("ShellCore"))
+@Html.Raw(ClientResources.RenderResources("ShellWidgets"))
+@Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+@Html.Raw(ClientResources.RenderResources("Navigation"))
+@Html.Raw(ClientResources.RenderResources("DojoDashboardCompatability", new[] { ClientResourceType.Style }))
+@Html.Raw(ClientResources.RenderResources("system"))
+<link href="/App_Themes/Default/Styles/ToolButton.css" rel="stylesheet" />
+
+<div class="epi-contentContainer epi-padding">
+    <div class="epi-contentArea">
+        <h1>Impersonation Log Tool</h1>
+        <p>
+            Tool to review impersonation logs.
+        </p>
+    </div>
+    @if (Model == null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Something went wrong.
+        </div>
+    }
+    else
+    {
+        using (Html.BeginForm("Index", "ImpersonationLog", FormMethod.Post))
+        {
+            <div class="epi-formArea">
+                <div class="epi-size10">
+
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(x => x.PagingInfo.PageNumber)
+                    @Html.HiddenFor(x => x.PagingInfo.PageSize)
+                    <div>
+                        @Html.LabelFor(x => x.From)
+                        @Html.TextBoxFor(x => x.From, "{0:yyyy-MM-dd}", new { @type = "date" })
+                    </div>
+                    <div>
+                        @Html.LabelFor(x => x.To)
+                        @Html.TextBoxFor(x => x.To, "{0:yyyy-MM-dd}", new { @type = "date" })
+                    </div>
+                    <div>
+                        @Html.LabelFor(x => x.TransactionReference)
+                        @Html.TextBoxFor(x => x.TransactionReference)
+                    </div>
+                    <div>
+                        @Html.LabelFor(x => x.PerformedByName)
+                        @Html.TextBoxFor(x => x.PerformedByName)
+                    </div>
+                    <div>
+                        @Html.LabelFor(x => x.PerformedByRole)
+                        @Html.DropDownListFor(x => x.PerformedByRole, Model.Roles)
+                    </div>
+                    <div>
+                        @Html.LabelFor(x => x.TransactionType)
+                        @Html.DropDownListFor(x => x.TransactionType, Model.TransactionTypes)
+                    </div>
+                    <div class="epi-indent">
+                        <span class="epi-cmsButton">
+                            <input type="submit" class="epi-cmsButton-text epi-cmsButton-tools epi-cmsButton-Search" value="Search" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        if (Model.PagingInfo.Items.Count > 0)
+        {
+            <table class="epi-default epi-marginVertical">
+                <tr>
+                    <th>Performed By Role</th>
+                    <th>Performed By Name</th>
+                    <th>Performed By Ip Address</th>
+                    <th>Payload</th>
+                    <th>Transaction Type</th>
+                    <th>Created Date Time</th>
+                    <th>Transaction Reference</th>
+                </tr>
+
+                @foreach (var item in Model.PagingInfo.Items)
+                {
+                    <tr>
+                        <td>@item.PerformedByRole</td>
+                        <td>@item.PerformedByName</td>
+                        <td>@item.PerformedByIpAddress</td>
+                        <td style="text-overflow:ellipsis;overflow:hidden;white-space: nowrap;max-width: 100px;">
+                            @Html.ActionLink("Read", "Payload", new { transactionId = item.TransactionId })
+                        </td>
+                        <td>@item.GetTransactionTypeString()</td>
+                        <td>@item.CreatedDateTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@item.TransactionReference</td>
+                    </tr>
+                }
+                <tr class="epipager">
+                    <td colspan="12">
+                        @foreach (var p in Enumerable.Range(1, Model.PagingInfo.PageCount))
+                        {
+                            if (Model.PagingInfo.PageNumber == p)
+                            {
+                                <span>@p</span>
+                            }
+                            else
+                            {
+                                <span>@Html.ActionLink(p.ToString(), "Index", new { from = Model.From.ToString("yyyy-MM-dd"), to = Model.To.ToString("yyyy-MM-dd"), performedByName = Model.PerformedByName, performedByRole = Model.PerformedByRole, transactionType = Model.TransactionType, page = p })</span>
+                            }
+                        }
+                    </td>
+                </tr>
+            </table>
+        }
+        else
+        {
+            <p class="epi-default epi-marginVertical">
+                No transactions to audit.
+            </p>
+        }
+    }
+</div>

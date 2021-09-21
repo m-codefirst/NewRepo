@@ -1,0 +1,17 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.ContainerBlock
+
+@if (Model.BackgroundColour != Enums.eBackgroundColour.None)
+{
+    <div class="block-background @Model.BackgroundColour.DescriptionAttr()"></div>
+}
+
+<div class="block-container">
+    <div class="blockContent">
+        <div class="row" @Html.EditAttributes(x => x.Content)>
+            @Html.DisplayFor(x => x.Content)
+        </div>
+    </div>
+</div>
+

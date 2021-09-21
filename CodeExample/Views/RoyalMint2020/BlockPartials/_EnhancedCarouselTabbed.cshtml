@@ -1,0 +1,37 @@
+﻿@model TRM.Web.Models.Blocks.EnhancedCarouselBlock
+@* ReSharper disable  Mvc.PartialViewNotResolved *@
+<!-- Tabbed Carousel -->
+    <div class="sliderTabbed blockContent">
+        @{
+            Html.RenderPartial("_EnhancedCarouselTabbedSlide", Model.Slide1);
+
+            if (!string.IsNullOrWhiteSpace(Model.Slide2.Label))
+            {
+                Html.RenderPartial("_EnhancedCarouselTabbedSlide", Model.Slide2);
+            }
+            if (!string.IsNullOrWhiteSpace(Model.Slide3.Label))
+            {
+                Html.RenderPartial("_EnhancedCarouselTabbedSlide", Model.Slide3);
+            }
+            if (!string.IsNullOrWhiteSpace(Model.Slide4.Label))
+            {
+                Html.RenderPartial("_EnhancedCarouselTabbedSlide", Model.Slide4);
+            }
+        }
+    </div>
+    <!-- Carousel Navigation -->
+    <ul class="container slick-nav">
+        <li class="active"><span>@Html.DisplayFor(m=>m.Slide1.Label)</span></li>
+        @if (!string.IsNullOrWhiteSpace(Model.Slide2.Label))
+        {
+            <li><span>@Html.DisplayFor(m => m.Slide2.Label)</span></li>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Slide3.Label))
+        {
+            <li><span>@Html.DisplayFor(m => m.Slide3.Label)</span></li>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Slide4.Label))
+        {
+            <li><span>@Html.DisplayFor(m => m.Slide4.Label)</span></li>
+        }
+    </ul>

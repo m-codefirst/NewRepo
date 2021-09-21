@@ -1,0 +1,286 @@
+﻿@using TRM.Shared.Extensions;
+@using EPiServer.Editor
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep2ViewModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+	var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+}
+
+@functions
+{
+	public string GetFeedbackClass(string fieldName, string classes = null)
+	{
+		var fieldKey = string.Format("viewModel.{0}", fieldName);
+		if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+		{
+			return string.IsNullOrEmpty(classes) ? "has-feedback ValidationFail" : classes;
+		}
+		return "has-feedback";
+	}
+}
+
+@helper ErrorMessage(string fieldName, bool isShowFeedbackIcon = true)
+{
+	var fieldKey = string.Format("viewModel.{0}", fieldName);
+	if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+	{
+		<span id="bull-email__helpBlock2" class="help-block">@Html.ValidationMessage(fieldKey)</span>
+		if (isShowFeedbackIcon)
+		{
+			<span class="trmi form-control-feedback" aria-hidden="true"></span>
+		}
+	}
+}
+
+<div class="container-fluid no-padding">
+	<div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+		</div>
+	</div>
+</div>
+
+<div class="container bull-registration">
+
+	<!-- Content Area -->
+	@*@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)*@
+	<!-- / Content Area -->
+	<!-- BULL-148 - Bullion Registration Step 2 - Personal Details -->
+	<div class="container mb-4x mt-2x">
+		<!-- page header -->
+		@if (Model.CurrentPage.DisplayPageHeading)
+		{
+			<div class="page-header">
+				<h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+			</div>
+		}
+		<!-- / page header -->
+		@if (!Model.CurrentPage.HideStepProgressBar)
+		{
+			<!-- Step bar -->
+			<div class="row">
+				<div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+					<!-- Step bar -->
+					<ol class="nav nav-bar nav-progress-bar">
+						<li class="col-xs-3 no-padding"><a href="@string.Format("{0}", currentUrl)"><span>1</span></a></li>
+						<li class="col-xs-3 no-padding active"><a href="javascript:void(0);"><span>2</span></a></li>
+						<li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step3", currentUrl)"><span>3</span></a></li>
+						<li class="col-xs-3 no-padding"><a href="@string.Format("{0}Step4", currentUrl)"><span>4</span></a></li>
+					</ol>
+
+					<!-- / Step bar -->
+				</div>
+			</div>
+		}
+
+		<!-- / Step bar -->
+		<!-- Sub Headline -->
+		<!-- / Content Area -->
+		<!-- Form -->
+		<main class="row">
+			@using (Html.BeginForm("Step2", null, FormMethod.Post, new { name = "formPersonalDetails", id = "formPersonalDetails" }))
+			{
+				<div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+					<h1 class="h3 mt-0">@Model.CurrentPage.Step2Heading</h1>
+					<!-- / Sub Headline -->
+					<!-- Content Area -->
+					@*@Html.PropertyFor(m => m.CurrentPage.MainBody)*@
+					@if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+					{
+						<div class="row">
+							@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+						</div>
+					}
+
+					@if (Model.CurrentPage.MiddleContentStep2 != null)
+					{
+						<div class="row">
+							@Html.PropertyFor(m => m.CurrentPage.MiddleContentStep2)
+						</div>
+					}
+
+					<div class="row">
+						<div class="col-xs-6 col-sm-4 col-md-4">
+							<div class="form-group has-feedback @GetFeedbackClass("Title")" ng-class="{'ValidationFail': (formPersonalDetails['ViewModel.Title'].$touched && (!formPersonalDetails['ViewModel.Title'].$valid || Title == 'Select')), 'ValidationSuccess': (formPersonalDetails['ViewModel.Title'].$touched && formPersonalDetails['ViewModel.Title'].$valid && Title != 'Select')}">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.TitleLabel)
+									<span class="text-danger">*</span>
+								</label>
+								<!-- Select - Title -->
+								<div class="select-form">
+									@Html.DropDownListFor(x => x.ViewModel.Title, new SelectList(Model.ViewModel.TitleList), new { @class = "form-control", name = "Title", data_required = "true", data_notequal = "Select", @ng_model = "Title", @ng_init = "Title = '" + (string.IsNullOrEmpty(Model.ViewModel.Title) ? "Select" : Model.ViewModel.Title) + "'" })
+									<span ng-if="!formPersonalDetails['ViewModel.Title'].$touched">
+										@ErrorMessage("Title", false)
+									</span>
+								</div>
+								<!-- / Select - Title -->
+							</div>
+						</div>
+
+						<!-- Input - First Name -->
+						<div class="col-xs-12">
+							<div class="form-group @GetFeedbackClass("FirstName")" ng-class="{'ValidationFail': (formPersonalDetails['ViewModel.FirstName'].$touched && !formPersonalDetails['ViewModel.FirstName'].$valid), 'ValidationSuccess': (formPersonalDetails['ViewModel.FirstName'].$touched && formPersonalDetails['ViewModel.FirstName'].$valid)}">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.FirstNameLabel)
+									<span class="text-danger">*</span>
+									<small class="text-greyblue">@Html.PropertyFor(a => a.CurrentPage.FirstNameMessage)</small>
+								</label>
+
+								<div class="has-feedback">
+									@Html.TextBoxFor(x => x.ViewModel.FirstName, new { @class = "form-control", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.FirstNamePlaceholder, @ng_model = "FirstName", @ng_init = "FirstName = '" + Model.ViewModel.FirstName + "'" })
+									<span ng-if="!formPersonalDetails['ViewModel.FirstName'].$touched">
+										@ErrorMessage("FirstName", false)
+									</span>
+									<span class="trmi form-control-feedback" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- / Input - First Name -->
+						<!-- Input - Middle Name -->
+						<div class="col-xs-12">
+							<div class="form-group @GetFeedbackClass("MiddleName")">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.MiddleNameLabel)
+									<small class="text-greyblue">@Html.PropertyFor(a => a.CurrentPage.MiddleNameMessage)</small>
+								</label>
+								<div class="has-feedback">
+									@Html.TextBoxFor(x => x.ViewModel.MiddleName, new { @class = "form-control", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.MiddleNamePlaceholder })
+									@ErrorMessage("MiddleName")
+								</div>
+							</div>
+						</div>
+
+						<!-- / Input - Middle Name -->
+						<!-- Input - Last Name -->
+						<div class="col-xs-12">
+							<div class="form-group @GetFeedbackClass("LastName")" ng-class="{'ValidationFail': (formPersonalDetails['ViewModel.LastName'].$touched && !formPersonalDetails['ViewModel.LastName'].$valid), 'ValidationSuccess': (formPersonalDetails['ViewModel.LastName'].$touched && formPersonalDetails['ViewModel.LastName'].$valid)}">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.LastNameLabel)
+									<span class="text-danger">*</span>
+									<small class="text-greyblue">@Html.PropertyFor(a => a.CurrentPage.LastNameMessage)</small>
+								</label>
+								<div class="has-feedback">
+									@Html.TextBoxFor(x => x.ViewModel.LastName, new { @class = "form-control", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.LastNamePlaceholder, @ng_model = "LastName", @ng_init = "LastName = '" + Model.ViewModel.LastName + "'" })
+									<span ng-if="!formPersonalDetails['ViewModel.LastName'].$touched">
+										@ErrorMessage("LastName", false)
+									</span>
+									<span class="trmi form-control-feedback" aria-hidden="true"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- / Input - Last Name -->
+						<!-- Input - Second Last Name -->
+						<div class="col-xs-12">
+							<div class="form-group @GetFeedbackClass("SecondLastName")">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.SecondLastNameLabel)
+									<small class="text-greyblue">@Html.PropertyFor(a => a.CurrentPage.SecondLastNameMessage)</small>
+									@if (!string.IsNullOrEmpty(Model.CurrentPage.SecondLastNameHoveringQuestionText))
+									{
+										<i class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="@Html.PropertyFor(x => x.CurrentPage.SecondLastNameHoveringQuestionText)"></i>
+									}
+								</label>
+								<div class="has-feedback">
+									@Html.TextBoxFor(x => x.ViewModel.SecondLastName, new { @class = "form-control", data_required = "true", data_notequal = "", placeholder = Model.CurrentPage.SecondLastNamePlaceholder })
+									@ErrorMessage("SecondLastName")
+								</div>
+							</div>
+						</div>
+
+						<!-- / Input - Second Last Name -->
+					</div>
+
+					<div class="row">
+						<!-- Select - Gender -->
+						<div class="col-xs-6 col-sm-5 col-md-5 col-lg-4 ">
+							<div class="form-group has-feedback @GetFeedbackClass("Gender")" ng-class="{'ValidationFail': (formPersonalDetails['ViewModel.Gender'].$touched && (!formPersonalDetails['ViewModel.Gender'].$valid || Gender == 'Select')), 'ValidationSuccess': (formPersonalDetails['ViewModel.Gender'].$touched && formPersonalDetails['ViewModel.Gender'].$valid && Gender != 'Select')}">
+								<label class="control-label" for="">
+									@Html.PropertyFor(a => a.CurrentPage.GenderLabel)
+									<span class="text-danger">*</span>
+								</label>
+								<div class="select-form">
+									@Html.DropDownListFor(x => x.ViewModel.Gender, new SelectList(Model.ViewModel.GenderList), new { @class = "form-control", name = "Gender", data_required = "true", data_notequal = "Select", @ng_model = "Gender", @ng_init = "Gender = '" + (string.IsNullOrEmpty(Model.ViewModel.Gender) ? "Select" : Model.ViewModel.Gender) + "'" })
+									<span ng-if="!formPersonalDetails['ViewModel.Gender'].$touched">
+										@ErrorMessage("Gender", false)
+									</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- / Select - Gender -->
+						<!-- Select Group - Date of Birth -->
+						<input type="hidden" name="dobValid" ng-model="dobInValid" ng-init="dobInValid = @Json.Encode(ViewData.ModelState["viewModel.DateOfBirth"] != null && ViewData.ModelState["viewModel.DateOfBirth"].Errors.Any())" />
+						<div class="col-xs-12 mb-0">
+							<div class="form-group select-form-group @GetFeedbackClass("DateOfBirth")"
+								 ng-class="{'ValidationSuccess': dobDay != 'Day' && dobMonth != 'Month' && dobYear != 'Year'
+								 && formPersonalDetails['ViewModel.DateOfBirthDay'].$touched
+								 && formPersonalDetails['ViewModel.DateOfBirthMonth'].$touched
+								 && formPersonalDetails['ViewModel.DateOfBirthYear'].$touched}">
+								<label class="control-label" for="dobDay">
+									@Html.PropertyFor(a => a.CurrentPage.DateOfBirthLabel)
+									<span class="text-danger">*</span>
+									<small class="text-greyblue">@Html.PropertyFor(a => a.CurrentPage.DateOfBirthMessage)</small>
+								</label>
+								<div class="row">
+									<div class="col-xs-4">
+										<div class="select-form dob">
+											@Html.DropDownListFor(x => x.ViewModel.DateOfBirthDay, new SelectList(Model.ViewModel.DayList), new { @class = "form-control", @name = "dobDay", data_required = "true", data_notequal = "Day", @ng_model = "dobDay", @ng_init = "dobDay = '" + (string.IsNullOrEmpty(Model.ViewModel.DateOfBirthDay) ? "Day" : Model.ViewModel.DateOfBirthDay) + "'" })
+										</div>
+									</div>
+
+									<div class="col-xs-4">
+										<div class="select-form dob">
+											@Html.DropDownListFor(x => x.ViewModel.DateOfBirthMonth, new SelectList(Model.ViewModel.MonthList), new { @class = "form-control", @name = "dobMonth", data_required = "true", data_notequal = "Month", @ng_model = "dobMonth", @ng_init = "dobMonth = '" + (string.IsNullOrEmpty(Model.ViewModel.DateOfBirthMonth) ? "Month" : Model.ViewModel.DateOfBirthMonth) + "'" })
+										</div>
+									</div>
+
+									<div class="col-xs-4">
+										<div class="select-form dob">
+											@Html.DropDownListFor(x => x.ViewModel.DateOfBirthYear, new SelectList(Model.ViewModel.YearList), new { @class = "form-control", @name = "dobYear", data_required = "true", data_notequal = "Year", @ng_model = "dobYear", @ng_init = "dobYear = '" + (string.IsNullOrEmpty(Model.ViewModel.DateOfBirthYear) ? "Year" : Model.ViewModel.DateOfBirthYear) + "'" })
+										</div>
+									</div>
+								</div>
+								@Html.HiddenFor(x => x.ViewModel.DateOfBirth)
+								<span ng-if="(dobDay == 'Day' || dobMonth == 'Month' || dobYear == 'Year') && dobInValid">
+									@ErrorMessage("DateOfBirth", false)
+								</span>
+							</div>
+
+						</div>
+						<!-- / Select Group - Date of Birth -->
+					</div>
+				</div>
+				<!-- toolbar -->
+				var returnUrl = Request.IsAuthenticated ? myLayout.MyAccountPage.GetExternalUrl_V2() : currentUrl;
+				<div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 mb-2x">
+
+					<a href="@string.Format("{0}", returnUrl)" type="" class="btn btn-default mb-1x">@Model.CurrentPage.Step2BackButtonText</a>
+					<input type="submit" class="btn btn-secondary mb-1x ml-1x" value="@Model.CurrentPage.Step2ContinueButtonText" />
+				</div>
+				<!-- / toolbar -->
+			}
+		</main>
+		<!-- / Form -->
+		<!-- / BULL-148 - Bullion Registration Step 2 - Personal Details -->
+
+	</div>
+
+</div>
+
+<div class="container-fluid no-padding">
+	<div class="contentArea row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+		<!-- Content Area -->
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+		<!-- / Content Area -->
+	</div>
+</div>

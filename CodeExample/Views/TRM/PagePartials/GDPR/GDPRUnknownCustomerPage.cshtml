@@ -1,0 +1,164 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.GdprConsentPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.GdprConsentPageViewModel>
+
+@functions
+{
+    public bool FieldHasErrors(string fieldName)
+    {
+        return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+    }
+}
+
+@helper ErrorMessage(MvcHtmlString error)
+{
+    <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+    <span class="help-block">
+        @error
+    </span>
+}
+
+@{ var feedbackClass = "has-error has-feedback"; }
+
+@{
+    //Title field
+    var thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.Title"))
+    {
+        thisFeedbackClass = feedbackClass;
+    }
+    <div class="form-group @thisFeedbackClass">
+        <label class="col-sm-4 col-md-3 control-label" for="formGroupInputLarge">@Html.PropertyFor(a => a.CurrentPage.TitleLabel) <span class="text-danger">*</span></label>
+        <div class="col-sm-4 col-md-3">
+            <div class="select-form">
+                @Html.DropDownListFor(x => x.ViewModel.Title, new SelectList(Model.ViewModel.TitleList), new { @class = "form-control", name = "Title" })
+            </div>
+            @if (!string.IsNullOrEmpty(thisFeedbackClass))
+            {
+                @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.Title))
+            }
+        </div>
+    </div>
+
+    //First Name field
+    thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.FirstName"))
+    {
+        thisFeedbackClass = feedbackClass;
+    }
+    <div class="form-group @thisFeedbackClass">
+        <label class="col-sm-4 col-md-3 control-label" for="registerFName">@Html.PropertyFor(a => a.CurrentPage.FirstNameLabel) <span class="text-danger">*</span></label>
+        <div class="col-sm-8 col-md-7">
+            @Html.TextBoxFor(x => x.ViewModel.FirstName, new { @class = "form-control", @id = "firstName" })
+            @if (!string.IsNullOrEmpty(thisFeedbackClass))
+            {
+                @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.FirstName))
+            }
+        </div>
+    </div>
+
+    //Last Name field
+    thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.LastName"))
+    {
+        thisFeedbackClass = feedbackClass;
+    }
+    <div class="form-group @thisFeedbackClass">
+        <label class="col-sm-4 col-md-3 control-label" for="registerSurname">@Html.PropertyFor(a => a.CurrentPage.LastNameLabel) <span class="text-danger">*</span></label>
+        <div class="col-sm-8 col-md-7">
+            @Html.TextBoxFor(x => x.ViewModel.LastName, new { @class = "form-control", id = "lastName" })
+            @if (!string.IsNullOrEmpty(thisFeedbackClass))
+            {
+                @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.LastName))
+            }
+        </div>
+    </div>
+
+    if (Model.ViewModel.Scenario.Equals(StringConstants.GdprScenario.OfflineCustomer))
+    {
+        //Email field
+        thisFeedbackClass = string.Empty;
+        if (Model.ViewModel.Errors.Count > 0 || FieldHasErrors("viewModel.EmailAddressOptional"))
+        {
+            thisFeedbackClass = "has-error has-feedback";
+        }
+        <div class="form-group @thisFeedbackClass">
+            <!--has-success has-feedback-->
+            <label class="col-sm-4 col-md-3 control-label" for="emailAddressOptional">@Html.PropertyFor(a => a.CurrentPage.EmailLabel)</label>
+            <div class="col-sm-8 col-md-7">
+                @Html.TextBoxFor(x => x.ViewModel.EmailAddressOptional, new { @class = "form-control", id = "emailAddressOptional" })
+                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                {
+                    @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddressOptional))
+                }
+                @if (Model.ViewModel.Errors.Count > 0 && !FieldHasErrors("viewModel.EmailAddressOptional"))
+                {
+                    <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+                }
+                @foreach (var error in Model.ViewModel.Errors)
+                {
+                    <span class="help-block">
+                        @error
+                    </span>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        //Email field
+        thisFeedbackClass = string.Empty;
+        if (Model.ViewModel.Errors.Count > 0 || FieldHasErrors("viewModel.EmailAddress"))
+        {
+            thisFeedbackClass = "has-error has-feedback";
+        }
+        <div class="form-group @thisFeedbackClass">
+            <!--has-success has-feedback-->
+            <label class="col-sm-4 col-md-3 control-label" for="registerEmail">@Html.PropertyFor(a => a.CurrentPage.EmailLabel) <span class="text-danger">*</span></label>
+            <div class="col-sm-8 col-md-7">
+                @Html.TextBoxFor(x => x.ViewModel.EmailAddress, new { @class = "form-control", id = "registerEmail" })
+                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                {
+                    @ErrorMessage(Html.ValidationMessageFor(x => x.ViewModel.EmailAddress))
+                }
+                @if (Model.ViewModel.Errors.Count > 0 && !FieldHasErrors("viewModel.EmailAddress"))
+                {
+                    <span class="trmi trmi-close form-control-feedback" aria-hidden="true"></span>
+                }
+                @foreach (var error in Model.ViewModel.Errors)
+                {
+                    <span class="help-block">
+                        @error
+                    </span>
+                }
+            </div>
+        </div>
+    }
+
+    if (Model.CurrentPage.ContentAboveCheckBoxes != null && !Model.CurrentPage.ContentAboveCheckBoxes.IsEmpty)
+    {
+        <div class="wysiwyg clear">
+            @Html.DisplayFor(a => a.CurrentPage.ContentAboveCheckBoxes)
+        </div>
+    }
+    //CanEmail field
+    thisFeedbackClass = string.Empty;
+    if (FieldHasErrors("viewModel.CanEmail"))
+    {
+        thisFeedbackClass = "has-error has-feedback";
+    }
+    <div class="form-group mb-2x @thisFeedbackClass">
+        <div class="col-xs-12 col-sm-9 col-sm-push-3">
+            <div class="checkbox small fancy">
+                @Html.CheckBoxFor(a => a.ViewModel.CanEmail, new { @id = "canEmail" })
+                <label class="" for="canEmail">
+                    @Html.PropertyFor(a => a.CurrentPage.CanEmailLabel)
+                </label>
+                @if (!string.IsNullOrEmpty(thisFeedbackClass))
+                {
+                    @ErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.CanEmail))
+                }
+            </div>
+        </div>
+    </div>
+}

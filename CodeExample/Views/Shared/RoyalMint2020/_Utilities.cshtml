@@ -1,0 +1,34 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+@using Newtonsoft.Json
+
+@{
+    var viewModel = new
+    {
+        placeholder = Html.TranslateFallback(StringResources.SearchPlaceholder, "Search for a product, service or article"),
+        buttonName = Html.TranslateFallback(StringResources.SearchButtonName, "Search"),
+        includingResultsFor = Html.TranslateFallback(StringResources.SearchIncludingResultsFor, "Including Results For"),
+        viewMoreResults = Html.TranslateFallback(StringResources.SearchViewMoreResults, "View More Results"),
+        seeFullSearchResults = Html.TranslateFallback(StringResources.SearchSeeFullSearchResults, "See Full Search Results"),
+        noresultsFound = Html.TranslateFallback(StringResources.SearchNoresultsFound, "No results found"),
+    };
+}
+
+<ul class="utilities" role="menu">
+    @if (!Model.HideMegaMenuAndSearch && !Model.DisplayCheckoutHeader)
+    {
+        <li role="menuitem" class="d-lg-none search-utility">         
+            <div data-module="search-utility" data-search-utility-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+        </li>
+    }
+
+    @if (!Model.HideUserAndMiniBasketFromHeader)
+    {
+        <li role="menuitem" class="account-management">
+            @{ Html.RenderPartial("RoyalMint2020/_AccountManagement"); }
+        </li>
+        <li role="menuitem" class="basket-management">
+            @{ Html.RenderPartial("RoyalMint2020/_BasketMini"); }
+        </li>
+    }
+</ul>

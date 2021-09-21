@@ -1,0 +1,64 @@
+﻿@using TRM.Web.Constants
+@using Newtonsoft.Json
+@model TRM.Web.Models.ViewModels.MyAccountAddEditAddressViewModel
+
+@{
+    var address = new
+    {
+        addressId = Model.Address.AddressId,
+        line1 = Model.Address.Line1,
+        line2 = Model.Address.Line2,
+        town = Model.Address.City,
+        postcode = Model.Address.PostalCode,
+        region = Model.Address.CountryRegion.Region,
+        country = Model.CountryList.FirstOrDefault(x => x.Key == Model.Address.CountryCode).Value ?? null,
+        countryCode = Model.Address.CountryCode,
+    };
+
+    var viewModel = new
+    {
+        usaStateRequired = "State is required.",
+        usaMaxStateLength = "State code must be {2} characters.",
+        postCodeAnywhereLicense = Model.PostcodeAnywhereLicense,
+        nicknameLabel = @Html.TranslateFallback(StringResources.AddressNickname, "Nickname"),
+        firstNameLabel = @Html.TranslateFallback(StringResources.FirstName, "First Name"),
+        lastNameLabel = @Html.TranslateFallback(StringResources.LastName, "Last Name"),
+        line1Label = @Html.TranslateFallback(StringResources.AddressLineOne, "Address Line 1"),
+        line2Label = @Html.TranslateFallback(StringResources.AddressLineTwo, "Address Line 2"),
+        townLabel = @Html.TranslateFallback(StringResources.Town, "Town"),
+        postcodeLabel = @Html.TranslateFallback(StringResources.PostCode, "Postcode"),
+        countyLabel = @Html.TranslateFallback(StringResources.County, "County"),
+        countryLabel = @Html.TranslateFallback(StringResources.Country, "Country"),
+        submitButton = Html.TranslateFallback(StringResources.Save, "Save"),
+        successMessage = Html.TranslateFallback(StringResources.AddNewAddress, "Address updated"),
+        failureMessage = Html.TranslateFallback(StringResources.AddNewAddressError, "An error occurred while processing request. Please try again"),
+        address = address,
+        nickname = Model.Address.Name,
+        firstName = Model.Address.FirstName,
+        lastName = Model.Address.LastName,
+        inputPCAnywhere = Model.Address.PostalCode,
+        countryList = Model.CountryList,
+        nicknameRequired = Html.TranslateFallback(StringResources.RequiredNickname, "Nickname is required"),
+        nicknameAlreadyExists = Html.TranslateFallback(StringResources.NicknameExisted, "Nickname already exists"),
+        nicknameMaxLength = string.Format(Html.TranslateFallback(StringResources.NicknameMaxlengthError, "Nickname cannot be longer than {0} characters"), 64),
+        firstNameRequired = Html.TranslateFallback(StringResources.RequiredFirstname, "First Name is required"),
+        firstNameMaxLength = string.Format(Html.TranslateFallback(StringResources.FirstNameMaxlengthError, "First Name cannot be longer than {0} characters"), 64),
+        lastNameRequired = Html.TranslateFallback(StringResources.RequiredLastname, "Last Name is required"),
+        lastNameMaxLength = string.Format(Html.TranslateFallback(StringResources.LastNameMaxlengthError, "Last Name cannot be longer than {0} characters"), 64),
+        line1Required = Html.TranslateFallback(StringResources.ErrorLine1, "Address is required"),
+        line1MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+        line2MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+        countryRequired = Html.TranslateFallback(StringResources.ErrorCountryCode, "Country is required"),
+        postcodeRequired = Html.TranslateFallback(StringResources.ErrorPostCode, "Postal Code is required"),
+        postcodeMaxLength = string.Format(Html.TranslateFallback(StringResources.MaxlengthError, "Postal Code is over {0} signs"), 11),
+        postcodeInvalid = Html.TranslateFallback(StringResources.ErrorPostCodeInvalid, "Postal Code is invalid"),
+        cityRequired = Html.TranslateFallback(StringResources.RequiredCity, "City is required"),
+        cityMaxLength = string.Format(Html.TranslateFallback(StringResources.CityMaxlengthError, "City cannot be longer than {0} characters"), 64),
+        countyMaxLength = string.Format(Html.TranslateFallback(StringResources.CountyMaxlengthError, "County cannot be longer than {0} characters"), 64),
+        addressIncomplete = Html.TranslateFallback(TRM.Shared.Constants.StringResources.AddressIncomplete, "Address is incomplete, please enter manually"),
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div data-module="add-edit-address" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>

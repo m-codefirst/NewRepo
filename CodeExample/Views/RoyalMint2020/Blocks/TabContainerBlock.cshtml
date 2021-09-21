@@ -1,0 +1,120 @@
+﻿@using System.Linq
+@using EPiServer.Core
+@using EPiServer.Editor
+@using TRM.Web.Models.Blocks
+@model TabContainerBlock
+
+@if (Model == null)
+{
+    return;
+}
+
+@if (Model.Content == null)
+{
+    if (PageEditing.PageIsInEditMode)
+    {
+        @Html.PropertyFor(t => t.Content)
+    }
+    return;
+}
+
+@{
+    var firstTab = @Model.Content.Items[0].GetContent() as TabItemBlock;
+}
+
+<!-- Nav tabs -->
+
+<div class="row justify-content-center tab-menu-bg">
+    <div class="col-12 col-lg-10">
+        <a class="tab-menu tab-menu-item d-lg-none" data-toggle="collapse" href="#tabmenu" role="button" aria-expanded="false" aria-controls="tabmenu">
+            <span class="tab-menu-selected mr-1">
+                @firstTab.Label
+            </span>
+            <div class="tab-menu-link">              
+                <span class="icon"><svg><use xlink:href="#chevron-up" /></svg></span>
+            </div>
+        </a>
+        <ul class="nav nav-tabs nav-tabs--no-border d-lg-flex flex-nowrap collapse" role="tablist" id="tabmenu">
+            @{ var currentTab = 1;}
+            @foreach (var item in Model.Content.Items)
+            {
+
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                var tab = item.GetContent() as TabItemBlock;
+
+
+                if (tab != null)
+                {
+                    <li class="nav-item tab-menu-item @(currentTab == 1 ? "tab-menu-item--active" : string.Empty)">
+                        <a href="" class="d-flex d-lg-block w-100 justify-content-between align-content-center nav-link text-uppercase js-nav-item  @(currentTab == 1 ? "active" : string.Empty)" target="_self" data-target="#tab_@(item.ContentLink.ID)_@(currentTab)" aria-controls="tab_@(item.ContentLink.ID)_@(currentTab)" role="tab" data-toggle="tab">
+                            <span>@tab.Label</span>  
+                            <span class="icon d-lg-none"><svg><use xlink:href="#chevron-up" /></svg></span>
+                        </a>
+
+                    </li>
+                    currentTab++;
+                }
+            }
+        </ul>
+    </div>
+
+</div>
+<!-- Tab panes -->
+<div class="tab-content pt-3 pb-3 row justify-content-center">
+    @{
+        currentTab = 1;
+        foreach (var item in Model.Content.Items)
+        {
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            var tab = item.GetContent() as TabItemBlock;
+
+            if (tab != null)
+            {
+
+                <div role="tabpanel" class="col-12 col-lg-10 tab-pane fade  @(currentTab == 1 ? "active show" : string.Empty )" id="tab_@(tab.Property.OwnerLink.ID)_@(currentTab)">
+
+                    @{
+                        // ReSharper disable once Mvc.PartialViewNotResolved
+                        Html.RenderPartial("Blocks/TabItemBlock", tab);
+                    }
+
+                </div>
+                currentTab++;
+            }
+
+        }
+    }
+</div>
+
+
+
+
+
+<script type="text/javascript">
+    $('.js-nav-item').click(function () {
+        var active = $(this).text();
+        $('.tab-menu-selected').text(active);
+        $('.tab-menu-item').each(function (e) {
+            $(this).removeClass('tab-menu-item--active');
+        })
+        $(this).parent().addClass('tab-menu-item--active')
+        if ($('.tab-menu').css('display') !== 'none') {
+            $('#tabmenu').collapse('hide');
+        }
+    })
+
+    $('#tabmenu').on('show.bs.collapse', function () {
+        $('.tab-menu-item .icon').addClass('icon--collapsed')
+        $('.tab-content').addClass('d-none').addClass('d-lg-flex');
+        $('.tab-menu-selected').addClass('tab-menu-selected--collapsed')
+    });
+    $('#tabmenu').on('hide.bs.collapse', function () {
+        $('.tab-menu-item .icon').removeClass('icon--collapsed')
+        $('.tab-content').removeClass('d-none').removeClass('d-lg-flex');
+        $('.tab-menu-selected').removeClass('tab-menu-selected--collapsed')
+    });
+
+
+</script>
+

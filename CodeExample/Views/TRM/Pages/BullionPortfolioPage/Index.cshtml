@@ -1,0 +1,179 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Helpers
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionPortfolioPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.Portfolio.PortfolioViewModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+	@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	<div class="container vault-holding">
+		@if (Model.CurrentPage.DisplayPageHeading)
+		{
+			<div class="page-header">
+				<div class="row center-items">
+					<div class="col-xs-12 col-md-6">
+						<h1 class="h1 mt-0">@Html.DisplayFor(x => x.CurrentPage.Heading)</h1>
+					</div>
+					<div class="col-xs-12 col-md-6">
+						<div class="pull-right">
+							<a href="">@Html.TranslateFallback(StringResources.PortfolioBackToAccountDashboard, "Back to Account Dashboard")</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+		<div class="row">
+			@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+		</div>
+		<div class="row mb-2x">
+			<div class="col-xs-12">
+				<h2 class="h3 mb-2x">@Html.TranslateFallback(StringResources.PortfolioVaultContentsHeader, "Your Vault Contents")</h2>
+				<div class="filter-dropdown flex-two-column-items">
+					<label for="filterType" class="mr-1x">@Html.TranslateFallback(StringResources.PortfolioFilterByLabel, "Filter by")</label>
+					<div class="select-form">
+						<select class="form-control" id="filterType">
+							<option value="-1" selected="">All</option>
+							<option value="01" disabled>Category</option>
+							@foreach (var category in Model.ViewModel.CategoriesFilter)
+							{
+								<option value="@category.Key" data-type="metalCategory">- @category.Value</option>
+							}
+							<option value="05" disabled>Metal</option>
+							@foreach (var metal in Model.ViewModel.MetalTypesFilter)
+							{
+								<option value="@metal.Key" data-type="metalType">- @metal.Value</option>
+							}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12">
+				<div class="product-table">
+					<div class="product-table-header hidden-xs">
+						<div class="row">
+							<div class="col-xs-5">
+								<p class="h6 mb-0 strong">@Html.TranslateFallback(StringResources.PortfolioColumnHeader1Label, "Item")</p>
+							</div>
+							<div class="col-xs-1">
+								<p class="h6 mb-0 strong text-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader2Label, "Quantity")</p>
+							</div>
+							<div class="col-xs-2">
+								<p class="h6 mb-0 strong text-center">@Html.TranslateFallback(StringResources.PortfolioColumnHeader3Label, "Valuation")</p>
+							</div>
+							<div class="col-xs-1 center-items">
+
+							</div>
+							<div class="clearfix-sm-down d-sm-none"></div>
+							<div class="col-xs-12 col-sm-4 cta-action-group has-two-children">
+							</div>
+						</div>
+					</div>
+					<hr />
+					@if (Model.ViewModel != null && Model.ViewModel.PortfolioVariantItems != null && Model.ViewModel.PortfolioVariantItems.Count() > 0)
+					{
+						foreach (var item in Model.ViewModel.PortfolioVariantItems)
+						{
+							<div class="product-item" data-bullionType="@((int)item.BullionType)" data-metalType="@((int)item.MetalType)">
+								<div class="row stretch-items-sm-up">
+									<div class="col-xs-6 col-sm-2">
+										<a href="@item.EntryUrl">
+											<div class="image-bg" style="background-image: url(@item.ImageUrl);"></div>
+										</a>
+									</div>
+									<div class="col-xs-6 col-sm-3 center-items">
+										<div class="product-name-wrapper">
+											<h6 class="h6 strong mb-0">
+												<a href="@item.EntryUrl">
+													@item.Title
+												</a>
+											</h6>
+										</div>
+									</div>
+									<div class="col-xs-12 col-sm-1 mt-xs-1x center-items">
+										<p class="h6 strong flex-align-center-sm-up">
+											<label class="title-xs">@Html.TranslateFallback(StringResources.PortfolioColumnHeader2Label, "Quantity"): </label>
+											<span>
+												@if (item.BullionType == Enums.BullionVariantType.Signature)
+												{
+													@(string.Format("{0}oz", item.TotalWeightInVault));
+												}
+												else
+												{
+													@((int)item.QuantityInVault);
+												}
+											</span>
+										</p>
+									</div>
+									<div class="col-xs-12 col-sm-2 center-items">
+										<div class="product-price-wrapper flex-align-center text-center">
+											<label class="title-xs">@Html.TranslateFallback(StringResources.PortfolioColumnHeader3Label, "Valuation"): </label>
+											<p class="h4 strong">@item.CurrentPrice.ToString()</p>
+											<p class="strong @(@item.DifferencePrice >= 0 ? "text-seagreen" : "text-warm-red")">@item.DifferencePrice.ToString()</p>
+										</div>
+									</div>
+									<div class="clearfix-sm-down d-sm-none"></div>
+									@if (item.CanSellBack && !Model.ViewModel.ShowNeedConfirmKyc)
+									{
+										<div class="col-xs-6 col-sm-2 center-items">
+											<a href="@string.Format("{0}?code={1}", Model.ViewModel.SellBackUrl, item.VariantCode)" class="btn btn-block btn-default mt-1x mt-sm-up-0x">@Html.TranslateFallback(StringResources.PortfolioSellBackButtonLabel, "Sell Back")</a>
+										</div>
+									}
+
+									@if (item.CanDeliver && !Model.ViewModel.ShowNeedConfirmKyc)
+									{
+										<div class="col-xs-6 col-sm-2 center-items">
+											<a href="@string.Format("{0}?code={1}", Model.ViewModel.DeliverFromVaultUrl, item.VariantCode)" class="btn btn-block btn-secondary mt-1x mt-sm-up-0x">@Html.TranslateFallback(StringResources.PortfolioDeliveryToMeButtonLabel, "Deliver to me")</a>
+										</div>
+									}
+								</div>
+							</div>
+						}
+					}
+					else
+					{
+						<div>
+							<p class="text-center">@Html.TranslateFallback(StringResources.NoItemData, "There is no item")</p>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>
+
+@section JustBeforeBodyTag{
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#filterType').change(function (e) {
+				var $this = $(this);
+				var selectedVal = $this.val();
+				var selectedType = $this.find('option:selected').data('type');
+				if (selectedVal && selectedVal != -1) {
+					if (selectedType == 'metalCategory') {
+						$('.product-item').addClass('hidden');
+						$(".product-item[data-bulliontype='" + selectedVal + "']").removeClass('hidden');
+					} else {
+						$('.product-item').addClass('hidden');
+						$(".product-item[data-metaltype='" + selectedVal + "']").removeClass('hidden');
+					}
+				} else {
+					$('.product-item').removeClass('hidden');
+				}
+			});
+		})
+	</script>
+}

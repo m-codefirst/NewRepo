@@ -1,0 +1,43 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Services
+@using Newtonsoft.Json
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionCustomerServicePage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionCustomerServiceViewModel>
+@{
+    var trmLayout = Model.Layout as TrmLayoutModel;
+
+    var viewModel = new
+    {
+        isSipp = false,
+        breadcrumb = @Html.Partial("_Breadcrumb", trmLayout.Breadcrumb),
+        mainBodyAttributes = @Html.EditAttributes(m => m.CurrentPage.MainBody),
+        mainBody = @Html.DisplayFor(m => m.CurrentPage.MainBody).ToHtmlString(),
+
+        heading = @Html.DisplayFor(a => a.CurrentPage.Heading).ToHtmlString(),
+        searchLabel = @Model.CurrentPage.SearchPlaceHolder,
+        searchButton = @Model.CurrentPage.SearchButtonText,
+        noresultText = @Html.DisplayFor(x => x.CurrentPage.NoResultText).ToHtmlString(),
+        impersonateText = @Model.CurrentPage.ImpseronateUserLinkText,
+
+        userNameColumnName = @Model.CurrentPage.UserNameColText,
+        emailColumnName = @Model.CurrentPage.EmailColText,
+        accountStatusColumnName = @Model.CurrentPage.AccountStatusColText,
+        accountTypeColumnName = @Model.CurrentPage.AccountTypeColText,
+        actionColumnName = @Model.CurrentPage.ActionColText,
+        pageSize = Model.CurrentPage.NumberOfItemsPerPage,
+    };
+}
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div data-module="customer-search" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+</div>
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+</div>

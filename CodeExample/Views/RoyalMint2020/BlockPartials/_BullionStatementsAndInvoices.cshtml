@@ -1,0 +1,36 @@
+﻿@using EPiServer.Framework.Localization
+@using EPiServer.Globalization
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+
+@model List<TRM.Web.Models.ViewModels.DocumentDto>
+
+@if (Model != null && Model.Count > 0) {
+
+    <table class="table table-mobile">
+        <thead>
+            <tr>
+                <th>@LocalizationService.Current.GetStringByCulture(StringResources.BullStatementDate, "Date", ContentLanguage.PreferredCulture)</th>
+                <th>@LocalizationService.Current.GetStringByCulture(StringResources.BullStatementType, "Type", ContentLanguage.PreferredCulture)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var document in Model)
+            {
+                <tr>
+                    <td>@document.Created</td>
+                    <td>
+                        @document.Type
+                        @(!string.IsNullOrEmpty(document.Month) && !document.Type.Equals("Invoice") ? string.Format("{0}{1}", "- ", document.Month) : "")
+                    </td>
+                    <td>
+                        <a class="btn btn-secondary" role="button" href="/bullion/document/download?id=@document.ID">
+                            @LocalizationService.Current.GetStringByCulture(StringResources.BullStatementDownload, "Download", ContentLanguage.PreferredCulture)
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

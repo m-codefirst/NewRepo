@@ -1,0 +1,138 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions 
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionQuickCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.QuickCheckout.QuickCheckoutViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var items = Model.ViewModel.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems);
+    var isExistsItem = items.Any(x => x != null);
+    var firstItem = Model.ViewModel.OrderGroupViewModel.Shipments.SelectMany(x => x.CartItems).FirstOrDefault();
+}
+
+<div class="pageContainer quick-checkout">
+    @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    }
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2 mb-1x">
+                <!-- Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <div class="page-header">
+                    </div>
+                    <div class="page-header">
+                        <div class="row center-items">
+                            <div class="col-xs-8">
+                                <h1 class="h1">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="pull-right">
+                                    <a name="back-link" class="" href="@(firstItem != null ? Url.ContentUrlExtension(firstItem.Url) : "javascript:history.back()")">
+                                        @Html.TranslateFallback(StringResources.Back, "Back")
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                {
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                }
+                <div class="quick-checkout-validation-errors">
+                    @Html.ValidationSummary(false)
+                </div>
+
+                @using (Html.BeginForm("Index", null, FormMethod.Post, new { @id = "quick-checkout-form", onsubmit = "quickCheckoutJs.onQuickCheckoutSubmit()" }))
+                {
+                    <div id="quickCheckoutContent">
+                        @Html.Partial("_BullionQuickCheckoutPartial", Model.ViewModel)
+                    </div>
+
+                    <h6 class="h6 mt-20 wallet-balance text-right-sm-up">
+                        @Html.PropertyFor(x => x.CurrentPage.AvailableWalletBalanceTitle)
+                        @{
+                            var shouldShowAddFund = Model.ViewModel.ShowInsufficientFunds;
+                        }
+                        <span class="quick-checkout-availableToInvest @(shouldShowAddFund ? "text-danger" : "text-success")">@Model.ViewModel.AvailableToInvest.ToString()</span>
+                    </h6>
+                    <hr>
+                    <div class="checkout-cta">
+                        <button id="payment-btn" type="submit" @(!Model.ViewModel.ValidForPayment ? "disabled" : "") class="btn btn-secondary pull-right-sm-up mb-1x @(Model.ViewModel.Shipping != null && isExistsItem && !shouldShowAddFund ? "" : "hidden") quick-checkout-fixedprice">
+                            @Html.PropertyFor(x => x.CurrentPage.FixPriceAndBuyInvestmentsButtonText)
+                        </button>
+                        @if (!myLayout.IsSippContact)
+                        {
+                            <a id="add-fund-btn" class="btn btn-secondary pull-right-sm-up mb-1x quick-checkout-addfund @(Model.ViewModel.Shipping == null || !isExistsItem || !shouldShowAddFund ? "hidden" : "")" href="@(Model.GetQuickCheckoutPageUrl() + "AddFunds")">
+                                @Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds")
+                            </a>
+                        }
+                        <a class="h6 display-inline-block-sm-up display-block-sm-down" data-toggle="collapse" href="#newId1" role="button" aria-expanded="false">
+                            @Html.TranslateFallback(StringResources.BullionQuickCheckOutPromotionCodeQuestion, "Do you have a promotion code?")
+                        </a>
+                    </div>
+                    <div class="row collapse" id="newId1" ng-init="rmCommerce.onGetQuickcheckoutPromotions()" ng-cloak style="height: 218px;">
+                        <div class="col-xs-12 col-sm-6">
+                            <p>@Html.TranslateFallback(StringResources.BullionQuickCheckOutPromotionCodeMessage, "Please enter it here")</p>
+                            <div class="input-group w-275">
+                                <input type="text" class="form-control coupon-code" ng-model="rmCommerce.couponCode" maxlength="20">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" placeholder="This is place holder text" ng-click="addCoupon(true)" ng-disabled="rmCommerce.couponCode == ''" type="button" disabled="disabled">@Html.TranslateFallback(StringResources.BullionQuickCheckOutPromotionCodeButton, "Go!")</button>
+                                </span>
+                            </div>
+                            @if (Model.CurrentPage.NewContentArea != null)
+                            {
+                                <div class="row">
+                                    @Html.PropertyFor(x => x.CurrentPage.NewContentArea)
+                                </div>
+                            }
+                            <div class="panel panel-info" ng-if="rmCommerce.quickCheckoutPromotions.length > 0">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row" ng-repeat="promo in rmCommerce.quickCheckoutPromotions">
+                                        <div class="col-xs-6">
+                                            <p>
+                                                <i class="trmi trmi-check text-success"></i> {{promo.Code || promo.Description}}
+                                            </p>
+                                        </div>
+                                        <div class="col-xs-6 text-right">
+                                            <a href="" title="@Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)" ng-if="!!promo.Code" ng-click="removeCoupon(promo.Code, true)" class="small">
+                                                @Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    }
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/Static/trm/js/bullion/quickCheckout.js").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"quickCheckoutJs.initCountDown(" + Model.CurrentPage.SecondsRefreshPrice + ", '#coundown-timer', " + @Json.Encode(Model.ViewModel.ShowInsufficientFunds) + ")").AtFooter();
+}

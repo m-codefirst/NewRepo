@@ -1,0 +1,90 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TransactionHistoryPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.TransactionHistoryViewModel>
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using Castle.Core.Internal
+
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+}
+<script type="text/javascript">
+	var pageSize = @Model.ViewModel.PageSize,
+		totalItems = @Model.ViewModel.TotalRecords;
+</script>
+
+
+<div class="pageContainer">
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        <div class="container">
+            @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+        </div>
+    } 
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+
+<div class="container transaction-history">
+    <div class="page-header">
+        <div class="row center-items">
+            <div class="col-xs-12 col-md-6">
+                <h1 class="h1 mt-0">@Model.CurrentPage.Name </h1>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <div class="pull-right">
+                    <a href="@Model.ViewModel.BackToMyAccountUrl">@Html.TranslateFallback(StringResources.PortfolioBackToAccountDashboard, "Back to Account Dashboard")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.PropertyFor(x => x.CurrentPage.MainBody)
+    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+        </div>
+    }
+    <div class="row" ng-controller="rmTransactionHistoryController" ng-init="totalItems = @Model.ViewModel.TotalRecords; pageSize = @Model.ViewModel.PageSize" ng-cloak>
+        <div class="col-xs-12 col-sm-5 mb-xs-1x">
+            <div class="filter-transaction">
+                <label for="filterType" class="mr-1x">Filter by</label>
+                <div class="select-form">
+                    <select class="form-control" id="filterType" ng-model="filterKey" ng-init="filterKey = 'All'" ng-change="onFilter(true)">
+                        <option value="All">Show All</option>
+                        @if (!Model.ViewModel.TransactionFilterOptions.IsNullOrEmpty())
+                        {
+                            foreach (var option in Model.ViewModel.TransactionFilterOptions)
+                            {
+                                <option value="@option.Key">@option.Value</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-7 text-right-sm-up">
+            <pagination ng-if="totalItems && totalItems > 0" options="options" current-page="currentPage" total-items="totalItems"></pagination>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-xs-12 transaction-list" ng-if="!isFetchedData">
+            @Html.Partial("TransactionHistoryItemList", Model.ViewModel)
+        </div>
+        <div class="col-xs-12 transaction-list" ng-if="isFetchedData">
+            <div compile="fetchedView"></div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-xs-12 text-right-sm-up mt-2x">
+            <pagination ng-if="totalItems && totalItems > 0" options="options" current-page="currentPage" total-items="totalItems"></pagination>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+</div>

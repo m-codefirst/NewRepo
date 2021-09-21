@@ -1,0 +1,43 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycPhotoIdBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycPhotoIdViewModel>
+
+<div class="col-xs-12 col-sm-12">
+	<div class="row mb-1x">
+		@Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-7">
+			<div class="row">
+				<div class="form-group col-xs-12 col-sm-11">
+					<label class="control-label" for="">
+						@Html.PropertyFor(x => x.CurrentBlock.CountryOfIssueTitle)
+						<span class="text-danger">*</span>
+					</label>
+					<div class="select-form">
+						@Html.CustomDropDownListFor(x => x.ViewModel.CountryCode, Model.ViewModel.Countries, new { @class = "form-control countryCode", data_required = "true", @value = "@Model.ViewModel.CountryCode", @id = "kyc_photoIdCountryCode" })
+					</div>
+				</div>
+				<div class="form-group mb-2x col-xs-12 col-sm-11" id="kyc_documentNumber_formGroup">
+					<label class="control-label" for="">
+						@Html.PropertyFor(x => x.CurrentBlock.DocumentNumberTitle)
+						<span class="text-danger">*</span>
+						<small class="text-greyblue text-nowrap display-inline-block display-block-sm"></small>
+					</label>
+					<input type="text" class="form-control" id="kyc_documentNumber" placeholder="@Html.PropertyFor(x => x.CurrentBlock.DocumentNumberPlaceholder)" data-original-title="" title="">
+					<p class="alert alert-danger mt-1x mb-0 text-left hidden" id="kyc_InvalidDocumentNumber">
+						@Html.TranslateFallback(StringResources.InvalidDocumentNumber, "Invalid Document Number")
+					</p>
+				</div>
+			</div>
+			<button type="button" onclick="BullionKycFurtherDetails.ValidatePhotoId();" class="btn btn-secondary btn-200 mr-2x">@Html.PropertyFor(x => x.CurrentBlock.ConfirmDetailsButtonText)</button>
+			<a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="display-block-xs display-inline-block mt-xs-2x mt-md-2x mb-xs-2x">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+		</div>
+		<div class="col-xs-12 col-sm-5">
+			<div class="row">
+				@Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+			</div>
+		</div>
+	</div>
+</div>

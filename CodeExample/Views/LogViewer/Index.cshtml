@@ -1,0 +1,56 @@
+﻿@model IEnumerable<TRM.Web.Plugins.LogViewer.LogFileItem>
+@{
+     Layout = null;
+}
+<div class="body-content">
+    <h1>Log retrieval tool</h1>
+    <p>
+        Tool for easy access to log files on the server.
+    </p>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Oh snap!</strong> Something went wrong.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success" role="alert">
+            <strong>@Model.Count()</strong> file(s) are found on the server.
+        </div>
+
+        <table class="table table-striped">
+            <tr>
+                <th>Server</th>
+                <th>File name</th>
+                <th>Size</th>
+                <th>Changed</th>
+                <th>Created</th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Server</td>
+                    <td>@Html.ActionLink(item.Name, "LogFileStream", "LogViewer", item, null)</td>
+                    <td>@item.Size byte(s)</td>
+                    <td>@item.Changed.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@item.Created.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+            }
+        </table>
+    }
+    
+    <div class="note">
+        <h4>Note:</h4>
+        <ul>
+            <li>
+                By default, it reads files from ./App_Data/ folder (to modify, add settings 'LogDirectoryName' to the desired folder).
+            </li>
+            <li>
+                Limitations include the tool not taking load balanced multi server environments into account, meaning that you’ll get the log(s) from whatever server you happen to be using for the moment.
+            </li>
+        </ul>
+    </div>
+</div>

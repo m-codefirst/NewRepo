@@ -1,0 +1,31 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.ContentNavBlock
+
+@{
+    var buttonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.ButtonStyle, Enums.eButtonColour2020.Primary);
+}
+
+<div class="content-card">
+    @Html.PropertyFor(a => a.BackgroundImage, new { CssClass = "asset" })
+
+    <div class="copy">
+        <p class="title">
+            @if (Model.HasHeaderLink)
+            {
+                <a aria-label="@Model.HeaderText - @Model.ButtonText" title="@Model.HeaderText" href="@Url.ContentUrlExtension(Model.HeaderLink)">
+                    @Html.PropertyFor(a => a.HeaderText)
+                </a>
+            }
+            else if (Model.HeaderText != null)
+            {
+                @Html.PropertyFor(a => a.HeaderText)
+            }
+        </p>
+        @Html.PropertyFor(a => a.Content)
+        @if (!String.IsNullOrEmpty(Model.ButtonText) && Model.ButtonLink != null)
+        {
+            <a aria-label="@Model.HeaderText - @Model.ButtonText" title="@Model.ButtonText" class="btn @buttonClass" href="@Url.ContentUrlExtension(Model.ButtonLink)">@Html.PropertyFor(a => a.ButtonText)</a>
+        }
+    </div>
+</div>

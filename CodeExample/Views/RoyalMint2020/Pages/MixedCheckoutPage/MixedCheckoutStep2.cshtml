@@ -1,0 +1,322 @@
+﻿@using EPiServer.Business.Commerce.Payment.BarclaysCardPayment.Barclays
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.MixedCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.MixedCheckout.MixedCheckoutStep2ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem> {
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step1TabHeading,
+                Number = "1",
+                IsComplete = true
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step2TabHeading,
+                Number = "2",
+                IsCurrent = true
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step3TabHeading,
+                Number = "3"
+            },
+            new ProgressBarItem {
+                Heading = Model.CurrentPage.Step4TabHeading,
+                Number = "4",
+            }
+        }
+    };
+}
+
+
+@{
+    var barclaysProvider = Model.ViewModel.PaymentProviders.FirstOrDefault(x => x.IsActive && x.PaymentMethodId.Equals(Model.ViewModel.BarclaysCardPaymentMethodId));
+    var isBarclaysProviderActive = barclaysProvider.IsBarclaysPayment();
+
+    var FormViewModel = new
+    {
+        enterPaymentDetailsUrl = Url.Action("EnterPaymentDetails"),
+        enterPaymentDetailsPostData = Model.ViewModel.EntryPaymentDetailsPostData,
+        dontResetFormWhenSelectCreditCard = true,
+        enterPaymentDetailsButtonText = Model.CurrentPage.Step2EnterPaymentDetailsBtnText ?? "Enter payment details",
+        backButtonUrl = Url.Action("Step1"),
+        backButtonText = Html.TranslateFallback(StringResources.Back, "Back"),
+        actionUrl = Url.Action(Html.TranslateFallback(StringResources.Step2, "Step2")),
+        isAuthenticated = Request.IsAuthenticated,
+        sameAsDelivery = Model.ViewModel.SameAsDelivery.ToString().ToLower(),
+        message = Model.ViewModel.Message,
+        antiForgeryToken = Html.AntiForgeryToken().ToString(),
+        antiForgeryTokenValue = Html.AntiForgeryTokenValue(),
+        hasEnoughCredit = Model.ViewModel.HasEnoughCredit,
+        paymentMessage = Model.CurrentPage.Step2PaymentMessage,
+        paymentTypeLabel = Model.CurrentPage.Step2PaymentTypeLabel,
+        paymentProviders = Model.ViewModel.PaymentProviders.OrderByDescending(p => p.IsDefault),
+        mastercardPaymentMethodId = Model.ViewModel.MastercardPaymentMethodId,
+        isBarclaysProviderActive = isBarclaysProviderActive,
+        barclaysPaymentMethodId = Model.ViewModel.BarclaysCardPaymentMethodId,
+        allOptionsUntickPopupTitle = "",
+        allOptionsUntickPopupMessage = "",
+        basket = new
+        {
+            basketSubTotal = Html.TranslateFallback(StringResources.BasketSubTotal, StringConstants.TranslationFallback.BasketSubTotal),
+            basketDelivery = Html.TranslateFallback(StringResources.BasketDelivery, StringConstants.TranslationFallback.BasketDelivery),
+            basketFreeDelivery = Html.TranslateFallback(StringResources.BasketFreeDelivery, StringConstants.TranslationFallback.BasketFreeDelivery),
+            basketSavings = Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings),
+            basketTotal = Html.TranslateFallback(StringResources.BasketTotal, StringConstants.TranslationFallback.BasketTotal),
+            basketSummary = Html.TranslateFallback(StringResources.BasketSummary, StringConstants.TranslationFallback.BasketSummary),
+            isPersonalized = Html.TranslateFallback(StringResources.HasBeenPersonalised, StringConstants.TranslationFallback.HasBeenPersonalised),
+            empty = Html.TranslateFallback(StringResources.BasketEmpty, StringConstants.TranslationFallback.BasketEmpty)
+
+        },
+        promotions = new
+        {
+            title = Html.TranslateFallback(StringResources.PromotionsTitle, StringConstants.TranslationFallback.PromotionsTitle),
+            description = Html.TranslateFallback(StringResources.PromotionsDescription, StringConstants.TranslationFallback.PromotionsDescription),
+            placeholder = Html.TranslateFallback(StringResources.PromotionPlaceholder, StringConstants.TranslationFallback.PromotionPlaceholder),
+            button = Html.TranslateFallback(StringResources.PromotionsButton, StringConstants.TranslationFallback.PromotionsButton),
+            applied = Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied),
+            couponNotValidMessage = Html.TranslateFallback(StringResources.CouponNotValidMessage, "Coupon Not Valid: Unable to Apply Promotion"),
+            remove = Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove),
+        },
+
+        billingAddress = new
+        {
+            billingAddressLabel = Model.CurrentPage.Step2BillingAddressTitle,
+            yourBillingAddress = Model.CurrentPage.Step2BillingAddressTitle,
+            sameBillingAddressLabel = Model.CurrentPage.Step2SameAsDeliveryAddressTitle,
+            chooseBillingMessage = Model.CurrentPage.Step2ChooseBillingMessage,
+            addresLine1 = Model.ViewModel.BillingAddress.Line1,
+            addressLine2 = Model.ViewModel.BillingAddress.Line2,
+            city = Model.ViewModel.BillingAddress.City,
+            region = Model.ViewModel.BillingAddress.CountryRegion,
+            cuntry = Model.ViewModel.BillingAddress.CountryName,
+            countryCode = Model.ViewModel.BillingAddress.CountryCode,
+            postcode = Model.ViewModel.BillingAddress.PostalCode,
+
+            errorLine1 = Html.TranslateFallback(StringResources.ErrorLine1, "Address is required"),
+            addressLine1MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            addressLine2MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            errorCountryCode = Html.TranslateFallback(StringResources.ErrorCountryCode, "Country is required"),
+            errorPostCode = Html.TranslateFallback(StringResources.ErrorPostCode, "Postal Code is required"),
+            errorPostCodeInvalid = Html.TranslateFallback(StringResources.ErrorPostCodeInvalid, "Postcode is invalid"),
+            cityRequired = Html.TranslateFallback(StringResources.RequiredCity, "City is required"),
+            cityMaxLength = string.Format(Html.TranslateFallback(StringResources.CityMaxlengthError, "City cannot be longer than {0} characters"), 64),
+            postalCodeMaxLength = string.Format(Html.TranslateFallback(StringResources.MaxlengthError, "Postal Code is over {0} signs"), 11),
+            countyMaxLength = string.Format(Html.TranslateFallback(StringResources.CountyMaxlengthError, "County cannot be longer than {0} characters"), 64),
+        },
+        addressForm = new
+        {
+            postcodeLabel = Model.CurrentPage.PostcodeLabel,
+            postcodeAnywhereLicense = myLayout.PostcodeAnywhereLicense,
+            postcodePlaceholder = Model.CurrentPage.PostcodePlaceholder,
+            enterManuallyText = Model.CurrentPage.EnterManuallyText,
+            enterManuallyCancelText = Model.CurrentPage.EnterManuallyCancelText,
+            addressLine1Label = Model.CurrentPage.AddressLine1Label,
+            addressLine2Label = Model.CurrentPage.AddressLine2Label,
+            addressLine3Label = Model.CurrentPage.AddressLine3Label,
+            countryList = Model.ViewModel.CountryList,
+            addressCountyLabel = Model.CurrentPage.AddressCountyLabel
+
+        },
+        deliveryAddress = new
+        {
+            contactId = Model.ViewModel.ContactId,
+            line1 = Model.ViewModel.DeliveryAddress.Line1,
+            line2 = Model.ViewModel.DeliveryAddress.Line2,
+            city = Model.ViewModel.DeliveryAddress.City,
+            region = Model.ViewModel.DeliveryAddress.CountryRegion.Region,
+            postalCode = Model.ViewModel.DeliveryAddress.PostalCode,
+            countryCode = Model.ViewModel.DeliveryAddress.CountryCode,
+        },
+        userRegistrationPOST = new { },
+        deliveryAddressPOST = new { },
+        selectionPleaseSelect = Html.TranslateFallback(StringResources.SelectionPleaseSelect, StringConstants.TranslationFallback.SelectionPleaseSelect),
+        selectionNew = Html.TranslateFallback(StringResources.SelectionNew, StringConstants.TranslationFallback.SelectionNew),
+        nickname = new
+        {
+            label = Model.CurrentPage.AddressNicknameLabel,
+            error = Model.CurrentPage.AddressNicknameErrorMessage,
+            message = Model.CurrentPage.AddressNicknameMessage,
+            validationError = Html.TranslateFallback(StringResources.RequiredNickname, "Nickname is required"),
+            validationNickNameAlreadyExist = Html.TranslateFallback(StringResources.NicknameExisted, "Nickname already exists"),
+        },
+        creditPaymentMethodId = Model.ViewModel.CreditPaymentMethodId,
+        accountBalanceMessage = Model.CurrentPage.Step2AccountBalanceMessage,
+        accountBalance = Model.ViewModel.AccountBalance,
+        termsAndConditions = Model.CurrentPage.Step2TermsAndConditionsTitle,
+        termsAndConditionInputName = "AcceptTermsAndConditions",
+        showContactPreferences = Model.ViewModel.ShowContactPreferences,
+        showOver16YearsOldConfirm = false,
+        step4CheckboxOver16YearsOldLabel = "",
+        customerContactPreferences = Html.TranslateFallback(StringResources.CustomerContactPreferences, "Please tick if you prefer NOT to be contacted regarding special offers and exclusive coin launch information direct from The Royal Mint"),
+        additionalInformation = "",
+        termsAndConditionsWarning = "",
+        isOver16 = Html.TranslateFallback(StringResources.IsOver16, "Please tick 'I am over 16 years old"),
+        cardDetailsWarning = "",
+        orderButtonText = Model.CurrentPage.Step2InvestButtonText,
+        creditCardErrorMessage = Html.TranslateFallback(TRM.Shared.Constants.StringResources.CreditCardErrorMessage, "Please provide credit card details"),
+        kyc = new
+        {
+            modalTitle = Html.TranslateFallback(StringResources.AmlReapplicationModalTitle, "KYC"),
+            title = Html.TranslateFallback(StringResources.AmlReapplicationTitle, "Your Bullion Details"),
+            firstName = Html.TranslateFallback(StringResources.AmlReapplicationFirstName, "First Name"),
+            firstNameRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrFirstNameRequired, "Your first name is required!"),
+            firstNameMaxlength = 64,
+            firstNameMaxlengthError = string.Format(Html.TranslateFallback(StringResources.FirstNameMaxlengthError, "First Name cannot be longer than {0} characters"), 64),
+            middleName = Html.TranslateFallback(StringResources.AmlReapplicationMiddleName, "Middle Name"),
+            middleNameMaxlength = 64,
+            middleNameMaxlengthError = string.Format(Html.TranslateFallback(StringResources.MiddleNameMaxlengthError, "Middle Name cannot be longer than {0} characters"), 64),
+            lastName = Html.TranslateFallback(StringResources.AmlReapplicationLastName, "Last Name"),
+            lastNameRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrLastNameRequired, "Your last name is required!"),
+            lastNameMaxlength = 64,
+            lastNameMaxlengthError = string.Format(Html.TranslateFallback(StringResources.LastNameMaxlengthError, "Last Name cannot be longer than {0} characters"), 64),
+            gender = Html.TranslateFallback(StringResources.AmlReapplicationGender, "Gender"),
+            genderRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrGenderRequired, "Your gender is required!"),
+            genderList = TRM.Web.Extentions.EnumExtensions.GetGenderList(),
+            birth = Html.TranslateFallback(StringResources.AmlReapplicationDateOfBirth, "Date of Birth"),
+            birthRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrDateOfBirthRequired, "Your date of birth is required!"),
+            addressTitle = Html.TranslateFallback(StringResources.AmlReapplicationAddressTitle, "Your Bullion Address"),
+            addressFirstLine = Html.TranslateFallback(StringResources.AmlReapplicationAddressFirstLineLabel, "First Line"),
+            addressSecondLine = Html.TranslateFallback(StringResources.AmlReapplicationAddressSecondLineLabel, "Second Line"),
+            city = Html.TranslateFallback(StringResources.AmlReapplicationAddressCityLabel, "City"),
+            state = Html.TranslateFallback(StringResources.AmlReapplicationAddressStateLabel, "State/County"),
+            //  stateRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrStateRequired, "Your state/county is required!"),
+            country = Html.TranslateFallback(StringResources.AmlReapplicationAddressCountryLabel, "Country"),
+            postcode = Html.TranslateFallback(StringResources.AmlReapplicationAddressPostcodeLabel, "Postal Code"),
+            line1Required = Html.TranslateFallback(StringResources.AmlReapplicationErrFirstAddressLineRequired, "Your first line of address is required!"),
+            line1MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            line2MaxLength = string.Format(Html.TranslateFallback(StringResources.AddressLineMaxlengthError, "Address cannot be longer than {0} characters"), 80),
+            countryRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrCountryRequired, "Your country is required!"),
+            postcodeRequired = Html.TranslateFallback(StringResources.ErrorPostCode, "Postal Code is required"),
+            postcodeMaxLength = string.Format(Html.TranslateFallback(StringResources.MaxlengthError, "Postal Code is over {0} signs"), 11),
+            postcodeInvalid = Html.TranslateFallback(StringResources.ErrorPostCodeInvalid, "Postal Code is invalid"),
+            cityRequired = Html.TranslateFallback(StringResources.AmlReapplicationErrCityRequired, "Your city is required!"),
+            cityMaxLength = string.Format(Html.TranslateFallback(StringResources.CityMaxlengthError, "City cannot be longer than {0} characters"), 64),
+            countyMaxLength = string.Format(Html.TranslateFallback(StringResources.CountyMaxlengthError, "County cannot be longer than {0} characters"), 64),
+            countryList = Model.ViewModel.CountryList,
+            button = Html.TranslateFallback(StringResources.AmlReapplicationButtonText, "Re-Apply for Kyc"),
+
+        },
+        extraValidation = new
+        {
+            errorIsOver16 = Html.TranslateFallback(StringResources.ErrorIsOver16, "* Must confirm \"I am over 16 years old\""),
+            errorSelectedCard = Html.TranslateFallback(StringResources.ErrorSelectedCard, "* Please select credit card"),
+            errorPaymentSessionId = Html.TranslateFallback(StringResources.ErrorPaymentSessionId, "* Please provide credit card details"),
+            errorNameOnCard = Html.TranslateFallback(StringResources.ErrorNameOnCard, "Name on card is required"),
+            errorTerms = Html.TranslateFallback(StringResources.ErrorTerms, "* Must Accept Terms and Conditions"),
+        },
+
+        submitButtonText = Html.TranslateFallback(StringResources.SubmitButtonText, "Proceed with order"),
+        orderSummary = Html.TranslateFallback(StringResources.OrderSummary, "Order summary"),
+        paymentMethod = Html.TranslateFallback(StringResources.PaymentMethod, "Payment method"),
+        sureMessage = Html.TranslateFallback(StringResources.SureMessage, "Are You Sure?"),
+        removeCard = Html.TranslateFallback(StringResources.RemoveCard, "Remove this card."),
+        buttonClose = Html.TranslateFallback(StringResources.ButtonClose, "Close"),
+        buttonContinue = Html.TranslateFallback(StringResources.ButtonContinue, "Continue"),
+        quantity = Html.TranslateFallback(StringResources.GeneralQuantity, "Quantity"),
+        pricePerItem = Html.TranslateFallback(StringResources.PricePerItem, "Price per item"),
+        total = Html.TranslateFallback(StringResources.GeneralTotal, "Total"),
+        addressIncomplete = Html.TranslateFallback(TRM.Shared.Constants.StringResources.AddressIncomplete, "Address is incomplete, please enter manually"),
+    };
+
+    var anyPaymentProviderAvailable = Model.ViewModel.PaymentProviders.Any(x => x.IsActive);
+}
+
+<div class="mod-section">
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+
+    <div class="row justify-content-center text-center">
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="col-12 form-spacing">
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>
+            </div>
+        }
+
+        <div class="col-md-10 col-lg-8">
+            <div class="form-container">
+                <div class="form-spacing">
+                    <h1>@Html.PropertyFor(x => x.CurrentPage.Step2PageHeading)</h1>
+                    <div class="row justify-content-center">
+                        <div class="col-10 col-sm-8 col-md-7 col-lg-6">
+                            <div class="text-danger">
+                                @Html.ValidationSummary(false)
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    }
+                </div>
+
+                <div>
+                    @if (anyPaymentProviderAvailable && barclaysProvider != null)
+                    {
+                        var vm = new PaymentMethodViewModel()
+                        {
+                            PaymentMethodRow = barclaysProvider,
+                            AllowSavedCards = Model.CurrentPage.EnableSavedCards,
+                            ExpiredMessage = Model.CurrentPage.Step2ExpiredMessage ?? "Expired"
+                        };
+                        var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, barclaysProvider.SystemKeyword);
+                        if (result != null && result.View != null)
+                        {
+                            Html.RenderPartial(barclaysProvider.SystemKeyword, vm);
+                        }
+                    }
+                </div>
+
+                <div data-module="payment" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+
+                <div class="form-spacing mt-5 pb-0">
+                    @Html.DisplayFor(x => x.CurrentPage.Step2RightContentArea)
+                </div>
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="col-12 form-spacing">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+
+    @if (anyPaymentProviderAvailable && barclaysProvider == null)
+    {
+        var payMethod = Model.ViewModel.PaymentProviders.FirstOrDefault(x => x.PaymentMethodId.Equals(Model.ViewModel.MastercardPaymentMethodId));
+        if (payMethod != null)
+        {
+            var vm = new PaymentMethodViewModel()
+            {
+                PaymentMethodRow = payMethod,
+                AllowSavedCards = Model.CurrentPage.EnableSavedCards,
+                ExpiredMessage = Model.CurrentPage.Step2ExpiredMessage ?? "Expired"
+            };
+            var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, payMethod.SystemKeyword);
+            if (result != null && result.View != null)
+            {
+                Html.RenderPartial(payMethod.SystemKeyword, vm);
+            }
+        }
+    }
+</div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Five })
+@section HeaderScripts{
+    @Html.Partial("_RedirectOutsideTheIframe")
+}

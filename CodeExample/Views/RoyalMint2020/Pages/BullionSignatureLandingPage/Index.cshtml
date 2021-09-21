@@ -1,0 +1,388 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.ContentTypes.Business.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions;
+@using TRM.Shared.Extensions;
+@using EPiServer.Web
+@using System.Web.Optimization
+@using Hephaestus.CMS.ViewModels
+@using TRM.Web.Models.Pages.Bullion
+@using TRM.Web.Models.ViewModels.Bullion
+@using Newtonsoft.Json
+
+@model IPageViewModel<BullionSignatureLandingPage, ILayoutModel, BullionSignatureLandingViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+
+    var isPensionProvider = false;
+    var impertionatedByPensionProvider = false;
+    var isImpersonating = false;
+
+    if (Request.IsAuthenticated)
+    {
+        var currentContact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+        if (currentContact != null)
+        {
+            isImpersonating = myLayout.IsImpersonating;
+            isPensionProvider = myLayout.IsPensionProviderContact;
+            impertionatedByPensionProvider = myLayout.IsImpertionatedByPensionProvider;
+        }
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+
+    string copyClass = Model.CurrentPage.TextAlignment.DescriptionAttr();
+    string colClass = Model.CurrentPage.IsFullWidthContainer ? "col-12" : "col-md-9";
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "investSignaturePageCss")
+}
+
+
+<script>
+    $(document).ready(function () {
+        // DOM events and DOM manipulations
+        var loadShare = new Event('loadShare');
+        document.dispatchEvent(loadShare);
+    });
+
+</script>
+
+
+<div class="justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    <div class="mod-hero flush">
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <!--</div>-->
+    <!-- Breadcrumbs -->
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", myLayout.Breadcrumb);
+    }
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-12">
+            @* TODO: Add legacy code for CustomerServicePage  *@
+
+            @if (myLayout.HasMessage)
+            {
+                Html.RenderPartial("_MessageBox", myLayout.Message);
+            }
+
+            <!-- Main Body -->
+            <div class="panel-signature-box">
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-9">
+                            <h1 class="h1 mt-0">@Html.PropertyFor(x => x.CurrentPage.Name)</h1>
+                        </div>
+                        @if (myLayout.ShowSocialShareOnSellableEntryDetails)
+                        {
+                            var url = Request.Url;
+                            var metaDescription = Html.Encode(Model.CurrentPage.MetaDescription);
+
+                            var twitterUrl = "https://twitter.com/intent/tweet?text=" + metaDescription + "&url=" + url;
+                            var facebookUrl = "https://facebook.com/sharer.php?u=" + url;
+                            var pinterstUrl = "http://pinterest.com/pin/create/button/?url=" + url + "&description=" + metaDescription;
+
+                            <div class="mod-share mod-share-widget" data-trigger=".share-via" data-target=".share-container">
+                                <div class="share-via">
+                                    <span class="sr-only"></span><span class="icon"><svg><use xlink:href="#share"></use></svg></span>
+                                </div>
+                                <div class="share-container d-none">
+                                    <ul class="d-flex justify-content-center mod-print">
+                                        <li id="twitter">
+                                            <a href="@twitterUrl" target="_blank" rel="noopener noreferrer">
+                                                <span class="icon"><svg><use xlink:href="#twitter"></use></svg></span>
+                                                <span class="sr-only"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="facebookhref" target="_blank" rel="noopener noreferrer">
+                                                <span class="icon"><svg><use xlink:href="#facebook"></use></svg></span><span class="sr-only"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="@pinterstUrl" target="_blank" rel="noopener noreferrer">
+                                                <span class="icon"><svg><use xlink:href="#pintrest"></use></svg></span><span class="sr-only"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <div class="link" data-href="@url" data-failed="Sorry, something went wrong" data-success="Link successfully copied">
+                                                <span class="instruction sr-only"></span><span class="icon"><svg><use xlink:href="#direct"></use></svg></span><span class="message-container"></span>
+                                            </div>
+                                        </li>
+                                        @*<li>
+                                                <a href="#" class="print">
+                                                    <span class="sr-only"></span><span class="icon"><svg><use xlink:href="#print"></use></svg></span>
+                                                </a>
+                                            </li>*@
+                                    </ul>
+                                    <div class="url-container sr-only">
+                                        <label for="siteUrl"></label>
+                                        <textarea class="url" id="siteUrl">@url</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="panel-box bg-gray annotation-box investment-block">
+                    <div class="investment-price">
+                        <h5 class="mb-xs-1x mb-0 mt-0 investment-title">@Html.PropertyFor(x => x.CurrentPage.WouldLikeToInvestText)</h5>
+                        <div class="price-input">
+                            <div class="input-group subtle">
+                                <div class="input-group-addon">@Model.ViewModel.DefaultCurrency.CurrencyCode.ToCurrencySymbol()</div>
+                                <input type="text" class="form-control form-group invest-price currency-input" maxlength="12" id="investPrice" value="@Model.ViewModel.InvestAmount.ToString("N2")" placeholder="Amount" data-original-title="" title="">
+                            </div>
+                        </div>
+                        <a href="javascript:void(0);" onclick="showInvestmentOptions()" class="btn btn-primary">@Html.PropertyFor(x => x.CurrentPage.ShowInvestmentOptionsText)</a>
+                    </div>
+                    <div class="quick-investment">
+                        <h3>@Html.PropertyFor(x => x.CurrentPage.QuickInvestmentText)</h3>
+                        @foreach (var item in Model.ViewModel.QuickInvestments)
+                        {
+                            <a class="quick-invest-number" data-invest-number="@item.Amount" href="javascript:void(0);" onclick="setAmountInvestment('@item.Amount')">@item.ToString()</a>
+                        }
+                    </div>
+                    <p>@Html.PropertyFor(x => x.CurrentPage.InvestmentNote)</p>
+                </div>
+                <h2 class="h2 text-center investment-inform" data-investment-amount="@(Model.ViewModel.InvestmentAmountFormatter)">@Html.Raw(Model.ViewModel.InvestmentInformText)</h2>
+                <div class="row variant-section">
+                    @foreach (var item in Model.ViewModel.SignatureVariants)
+                    {
+
+
+
+                        var buyNowViewModel = new
+                        {
+                            buyNowButtonLabel = @Html.TranslateFallback(StringResources.BuyNow, "Buy Now"),
+                            investAmount = Model.ViewModel.InvestAmount,
+                            quickCheckoutUrl = @myLayout.QuickCheckoutPage.GetExternalUrl_V2(),
+                            basketPageUrl = myLayout.BasketPage.GetExternalUrl_V2(),
+                            item = item,
+                            addToBasketButtonLabel = Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket"),
+                            buttonAddedLabel = Html.TranslateFallback(StringResources.AddedToBasket, "Added To Basket"),
+                            titleAddBasket = @Html.TranslateFallback(StringResources.BullionTitleAddToBasket, "Added to basket"),
+                            viewBasket = @Html.TranslateFallback(StringResources.BullionViewBasket, "View basket"),         
+                            continueShopping = @Html.TranslateFallback(StringResources.BullionContinueShopping, "Continue shopping"),
+                            recommendedProducts = @Html.TranslateFallback(StringResources.BullionRecommendedProducts, "Recommended products"),
+                            recalculateLabel = Html.TranslateFallback(StringResources.Recalculate, "Recalculate"),
+                        };
+
+
+
+                    <div class="variant-wrapper">
+                        <a href="@Url.ContentUrlExtension(item.SignatureUrlHref)"><div class="variant-image" style="background-image: url(@item.ImageUrl)"></div></a>
+                        <div class="variant-info d-flex flex-column">
+                            <h3 class="mt-0 mb-2x variant-title section-head d-flex align-items-end pt-0" style="flex-basis:80px"><span class="w-100">@item.Title</span></h3>
+                            <h2 class="mt-0 mb-0">@item.PurchaseWeightInOz oz</h2>
+                            <p class="h4 mt-0 price-unit">@item.PricePerOz.ToString() per oz</p>
+                            <div class="flare"><span>Estimated</span></div>
+                        </div>
+                        @if (!impertionatedByPensionProvider || !isImpersonating && !isPensionProvider)
+                        {
+                            if (!item.ShowCanNotPensionMessage)
+                            {
+                                <div data-module="purchaseButtons" data-settings="@JsonConvert.SerializeObject(buyNowViewModel)"></div>
+                            }
+
+                                if (item.ShowCanNotPensionMessage)
+                                {
+                                    <div class="pr-1 pl-1">
+                                        <div class="text-center alert alert-warning alert-children" style="font-size:14px">
+                                            @Html.PropertyFor(x => startPage.UnableToBuySignatureMessage)
+                                        </div>
+                                    </div>
+                                }
+
+                                if (item.ShowNotifyWhenInStock && !item.ShowAddToBasket)
+                                {
+                                    <button type="button" class="btn btn-primary mt-0 mb-2x">@Model.ViewModel.EmailMeWhenInStockButtonText</button>
+                                }
+
+                                if (item.ShowUnableSellProductText)
+                                {
+                                    <div class="pr-1 pl-1">
+                                        <div class="text-center alert alert-warning alert-children" style="font-size:14px">
+                                            @Html.PropertyFor(x => x.CurrentPage.UnableSellProductMessage)
+                                        </div>
+                                    </div>
+                                }
+
+                                if (item.ShowUnderMinSpendMessage)
+                                {
+                                    <div class="pr-1 pl-1">
+                                        <div class="text-center alert alert-warning alert-children" style="font-size:14px">
+                                            @Html.PropertyFor(x => x.CurrentPage.UnderMinimumSpentAmountMessage)
+                                        </div>
+                                    </div>
+                                }
+
+                                if (item.ShowNotAvailableMessage)
+                                {
+                                    <div class="pr-1 pl-1">
+                                        <div class="text-center alert alert-warning alert-children" style="font-size:14px">
+                                            @Html.TranslateFallback(StringResources.ItemNotAvailable, "This item is not available")
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                        </div>
+                    }
+                </div>
+                @if (!Request.IsAuthenticated)
+                {
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="cta-action mb-2x">
+                                <a href="@Url.ContentUrlExtension(Model.ViewModel.LoginUrl)" class="btn btn-secondary mr-sm-1 mb-1 mb-sm-0">Log in</a>
+                                <p class="mb-1 mb-sm-0 mr-0 mr-sm-1 d-block d-sm-inline-block ">or</p>
+                                <a href="@Url.ContentUrlExtension(Model.ViewModel.BullionRegistrationPageUrl)" class="btn btn-primary mb-1 mb-sm-0 mr-0 mr-sm-1 ">Sign up</a>
+                                <p class="mb-1 mb-sm-0 d-block d-sm-inline-block">To begin investing in signature</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    if (!Model.ViewModel.IsBullionAccount)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="cta-action mb-2x">
+                                    <a href="@Url.ContentUrlExtension(Model.ViewModel.BullionRegistrationPageUrl)" class="btn btn-secondary mr-1x">@Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your Bullion account")</a>
+                                    <label class="mt-xs-1x">To begin investing in signature</label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.StoppedTrading)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12 mb-2x text-center">
+                                <div class="@startPage.StopTradingMessageColour.DescriptionAttr() p-1x">
+                                    <h6 class="h6 text-center">
+                                        @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.ViewModel.ShowUnableToPurchasePreciousMetals)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="alert @startPage.UnableToPurchasePreciousMetalsMessageColour.DescriptionAttr()">
+                                    @Html.TranslateFallback(StringResources.UnableToPurchasePreciousMetals, "Customer flagged as unable to purchase precious metals")
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                    else if (Model.ViewModel.ShowNeedConfirmKyc)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12 mb-1x text-center">
+                                <div class="alert @startPage.ConfirmKycMessageColour.DescriptionAttr() p-1x">
+                                    <h6 class="h6 text-center">
+                                        @if (myLayout.KycRefered)
+                                        {
+                                            @Html.TranslateFallback(StringResources.BullionConfirmIdentity, "In order to purchase this product you'll need to confirm your identity")
+                                        }
+                                        @if (myLayout.KycRejected)
+                                        {
+                                            @Html.TranslateFallback(StringResources.BullionKYCRejected, "In order to purchase this product you'll need to contact with customer service")
+                                        }
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (!isImpersonating && isPensionProvider || impertionatedByPensionProvider)
+                    {
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="alert @startPage.CanNotPensionMessageColour.DescriptionAttr()">
+                                    @Html.TranslateFallback(StringResources.ItemNotAvailableForPensionProvider, "This product cannot be bought within a pension provider")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Middle Content -->
+            @if (Model.CurrentPage.ThreeContentAreas != null && Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+            {
+                <div class="row">
+                    <div class="col-xs-12 mb-2x">
+                        <!-- Content Area Here -->
+                        <div class="html-content-area">
+                            <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <!-- Bottom Content -->
+    <div class="mod-section mod-section-copy">
+        <div class="row justify-content-center">
+            <div class="@copyClass @colClass">
+                <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section JustBeforeBodyTag{
+    <script type="text/javascript">
+		function onPopulateSignatureVariant() {
+			var url = new URL(window.location.href);
+			var isFirstInvest = !!localStorage.getItem('firstInvest');
+            if (isFirstInvest && url.searchParams.get('amount')) {           
+				$('html, body').animate({
+					scrollTop: $(".investment-inform").offset().top - ($(".investment-inform").next().find('.variant-wrapper').first().outerHeight() / 2)
+				}, 2000);
+
+				localStorage.removeItem('firstInvest');
+			}
+		}
+
+		$(document).ready(function () {
+			onPopulateSignatureVariant();
+		});
+
+        $(window).resize(function () {
+			onPopulateSignatureVariant();
+		});
+
+        function setAmountInvestment(amount) {
+            $('#investPrice').val(amount);
+            showInvestmentOptions();
+        }
+
+		function showInvestmentOptions() {
+			localStorage.setItem('firstInvest', true);
+            window.location.href = "@Model.CurrentPage.ContentLink.GetExternalUrl_V2()?amount=" + $('#investPrice').val();
+        }
+    </script>
+}

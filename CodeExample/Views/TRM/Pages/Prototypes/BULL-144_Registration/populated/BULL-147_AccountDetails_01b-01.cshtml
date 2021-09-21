@@ -1,0 +1,154 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer bull-registration">
+
+    <!-- BULL-147 - Bullion Registration Step 1b - Account Details -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                <!-- Step bar -->
+                <ol class="nav nav-bar nav-progress-bar">
+                    <li class="active"><a href="/prototypes/bullion/registration/populated/AccountDetails_01b-01/"><span>1.</span></a></li>
+                    <li><a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/"><span>2.</span></a></li>
+                    <li><a href="/prototypes/bullion/registration/populated/VerifyYourIdentity_03b-01/"><span>3.</span></a></li>
+                    <li><a href="/prototypes/bullion/registration/populated/SecurityQuestion_04-01/"><span>4.</span></a></li>
+                </ol>
+                <!-- / Step bar -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <!-- Sub Headline -->
+                <h3 class="mt-0 mb-2x">Account Details</h3>
+                <!-- / Sub Headline -->
+                <!-- Content Area -->
+                <div class="content-area">
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                    </div>
+                </div>
+                <!-- / Content Area -->
+                <!-- Form -->
+                <main class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group has-feedback ValidationSuccess">
+                            <label class="control-label" for="">
+                                E-mail
+                                <span class="">*</span>
+                                @*<small class="text-greyblue">(Please enter your email address)</small>*@
+                            </label>
+                            <input type="text" class="form-control" id="" placeholder="Enter your email address here" value="Max@Mustermann.de" data-original-title="" title="">
+                            <span class="trmi form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="">
+                                Username
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue">(Please enter a username)</small>
+                            </label>
+                            <input type="text" class="form-control" id="" placeholder="Enter a username here" data-original-title="" title="">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group" ng-class="{'has-error': changePasswordForm.password.$error.required &amp;&amp; changePasswordForm.$submitted}">
+                            <label class="control-label" for="">
+                                Password
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue">(Please enter a secure password that's unique to you)</small>
+                            </label>
+
+                            <input type="password" class="form-control ok-password ng-invalid ng-touched ng-invalid-ok-password ng-not-empty ng-dirty ng-valid-parse ng-valid-required error" ng-class="(changePasswordForm.password.$dirty &amp;&amp; changePasswordForm.password.$invalid) ? 'error' : ''" name="password" placeholder="Enter a secure password that's unique to you here" ng-required="true" ng-model="password" id="registerUsrPW1-main" data-original-title="" title="" required="required" style="" data-toggle="collapse" href="#registration-password" aria-expanded="false" aria-controls="collapseExample">
+                            <div class="label password-count ng-binding label-danger" ng-class="password.length > 8 ? 'label-success' : 'label-danger'" ng-show="password.length > 0" style="">
+                                (4)
+                            </div>
+
+                            <div class="strength-meter" ng-show="password.length > 0" style="">
+                                <div class="strength-meter-fill" data-strength="0">
+                                </div>
+                            </div>
+
+                            <div id="registration-password" class="alert alert-info mb-0 mt-1x collapse">Password should be a min of XYZ etc…</div>
+                        </div>
+                        <!-- Password -->
+
+                        <p>
+                            We would like to keep you up to date with information about our competitions, products, services,
+                            offers and news that may interest you – if thats of please select the box below.
+                            By doing so you are acknoledging that you are above the age of 16 and consent to being contacted
+                            in the manner described.
+                        </p>
+
+                        <div class="mt-2x">
+                            <div class="pull-left">
+                                <!-- Due to from the second child checkbox gets a -5px margin I cannot override -->
+                                <div class="checkbox small fancy">
+                                    <input type="checkbox" name="" value="" id="checkbox__email" title="" class="" style="">
+                                    <label class="" for="checkbox__email">
+                                        By email
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="pull-left ml-2x">
+                                <div class="checkbox small fancy">
+                                    <input type="checkbox" name="" value="" id="checkbox__post" title="" class="" style="">
+                                    <label class="" for="checkbox__post">
+                                        By post
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="pull-left ml-2x">
+                                <div class="checkbox small fancy">
+                                    <input type="checkbox" name="" value="" id="checkbox__phone" title="" class="" style="">
+                                    <label class="" for="checkbox__phone">
+                                        By phone
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="checkbox small fancy clear">
+                                <input type="checkbox" name="" value="" id="checkbox__terms" title="" class="" style="">
+                                <label class="" for="checkbox__terms">
+                                    Please tick to confirm you have read The Royal Mint's
+                                    <a href="#" class="text-nowrap">Terms & Conditions</a>
+                                    and
+                                    <a href="#" class="text-nowrap">Privacy and Cookies Policy</a>.
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- toolbar -->
+                    <div class="col-xs-12 mt-1x mb-2x">
+                        <a href="#" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                        <a href="/prototypes/bullion/registration/populated/PersonalDetails_02-01/" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+                    </div>
+                    <!-- / toolbar -->
+                </main>
+                <!-- / Form -->
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+        <!-- / Content Area -->
+
+        <!-- / BULL-147 - Bullion Registration Step 1b - Account Details -->
+
+    </div>
+
+</div>

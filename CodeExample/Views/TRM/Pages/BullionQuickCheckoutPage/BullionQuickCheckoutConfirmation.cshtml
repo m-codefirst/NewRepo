@@ -1,0 +1,151 @@
+﻿@using Hephaestus.CMS.Extensions
+@using Mediachase.Commerce.Orders
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionQuickCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.QuickCheckout.QuickCheckoutViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+<div class="pageContainer quick-checkout">
+    @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    }
+    <div class="container mb-4x mt-2x">
+        @if (Model.CurrentPage.DisplayPageHeading && Model.ViewModel.InvestmentPurchaseOrder.OrderStatus != OrderStatus.Cancelled)
+        {
+            <div class="page-header">
+                <h1 class="h1">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            </div>
+        }
+        @if (Model.ViewModel.InvestmentPurchaseOrder.OrderStatus == OrderStatus.Cancelled)
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-danger inline-text-info">
+                        <i class="trmi trmi-check text-warning mr-1x"></i>
+                        @Model.ViewModel.OrderRejectedMsg
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    @if (Model.ViewModel.InvestmentPurchaseOrder.OrderStatus == OrderStatus.InProgress)
+                    {
+                        <div class="alert alert-success inline-text-info">
+                            <i class="trmi trmi-check text-success mr-1x"></i>
+                            @Html.PropertyFor(x => x.CurrentPage.PendingOrderConfirmationMessage)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success inline-text-info">
+                            <i class="trmi trmi-check text-success mr-1x"></i>
+                            @Html.PropertyFor(x => x.CurrentPage.SuccessfulOrderConfirmationMessage)
+                        </div>
+                    }
+                </div>
+                <div class="col-xs-12 col-md-7 mb-1x">
+                    @if (Model.CurrentPage.Step2TopContentArea != null)
+                    {
+                        <div class="row mb-2x">
+                            @Html.PropertyFor(x => x.CurrentPage.Step2TopContentArea)
+                        </div>
+                    }
+                    @{
+                        var investmentOrder = Model.ViewModel.InvestmentPurchaseOrder;
+                    }
+                    <h3 class="h3 mt-0 mb-1x">@Html.PropertyFor(x => x.CurrentPage.OrderDateTitle): @Model.ViewModel.OrderDate.ToString("dd/MM/yyyy")</h3>
+                    <h4 class="h4 mb-0 text-midblue"> @Html.PropertyFor(x => x.CurrentPage.OrderNumberTitle)</h4>
+                    @foreach (var orderNumber in investmentOrder.OrderNumbers)
+                    {
+                        <h5 class="h5 mt-0 text-midblue">#@orderNumber</h5>
+                    }
+                    <div class="row mb-2x">
+                        <div class="col-xs-12 col-sm-6">
+                            <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.DeliveryToTitle)</h6>
+                            @{
+                                var investmentDelivery = investmentOrder.DeliveryAddress;
+                            }
+                            @if (investmentDelivery.Name.Equals("VaultShippingAddress"))
+                            {
+                                @Html.TranslateFallBack(StringResources.BullionDeliveryToVault, "Royal Mint Vault")
+                            }
+                            else
+                            {
+                                <p class="mb-0">@investmentDelivery.Line1</p>
+                                if (!string.IsNullOrWhiteSpace(investmentDelivery.Line2))
+                                {
+                                    <p class="mb-0">@investmentDelivery.Line2</p>
+                                }
+                                <p class="mb-0">@investmentDelivery.City</p>
+                                if (!string.IsNullOrWhiteSpace(investmentDelivery.CountryRegion.Region))
+                                {
+                                    <p>@investmentDelivery.CountryRegion.Region</p>
+                                }
+                                <p class="mb-0">@investmentDelivery.PostalCode</p>
+                                <p class="mb-0">@investmentDelivery.CountryName</p>
+                            }
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.PaymentTitle)</h6>
+                            @Html.TranslateFallBack(StringResources.BullionWalletPayment, "Investment Wallet")
+                        </div>
+                    </div>
+                    @if (Model.CurrentPage.Step2MiddleContentArea != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(x => x.CurrentPage.Step2MiddleContentArea)
+                        </div>
+                    }
+                    <div class="mt-2x mb-2x">
+                        @Html.PropertyFor(x => x.CurrentPage.OrderSummaryDescription)
+                    </div>
+
+                    <div class="confirm-detail bg-gray p-1x mb-2x">
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <h5 class="h5 mt-0 mb-0">
+                                    @Html.PropertyFor(x => x.CurrentPage.TotalOrderTitle)
+                                </h5>
+                            </div>
+                            <div class="col-xs-4 text-right">
+                                <h5 class="h5 mt-0 mb-0">
+                                    @investmentOrder.Total
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" class="btn btn-secondary mt-1x mb-1x mr-1x">@Html.TranslateFallback(StringResources.BullionCheckOutOpenMyAccountDashboard, "Open my Account Dashboard")</a>
+                    <a href="@Url.ContentUrlExtension(myLayout.StartPageReference)" class="btn btn-default mt-1x mb-1x">@Html.TranslateFallback(StringResources.BullionCheckOutVisitHomePage, "Visit our homepage")</a>
+                </div>
+                <div class="col-xs-12 col-md-5 mb-1x">
+                    @Html.Partial("_InvestmentSummaryConfirmation", Model.ViewModel.InvestmentPurchaseOrder, new ViewDataDictionary { { "IsBullionOnly", true } })
+                </div>
+            </div>
+        }
+    </div>
+    @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    }
+</div>

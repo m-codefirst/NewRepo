@@ -1,0 +1,58 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TrmActivateAccountPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.ActivateAccountViewModel>
+
+@if (Model.ViewModel.ShowFullForm)
+{
+    using (Html.BeginForm("CompleteActivation", null, FormMethod.Post, new { ng_controller = "FormController" }))
+    {
+        @Html.HiddenFor(x => x.ViewModel.CustomerCode)
+        @Html.HiddenFor(x => x.ViewModel.Postcode)
+        <div class="activate-register">
+            <div class="form-group input-subtle mb-1x">
+                <label class="sr-only" for="registerEmail1">@Html.PropertyFor(a => a.CurrentPage.EmailPlaceholder)</label>
+                @Html.TextBoxFor(a => a.ViewModel.EmailAddress, new { placeholder = Model.CurrentPage.EmailPlaceholder, @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.ViewModel.EmailAddress)
+            </div>
+
+            <div class="form-group input-subtle mb-1x">
+                <label class="sr-only" for="registerEmail2">@Html.PropertyFor(a => a.CurrentPage.ConfirmEmailPlaceholder)</label>
+                @Html.TextBoxFor(a => a.ViewModel.EmailAddress2, new { placeholder = Model.CurrentPage.ConfirmEmailPlaceholder, @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.ViewModel.EmailAddress2)
+            </div>
+
+            <div class="form-group input-subtle mb-1x">
+                <label class="sr-only" for="registerEnterPassword">@Html.PropertyFor(a => a.CurrentPage.PasswordPlaceholder)</label>
+                @Html.PasswordFor(x => x.ViewModel.Password, new
+            {
+                @class = "form-control ok-password",
+                id = "registerUsrPW1-main",
+                placeholder = Model.CurrentPage.PasswordPlaceholder,
+                ng_class = "(joinTeamForm.password.$dirty && joinTeamForm.password.$invalid) ? 'error' : ''",
+                name = "password",
+                ng_model = "password"
+            })
+                @Html.ValidationMessageFor(x => x.ViewModel.Password)
+                <div class="label password-count" ng-class="password.length > 7 ? 'label-success' : 'label-danger'"
+                     ng-show="password.length > 0"
+                     ng-cloak>
+                    {{pwStrengthLabel}} ({{ password | passwordCount:7 }})
+                </div>
+                <div class="strength-meter" ng-show="password.length > 0" ng-cloak>
+                    <div class="strength-meter-fill" data-strength="{{passwordStrength}}"></div>
+                </div>
+            </div>
+
+            <div class="form-group input-subtle mb-2x">
+                <label class="sr-only" for="registerConfirmPassword">@Html.PropertyFor(a => a.CurrentPage.ConfirmPasswordPlaceholder)</label>
+                @Html.PasswordFor(a => a.ViewModel.Password2, new { @class = "form-control", placeholder = Model.CurrentPage.ConfirmPasswordPlaceholder })
+                @Html.ValidationMessageFor(x => x.ViewModel.Password2)
+            </div>
+            <div class="form-group">
+                @Html.PropertyFor(a => a.CurrentPage.TermsConditionsText)
+            </div>
+
+            <div class="form-group mb-0">
+                <button class="btn btn-secondary" type="submit">@Model.CurrentPage.ConfirmActivationButtonText</button>
+            </div>
+        </div>
+    }
+}

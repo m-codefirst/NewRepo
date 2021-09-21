@@ -1,0 +1,29 @@
+﻿@model TRM.Web.Models.Blocks.AccordionItemBlock
+
+@{
+    //ReSharper disable once SuspiciousTypeConversion.Global
+    var parentId = ViewData["AccordionId"];
+    var ownerLinkId = Model.Property.OwnerLink.ID;
+
+    //ReSharper disable once UseStringInterpolation
+    var accordionId = string.Format("accordion-{0}", parentId);
+    var questionId = string.Format("question-{0}-{1}", parentId, ownerLinkId);
+    var answerId = string.Format("answer-{0}-{1}", parentId, ownerLinkId);
+    var openOnLoad = Model.OpenOnLoad ? "true" : "false";
+    var openCssClass = Model.OpenOnLoad ? "show" : "";
+    var titleOpenCssClass = Model.OpenOnLoad ? "" : "collapsed";
+}
+
+<div class="card">
+    <div class="card-header" id="@questionId">
+        <button class="btn btn-link @titleOpenCssClass" data-toggle="collapse" data-target="#@answerId" aria-expanded="@openOnLoad" aria-controls="#@answerId">
+            @Model.AccordionLabel
+            <span class="icon"><svg><use xlink:href="#chevron-down" /></svg></span>
+        </button>
+    </div>
+    <div id="@answerId" class="collapse @openCssClass" aria-labelledby="#@questionId" data-parent="#@accordionId">
+        <div class="card-body">
+            @Html.PropertyFor(x => x.Content)
+        </div>
+    </div>
+</div> <!-- /.card -->

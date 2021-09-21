@@ -1,0 +1,63 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.ViewModels.MyAccountManageAddressesViewModel
+
+@{ 
+    var addressNicknameLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AddressNickname, "Address Nickname");
+    var nameLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Name, "Name");
+    var addressLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Address, "Address");
+    var externalUrl = Model.CurrentBlock.AddEditAddressesPage.GetExternalUrl_V2();
+}
+
+    <div class="mod-copy">
+        @Html.PropertyFor(a => a.CurrentBlock.IntroductionText)
+    </div>
+    <div class="mod-section">
+        
+        @foreach (var address in Model.Addresses)
+        {
+            <div class="manage-address">
+                <div class="row justify-content-center">
+                    <table class="table col-11 col-md-10 mb-5">
+                        <tr>
+                            <th>@addressNicknameLabel</th>
+                            <td>@address.Name</td>
+                        </tr>
+                        <tr>
+                            <th>@nameLabel</th>
+                            <td>@address.FirstName @address.LastName</td>
+                        </tr>
+                        <tr>
+                            <th>@addressLabel</th>
+                            <td>
+                                <dl>
+                                    <dd>@address.Line1</dd>
+                                    <dd>@address.Line2</dd>
+                                    <dd>@address.City</dd>
+                                    <dd>@address.CountryRegion.Region</dd>
+                                    <dd class="text-uppercase">@address.PostalCode</dd>
+                                    <dd>@address.CountryName</dd>
+                                </dl>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                @if ((!address.BillingDefault || !address.ShippingDefault) && !Model.KYCAddressIds.Contains(address.AddressId))
+                {
+                    <div class="row btns justify-content-center justify-content-xl-end">
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            @{
+                                var editLink = externalUrl + "?address=" + address.AddressId;
+                            }
+                            <a class="btn btn-primary mb-lg-0" href="@editLink">Edit</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (!Model.IsBullionAccountOnly)
+        {
+            <a href="@externalUrl" class="btn btn-primary mb-lg-0">@Html.TranslateFallback(TRM.Web.Constants.StringResources.AddNewAddress, "Add New Address")</a>
+        }
+    </div>

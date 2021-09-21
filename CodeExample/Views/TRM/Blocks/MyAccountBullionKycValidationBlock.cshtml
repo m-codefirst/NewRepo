@@ -1,0 +1,38 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions 
+@model TRM.Web.Controllers.Blocks.MyAccountBullionKycValidationViewModel
+
+<div class="blockContent">
+    <div class="alert @Model.CurrentBlock.BackgroudColour.DescriptionAttr() mb-0 p-1x">
+        <i class="h6 trmi trmi-exclamation mt-0 mb-0 mr-1x" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentBlock.Tooltip)"></i>
+        <div class="display-inline-block vertical-top @Model.CurrentBlock.ContentTextColour.DescriptionAttr()">
+            <h5 class="h5">@Html.PropertyFor(x => x.CurrentBlock.Heading)</h5>
+            @if (Model.FailedStage1)
+            {
+                if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage1Description))
+                {
+                    <p>@Html.PropertyFor(x => x.CurrentBlock.FailStage1Description)</p>
+                }
+                if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage1ButtonText))
+                {
+                    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.FailStage1ButtonLink)" class="btn @Model.CurrentBlock.FailStage1ButtonColour.DescriptionAttr()">
+                        @Html.PropertyFor(x => x.CurrentBlock.FailStage1ButtonText)
+                    </a>
+                }
+            }
+            @if (Model.FailedStage2)
+            {
+                if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage2Description))
+                {
+                    <p>@Html.PropertyFor(x => x.CurrentBlock.FailStage2Description)</p>
+                }
+                if (!string.IsNullOrEmpty(Model.CurrentBlock.FailStage2ButtonText))
+                {
+                    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.FailStage2ButtonLink)" class="btn @Model.CurrentBlock.FailStage2ButtonColour.DescriptionAttr()">
+                        @Html.PropertyFor(x => x.CurrentBlock.FailStage2ButtonText)
+                    </a>
+                }
+            }
+        </div>
+    </div>
+</div> 

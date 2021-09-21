@@ -1,0 +1,114 @@
+﻿@model TRM.Web.Models.ViewModels.MegaMenuViewModel
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+
+@{
+    const int MenuItemsToDisplay = 4;
+    const string TargetBlankAttributes = "target=_blank rel=noopener";
+
+    var hideOnClasses = Model.MegaMenuDto.HideOnClasses;
+
+    int menuItemsCounter = 0;
+}
+
+<div class="toolbar-container d-print-none">
+    <nav class="toolbar @hideOnClasses">
+        <ul>
+            @foreach (var tierOneItem in Model.MegaMenuDto.ChildNavigationItems.Where(i => i.VisibleInNav).Take(MenuItemsToDisplay))
+            {
+                var tierOneHasChildren = tierOneItem.ChildNavigationItems != null && tierOneItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+                var jsMenuTriggerAttributes = string.Format("class=js-trigger data-target=toolbar-{0} role=button aria-expanded=false aria-controls=toolbar-{0}", menuItemsCounter);
+
+                <li class="@tierOneItem.HideOnClasses">
+                    <a class="@tierOneItem.CssClass" href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty) @(tierOneHasChildren ? jsMenuTriggerAttributes : string.Empty)>
+                        <span class="icon">
+                            <svg><use xlink:href="#@tierOneItem.MenuIcon.DescriptionAttr()" /></svg>
+                        </span>
+                        <span class="label">@tierOneItem.MenuItemDisplayName</span>
+                    </a>
+                </li>
+
+                menuItemsCounter++;
+            }
+
+            <li class="toolbar-main-menu">
+                <a href="#" class="menu js-trigger" data-target="global-navigation" role="button" aria-expanded="false" aria-controls="global-navigation">
+                    <span class="icon"><svg><use xlink:href="#menu" /></svg></span>
+                    <span class="label sr-only">Menu</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    @{
+        menuItemsCounter = 0;
+
+        foreach (var tierOneItem in Model.MegaMenuDto.ChildNavigationItems.Where(i => i.VisibleInNav).Take(MenuItemsToDisplay))
+        {
+            var tierOneHasChildren = tierOneItem.ChildNavigationItems != null && tierOneItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+
+            if (tierOneHasChildren)
+            {
+                <div class="toolbar-expandable js-expandable" id="toolbar-@menuItemsCounter">
+                    <nav class="navigation container">
+                        <div class="root">
+                            <ul class="navigation-menu" data-label="@tierOneItem.MenuItemDisplayName">
+                                <li>
+                                    <div class="container">
+                                        <div class="row justify-content-center">
+                                            <div class="col-12 col-lg-10">
+                                                <div class="row">
+                                                    @{
+                                                        var tearTwoItemsCount = 0;
+                                                    }
+
+                                                    @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems.Where(i => i.VisibleInNav))
+                                                    {
+                                                        var tierTwoHasChildren = tierTwoItem.ChildNavigationItems != null && tierTwoItem.ChildNavigationItems.Any(i => i.VisibleInNav);
+                                                        var tierTwoTitleClass = tierTwoHasChildren ? "navigation-more" : string.Empty;
+
+                                                        <div class="col">
+                                                            @if (tearTwoItemsCount == 0)
+                                                            {
+                                                                <a href="@tierOneItem.MenuItemExternalUrl" @(tierOneItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty) class="toolbar-title d-md-none"><span>@tierOneItem.MenuItemDisplayName</span></a>
+                                                            }
+
+                                                            <ul>
+                                                                <li class="@tierTwoItem.HideOnClasses">
+                                                                    <a href="@tierTwoItem.MenuItemExternalUrl" @(tierTwoItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty) class="title @tierTwoTitleClass">@tierTwoItem.MenuItemDisplayName</a>
+                                                                    @if (tierTwoHasChildren)
+                                                                    {
+                                                                        <ul class="navigation-menu" data-label="@tierTwoItem.MenuItemDisplayName">
+                                                                            @foreach (var tierThreeItem in tierTwoItem.ChildNavigationItems.Where(i => i.VisibleInNav))
+                                                                            {
+                                                                                <li class="@tierThreeItem.HideOnClasses"><a href="@tierThreeItem.MenuItemExternalUrl" @(tierThreeItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty)>@tierThreeItem.MenuItemDisplayName</a></li>
+                                                                            }
+
+                                                                            @if (tierTwoItem.ShowViewAll)
+                                                                            {
+                                                                                var viewAll = string.IsNullOrWhiteSpace(tierTwoItem.ViewAllText) ? Html.TranslateFallback(StringResources.MegaMenuViewAll, StringConstants.TranslationFallback.ViewAll) : tierTwoItem.ViewAllText;
+                                                                                <li><a href="@tierTwoItem.MenuItemExternalUrl" @(tierTwoItem.OpenInANewWindow ? TargetBlankAttributes : string.Empty) class="all">@viewAll</a></li>
+                                                                            }
+                                                                        </ul>
+                                                                    }
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+                                                        tearTwoItemsCount++;
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.container -->
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            }
+
+            menuItemsCounter++;
+        }
+    }
+</div> <!-- /.toolbar-container -->

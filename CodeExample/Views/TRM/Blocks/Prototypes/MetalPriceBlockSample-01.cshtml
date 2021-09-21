@@ -1,0 +1,90 @@
+﻿@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions
+@model TRM.Web.Models.Blocks.EcomPrototypeBlock
+
+<div class="block-container">
+    <div class="metal-price__wrapper bg-slateblue">
+        <div class="row">
+            <div class="col-xs-6 col-sm-2 col-md-1 pr-0">
+                <!-- button - Sell -->
+                <button type="button" class="btn btn-primary btn-block pl-0 pr-0">Sell</button>
+                <!-- / button - Sell -->
+            </div>
+            <div class="col-xs-6 col-sm-2 col-md-1 pl-0">
+                <button type="button" class="btn btn-secondary btn-block pl-0 pr-0">Buy</button>
+            </div>
+            <div class="col-xs-12 col-md-7 col-lg-6 pl-md-0x pl-sm-1x">
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-4 pr-lg-0x pl-lg-0x pr-md-0x">
+                        <!-- price - gold -->
+                        <p class="price-note__wrapper text-white bg-slateblue mb-0 pt-1x pb-sm-1x pl-sm-1x pl-xs-1x pl-sm-0">
+                            <span class="price-note__metal text-uppercase">
+                                Gold
+                            </span>
+                            <span class="price-note__price">
+                                £910.00
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 20 20"
+                                 style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                <defs> </defs>
+                                <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <small>0.13%</small>
+                        </p>
+                        <!-- / price - gold -->
+                    </div>
+                    <div class="col-xs-12 col-sm-4 pr-lg-0x pl-lg-0x pr-md-0x pl-md-0x">
+                        <!-- price - silver -->
+                        <p class="price-note__wrapper text-white bg-slateblue mb-0 pt-1x pl-xs-1x pl-sm-0">
+                            <span class="price-note__metal text-uppercase">
+                                Silver
+                            </span>
+                            <span class="price-note__price">
+                                £910.00
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 20 20"
+                                 style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                <defs></defs>
+                                <polyline class="chevron-down__colour" points="18 6 10 14 2 6" />
+                            </svg>
+                            <small>0.13%</small>
+                        </p>
+                        <!-- / price - silver -->
+                    </div>
+                    <div class="col-xs-12 col-sm-4 pr-lg-0x pl-lg-0x pr-md-0x pl-md-0x">
+                        <!-- price - platinum -->
+                        <p class="price-note__wrapper text-white bg-slateblue mb-0 pt-1x pl-xs-1x pl-sm-0">
+                            <span class="price-note__metal text-uppercase">
+                                Platinum
+                            </span>
+                            <span class="price-note__price">
+                                £910.00
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 viewBox="0 0 20 20"
+                                 style="vertical-align:-4px;height:16px;margin-left:2px;margin-right:2px;">
+                                <defs></defs>
+                                <polyline class="chevron-up__colour" points="2 14 10 6 18 14" />
+                            </svg>
+                            <small>0.13%</small>
+                        </p>
+                        <!-- / price - platinum -->
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-xs-12 col-md-3 col-lg-4 pl-md-0x pl-sm-1x">
+                <!-- more buttons -->
+                <button type="button" class="btn btn-secondary pl-md-0x pr-md-0x"><small><i class="trmi trmi-question"></i></small></button>
+                <button type="button" class="btn btn-secondary pl-md-0x pr-md-0x ml-md-1x"><small>Price Alerts</small></button>
+                <button type="button" class="btn btn-secondary pl-md-0x pr-md-0x ml-md-1x"><small>View Charts</small></button>
+                <!-- / more buttons -->
+            </div>
+            @*<div class="metal-price-block-test">working example</div>*@
+        </div>
+    </div>
+       
+</div>

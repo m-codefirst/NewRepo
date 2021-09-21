@@ -1,0 +1,68 @@
+﻿@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+    var contact = isLoggedIn ? ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact : CustomerContact.CreateInstance();
+
+    var contactFirstName = contact.FirstName ?? string.Empty;
+    var contactLastName = contact.LastName ?? string.Empty;
+    var contactEmail = contact.Email ?? string.Empty;
+}
+<div class="nav-section" ng-controller="rmLogin" id="navSectionAccount">
+    <div ng-init="setupLogin('@(contactFirstName.Replace("'", "\\'"))', '@(contactLastName.Replace("'", "\\'"))', '@(contactEmail.Replace("'", "\\'"))', @isLoggedIn.ToString().ToLower())" class="section-body">
+        <div class="row" ng-hide="userLoggedIn == true" ng-cloak>
+
+            <div class="col-xs-12">
+                <div class="row" id="login-form-main">
+                    <div class="col-xs-12 col-md-5 col-lg-4 col-lg-offset-1">
+
+                        @Html.Partial("LoginRegister/_LoginForm", Model)
+
+                        @Html.Partial("LoginRegister/_TwoStepAuthenticationQuestionsAndAnswer", Model)
+
+                        @Html.Partial("LoginRegister/_ForgottenYourPasswordForm", Model)
+
+                        @Html.Partial("LoginRegister/_ForgottenYourUsernameOrPasswordForm", Model)
+
+                        @Html.Partial("LoginRegister/_ActivateYourAccount", Model)
+
+                    </div>
+
+                    <div class="col-xs-12 col-md-1 col-lg-1 hidden-xs hidden-sm">
+                        <div class="separator">
+                        </div>
+                    </div>
+
+                    @if (Model.IsInvestmentPage)
+                    {
+                        @Html.Partial("LoginRegister/_BullionRegistration", Model)
+                    }
+                    else
+                    {
+                        @Html.Partial("LoginRegister/_ConsumerRegistration", Model)
+                    }
+                </div>
+
+                @Html.Partial("LoginRegister/_RequestUsernameSuccess", Model)
+
+                @Html.Partial("LoginRegister/_PasswordResetConfirmation", Model)
+
+            </div>
+
+        </div>
+        <div class="row" ng-cloak ng-show="userLoggedIn == true">
+            @if (Model.UseManualAccountMenu)
+            {
+                @Html.PropertyFor(x => x.ManualAccountMenu)
+            }
+            else
+            {
+                @Html.Partial("LoginRegister/_MyAccountMenu", Model)
+            }
+            
+            @Html.Partial("LoginRegister/_UserWelcome", Model)
+        </div>
+    </div>
+</div>

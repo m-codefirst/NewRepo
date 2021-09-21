@@ -1,0 +1,12 @@
+﻿@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions
+@model TRM.Web.Models.Blocks.BannerBlock
+
+
+<div class="@Model.BackgroundColour.DescriptionAttr()">
+    @if (Model.Image != null && !ContentReference.IsNullOrEmpty(Model.Image.LgImage))
+    {
+        @Html.PropertyFor(a => a.Image)
+
+    }
+</div>

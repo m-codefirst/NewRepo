@@ -1,0 +1,19 @@
+﻿@using TRM.Web.Constants
+@model IList<TRM.Web.Models.ViewModels.TeaserViewModel>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="col-xs-12">
+        <div class="alert alert-info text-center">
+            @Html.TranslateFallback(StringResources.NoResultsFound, "No articels found.")
+        </div>
+    </div>
+}
+@* ReSharper disable once Mvc.PartialViewNotResolved *@
+@foreach (var article in Model)
+{
+   <article class="block standardPage  col-xs-6 col-sm-4">
+        @Html.Partial("StandardPagePartial", article)
+    </article>
+    
+}

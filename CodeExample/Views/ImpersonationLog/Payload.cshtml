@@ -1,0 +1,42 @@
+﻿@model TRM.IntegrationServices.Models.Impersonation.Payload
+@{
+    Layout = null;
+}
+
+@using EPiServer.Framework.Web.Resources
+
+@*
+    - Renders necessary Episerver system styles
+    ----------------------------------------------------- *@
+
+@Html.Raw(ClientResources.RenderResources("ShellCore"))
+@Html.Raw(ClientResources.RenderResources("ShellWidgets"))
+@Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+@Html.Raw(ClientResources.RenderResources("Navigation"))
+@Html.Raw(ClientResources.RenderResources("DojoDashboardCompatability", new[] { ClientResourceType.Style }))
+@Html.Raw(ClientResources.RenderResources("system"))
+
+<div class="epi-padding">
+    <div class="epi-contentArea">
+        <h1>Impersonation Log Tool</h1>
+        <p>
+            The payload.
+        </p>
+    </div>
+    <div class="epi-default epi-marginVertical">
+        <p>
+            @Html.ActionLink("Back", "Index")
+        </p>
+
+        @if (Model == null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <strong>Oh snap!</strong> Something went wrong.
+            </div>
+        }
+        else
+        {
+            <pre>@Model.Body</pre>
+        }
+    </div>
+</div>

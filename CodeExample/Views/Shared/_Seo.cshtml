@@ -1,0 +1,143 @@
+﻿@using System.Globalization
+@using System.Text
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.CMS.Models.Pages
+@using EPiServer.Core
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<IContent, Hephaestus.CMS.ViewModels.ILayoutModel>
+
+@{
+    var trmLayout = Model.Layout as TrmLayoutModel;
+    if (trmLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.InvalidCastException);
+    }
+
+    var twitterAccount = string.IsNullOrEmpty(trmLayout.TwitterAccount) ? StringConstants.Twitter.DefaultTwitterAccount : trmLayout.TwitterAccount;
+    var facebookAppId = trmLayout.FacebookAppId;
+
+    var requestUri = Context.Request.Url;
+    var baseUri = string.Format("{0}://{1}{2}", requestUri.Scheme, requestUri.Host, requestUri.IsDefaultPort ? string.Empty : string.Format(":{0}", requestUri.Port));
+    <base href="@baseUri" />
+
+
+    //------ canonical
+    string canonicalUrl = string.Empty;
+    if (trmLayout.CanonicalUrl != null && !string.IsNullOrEmpty(trmLayout.CanonicalUrl.Path))
+    {
+        canonicalUrl = trmLayout.CanonicalUrl.ToString();
+        <link rel="canonical" href="@canonicalUrl" />
+    }
+    //----- canonical END
+}
+
+@{
+    var iControlMySeo = Model.CurrentPage as IControlMySeo;
+    if (iControlMySeo == null)
+    {
+        if (Model.CurrentPage == null)
+        {
+            <title>Unknow Page</title>
+        }
+        else
+        {
+            <title>@Model.CurrentPage.Name</title>
+        }
+    }
+    else
+    {
+        <title>@Html.TranslateFallBack(iControlMySeo.MetaTitle, iControlMySeo.MetaTitle, Model.CurrentPage.Name)</title>
+
+        if (!string.IsNullOrWhiteSpace(iControlMySeo.MetaDescription))
+        {
+            <meta name="description" content="@Html.TranslateFallBack(iControlMySeo.MetaDescription, iControlMySeo.MetaDescription)" />
+        }
+        if (!string.IsNullOrWhiteSpace(iControlMySeo.MetaKeywords))
+        {
+            <meta name="keywords" content="@Html.TranslateFallBack(iControlMySeo.MetaKeywords, iControlMySeo.MetaKeywords)" />
+        }
+        StringBuilder metaRobots = null;
+        if (iControlMySeo.DisableIndexing)
+        {
+            metaRobots = new StringBuilder("noindex");
+        }
+        if (iControlMySeo.DoNotFollow)
+        {
+            if (metaRobots != null)
+            {
+                metaRobots.Append(",");
+            }
+            else
+            {
+                metaRobots = new StringBuilder();
+            }
+            metaRobots.Append("nofollow");
+        }
+        if (metaRobots != null)
+        {
+            <meta name="robots" content="@metaRobots.ToString()" />
+        }
+
+        @GeneralTwitterCard(iControlMySeo, Model.CurrentPage.Name, twitterAccount)
+
+        if (trmLayout.Teaser != null && !string.IsNullOrWhiteSpace(trmLayout.Teaser.TeaserImageUrl))
+        {
+            @TwitterCardImage(trmLayout.Teaser.TeaserImageUrl, trmLayout.Teaser.TeaserDescription)
+            if (string.IsNullOrWhiteSpace(canonicalUrl))
+            {
+                return;
+            }
+            @GeneralOpenGraph(iControlMySeo, Model.CurrentPage.Name, canonicalUrl, facebookAppId, "article")
+            @OpenGraphImage(trmLayout.Teaser.TeaserImageUrl)
+        }
+
+    }
+}
+
+@helper GeneralTwitterCard(IControlMySeo currentPage, string name, string twitterSite)
+{
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@twitterSite" />
+    <meta name="twitter:title" content="@Html.TranslateFallBack(currentPage.MetaTitle, currentPage.MetaTitle).SafeSubstring(70,string.Empty)" />
+    if (!string.IsNullOrWhiteSpace(currentPage.MetaDescription))
+    {
+        <meta name="twitter:description" content="@Html.TranslateFallBack(currentPage.MetaDescription, currentPage.MetaDescription).SafeSubstring(200, string.Empty)" />
+    }
+}
+
+@helper TwitterCardImage(string imageUrl, string imageAlt)
+{
+    if (!string.IsNullOrWhiteSpace(imageUrl))
+    {
+        <meta name="twitter:image" content="@imageUrl" />
+        if (!string.IsNullOrWhiteSpace(imageAlt))
+        {
+            <meta name="twitter:image:alt" content="@imageAlt" />
+        }
+    }
+}
+
+@helper GeneralOpenGraph(IControlMySeo currentPage, string name, string canonicalUrl, string appId, string type)
+{
+    <meta property="og:url" content="@canonicalUrl" />
+    <meta property="og:type" content="@type" />
+    <meta property="og:title" content="@Html.TranslateFallBack(currentPage.MetaTitle, currentPage.MetaTitle)" />
+    if (!string.IsNullOrWhiteSpace(currentPage.MetaDescription))
+    {
+        <meta property="og:description" content="@Html.TranslateFallBack(currentPage.MetaDescription, currentPage.MetaDescription)" />
+    }
+    if (!string.IsNullOrWhiteSpace(appId))
+    {
+        <meta property="og:app_id" content="@appId" />
+    }
+}
+
+@helper OpenGraphImage(string imageUrl)
+{
+    if (!string.IsNullOrWhiteSpace(imageUrl))
+    {
+        <meta property="og:image" content="@imageUrl" />
+    }
+}
+

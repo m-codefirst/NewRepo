@@ -1,0 +1,235 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Shared.Extensions
+@using TRM.Web.Models.Pages
+@using System.Web.Optimization
+
+@using Newtonsoft.Json
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionCustomerBankAccountPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.CustomerBankAccount.AddOrEditBankAccountViewModel>
+@{
+    var trmLayoutModel = Model.Layout as TrmLayoutModel;
+    if (trmLayoutModel == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+  
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+
+    var mainContentClass = Model.CurrentPage.ShowMyLeftMenu || Model.CurrentPage.ShowAutomaticLeftNavigation ? "col-12 col-md-9 py-2" : String.Empty;
+
+    var ViewModel = new
+    {
+        isEditBankAccount = Model.ViewModel.IsEditing,
+        countryList = Model.ViewModel.CountryList,
+        countryCodeInitial = Model.ViewModel.CountryCode,
+        submitText = @Html.PropertyFor(x => x.CurrentPage.ActionAddText).ToString(),
+        isEnqueMessage = !string.IsNullOrEmpty(GetFeedbackClass("EnqueMessage")),
+        enqueMessage =   @Html.ValidationMessage("viewModel.EnqueMessage").ToString(),
+        isEditAccountContentArea = Model.CurrentPage.EditAccountsContentArea != null || PageEditing.PageIsInEditMode, 
+        editAccountContentArea = @Html.PropertyFor(x => x.CurrentPage.EditAccountsContentArea).ToString(),
+        requiredErrorMessage = @Html.TranslateFallback(StringResources.RequiredField, StringConstants.TranslationFallback.RequiredField),
+        customerBankAccountId = Model.ViewModel.CustomerBankAccountId,
+        actionUrl = Model.ViewModel.IsEditing ? Url.Action("Edit", new { bankAccountId = Model.ViewModel.CustomerBankAccountId }) : Url.Action("AddBankAccount"),
+        fields = new {
+            accountHolderName = new
+            {
+                value = Model.ViewModel.AccountHolderName,
+                feedbackClass = @GetFeedbackClass("AccountHolderName"),
+                label = Html.PropertyFor(x => x.CurrentPage.AccountHolderNameLabel).ToString(),
+                error = @ErrorMessage("AccountHolderName").ToString(),
+            },
+            countryCode = new
+            {
+                value = Model.ViewModel.CountryCode,
+                feedbackClass = @GetFeedbackClass("CountryCode"),
+                label = @Html.PropertyFor(x => x.CurrentPage.CountryLabel).ToString(),
+                error = ErrorMessage("CountryCode").ToString(),
+            },
+            sortCode = new
+            {
+                value = Model.ViewModel.SortCode,
+                label = @Html.PropertyFor(x => x.CurrentPage.SortCodeLabel).ToString(),
+                feedbackClass = GetFeedbackClass("SortCode"),
+                error = ErrorMessage("SortCode").ToString()
+            },
+            iban = new
+            {
+                value = Model.ViewModel.Iban,
+                label = @Html.PropertyFor(x => x.CurrentPage.IbanLable).ToString(),
+                feedbackClass = GetFeedbackClass("Iban"),
+                error = ErrorMessage("Iban").ToString(),
+            },
+            swiftOrBic = new
+            {
+                value = Model.ViewModel.SwiftOrBic,
+                label = @Html.PropertyFor(x => x.CurrentPage.SwiftCodeLable).ToString(),
+                feedbackClass = GetFeedbackClass("SwiftOrBic"),
+                error = ErrorMessage("SwiftOrBic").ToString(),
+            },
+            accountNumber = new
+            {
+                label = @Html.PropertyFor(x => x.CurrentPage.AccountNumberLablel).ToString(),
+                feedbackClass = GetFeedbackClass("AccountNumber"),
+                error = ErrorMessage("AccountNumber").ToString(),
+                value = !string.IsNullOrEmpty(Model.ViewModel.AccountNumber) ? Model.ViewModel.AccountNumber.Replace("'", " ") : "",
+            },
+           nickname = new
+            {
+                value = Model.ViewModel.Nickname,
+                label = @Html.PropertyFor(x => x.CurrentPage.AccountNicknameLable).ToString(),
+                feedbackClass = GetFeedbackClass("Nickname"),
+                error = ErrorMessage("Nickname").ToString(),            
+            }
+        }         
+    };
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "accountCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "helpPageCss")
+}
+
+
+@functions
+{
+    public string GetFeedbackClass(string fieldName, string classes = null)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return string.IsNullOrEmpty(classes) ? "has-feedback ValidationFail" : classes;
+        }
+        return string.Empty;
+    }
+}
+
+@helper ErrorMessage(string fieldName)
+{
+    var fieldKey = string.Format("viewModel.{0}", fieldName);
+    if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+    {
+        <span class="invalid-feedback d-block">
+            @Html.ValidationMessage(fieldKey);
+        </span>
+    }
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    <!-- Breadcrumbs -->
+    @if (!trmLayoutModel.HideSiteBreadcrumb)
+    {
+
+        if (!trmLayoutModel.HideSiteBreadcrumb)
+        {
+            trmLayoutModel.Breadcrumb.IsWide = true;
+        }
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", trmLayoutModel.Breadcrumb);
+    }
+</div>
+
+<div class="row">
+    <!-- Left Menu -->
+    @if (Model.CurrentPage.ShowMyLeftMenu)
+    {
+        Html.RenderPartial("RoyalMint2020/_ManualLeftMenu", trmLayoutModel);
+    }
+
+    @if (Model.CurrentPage.ShowAutomaticLeftNavigation)
+    {
+        Html.RenderPartial("RoyalMint2020/_AutomaticLeftMenu", trmLayoutModel);
+    }
+
+    <!-- Main Content -->
+    <div class="col-12 @mainContentClass">
+
+        @if (trmLayoutModel.HasMessage)
+        {
+            Html.RenderPartial("_MessageBox", trmLayoutModel.Message);
+        }
+
+        <!-- Main Body -->
+        @if (Model.CurrentPage.MainBody != null || Model.CurrentPage.DisplayPageHeading)
+        {
+            if (Model.CurrentPage.DisplayPageHeading)
+            {
+                <div class="welcome row justify-content-center">
+                    <div class="col-12 col-lg-9">
+                        <div class="message">@Html.Partial("_PageHeader", trmLayoutModel)</div>
+                    </div>
+                </div>
+            }
+            <div class="form-container">
+                <div class="row">
+                    <div class="col">
+                        <div class="row justify-content-center">
+                            <div class="col-10 col-sm-8 col-md-7 col-lg-6">
+                                
+                                <div class="form-spacing">
+                                    <div @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                                        @Html.DisplayFor(m => m.CurrentPage.MainBody)
+
+
+                                        @if ((Model.CurrentPage.MainBody != null && !Model.CurrentPage.MainBody.IsEmpty) || PageEditing.PageIsInEditMode)
+                                        {
+                                            <div class="clearfix" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                                                @{ var content = Html.ParseXhtmlString(Model.CurrentPage.MainBody); }
+                                                @Html.DisplayFor(m => content)
+                                            </div>
+                                        }
+                                        <h2 class="mt-0">@Html.PropertyFor(x => x.CurrentPage.FormHeaderText)</h2>
+                                        <p>@Html.Raw(Model.CurrentPage.FormIntroText)</p>
+
+                                        <div class="form-spacing">
+                                            <div data-module="bankAccount" data-settings="@JsonConvert.SerializeObject(ViewModel)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        }
+
+        <!-- Middle Content -->
+        <div class="mod-section mod-section-copy">
+            <div class="row justify-content-center">
+                <div>
+                    <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bottom Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div>
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "bullionAddBankAccount").AtFooter();
+}
+
+@section JustBeforeBodyTag
+{
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "helpPage")
+}

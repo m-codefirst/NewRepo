@@ -1,0 +1,32 @@
+﻿@using EPiServer.Web
+@model TRM.Web.Models.ViewModels.BullionDocumentViewModel
+
+<div class="panel panel-default panel-secondary">
+    <div class="panel-body item-row">
+        @if (Model.Documents != null && Model.Documents.Any())
+        {
+            <div class="row mb-2x">
+                <div class="col-xs-12 flex-two-column-items">
+                    <label for="" class="mr-1x">@Html.PropertyFor(x => x.CurrentBlock.FilterText): </label>
+                    <div class="select-form" id="">
+                        @Html.DropDownListFor(x => x.Year, new SelectList(Model.Years), new { @class = "form-control", id = "yearFilter" })
+                    </div>
+                </div>
+            </div>
+            <div class="statementContents">
+                @Html.Partial("_BullionStatementsAndInvoices", Model.Documents)
+            </div>
+        }
+        else
+        {
+            <div class="row mb-2x">
+                @Html.PropertyFor(x => x.CurrentBlock.NoStatementsMessage)
+            </div>
+        }
+        @Html.PropertyFor(x => x.CurrentBlock.NewBottomContentArea)
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "bullionStatement").AtFooter();
+}

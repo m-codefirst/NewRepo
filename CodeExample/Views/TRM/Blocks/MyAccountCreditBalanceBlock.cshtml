@@ -1,0 +1,41 @@
+﻿@using EPiServer.Web.Mvc.Html
+
+@model TRM.Web.Models.ViewModels.MyAccountCreditBalanceViewModel
+
+<div class="panel panel-default panel-secondary">
+				
+    <div class="panel-body">
+        <div class="row">
+            @if (!Request.IsAuthenticated)
+            {
+                <div class="col-xs-12">
+                    @Html.PropertyFor(m => m.ThisBlock.NotLoggedinMessage)
+                </div>
+            }else if(Model.HasCreditAccount)
+            {
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-item mb-xs-1x mb-0">
+                        <div class="panel-body">
+                            <h4>@Html.PropertyFor(m => m.ThisBlock.AvailableBalanceLabel)</h4>
+                            <span class="h5 font-light">£@Model.AvailableBalance</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel panel-item mb-0">
+                        <div class="panel-body">
+                            <h4>@Html.PropertyFor(m => m.ThisBlock.AmountOwingLabel)</h4>
+                            <span class="h5 font-light">£@Model.AmountOwing</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-12">
+                    @Html.PropertyFor(m => m.ThisBlock.NoCreditAccountMessage)
+                </div>
+            }
+        </div>
+    </div>
+</div>

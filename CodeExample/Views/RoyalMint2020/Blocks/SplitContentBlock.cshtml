@@ -1,0 +1,12 @@
+﻿@model TRM.Web.Models.Blocks.SplitContentBlock
+
+<div class="blockContent">
+    <div class="row @Model.VerticalAlignmentClass">
+        <div class="col-xs-4 col-sm-4 img-col">
+            @Html.PropertyFor(a => a.Image)
+        </div>
+        <div class="col-xs-7 col-sm-8 content-col xhtml">
+            @Html.PropertyFor(a => a.Content)
+        </div>
+    </div>
+</div>

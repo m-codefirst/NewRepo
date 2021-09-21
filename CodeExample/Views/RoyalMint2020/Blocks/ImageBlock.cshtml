@@ -1,0 +1,13 @@
+﻿@using EPiServer.Core
+@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.Models.Blocks.ImageBlock
+@if (Model == null || ContentReference.IsNullOrEmpty(Model.Image)) { return; }
+@if (string.IsNullOrWhiteSpace(Model.CssClass))
+{
+    <img class="img-responsive" src="@Url.ContentUrlExtension(Model.Image)" alt="@Model.Description">
+}
+else
+{
+    <img class="img-responsive @Model.CssClass" src="@Url.ContentUrlExtension(Model.Image)" alt="@Model.Description">
+}

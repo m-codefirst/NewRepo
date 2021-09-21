@@ -1,0 +1,10 @@
+﻿@using EPiServer.Core
+@using EPiServer.Web.Mvc.Html
+@model IList<TRM.Web.Models.ViewModels.EntryPartialViewModel>
+
+@foreach (var product in Model)
+{
+    <article class="trmVariant listView mb-1x ng-scope clear">
+       @{Html.RenderPartial("_VariantListingNonSellablePartial",product);}
+    </article>
+}

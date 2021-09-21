@@ -1,0 +1,326 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	<div class="container mb-4x mt-2x">
+		<div class="page-header">
+			<h1 class="h1">Step 4: Order confirmation</h1>
+		</div>
+
+		<div class="row">
+			<div class="col-xs-12">
+				<ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+					<li><a href="">1.<span>Delivery</span></a></li>
+					<li><a href="">2. <span>Payment</span></a> </li>
+					<li><a href="">3. <span>Delivery and Payment</span></a></li>
+					<li class="active"><a href="">4. <span>Confirmation</span></a></li>
+				</ol>
+			</div>
+			<div class="col-xs-12">
+				<div class="alert alert-success">
+					<i class="trmi trmi-check text-success mr-1x"></i><span>Thank you, your Retail and Investment orders were processed successfully. Your order can be reviewed below.<br/> We aim to dispatch all in stock items within 3 working days or same day if you have chosen special delivery (UL only).</span>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-7 mb-2x">
+				<h3 class="h3 mt-0 mb-1x">Order Date: 10th December 2018</h3>
+				<h4 class="h4 mb-0 header-font-color">Retail Order - £184.99</h4>
+				<h5 class="h5 mt-0 header-font-color">#09090909090</h5>
+				<p>Please Note: For your convenience your order has been split into separate shipments. Your order will show in order tracking with the following order reference numbers</p>
+				<div class="row">
+					<div class="col-xs-6 col-sm-4">
+						<h6 class="h6">Delivery to</h6>
+						<p class="mb-0">Street Address</p>
+						<p class="mb-0">Town</p>
+						<p class="mb-0">Country</p>
+						<p class="mb-0">Postcode</p>
+						<p class="mb-0">Country</p>
+					</div>
+					<div class="col-xs-6 col-sm-4">
+						<h6 class="h6">Billing Address</h6>
+						<p class="mb-0">Street Address</p>
+						<p class="mb-0">Town</p>
+						<p class="mb-0">Country</p>
+						<p class="mb-0">Postcode</p>
+						<p class="mb-0">Country</p>
+					</div>
+					<div class="col-xs-6 col-sm-4">
+						<h6 class="h6">Payment</h6>
+						<p class="mb-0">Visa</p>
+						<p class="mb-0">Last 4 digits: 6213</p>
+					</div>
+				</div>
+				<h4 class="h4 mb-0 header-font-color">Investment Order - £272.70</h4>
+				<h5 class="h5 mt-0 header-font-color">#09090909090</h5>
+				<div class="row">
+					<div class="col-xs-6 col-sm-4">
+						<h6 class="h6">Delivery to</h6>
+						<p class="mb-0">Street Address</p>
+						<p class="mb-0">Town</p>
+						<p class="mb-0">Country</p>
+						<p class="mb-0">Postcode</p>
+						<p class="mb-0">Country</p>
+					</div>
+					<div class="col-xs-6 col-sm-4">
+						<h6 class="h6">Payment</h6>
+						<p class="mb-0">Investment Wallet</p>
+					</div>
+				</div>
+				<div class="mt-2x mb-2x">
+					<p>Vault and Storage Fees will be managed outside of this order.</p>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis consequat</p>
+				</div>
+				<div class="confirm-detail bg-gray p-1x mb-1x">
+					<div class="row">
+						<div class="col-xs-8">
+							<h5 class="h5 mt-0 mb-0">
+							Combined Order Total:
+							</h5>
+						</div>
+						<div class="col-xs-4 text-right">
+							<h5 class="h5 mt-0 mb-0">
+								£457.69
+							</h5>
+						</div>
+					</div>
+				</div>
+				<a href="" class="btn btn-secondary mt-1x mb-1x mr-1x">Open my Account Dashboard</a>
+				<a href="" class="btn btn-default mt-1x mb-1x">Visit our homepage</a>
+			</div>
+			<div class="col-xs-12 col-sm-5 mb-2x">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="order-summary">
+							<div class="summary-header">
+								<div class="title">
+									<h5 class="h5 mt-0 mb-0">Retail order summary</h5>
+								</div>
+							</div>
+							<div class="summary-details collapse in" id="orderSummaryDetails">
+								<div class="row table-row">
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">Great Fire of London 2016 £2 Brilliant Uncirculated Coin</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+										<span class="visible-xs-inline visible-sm-inline strong mr-1x">Qty:</span>x3
+									</div>
+									<div class="col-xs-6 col-md-4 text-right">
+										<p class="mb-0">£40.00</p>
+										<p class="small mb-0">(inc VAT)</p>
+									</div>
+
+									<div class="col-sm-12 pt-1x">
+										<p class="small mb-0 text-success">In Stock</p>
+										<p class="small">Delivery in 3 to 5 working days</p>
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-row">
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">The Shakespeare 2016 £50 Fine Silver Coin</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+										<span class="visible-xs-inline visible-sm-inline strong mr-1x">Qty: </span>x3
+									</div>
+									<div class="col-xs-6 col-md-4 text-right">
+										<p class="mb-0">£4,799.99</p>
+										<p class="small mb-0">(inc VAT)</p>
+									</div>
+									<div class="col-sm-12 pt-1x">
+										<span class="bg-white p-1xs mt-1x ng-binding">
+											This item has been personalised
+										</span>
+									</div>
+
+									<div class="col-sm-12 pt-1x">
+										<p class="small mb-0 text-success">In Stock</p>
+										<p class="small mb-0 strong">Shipped by supplier</p>
+										<p class="small">Delivery in 3 to 5 working days</p>
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-footer">
+									<div class="col-xs-8 text-right">
+										<strong>Retail Basket Total</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<p class="mb-0">£30.00</p>
+									</div>
+									<div class="col-xs-8 text-right">
+										<strong>Retail Delivery</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£20.00
+									</div>
+									<div class="col-xs-8 text-right">
+										<strong>Retail Total</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<p class="mb-0 strong">
+											£50.00
+										</p>
+										<p class="small mb-0">(inc VAT)</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="investment-order-summary">
+							<div class="summary-header">
+								<div class="title">
+									<h5 class="h5 mt-0 mb-0">Investment order summary</h5>
+								</div>
+							</div>
+							<div class="summary-details collapse in" id="investmentSummaryDetails" aria-expanded="true" style="">
+								<div class="row table-row">
+									<div class="col-xs-12">
+										<p class="header-font-color strong">Items being Delivered</p>
+									</div>
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">2018 UK 50p BU Coin</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+										<span class="visible-xs-inline visible-sm-inline strong mr-1x">Qty: </span>x3
+									</div>
+									<div class="col-xs-6 col-md-4 pl-0 text-right">
+										<p class="mb-0">£30.00</p>
+										<p class="small mb-0">(ex VAT)</p>
+									</div>
+									<div class="col-xs-6 col-sm-8">
+										<p class="small mb-0 text-success">In Stock</p>
+										<p class="small mb-0">Delivery in 3 to 5 working days</p>
+									</div>
+									<div class="col-xs-6 col-sm-4 mt-1x text-right">
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-row">
+									<div class="col-xs-12">
+										<p class="header-font-color strong">Items to be stored in The Royal Mint Vault</p>
+									</div>
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">2017 UK 50p BU Coin</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+										<span class="visible-xs-inline visible-sm-inline strong mr-1x">Qty: </span>x3
+									</div>
+									<div class="col-xs-6 col-md-4 pl-0 text-right">
+										<p class="mb-0">£30.00</p>
+										<p class="small mb-0">(ex VAT)</p>
+									</div>
+									<div class="col-xs-6 col-sm-8">
+										<p class="small mb-0 text-success">In Stock</p>
+									</div>
+									<div class="col-xs-6 col-sm-4 mt-1x text-right">
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-row">
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">Signature Gold</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+									</div>
+									<div class="col-xs-6 col-md-4 pl-0 text-right">
+										<p class="mb-0">£30.00</p>
+										<p class="small mb-0">(ex VAT)</p>
+									</div>
+									<div class="col-sm-12">
+										<p class="small mb-0">Weight: 0.15oz</p>
+										<p class="small mb-0 text-success">In Stock</p>
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-row">
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">Signature Silver</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+									</div>
+									<div class="col-xs-6 col-md-4 pl-0 text-right">
+										<p class="mb-0">£30.00</p>
+										<p class="small mb-0">(ex VAT)</p>
+									</div>
+									<div class="col-sm-12">
+										<p class="small mb-0">Weight: 0.15oz</p>
+										<p class="small mb-0 text-success">In Stock</p>
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-row">
+									<div class="col-xs-12 col-md-7">
+										<p class="mt-0 strong mb-0">Signature Platinum</p>
+									</div>
+									<div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+
+									</div>
+									<div class="col-xs-6 col-md-4 pl-0 text-right">
+										<p class="mb-0">£30.00</p>
+										<p class="small mb-0">(ex VAT)</p>
+									</div>
+									<div class="col-sm-12">
+										<p class="small mb-0">Weight: 0.15oz</p>
+										<p class="small mb-0 text-success">In Stock</p>
+									</div>
+									<div class="col-xs-12">
+										<hr class="mb-0">
+									</div>
+								</div>
+								<div class="row table-footer">
+									<div class="col-xs-8 text-right">
+										<strong>Investment Basket Total</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£270.00
+									</div>
+									<div class="col-xs-8 text-right">
+										<strong>Investment VAT</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										£2.70
+									</div>
+									<div class="col-xs-8 text-right">
+										<strong>Delivery</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										Free
+									</div>
+									<div class="col-xs-8 text-right">
+										<strong>Investments Total</strong>
+									</div>
+									<div class="col-xs-4 text-right">
+										<span class="strong">
+											£272.70
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

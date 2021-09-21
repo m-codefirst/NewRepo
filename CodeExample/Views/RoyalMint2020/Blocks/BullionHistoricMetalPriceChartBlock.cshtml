@@ -1,0 +1,82 @@
+﻿@using System.Web.Optimization
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using EPiServer
+@using EPiServer.Web
+@using System;
+@using System.Collections;
+@using System.Collections.Specialized;
+@using Newtonsoft.Json
+
+@model TRM.Web.Models.Blocks.Bullion.BullionHistoricMetalPriceChartBlock
+
+@{
+    var uniqueGuid = Guid.NewGuid().ToString();
+    var periods = Enum.GetValues(typeof(HistoricPeriod)).Cast<HistoricPeriod>();
+
+    var chartId = string.Format("metalPriceChart-{0}", uniqueGuid);
+    var chartLoaderId = string.Format("metalPriceChartLoader-{0}", uniqueGuid);
+
+    var hAxisGridLines = Model.MetalPriceChartHAxisGridLines > 0 ? Model.MetalPriceChartHAxisGridLines : 6;
+    var vAxisGridLines = Model.MetalPriceChartVAxisGridLines > 0 ? Model.MetalPriceChartVAxisGridLines : 6;
+    var commodity = !string.IsNullOrWhiteSpace(Model.InitialMetal) ? Model.InitialMetal : "xau";
+    var currency = !string.IsNullOrWhiteSpace(Model.InitialCurrency) ? Model.InitialCurrency.ToLower() : "eur";
+    var refreshFrequently = Model.MetalPriceLiveRefreshFrequently > 0 ? Model.MetalPriceLiveRefreshFrequently * 1000 : 30000;
+
+
+    var periodsData = new HybridDictionary();
+
+    foreach (var period in periods)
+    {
+        var transKey = string.Format(StringResources.Period, period.ToString().ToLower());
+        periodsData.Add(period, Html.TranslateFallBack(transKey, period.ToString()));
+    }
+
+    var viewModel = new
+    {
+        periods = periodsData,
+        uniqueGuid = uniqueGuid,
+        chartId = chartId,
+        chartLoaderId = chartLoaderId,
+        hAxisGridLines = hAxisGridLines,
+        vAxisGridLines = vAxisGridLines,
+        initialCommodity = commodity,
+        initialCurrency = currency,
+        initialPeriod = Model.InitialPeriod.ToString(),
+        refreshFrequently = refreshFrequently,
+        textTableSummaryHigh = Model.TextTableSummaryHigh,
+        textTableSummaryLow = Model.TextTableSummaryLow,
+        textTableSummaryChange = Model.TextTableSummaryChange,
+        textTableSummaryCurrent = Model.TextTableSummaryCurrent,
+        pounds = "Pounds",
+        euros = "Euros",
+        dollars = "Dollars",
+        gold = "Gold",
+        silver = "Silver",
+        platinum = "Platinum",
+        periodText = "Period",
+        currencyText = "Currency",
+        comodityText = "Comodity",
+        textPricesUpdatedAt = Model.TextPricesUpdatedAt,
+        textPricesUpdatedAtExplanation = Model.TextPricesUpdatedAtExplanation
+    };
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.Heading))
+{
+    <h3>@Model.Heading</h3>
+}
+
+<div data-module="price-charts" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+
+
+@if (Html.IsDebug())
+{
+    @Scripts.Render("~/Static/royalmint2020/priceCharts.bundle.js")
+}
+else
+{
+    @Scripts.Render("~/bundles/" + SiteDefinition.Current.Name + "priceCharts")
+}

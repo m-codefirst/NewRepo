@@ -1,0 +1,83 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using EPiServer.Core
+@using TRM.Shared.Extensions
+
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+<div class="col-12 col-md-3 py-2">
+    <div class="mod-filters mod-filters--sidemenu">
+        <div class="filters-trigger d-md-none" data-toggle="modal" data-target="#filters-modal" data-content="#filters">Menu <span class="icon"><svg><use xlink:href="#chevron-down" /></svg></span></div>
+
+        <div class="filters-container section-navigation d-none d-md-block">
+            @* TODO: Fill aria-label *@
+            <nav id="filters" aria-label="">
+                @if (Model.IsCustomerServiceAccount && ((bool)ViewData["DisplayCustomerServiceButton"] && ViewData["DisplayCustomerServiceButton"] != null))
+                {
+                    var contentLoader = ServiceLocator.Current.GetInstance<EPiServer.IContentLoader>();
+                    var csPage = contentLoader.Get<TRM.Web.Models.Pages.StartPage>(ContentReference.StartPage).CustomerServicePage;
+                    <div class="navigation-group">
+                        <ul>
+                            <li>
+                                <a href="@csPage.GetExternalUrl_V2()">
+                                    @Html.TranslateFallback(StringResources.CustomerService, "Customer Service")
+                                    <span class="icon sr-none" aria-hidden="true"><svg><use xlink:href="#chevron-right" /></svg></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                @foreach (var tierOneItem in Model.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                {
+                    <div class="navigation-group @tierOneItem.HideOnClasses">
+                        @if (tierOneItem.ChildNavigationItems.Any())
+                        {
+                            <p><a href="@tierOneItem.MenuItemExternalUrl" class="@tierOneItem.CssClass">@tierOneItem.MenuItemDisplayName</a></p>
+                            <ul>
+                                @foreach (var tierTwoItem in tierOneItem.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                                {
+                                    var isContainer = tierTwoItem.IsContainer;
+                                    var hasCmsChilderen = tierTwoItem.CurrentBlock != null && tierTwoItem.CurrentBlock.LeftMenuContent != null && tierTwoItem.CurrentBlock.LeftMenuContent.Count > 0;
+
+                                    if (!isContainer && !hasCmsChilderen && !tierTwoItem.ChildNavigationItems.Any())
+                                    {
+                                        <li class="@tierTwoItem.HideOnClasses">
+                                            <a href="@tierTwoItem.MenuItemExternalUrl" class="@tierTwoItem.CssClass" @(tierTwoItem.OpenInANewWindow ? "target=_blank" : string.Empty) title="@tierTwoItem.MenuItemDisplayName">
+                                                @tierTwoItem.MenuItemDisplayName
+                                                <span class="icon sr-none" aria-hidden="true"><svg><use xlink:href="#chevron-right" /></svg></span>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul>
+                                <li>
+                                    <a href="@tierOneItem.MenuItemExternalUrl" class="@tierOneItem.CssClass" @(tierOneItem.OpenInANewWindow ? "target=_blank" : string.Empty) title="@tierOneItem.MenuItemDisplayName">
+                                        @tierOneItem.MenuItemDisplayName
+                                        <span class="icon sr-none" aria-hidden="true"><svg><use xlink:href="#chevron-right" /></svg></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        }
+                    </div>
+                }
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-dark fade" id="filters-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="icon"><svg><use xlink:href="#close"></use></svg></span>
+                </button>
+            </div><!-- /.modal-header -->
+            <div class="modal-body section-navigation"></div><!-- /.modal-body -->
+        </div>
+    </div>
+</div>

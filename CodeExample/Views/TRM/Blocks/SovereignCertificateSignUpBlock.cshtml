@@ -1,0 +1,121 @@
+﻿@using EPiServer.Core
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.Blocks.SovereignCertificateSignUpBlock
+@{
+    var contentId = (Model as IContent).ContentLink.ID;
+}  
+<div class="block-background"></div>
+<div class="block-container">
+    <div class="blockContent">
+        <div class="row">
+            <div class="block headerBlock col-xs-12 col-xs-12 mt-1x">
+                <div class="blockContent">
+                    <h2 class="">@Html.DisplayFor(m=>m.Heading)</h2>
+                </div>
+            </div>
+            	<div class="formBlock block mb-1x col-xs-12 ng-pristine ng-untouched ng-valid ng-empty">
+                <div class="blockContent" ng-cloak>
+                    <form name="soverignCertificateSignUp" id="soverignCertificateSignUp" ng-submit="submit()" ng-controller="rmSovereignCertificateSignUp as CertificateSignUp" ng-init="init()" class="ng-pristine ng-valid">
+                        
+                        <div class="form-group has-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.FirstName.$touched && !soverignCertificateSignUp.FirstName.$valid), 'ValidationSuccess': (soverignCertificateSignUp.FirstName.$touched && soverignCertificateSignUp.FirstName.$valid)}">
+                            <label>@Html.DisplayFor(m => m.FirstNameHeading)<span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                            <input class="form-control" name="FirstName" id="FirstName" placeholder="@Html.DisplayFor(m => m.FirstNamePlaceholderText)" ng-model="certificateSignUpFormData.FirstName" data-original-title="" title="" required>
+                            <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.FirstName.$touched && !soverignCertificateSignUp.FirstName.$valid), 'ValidationSuccess': (soverignCertificateSignUp.FirstName.$touched && soverignCertificateSignUp.FirstName.$valid)}" aria-hidden="true"></span>
+                            @if (!string.IsNullOrWhiteSpace(Model.FirstNameValidationMessage))
+                            {
+                                <div class="form-group has-error mb-0 ">
+                                    <span class="help-block" ng-show="soverignCertificateSignUp.FirstName.$touched && !soverignCertificateSignUp.FirstName.$valid"><i class="trmi trmi-times"></i>@Html.DisplayFor(m=>m.FirstNameValidationMessage)</span>
+                                </div>
+                            }
+                        </div>
+                       
+                        <div class="form-group has-feedback" ng-class="{'ValidationFail':(soverignCertificateSignUp.Surname.$touched && !soverignCertificateSignUp.Surname.$valid), 'ValidationSuccess': (soverignCertificateSignUp.Surname.$touched && soverignCertificateSignUp.Surname.$valid )}">
+                            <label>@Html.DisplayFor(m => m.SurnameHeading)<span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                            <input placeholder="@Html.DisplayFor(m => m.SurnamePlaceholderText)" class="form-control" id="Surname" name="Surname" ng-model="certificateSignUpFormData.Surname" data-original-title="" title="" required>
+                            <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.Surname.$touched && !soverignCertificateSignUp.Surname.$valid), 'ValidationSuccess': (soverignCertificateSignUp.Surname.$touched && soverignCertificateSignUp.Surname.$valid)}" aria-hidden="true"></span>
+                            @if (!string.IsNullOrWhiteSpace(Model.SurnameValidationMessage))
+                            {
+                                <div class="form-group has-error mb-0 ">
+                                    <span class="help-block" ng-show="soverignCertificateSignUp.Surname.$touched && !soverignCertificateSignUp.Surname.$valid"><i class="trmi trmi-times"></i>@Html.DisplayFor(m => m.SurnameValidationMessage)</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="form-group has-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.EmailAddress.$touched && !soverignCertificateSignUp.EmailAddress.$valid), 'ValidationSuccess': (soverignCertificateSignUp.EmailAddress.$touched && soverignCertificateSignUp.EmailAddress.$valid && certificateSignUpFormData.EmailAddress),'':(soverignCertificateSignUp.Telephone.$valid && soverignCertificateSignUp.Telephone.$touched && !certificateSignUpFormData.EmailAddress.length)}">
+                            <label>@Html.DisplayFor(m => m.EmailHeading)<span ng-class="{'text-danger':(!certificateSignUpFormData.Telephone),'':(certificateSignUpFormData.Telephone)}" ng-if="!certificateSignUpFormData.Telephone">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                            <input type="email" placeholder="@Html.DisplayFor(m => m.EmailPlaceholderText)" class="form-control" id="EmailAddress" name="EmailAddress" ng-model="certificateSignUpFormData.EmailAddress" ng-pattern="emailFormat" data-original-title="" title=""  ng-required="!certificateSignUpFormData.Telephone">
+                            <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.EmailAddress.$touched && !soverignCertificateSignUp.EmailAddress.$valid), 'ValidationSuccess': (soverignCertificateSignUp.EmailAddress.$touched && soverignCertificateSignUp.EmailAddress.$valid && certificateSignUpFormData.EmailAddress),'':(soverignCertificateSignUp.Telephone.$valid && soverignCertificateSignUp.Telephone.$touched && !certificateSignUpFormData.EmailAddress.length)}" aria-hidden="true"></span>
+                            @if (!string.IsNullOrWhiteSpace(Model.EmailValidationMessage))
+                            {
+                                <div class="form-group has-error mb-0 ">
+                                    <span class="help-block" ng-show="soverignCertificateSignUp.EmailAddress.$touched && !soverignCertificateSignUp.EmailAddress.$valid"><i class="trmi trmi-times"></i>@Html.DisplayFor(m => m.EmailValidationMessage)</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-group has-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.Telephone.$touched && !soverignCertificateSignUp.Telephone.$valid), 'ValidationSuccess': (soverignCertificateSignUp.Telephone.$touched && soverignCertificateSignUp.Telephone.$valid && certificateSignUpFormData.Telephone),'':(soverignCertificateSignUp.Telephone.$valid && soverignCertificateSignUp.Telephone.$touched && !certificateSignUpFormData.EmailAddress.length)}">
+                            <label>@Html.DisplayFor(m => m.TelephoneHeading)<span ng-class="{'text-danger':(!certificateSignUpFormData.EmailAddress),'':(certificateSignUpFormData.EmailAddress)}" ng-if="!certificateSignUpFormData.EmailAddress">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                            <input type="text" placeholder="@Html.DisplayFor(m => m.TelephonePlaceholderText)" class="form-control" id="Telephone" name="Telephone" ng-model="certificateSignUpFormData.Telephone" data-original-title="" title="" ng-required="!certificateSignUpFormData.EmailAddress">
+                            <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.Telephone.$touched && !soverignCertificateSignUp.Telephone.$valid), 'ValidationSuccess': (soverignCertificateSignUp.Telephone.$touched && soverignCertificateSignUp.Telephone.$valid && certificateSignUpFormData.Telephone),'':(soverignCertificateSignUp.Telephone.$valid && soverignCertificateSignUp.Telephone.$touched && !certificateSignUpFormData.EmailAddress.length)}" aria-hidden="true"></span>
+                            @if (!string.IsNullOrWhiteSpace(Model.TelephoneValidationMessage))
+                            {
+                                <div class="form-group has-error mb-0 ">
+                                    <span class="help-block" ng-show="soverignCertificateSignUp.Telephone.$touched && !soverignCertificateSignUp.Telephone.$valid"><i class="trmi trmi-times"></i>@Html.DisplayFor(m => m.EmailValidationMessage)</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-group has-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.CertificateCode.$touched && !soverignCertificateSignUp.CertificateCode.$valid), 'ValidationSuccess': (soverignCertificateSignUp.CertificateCode.$touched && soverignCertificateSignUp.CertificateCode.$valid)}">
+                            <label>@Html.DisplayFor(m => m.CertificateCodeHeading)<span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                            <input placeholder="@Html.DisplayFor(m => m.CertificateCodePlaceholderText)" id="CertificateCode" name="CertificateCode" class="form-control" ng-model="certificateSignUpFormData.CertificateCode" maxlength="8" data-original-title="" title="" required>
+                            <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (soverignCertificateSignUp.CertificateCode.$touched && !soverignCertificateSignUp.CertificateCode.$valid), 'ValidationSuccess': (soverignCertificateSignUp.CertificateCode.$touched && soverignCertificateSignUp.CertificateCode.$valid)}" aria-hidden="true"></span>
+                            @if (!string.IsNullOrWhiteSpace(Model.CertificateCodeErrorMessage))
+                            {
+                                <div class="form-group has-error mb-0 ">
+                                    <span class="help-block" ng-show="soverignCertificateSignUp.CertificateCode.$touched && !soverignCertificateSignUp.CertificateCode.$valid"><i class="trmi trmi-times"></i>@Html.DisplayFor(m => m.CertificateCodeErrorMessage)</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label>@Html.DisplayFor(m => m.CertificateNumberHeading)</label>
+                            <input type="text" placeholder="@Html.DisplayFor(m => m.CertificateCodePlaceholderText)" id="CertificateNumber" name="CertificateNumber" class="form-control" ng-model="certificateSignUpFormData.CertificateNumber" data-original-title="" title="">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div>
+                                <div class="wysiwyg mb-1x">
+                                    <p>@Html.TranslateFallback(StringResources.CustomerContactPreferences, @Model.ContactPreferenceHeading)</p>
+                                </div>
+
+                                <div class="checkbox fancy checkbox-inline">
+                                    <input type="checkbox" class="form-control" id="ByEmail" name="ByEmail" value="true" ng-model="certificateSignUpFormData.ByEmail" />
+                                    <label class="" for="ByEmail">
+                                        @Html.PropertyFor(a => a.ByEmailLabel)
+                                    </label>
+                                </div>
+                                
+                                <div class="checkbox fancy checkbox-inline">
+                                    <input type="checkbox" class="form-control" id="ByPhone" name="ByPhone" value="true" ng-model="certificateSignUpFormData.ByPhone" />
+                                    <label class="checkbox-inline" for="ByPhone">
+                                        @Html.PropertyFor(a => a.ByTelephoneLabel)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <input type="hidden" ng-init="certificateSignUpFormData.ContentId=@contentId" name="ContentId" ng-model="certificateSignUpFormData.ContentId" />
+                        <button type="submit" ng-disabled="soverignCertificateSignUp.$invalid" class="btn btn-secondary">@Html.DisplayFor(m => m.RegisterButtonText)</button>
+                        @Html.AntiForgeryToken()
+                        <div class="form-group has-error mb-0 certificate-error hidden">
+                            <span id="helpBlock2" class="help-block"><i class="trmi trmi-times"></i>{{Message}}</span>
+                        </div>
+                        <div class="form-group has-success mb-0 certificate-success hidden">
+                            <span id="helpBlock2" class="help-block"><i class="trmi trmi-times"></i>@Html.DisplayFor(m=>m.SuccessfulConfirmationMessage)</span>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

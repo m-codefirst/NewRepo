@@ -1,0 +1,375 @@
+﻿@using EPiServer.Business.Commerce.Payment.Mastercard.Mastercard
+@using EPiServer.Core
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Blocks
+@using TRM.Shared.Extensions 
+
+@model TRM.Web.Models.ViewModels.Bullion.BullionCheckoutAddFundsViewModel
+
+
+@{
+    var paymentMethodParameters = Model.CurrentPaymentMethod.GetPaymentMethodParameterRows();
+
+    var sessionJsUrl = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl).Value : string.Empty;
+
+    var amexSessionJsUrl = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl).Value : string.Empty;
+
+    var countryCodes = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter).Value.Split(',') : null;
+
+    var countryCodesJsArray = string.Empty;
+    if (countryCodes != null && countryCodes.Any())
+    {
+        countryCodesJsArray = string.Join(",", countryCodes.Select(x => string.Format("'{0}'", x.Trim())));
+    }
+    var isQuickcheckout = ViewData["IsQuickcheckout"] == null ? false : (bool)ViewData["IsQuickcheckout"];
+    var containerCssClass = isQuickcheckout ? "col-xs-12 col-md-8 col-md-offset-2" : "col-xs-12 col-md-9";
+}
+
+<div class="@containerCssClass mb-1x" ng-controller="rmCheckoutController as rmAddInfo">
+    <h3 class="mt-0">@Model.BullionCheckoutAddFundsBlock.AddFundsHeading</h3>
+    @if (!string.IsNullOrEmpty(Model.BullionCheckoutAddFundsBlock.AddFundsDescription))
+    {
+        <p class="mb-2x">
+            @string.Format(Model.BullionCheckoutAddFundsBlock.AddFundsDescription, Model.AdditionalPrice, Model.RecommendedTopUp)
+        </p>
+    }
+    <div ng-if="accPayErrorMessage" class="alert alert-warning">
+        {{accPayErrorMessage}}
+    </div>
+    <form id="checkoutForm" method="post" name="checkoutForm" class="ng-pristine ng-valid" novalidate>
+        <div class="panel panel-default panel-secondary" ng-init='rmAddInfo.initMasterCard("@countryCodesJsArray")'>
+            <input type="hidden" id="paymentMethodId" name="paymentMethodId" ng-init="fund.paymentMethodId='@Model.CurrentPaymentMethod.PaymentMethodId';" ng-value="fund.paymentMethodId" />
+            <input type="hidden" id="orderNumberPrefix" name="orderNumberPrefix" ng-init="fund.orderNumberPrefix='@Model.OrderNumberPrefix';" ng-value="fund.orderNumberPrefix" />
+            <input type="hidden" id="paymentSessionId" name="paymentSessionId" />
+            <div class="panel-body" id="paymentform">
+                <div class="row">
+                    <div class="col-xs-12 col-md-8 mb-1x">
+                        <div class="row card-info">
+                            <div class="col-xs-12 col-sm-6 col-lg-5">
+                                <div class="mb-0 mb-xs-1x">
+                                    <label>@Model.BullionCheckoutAddFundsBlock.AmountTitle<span class="text-danger">*</span></label>
+                                    <div class="input-group subtle  mb-0">
+                                        <div class="input-group-addon">@Model.CurrencyCode.ToCurrencySymbol()</div>
+                                        <input type="text" floating-number-only class="form-control" name="paymentAmount" id="paymentAmount" placeholder="Amount" ng-init="fund.paymentAmount=initNumber('@Model.RecommendedPriceTopUp')" ng-model="fund.paymentAmount" data-original-title="" title="" required>
+                                    </div>
+                                    <div class="fundQuanityErrorMessage form-group has-error mb-0" ng-if="fund.paymentAmount<=0 && checkoutForm.paymentAmount.$dirty">
+                                        <span class="help-block">@Html.TranslateFallback(TRM.Shared.Constants.StringResources.InvalidAmountOfFunds, "Invalid amount.")</span>
+                                    </div>
+                                    <div class="fundQuanityErrorMessage form-group has-error mb-0 hidden" id="fundQuanityErrorMessage">
+                                        <span class="help-block">Please enter your fund quantity.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.BullionCheckoutAddFundsBlock.AddFundsCardLogo != null)
+                            {
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="card-logo">
+                                        <label class="hidden-xs" style="opacity: 0">
+                                            Card logo
+                                        </label>
+                                        <img class="img-responsive mb-1x mb-xs-2x mt-xs-2x pb-1x ml-0" src="@Url.ContentUrlExtension(Model.BullionCheckoutAddFundsBlock.AddFundsCardLogo)">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <hr>
+                        <div class="choose-card row">
+                            <div class="col-xs-12">
+                                <div class="card-options mb-2x" ng-if="rmAddInfo.shouldShowCardOptions">
+                                    <h4>@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardChooseACard, "Choose a card")</h4>
+                                    @*@if (Request.IsAuthenticated)
+                                    {
+                                        <div class="checkbox small fancy" ng-repeat="card in rmCreditCards">
+                                            <input type="radio" name="@TRM.Shared.Constants.StringConstants.Payments.SelectedCard" value="{{card.Token}}" id="savedCard{{$index}}" ng-model="$parent.SelectedCard"/>
+                                            <label for="savedCard{{$index}}" ng-click="updateJs(card.Token)">
+                                                {{card.CardType}} @Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardEnding, "Ending") {{card.LastFour}}
+                                            </label>
+                                            <span ng-if="cart.IsExpired" class="text-danger">&nbsp;@ViewData["ExpiredMessage"]</span>
+                                            <a ng-click="removeCard(card.Token)" href="" class="ml-1x ml-xs-2x">@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardRemoveCard, "Remove")</a>
+                                        </div>
+                                    }*@
+                                    <div class="checkbox small fancy">
+                                        <input type="radio" name="@TRM.Shared.Constants.StringConstants.Payments.SelectedCard" value="newCard" id="newCard" ng-model="SelectedCard" ng-checked="SelectedCard == 'newCard'" data-original-title="" title="">
+                                        <label for="newCard" ng-click="updateJs('newCard')">
+                                            @Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardNewCard, "New Visa or Mastercard")
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="newCard" ng-if="enterNewCard">
+                            <div class="row gutter-sm">
+                                <div class="col-xs-12 col-md-6">
+                                    <div class="form-group has-feedback cardNo" id="cardNo">
+                                        <label for="card-number">
+                                            @Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CardNumberTitle)
+                                            <span class="text-danger">
+                                                @Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardMandatoryFieldAsterix, "*")
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control gw-proxied" id="card-number" ng-model="fund.cardNumber" placeholder="@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardCardNumberPlaceholder, " eg.1111 2222 3333 4444")" readonly data-original-title="" title="">
+                                        <span class="cardNoSpan trmi form-control-feedback hidden" id="cardNoSpan" aria-hidden="true"></span>
+                                        <div class="cardNoErrorMessage form-group has-error mb-0 hidden" id="cardNoErrorMessage">
+                                            <span class="help-block"><i class="trmi trmi-times"></i>Please enter your card number.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-md-6">
+                                    <label>@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.EndDateTitle)</label>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <div class="select-form expiryMonth" id="expiryMonth">
+                                            <select class="form-control" id="expiry-month" ng-model="fund.expiryMonth" onchange="PaymentSession.updateSessionFromForm('card');">
+                                                <option value="" selected="">@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardMonthPlaceholder, "MM")</option>
+                                                @for (int i = 1; i <= 12; i++)
+                                                {
+                                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                                }
+                                            </select>
+                                            <div class="cardExpiryMonthErrorMessage form-group has-error mb-0 hidden" id="cardExpiryMonthErrorMessage">
+                                                <span class="help-block"><i class="trmi trmi-times"></i> "Please enter the expiry month on your card."</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <div class="select-form expiryYear" id="expiryYear">
+                                            <select class="form-control " id="expiry-year" ng-model="fund.expiryYear" onchange="PaymentSession.updateSessionFromForm('card');">
+                                                <option value="" selected="">@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardYearPlaceholder, "YYYY")</option>
+                                                @for (int i = 0; i < 21; i++)
+                                                {
+                                                    var yr = DateTime.UtcNow.Year + i;
+                                                    <option value="@yr">@yr</option>
+                                                }
+                                            </select>
+                                            <div class="cardExpiryYearErrorMessage form-group has-error mb-0 hidden" id="cardExpiryYearErrorMessage">
+                                                <span class="help-block"><i class="trmi trmi-times"></i>"Please enter the expiry year on your card."</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group has-feedback" ng-class="{'ValidationFail': (checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !fund.nameOnCard.length), 'ValidationSuccess': (checkoutForm.nameOnCard.$touched && checkoutForm.nameOnCard.$valid && fund.nameOnCard.length)}">
+                                <label for="nameOnCard">
+                                    @Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.NameOnCardTitle)
+                                    <small>
+                                        (@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.NameOnCardSubTitle))
+                                    </small><span class="text-danger">@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardMandatoryFieldAsterix, "*")</span>
+                                </label>
+                                <input type="text" class="form-control" id="nameOnCard" name="nameOnCard" g-pattern="AlphabeticalPattern" capitalize ng-trim="true" ng-minlength="2" ng-maxlength="40" ng-model="fund.nameOnCard" placeholder="@Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardNameOnCardPlaceholder, " Name on Card")" ng-required="enterNewCard && !nameOnCard.length" data-original-title="" title="">
+                                <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !nameOnCard.length), 'ValidationSuccess': (checkoutForm.nameOnCard.$touched && checkoutForm.nameOnCard.$valid && nameOnCard.length)}" aria-hidden="true"></span>
+                                <div class="form-group has-error hidden mb-0" ng-show="checkoutForm.nameOnCard.$touched && !checkoutForm.nameOnCard.$valid && !nameOnCard.length">
+                                    <span class="help-block"><i class="trmi trmi-times"></i>Please enter your card name exactly as it appears on the card.</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-4">
+                                    <div class="form-group has-feedback securityCode mb-0" id="securityCode">
+                                        <label for="security-code">
+                                            @Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CvvNumberTitle)
+                                            <span class="text-danger">
+                                                @Html.TranslateFallback(TRM.Shared.Constants.StringResources.MastercardMandatoryFieldAsterix, "*")
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control gw-proxied" id="security-code" ng-model="fund.securityCode" readonly data-original-title="" title="">
+                                        <span class="securityCodeSpan trmi trmi-check form-control-feedback hidden" id="securityCodeSpan" aria-hidden="true"></span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 form-helper question-padding">
+                                    <label for="security-code" style="opacity: 0">
+                                        @Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CvvNumberTitle)
+                                    </label>
+                                    <div class="security-tooltip">
+                                        <i ng-if="!showAmexCcvMessage" class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CvvNumberTooltip)"></i>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-12">
+                                    <div class="securityCodeErrorMessage form-group has-error mb-0 hidden" id="securityCodeErrorMessage">
+                                        <span class="help-block mb-0"><i class="trmi trmi-times"></i>@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CvvNumberTooltip)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @*@if (Request.IsAuthenticated)
+                            {
+                                <div class="form-group mt-2x">
+                                    <div class="checkbox fancy">
+                                        <input type="checkbox" name="gift" id="saveForFuture" ng-model="fund.saveCard" data-original-title="" title="">
+                                        <label class="checkbox-inline" for="saveForFuture">@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.SaveCardForFutureTitle)</label>
+                                    </div>
+                                </div>
+                            }*@
+                        </div>
+                        <a href="@Url.ContentUrlExtension(Model.CancelLink)" class="btn btn-default mb-1x mr-1x">@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.CancelButtonText)</a>
+                        <button type="button" class="btn btn-secondary mb-1x" data-is-call="true" ng-click="amlCheck($event, null, ['', '@Model.CompletedLink'], scope.checkoutForm)" ng-disabled="inprogessPayment">@Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.MakePaymentButtonText)</button>
+                    </div>
+                    @if (isQuickcheckout)
+                    {
+                        <div class="col-xs-12 col-md-4">
+                            <div class="alert alert-info mb-0">
+                                <h6 class="h6 strong mt-0 mb-0 text-black">Investment Order Total:</h6>
+                                <h6 class="h6 strong mt-0 mb-1x text-black">@Model.InvestmentOrderTotal</h6>
+                                <h6 class="h6 strong mt-0 mb-0 text-black">Current Wallet Balance:</h6>
+                                <h6 class="h6 strong mt-0 mb-1x @(Model.RecommendedPriceTopUp == decimal.Zero ? "text-success" : "text-danger")">@Model.CurrentWalletBalance</h6>
+                                <h6 class="h6 strong mt-0 mb-0 text-black">Recommended Top Up:</h6>
+                                <h6 class="h6 strong mt-0 mb-0 text-success">@Model.RecommendedTopUp</h6>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="panel-body hidden" id="paymentsuccess">
+                <h2 class="mt-0">@Html.TranslateFallback(StringResources.BullionAddFundsPaymentSuccessHeader, "Payment Sucessful")</h2>
+                <hr>
+                <p>@Html.TranslateFallback(StringResources.BullionPaymentSuccessfully, "Your payment has been received, Thanks!") </p>
+                <h5> @Html.TranslateFallback(StringResources.BullionAddFundsOrderNumber, "Order Number:") </h5>
+                {{accPayOrderNumber}}
+            </div>
+
+            <a id="payment-header" class="hidden" data-show="#paymentsuccess" data-hide="#paymentform"></a>
+            <div id="paymentDiv"></div>
+        </div>
+    </form>
+    @Html.Partial("_AmlReapplyKycModal")
+</div>
+@if (!isQuickcheckout)
+{
+    <div class="col-xs-12 col-md-3 mb-1x">
+        <div class="alert alert-info mb-0">
+            <h6 class="h6 strong mt-0 mb-0 text-black">Investment Order Total:</h6>
+            <h6 class="h6 strong mt-0 mb-1x text-black">@Model.InvestmentOrderTotal</h6>
+            <h6 class="h6 strong mt-0 mb-0 text-black">Current Wallet Balance:</h6>
+            <h6 class="h6 strong mt-0 mb-1x @(Model.RecommendedPriceTopUp == decimal.Zero ? "text-success" : "text-danger")">@Model.CurrentWalletBalance</h6>
+            <h6 class="h6 strong mt-0 mb-0 text-black">Recommended Top Up:</h6>
+            <h6 class="h6 strong mt-0 mb-0 text-success">@Model.RecommendedTopUp</h6>
+        </div>
+    </div>
+}
+<div class="clearfix"></div>
+<div class="@containerCssClass mb-1x">
+    @Html.PropertyFor(x => x.BullionCheckoutAddFundsBlock.BankTransferDescription)
+</div>
+
+
+@if (!string.IsNullOrWhiteSpace(sessionJsUrl))
+{
+    <script type="text/javascript">
+        var loadingSession = false;
+
+        function LoadSessionJs(amex) {
+            if (loadingSession) return;
+
+            loadingSession = true;
+
+            var sessionJsUrl = "@sessionJsUrl";
+            if (amex) {
+                sessionJsUrl = "@amexSessionJsUrl";
+            }
+
+            //remove previous proxy fields
+            $('.newCard iframe').remove();
+
+            $.getScript(sessionJsUrl, function() {
+                PaymentSession.configure({
+                    fields: {
+                        card: {
+                            number: "#card-number",
+                            securityCode: "#security-code",
+                            expiryMonth: "#expiry-month",
+                            expiryYear: "#expiry-year"
+                        }
+                    },
+                    frameEmbeddingMitigation: ["javascript"],
+                    callbacks: {
+                        initialized: function(response) {
+                            console.log("initialized.");
+                        },
+                        formSessionUpdate: function (response) {
+
+                            if (response.status) {
+                                if ("ok" === response.status) {
+
+                                    $("#paymentSessionId").val(response.session.id);
+                                    angular.element("#paymentSessionId").scope().mastercardSessionId = response.session.id;
+
+                                    if (response.sourceOfFunds.provided.card.number) {
+                                        $('#cardNo').addClass('has-success');
+                                        $('#cardNoSpan').removeClass('hidden');
+                                        $('#cardNoSpan').addClass('trmi-check');
+
+                                    }
+									if (response.sourceOfFunds.provided.card.securityCode) {
+										$('#securityCode').addClass('has-success');
+										$('#securityCodeSpan').removeClass('hidden');
+                                    }
+                                    if (response.sourceOfFunds.provided.card.expiry.year) {
+										$('#expiryYear').addClass('has-success');
+                                    }
+									if (response.sourceOfFunds.provided.card.expiry.month) {
+										$('#expiryMonth').addClass('has-success');
+                                        //$('#securityCodeSpan').removeClass('hidden');
+                                        //$('#securityCodeSpan').addClass('trmi-check');
+                                    }
+                                } else if ("fields_in_error" === response.status) {
+
+                                    console.log("Session update failed with field errors.");
+									if (response.errors.cardNumber && response.errors.cardNumber === 'invalid') {
+										$('#cardNo').removeClass('has-success');
+                                        $('#cardNo').addClass('has-error');
+                                        $('#cardNoSpan').removeClass('hidden');
+                                        $('#cardNoSpan').removeClass('trmi-check');
+                                        $('#cardNoSpan').addClass('trmi-close');
+                                        $('#cardNoErrorMessage').removeClass('hidden');
+                                    }
+
+									if (response.errors.expiryYear && response.errors.expiryYear === 'invalid') {
+										$('#expiryYear').removeClass('has-success');
+                                        $('#expiryYear').addClass('has-error');
+                                        $('#cardExpiryYearErrorMessage').removeClass('hidden');
+                                    }
+									if (response.errors.expiryMonth && response.errors.expiryMonth === 'invalid') {
+										$('#expiryMonth').removeClass('has-success');
+                                        $('#expiryMonth').addClass('has-error');
+                                        $('#cardExpiryMonthErrorMessage').removeClass('hidden');
+                                    }
+									if (response.errors.securityCode && response.errors.securityCode === 'invalid') {
+										$('#securityCode').removeClass('has-success');
+                                        $('#securityCode').addClass('has-error');
+                                        $('#securityCodeSpan').removeClass('hidden');
+                                        $('#securityCodeSpan').removeClass('trmi-check');
+                                        $('#securityCodeSpan').addClass('trmi-close');
+                                        $('#securityCodeErrorMessage').removeClass('hidden');
+                                    }
+
+                                } else if ("request_timeout" === response.status) {
+                                    console.log("Session update failed with request timeout: " + response.errors.message);
+                                } else if ("system_error" === response.status) {
+                                    console.log("Session update failed with system error: " + response.errors.message);
+                                }
+                            } else {
+                                console.log("Session update failed: " + response);
+                            }
+                        }
+                    }
+                });
+                PaymentSession.onChange(['card.number', 'card.securityCode'], function (selector) {
+                    $('#card-number').removeClass('ValidationFail');
+                    $('#cardNoErrorMessage').addClass('hidden');
+                    $('#expiry-month').removeClass('ValidationFail');
+                    $('#expiry-year').removeClass('ValidationFail');
+                    $('#security-code').removeClass('ValidationFail');
+                    PaymentSession.updateSessionFromForm('card');
+                });
+                loadingSession = false;
+            });
+        }
+    </script>
+}

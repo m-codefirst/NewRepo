@@ -1,0 +1,20 @@
+﻿@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+<div class="row">
+    <div class="col-xs-12 ng-scope">
+        <h3 class="bb-solid-g pb-1x">@Html.TranslateFallback(StringResources.RelatedProducts, "Related Products")</h3>
+        <div class="rmGridView clear">
+            @{
+                var relatedCount = 0;
+                foreach (var relatedEntry in Model.ViewModel.RelatedEntries)
+                {
+                    var clearClass = relatedCount % 3 == 0 ? "clear" : string.Empty;
+                    <article class="trmVariant @clearClass" itemprop="isRelatedTo">
+                        @{ Html.RenderPartial("PagePartials/TrmEntryPartial", relatedEntry); }
+                    </article>
+                                relatedCount++;
+                            }
+            }
+        </div>
+    </div>
+</div>

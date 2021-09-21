@@ -1,0 +1,273 @@
+﻿
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    <div class="container">
+        @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+            @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <div class="container mb-3x statements">
+
+        <aside class="mobile-sidenav col-md-3" id="catFilters">
+            <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+            <div class="row">
+                <div class="account navigationBlock col-xs-12" id="account-menu">
+                    <div class="blockContent">
+                        <ul class="level0 contentNav">
+                            <li class="">
+                                <a href="#" title="My Account">My Account</a>
+                            </li>
+                            <li class=" has-children">
+                                <a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+                                <ul class="level1 collapse in" id="your-orders1">
+                                    <li><a href="#" title="Change Password">Change Password</a></li>
+                                    <li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+                                    <li><a href="#" title="View Statement History">View Statement History</a></li>
+                                    <li><a href="#" title="Manage Your Bank Account details">Manage Your Bank Account details</a></li>
+                                    <li><a href="#" title="Withdraw Funds From Wallet">Withdraw Funds From Wallet</a></li>
+                                    <li><a href="#" title="Add Funds to Wallet">Add Funds to Wallet</a></li>
+                                </ul>
+                            </li>
+                            <li class=" has-children">
+                                <a class="btn-collapse" data-target="#credit-account2" data-toggle="collapse" title="Show/Hide More">Credit Account</a>
+                                <ul class="level1 collapse in" id="credit-account2">
+                                    <li><a href="/my-account/contact-and-delivery-details/change-password/" title="Change Password">Change Password</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/contact-preferences/" title="Contact Preferences">Contact Preferences</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/manage-addresses/" title="Manage Addresses">Manage Addresses</a></li>
+                                    <li><a href="/my-account/contact-and-delivery-details/edit-personal-details/" title="Edit personal details">Edit personal details</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.blockContent -->
+                </div><!-- /. navigation block -->
+            </div>
+        </aside>
+
+        <div class="col-xs-12 col-md-9">
+
+            <div class="header-wrapper">
+                <div class="page-header">
+                    <h1>Statements &amp; Invoices</h1>
+                </div>
+            </div>
+
+            
+            <div class="row">
+                <div class="col-xs-12">
+                    <a class="btn btn-default btn-block sidenav-trigger mb-2x hidden-md hidden-lg" data-target="#catFilters">Account Menu</a>
+                </div>
+            </div>
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            </div>    
+            <div class="panel panel-default panel-secondary">
+                <div class="panel-body item-row">
+                    <div class="row mb-2x">
+                        <div class="col-xs-12 flex-two-column-items">
+                            <label for="fiterType" class="mr-1x">Currently Viewing: </label>
+                            <div class="select-form expiryYear" id="expiryYear">
+                                <select class="form-control" id="expiry-year" onchange="PaymentSession.updateSessionFromForm('card');">
+                                    <option value="2018" selected="">2018</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2015">2015</option>
+                                    <option value="2014">2014</option>
+                                    <option value="2013">2013</option>
+                                    <option value="2012">2012</option>
+                                    <option value="2011">2011</option>
+                                    <option value="2010">2010</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default panel-order">
+
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 December 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Statement - December
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 November 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Statement - November
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 29 November 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Invoice
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 October 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Statement - October
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 September 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Statement - September
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 09 September 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Invoice
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 August 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Statement:</span>&nbsp;Statement - August
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 July 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Statement:</span>&nbsp;Statement - July
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 18 June 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="">Invoice</span>
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 June 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Statement:</span>&nbsp;Statement - June
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 01 May 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Statement - May
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body item-row">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Date:</span> 11 February 2018
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Type:</span>&nbsp;Invoice
+                                </div>
+                                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                                    <a href="#"><i class="fa fa-download"></i>&nbsp;&nbsp;Download</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2x">
+                        @Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

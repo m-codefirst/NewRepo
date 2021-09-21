@@ -1,0 +1,514 @@
+﻿
+@model TRM.Web.Models.ViewModels.Bullion.Report.BullionStatementViewModel
+@{Layout = null;}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Client Statement</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.js"></script>
+</head>
+
+<body>
+    <style>
+        /* basic reset */
+        html {
+            box-sizing: border-box;
+            font-size: 10px;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        ol,
+        ul {
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+        }
+
+        ol,
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        body {
+            font-size: 1.1rem;
+            font-family: Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            clear: both;
+            margin: 1.5rem 1.1rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        h3 {
+            font-size: 1.6rem;
+        }
+
+        .da-full, .da-half, .da-thrid {
+            box-sizing: border-box;
+            margin: 0 2rem 2rem 2rem;
+        }
+
+        .da-full {
+            width: calc(100% - 4rem);
+        }
+
+        .da-half {
+            width: calc(50% - 4rem);
+        }
+
+        .da-third {
+            width: calc(33% - 4rem);
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -2rem;
+            margin-left: -2rem;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+            table.striped tr:nth-child(even) {
+                background-color: #ebebeb;
+            }
+
+        thead,
+        tfoot {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .break {
+            page-break-before: always;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        thead {
+            display: table-header-group
+        }
+
+        tfoot {
+            display: table-footer-group
+        }
+
+            thead th,
+            tfoot td {
+                border-top: 1px solid #000;
+                border-bottom: 1px solid #000;
+            }
+
+        th,
+        td {
+            padding: 0.2rem 1rem;
+        }
+
+            th.number,
+            td.number {
+                text-align: right;
+            }
+
+                td.number.neg {
+                    color: red;
+                }
+
+        ul {
+            list-style: none;
+            padding: 1rem;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .clear-both {
+            clear: both;
+        }
+
+        header {
+            margin: 1rem;
+        }
+    </style>
+    <div class="da-full">
+        <h2>Client Statement</h2>
+        <div id="summary" class="row">
+        </div>
+    </div>
+    <div class="da-full">
+        <h1>Financial Summary</h1>
+        <div class="row">
+            <div class="da-half">
+                <div class="row">
+                    <div class="da-full">
+                        <div id="total-assets-value"></div>
+                    </div>
+                    <div class="da-full">
+                        <div id="metal-prices"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="da-half">
+                <div id="financial-breakdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="da-full break">
+        <h1>Vaulted Summary</h1>
+        <div class="row">
+            <div class="da-half">
+                <div id="vp-metal"></div>
+            </div>
+            <div class="da-half">
+                <div id="vp-category"></div>
+            </div>
+            <div class="da-half">
+                <div id="vp-sub-category"></div>
+            </div>
+            <div class="da-half">
+                <div id="vp-range"></div>
+            </div>
+        </div>
+        <div class="da-full break">
+            <div id="vp-products"></div>
+        </div>
+
+        <div class="da-full break">
+            <div id="activity"></div>
+        </div>
+    </div>
+
+    <script id="metal-prices-template" type="text/x-handlebars-template">
+        <h3>Metal Prices </h3>
+        <table>
+            <tbody>
+                <tr>
+                    <td colspan="2">This valuation is based on the following metal prices:</td>
+                </tr>
+                <tr>
+                    <td>Gold</td>
+                    <td class="number">
+                        {{gold}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Silver</td>
+                    <td class="number">
+                        {{silver}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Platinum</td>
+                    <td class="number">
+                        {{platinum}}
+                </tr>
+            </tbody>
+        </table>
+    </script>
+    <script id="total-assets-template" type="text/x-handlebars-template">
+        <h3>{{header}} </h3>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Effective Balance</td>
+                    <td class="number {{negative balance}}">
+                        {{balance}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Vaulted Portfolio</td>
+                    <td class="number">
+                        {{portfolio}}
+                    </td>
+                </tr>
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total Asset Value</td>
+                    <td class="number {{negative total}}">
+                        {{total}}
+                </tr>
+            </tfoot>
+        </table>
+    </script>
+    <script id="financial-breakdown-template" type="text/x-handlebars-template">
+        <h3>Financial Breakdown</h3>
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>Starting Effective Balance</th>
+                    <th class="number {{negative start}}">{{start}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each items}}
+                <tr>
+                    <td>{{name}}</td>
+
+                    <td class="number {{negative total}}">
+                        {{total}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Ending Effective Balance</td>
+                    <td class="number {{negative end}}">{{end}}</td>
+                </tr>
+            </tfoot>
+
+
+        </table>
+    </script>
+    <script id="vaulted-template" type="text/x-handlebars-template">
+        <h3>{{header}}</h3>
+        <table class="striped">
+
+            <thead>
+                <tr>
+                    <th>Range</th>
+                    <th class="number">Weight (Troy Oz)</th>
+                    <th class="number">Effective Value</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                {{#each items}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td class="number">
+                        {{qty}}
+                    </td>
+                    <td class="number {{negative amount}}">
+                        {{amount}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total Value</td>
+                    <td></td>
+                    <td class="number {{negative total}}">{{total}}</td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </script>
+    <script id="activity-template" type="text/x-handlebars-template">
+        <h3>Period Activity</h3>
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th></th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th class="number">Amount</th>
+                    <th class="number">Effective Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-right">{{startdate}}</td>
+                    <td>
+                        <strong>Opening Balance</strong>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="number {{negative start}}">{{start}}</td>
+                </tr>
+                {{#each items}}
+                <tr>
+                    <td class="text-right">{{date}}</td>
+                    <td>
+                        {{type}}
+                    </td>
+                    <td>
+                        {{description}}
+                    </td>
+                    <td>
+                        {{reference}}
+                    </td>
+                    <td>{{status}}</td>
+                    <td class="number {{negative amount}}">{{amount}}</td>
+                    <td class="number {{negative balance}}">{{balance}}</td>
+                </tr>
+                {{/each}}
+
+            <tbody>
+            <tfoot>
+                <tr>
+                    <td class="text-right">{{enddate}}</td>
+                    <td colspan="2">Ending Balance</td>
+
+
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="number {{negative end}}">{{end}}</td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </script>
+    <script id="vaulted-product-template" type="text/x-handlebars-template">
+        <h3>{{header}}</h3>
+        <table class="striped">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="number">Quantity</th>
+                    <th class="number">Weight (Troy Oz)</th>
+                    <th class="number">Effective Value</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                {{#each items}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td class="number">
+                        {{qty}}
+                    </td>
+                    <td class="number">
+                        {{weight}}
+                    </td>
+                    <td class="number {{negative amount}}">
+                        {{amount}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td></td>
+                    <td></td>
+                    <td class="number {{negative total}}">{{total}}</td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </script>
+    <script id="summary-template" type="text/x-handlebars-template">
+        <ul class="da-half">
+            <li>{{name}}</li>
+            <li>{{address1}}</li>
+            <li>{{address2}}</li>
+            <li>{{postcode}}</li>
+            <li>{{country}}</li>
+
+        </ul>
+        <ul class="da-half">
+            <li>Account: {{account}} </li>
+            <li>Period: {{period}}</li>
+        </ul>
+    </script>
+    <div id="shutter"></div>
+    <script type="text/javascript">
+
+    Handlebars.registerHelper('negative', function (amount) {
+        if (!amount) return "";
+        return amount.includes("-") ? " neg " : "";
+    });
+
+    var metalPrices = @Html.Raw(Model.MetalPrices);
+    var totalAssets = @Html.Raw(Model.TotalAssets);
+    var financialBreakdown = @Html.Raw(Model.FinancialBreakdown);
+    var vpMetal =  @Html.Raw(Model.VaultedMetal);
+    var vpCategory = @Html.Raw(Model.VaultedCategory);
+    var vpSubCategory = @Html.Raw(Model.VaultedSubCategory);
+    var vpRange = @Html.Raw(Model.VaultedRange);
+    var vpProducts = @Html.Raw(Model.VaultedProducts);
+    var activity = @Html.Raw(Model.Activity);
+    var summary = @Html.Raw(Model.Summary);
+
+
+    var loadTemplate = function(id, model, templateId) {
+        var source = document.getElementById(templateId).innerHTML;
+        var template = Handlebars.compile(source);
+        var html = template(model);
+
+        document.getElementById(id).innerHTML = html;
+    }
+
+    loadTemplate("summary", summary, "summary-template");
+    loadTemplate("metal-prices", metalPrices, "metal-prices-template");
+    loadTemplate("total-assets-value", totalAssets, "total-assets-template");
+    loadTemplate("financial-breakdown", financialBreakdown, "financial-breakdown-template");
+    loadTemplate("vp-metal", vpMetal, "vaulted-template");
+    loadTemplate("vp-category", vpCategory, "vaulted-template");
+    loadTemplate("vp-sub-category", vpSubCategory, "vaulted-template");
+    loadTemplate("vp-range", vpRange, "vaulted-template");
+    loadTemplate("vp-products", vpProducts, "vaulted-product-template");
+    loadTemplate("activity", activity, "activity-template");
+
+
+    setTimeout(function() { document.getElementById("shutter").className = "close"; }, 10);
+
+    </script>
+
+</body>
+
+</html>

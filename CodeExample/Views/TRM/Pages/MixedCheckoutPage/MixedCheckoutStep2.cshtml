@@ -1,0 +1,321 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions 
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.MixedCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.MixedCheckout.MixedCheckoutStep2ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(myLayout.PostcodeAnywhereLicense))
+{
+    <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@myLayout.PostcodeAnywhereLicense" />
+    <script type="text/javascript">
+        var pcaJsUrl =
+            "https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@myLayout.PostcodeAnywhereLicense";
+    </script>
+}
+
+
+@helper ErrorMessage(string fieldName)
+{
+    var fieldKey = string.Format("viewModel.{0}", fieldName);
+    if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+    {
+        <span class="help-block">
+            <span class="field-validation-error text-danger" data-valmsg-for="fieldKey" data-valmsg-replace="true">@Html.ValidationMessage(fieldKey)</span>
+        </span>
+    }
+}
+
+<div class="pageContainer">
+    @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    }
+    <div class="container mb-4x mt-2x">
+        @Html.ValidationSummary(false)
+        <div class="page-header">
+            <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Step2PageHeading)</h1>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            </div>
+        }
+        <div class="row">
+            <div class="col-xs-12">
+                <ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+                    <li><a href="@Url.ContentUrlExtension(Model.CurrentPage.ContentLink)">1.<span>@Html.PropertyFor(x => x.CurrentPage.Step1TabHeading)</span></a></li>
+                    <li class="active"><a href="">2. <span>@Html.PropertyFor(x => x.CurrentPage.Step2TabHeading)</span></a> </li>
+                    <li><a href="">3. <span>@Html.PropertyFor(x => x.CurrentPage.Step3TabHeading)</span></a></li>
+                    <li><a href="">4. <span>@Html.PropertyFor(x => x.CurrentPage.Step4TabHeading)</span></a></li>
+                </ol>
+            </div>
+            <div ng-controller="rmCheckoutController as rmAddInfo" ng-init="init('@Model.ViewModel.BillingAddress.Name', false); getBasketSummary()">
+                <div class="col-xs-12 col-md-7 mb-2x">
+                    <h3 class="mt-0">@Html.PropertyFor(x => x.CurrentPage.Step2Heading)</h3>
+                    @if (!string.IsNullOrWhiteSpace(Model.ViewModel.Message))
+                    {
+                        <div class="alert alert-warning">
+                            @Model.ViewModel.Message
+                        </div>
+                    }
+                    <p class="mb-1x header-font-color">@Html.PropertyFor(x => x.CurrentPage.Step2Description)</p>
+                    @using (Html.BeginForm("Step2", null, FormMethod.Post, new
+                    {
+                        name = "checkoutForm",
+                        id = "formPaymentMixedCheckout",
+                        @class = "width-80 ng-pristine ng-valid",
+                        novalidate = ""/*, onsubmit = "return false;"*/
+                    }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        if (Model.ViewModel.HasEnoughCredit)
+                        {
+                            <p>@Html.DisplayFor(m => m.CurrentPage.Step2PaymentMessage)</p>
+                            <label class="control-label" for="paymentMethod">@Html.DisplayFor(m => m.CurrentPage.Step2PaymentTypeLabel)</label>
+                            <div class="form-group">
+                                <div class="select-form">
+                                    @{
+                                        var defaultPayment = Model.ViewModel.PaymentProviders.OrderByDescending(p => p.IsDefault).FirstOrDefault();
+                                    }
+                                    <select class="form-control" id="paymentMethod" name="paymentMethod" ng-model="paymentType" style="" ng-init="paymentType = '@defaultPayment.PaymentMethodId'" ng-change="changePaymentType('@defaultPayment.PaymentMethodId')">
+                                        @foreach (var method in Model.ViewModel.PaymentProviders.OrderByDescending(p => p.IsDefault))
+                                        {
+                                            <option @(method.IsDefault ? "ng-selected=\"selected\"" : string.Empty) value="@method.PaymentMethodId">@method.Description</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @Html.Hidden("paymentMethod", Model.ViewModel.MastercardPaymentMethodId, new { ng_model = "paymentType", ng_init = "paymentType = '" + Model.ViewModel.MastercardPaymentMethodId + "'" })
+                        }
+                        <div ng-if="paymentType == '@Model.ViewModel.MastercardPaymentMethodId'">
+                            <h4>@Html.DisplayFor(m => m.CurrentPage.Step2BillingAddressTitle)</h4>
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="SameAsDelivery" value="true" ng-change="SetSameAsDelivery()" ng-model="rmAddInfo.sameAsDelivery" ng-init="rmAddInfo.sameAsDelivery = true" id="SameAsDelivery">
+                                <input type="hidden" name="ViewModel.SameAsDelivery" value="{{rmAddInfo.sameAsDelivery}}">
+                                <label class="" for="SameAsDelivery">
+                                    @Html.DisplayFor(m => m.CurrentPage.Step2SameAsDeliveryAddressTitle)
+                                </label>
+                                <p class="help-block text-slateblue">
+                                    <strong>@Html.DisplayFor(m => m.CurrentPage.Step2SelectedDeliveryAddressTitle)</strong><br>
+                                    @Model.ViewModel.DeliveryAddressSummary
+                                </p>
+                            </div>
+                            <div ng-hide="rmAddInfo.sameAsDelivery">
+                                <div>
+                                    @if (Request.IsAuthenticated)
+                                    {
+                                        <div class="form-group">
+                                            <label class="control-label" for="checkoutSelectAdress">@Html.DisplayFor(m => m.CurrentPage.Step2ChooseBillingMessage)</label>
+
+                                            <div class="select-form" ng-init="rmAddInfo.getAddresses()">
+                                                <select class="form-control" ng-model="addressOption" id="checkoutSelectAdress" ng-change="makeCurrentAddress(addressOption); rmAddInfo.manualAddress = false">
+                                                    <option value="" selected="" disabled="">@Html.TranslateFallback(StringResources.SelectionPleaseSelect, StringConstants.TranslationFallback.SelectionPleaseSelect)</option>
+                                                    <option value="new">@Html.TranslateFallback(StringResources.SelectionNew, StringConstants.TranslationFallback.SelectionNew)</option>
+                                                    <option ng-repeat="address in rmAddInfo.rmAddresses track by $index" value="{{$index}}">
+                                                        {{address.Name}}: {{address.Line1}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div ng-show="@(Request.IsAuthenticated ? "addressOption == 'new'" : "true")">
+                                        @if (Request.IsAuthenticated)
+                                        {
+                                            <div class="form-group" ng-hide="rmAddInfo.sameAsDelivery" ng-if="!rmAddInfo.sameAsDelivery">
+                                                <div class="form-group has-feedback" ng-class="{'ValidationFail': (checkoutForm.AddressNickname.$touched && !checkoutForm.AddressNickname.$valid), 'ValidationSuccess': (checkoutForm.AddressNickname.$touched && checkoutForm.AddressNickname.$valid )}">
+                                                    <label for="BillingAddress.Name">@Html.DisplayFor(m => m.CurrentPage.AddressNicknameLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                                                    <input class="form-control" ng-change="checkNickname(AddressNickname)" type="text" name="AddressNickname" id="BillingAddress.Name" ng-model="AddressNickname" ng-required="addressOption === 'new' && !rmAddInfo.sameAsDelivery" data-original-title="" title="">
+                                                    <input type="hidden" name="ViewModel.AddressNickname" value="{{AddressNickname}}">
+                                                    <span class="trmi form-control-feedback" ng-class="{'ValidationFail': (checkoutForm.AddressNickname.$touched && !checkoutForm.AddressNickname.$valid), 'ValidationSuccess': (checkoutForm.AddressNickname.$touched && checkoutForm.AddressNickname.$valid)}" aria-hidden="true"></span>
+                                                    @if (!string.IsNullOrWhiteSpace(Model.CurrentPage.AddressNicknameErrorMessage))
+                                                    {
+                                                        <div class="form-group has-error mb-0" ng-show="(checkoutForm.AddressNickname.$touched && (!checkoutForm.AddressNickname.$valid))">
+                                                            <span class="help-block"><i class="trmi trmi-times"></i>@Html.DisplayFor(m => m.CurrentPage.AddressNicknameErrorMessage)</span>
+                                                        </div>
+                                                    }
+                                                    <span class="help-block">@Html.DisplayFor(m => m.CurrentPage.AddressNicknameMessage)</span>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="form-group" ng-hide="manualAddress">
+                                            <label class="control-label" for="inputPCAnywhere">@Html.DisplayFor(m => m.CurrentPage.PostcodeLabel) <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control pcaPredictInput" name="inputPCAnywhere" id="inputPCAnywhere" placeholder="@Html.DisplayFor(m => m.CurrentPage.PostcodePlaceholder)" ng-init="initPCAJS()" ng-model="rmAddInfo.pcaPredict" ng-change="getAddresses($event)">
+                                        </div>
+                                        <div class="form-group" ng-hide="manualAddress">
+                                            <a class="" href="" ng-click="rmAddInfo.addressEnterManuallyClick()">@Html.DisplayFor(m => m.CurrentPage.EnterManuallyText)</a>
+                                        </div>
+                                        <div class="form-group" ng-show="manualAddress">
+                                            <a href="" ng-click="rmAddInfo.addressCancelManuallyClick()">@Html.DisplayFor(m => m.CurrentPage.EnterManuallyCancelText)</a>
+                                        </div>
+                                    </div>
+                                    <div ng-show="manualAddress">
+                                        <input type="hidden" name="ViewModel.BillingAddress.AddressId" ng-value="selectedAddress.AddressId" />
+                                        <input type="hidden" name="ViewModel.BillingAddress.Name" ng-value="selectedAddress.Name" />
+
+                                        <div class="form-group">
+                                            <label for="manDelAdd1">@Html.DisplayFor(m => m.CurrentPage.AddressLine1Label) <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="ViewModel.BillingAddress.Line1" id="manDelAdd1" value="{{selectedAddress.Line1}}" ng-model="selectedAddress.Line1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="manDelAdd2">@Html.DisplayFor(m => m.CurrentPage.AddressLine2Label) <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="ViewModel.BillingAddress.Line2" id="manDelAdd2" value="{{selectedAddress.Line2}}" ng-model="selectedAddress.Line2">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="manDelAddCity">@Html.DisplayFor(m => m.CurrentPage.AddressLine3Label)</label>
+                                            <input class="form-control" type="text" name="ViewModel.BillingAddress.City" id="manDelAddCity" value="{{selectedAddress.City}}" ng-model="selectedAddress.City">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="manDelCounty">@Html.DisplayFor(m => m.CurrentPage.AddressCountyLabel)</label>
+                                            <input class="form-control" type="text" name="ViewModel.BillingAddress.CountryRegion.Region" id="manDelCounty" value="{{selectedAddress.CountryRegion.Region}}" ng-model="selectedAddress.CountryRegion.Region">
+                                        </div>
+                                        <input type="hidden" ng-if="!manualAddress" name="ViewModel.BillingAddress.PostalCode" value="{{selectedAddress.PostalCode}}" ng-value="selectedAddress.PostalCode" />
+                                        <div class="form-group" ng-if="manualAddress">
+                                            <label for="manDelPostcode">@Html.DisplayFor(m => m.CurrentPage.PostcodePlaceholder) <span class="text-danger">*</span></label>
+                                            <input class="form-control" capitalize postcode-validator="selectedAddress.CountryCode" type="text" name="ViewModel.BillingAddress.PostalCode" ng-maxlength='10' id="manDelPostcode" value="{{selectedAddress.PostalCode}}" ng-blur="checkPostCodeFormat(selectedAddress.CountryCode)" ng-model="selectedAddress.PostalCode">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="manDelCountryCode">Country <span class="text-danger">*</span></label>
+                                            <select class="form-control" ng-model="selectedAddress.CountryCode" name="ViewModel.BillingAddress.CountryCode" id="manDelCountryCode">
+                                                @if (Model.ViewModel.CountryList != null && Model.ViewModel.CountryList.Any())
+                                                {
+                                                    foreach (var country in Model.ViewModel.CountryList)
+                                                    {
+                                                        <option value="@country.Key">@country.Value</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div ng-show="selectedAddress && (selectedAddress.AddressId != '') && (selectedAddress.Line1 != '') && (selectedAddress.Line1.trim() != '') && !manualAddress">
+                                        <h5>@Model.CurrentPage.Step2BillingAddressTitle</h5>
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                {{selectedAddress.Line1}}
+                                                <br ng-if="selectedAddress.Line1">
+                                                {{selectedAddress.Line2}}
+                                                <br ng-if="selectedAddress.Line2">
+                                                {{selectedAddress.City}}
+                                                <br ng-if="selectedAddress.City">
+                                                {{selectedAddress.CountryRegion.Region}}
+                                                <br ng-if="selectedAddress.CountryRegion.Region">
+                                                {{selectedAddress.PostalCode}}
+                                                <br ng-if="selectedAddress.PostalCode">
+                                                {{selectedAddress.CountryCode}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+
+                            @if (Model.ViewModel.PaymentProviders.Any(x => x.IsActive))
+                            {
+                                var payMethod = Model.ViewModel.PaymentProviders.FirstOrDefault(x => x.PaymentMethodId.Equals(Model.ViewModel.MastercardPaymentMethodId));
+                                if (payMethod != null)
+                                {
+                                    var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, payMethod.SystemKeyword);
+                                    if (result != null && result.View != null)
+                                    {
+                                        var vm = new TRM.Web.Models.ViewModels.PaymentMethodViewModel()
+                                        {
+                                            PaymentMethodRow = payMethod,
+                                            AllowSavedCards = Model.CurrentPage.EnableSavedCards,
+                                            ExpiredMessage = Model.CurrentPage.Step2ExpiredMessage ?? "Expired"
+                                        };
+                                        Html.RenderPartial(payMethod.SystemKeyword, vm, new ViewDataDictionary { { "ExpiredMessage", Model.CurrentPage.Step2ExpiredMessage ?? "Expired" } });
+                                    }
+                                }
+                            }
+
+                            <hr>
+                        </div>
+
+                        if (Model.ViewModel.HasEnoughCredit)
+                        {
+                            <div ng-if="paymentType == '@Model.ViewModel.CreditPaymentMethodId'">
+                                <div class="well">
+                                    <strong>@Html.DisplayFor(m => m.CurrentPage.Step2AccountBalanceMessage)</strong> @Model.ViewModel.AccountBalance
+                                </div>
+                            </div>
+                        }
+                        //Html.RenderPartial("_OptionsOutWarning", Model);
+
+                        <div class="checkbox small fancy">
+                            @Html.CheckBoxFor(a => a.ViewModel.AcceptTermsAndConditions, new { @id = "acceptTerm" })
+                            <label class="" for="acceptTerm">@Html.DisplayFor(m => m.CurrentPage.Step2TermsAndConditionsTitle)</label>
+                        </div>
+                        @ErrorMessage("AcceptTerm")
+                        if (string.IsNullOrEmpty(Model.CurrentPage.Step2NextStepText))
+                        {
+                            <hr />
+                            <div class="form-group">
+                                @Html.PropertyFor(x => x.CurrentPage.Step2NextStepText)
+                            </div>
+                        }
+
+                        <hr />
+                        <div class="row table-footer visible-xs visible-sm mb-2x">
+                            <div class="col-xs-6">
+                                <strong>@Html.TranslateFallback(StringResources.BasketSubTotal, StringConstants.TranslationFallback.BasketSubTotal)</strong>
+                            </div>
+                            <div class="col-xs-6 ng-binding">
+                                {{getRetailSubTotal()}}
+                            </div>
+                            <div class="col-xs-6">
+                                <strong>@Html.TranslateFallback(StringResources.BasketDelivery, StringConstants.TranslationFallback.BasketDelivery)</strong>
+                            </div>
+                            <div class="col-xs-6">
+                                {{getRetailDeliveryTotal()}}
+                            </div>
+                            <div ng-show="showRetailTotalDiscount()" class="col-xs-6">
+                                <strong>@Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)</strong>
+                            </div>
+                            <div ng-show="showRetailTotalDiscount()" class="col-xs-6">
+                                {{getRetailDiscount()}}
+                            </div>
+                            <div class="col-xs-6">
+                                <strong>@Html.TranslateFallback(StringResources.BasketTotal, StringConstants.TranslationFallback.BasketTotal)</strong>
+                            </div>
+                            <div class="col-xs-6">
+                                <span>
+                                    {{getRetailTotal()}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="payNowButton" onclick="this.disabled = true;" ng-click="amlCheck($event, checkForm, ['@Model.ViewModel.MastercardPaymentMethodId', '@Model.ViewModel.CreditPaymentMethodId', '@(Request.IsAuthenticated ? "true" : "false")', checkoutForm, false])" class="btn btn-secondary">@Html.PropertyFor(x => x.CurrentPage.Step2InvestButtonText)</button>
+                    }
+                </div>
+                <div class="col-xs-12 col-md-5 mb-2x">
+                    @Html.Partial("_RetailOrderSummary", new ViewDataDictionary { { "ShowCollapse", true }, { "IsCollapse", true } })
+                    @Html.Partial("_InvestmentOrderSummary", new ViewDataDictionary { { "ShowCollapse", false }, { "IsCollapse", true } })
+                    <div class="row">
+                        @Html.DisplayFor(x => x.CurrentPage.Step2RightContentArea)
+                    </div>
+                </div>
+                @Html.Partial("_AmlReapplyKycModal")
+            </div>
+        </div>
+    </div>
+    @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    }
+</div>

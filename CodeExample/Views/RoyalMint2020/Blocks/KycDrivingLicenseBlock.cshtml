@@ -1,0 +1,46 @@
+﻿@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@using Newtonsoft.Json
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycDrivingLicenceBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycDrivingLicenceViewModel>
+
+
+@{
+    var viewModel = new {
+        licenceNumberTitle = Model.CurrentBlock.LicenceNumberTitle,
+        licenceNumberInputMessage = Model.CurrentBlock.LicenceNumberInputMessage,
+        licenceNumberPlaceholder = Model.CurrentBlock.LicenceNumberPlaceholder,
+        surname = Model.ViewModel.Surname,
+        confirmDetailsButtonText = Model.CurrentBlock.ConfirmDetailsButtonText,
+        formRequiredText = @Html.TranslateFallback(StringResources.FormRequiredText, "This field is required"),
+        invalidLicenceNumber = @Html.TranslateFallback(StringResources.InvalidLicenceNumber, "Invalid Licence Number"),
+    };
+}
+
+<div class="form-spacing text-right">
+    <a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="btn btn-default pl-0 pr-0 mb-0">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+</div>
+@if (Model.CurrentBlock.MiddleTopContent != null)
+{
+    <div class="form-spacing">
+        @Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+    </div>
+}
+
+<div data-module="kyc-verification-driving-license" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+<div class="form-spacing">
+    <div class="block editorialBlock col-xs-12">
+        <div class="blockContent ">
+            <div class="category">
+                <h3 class="title">
+                    <span class="icon"><svg><use xlink:href="#driving-license" /></svg></span>
+                    Get it right...&nbsp;
+                    <span class="text-capitalize">(Licence ID Number)</span>
+                </h3>
+                <img class="card-img-top mb-2" src="/Static/img/content/driving-licence.png">
+                <p>Don't forget you can 'Upload a Picture' of your Driving Licence if that's easier.</p>
+            </div>
+        </div>
+    </div>
+    @Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+</div>

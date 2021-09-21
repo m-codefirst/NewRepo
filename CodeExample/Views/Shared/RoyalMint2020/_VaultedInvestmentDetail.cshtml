@@ -1,0 +1,107 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Models.ViewModels.Bullion
+
+@model VaultedInvestmentBlockViewModel
+
+<div class="mod-copy">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <h2 class="section-head section-head--xl"><span>@Model.CurrentBlock.HeaderTitle</span></h2>
+            @if (Model.IsSippContact && Model.CurrentBlock.PensionDescription != null)
+            {
+                @Html.DisplayFor(x => x.CurrentBlock.PensionDescription)
+            }
+
+            @if (!Model.IsSippContact && Model.CurrentBlock.Description != null)
+            {
+                @Html.DisplayFor(x => x.CurrentBlock.Description)
+            }
+        </div>
+    </div>
+</div>
+
+@if (!Model.IsSippContact)
+{
+    <div class="mod-section total-holdings">
+        <h2>Total holdings: @Html.DisplayFor(x => x.TotalHoldings)</h2>
+
+        <form action="./" method="" class="change-weights mb-3">
+            <div class="custom-control custom-toggle">
+                <input type="checkbox" id="weight" class="d-none">
+                <label for="weight">
+                    <span class="handle">oz</span>
+                    <span class="toggle"></span>
+                    <span class="handle">kg</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-secondary d-none">Change weights</button>
+        </form>
+
+        @*TODO: Wire up absolute coin, bars and signature chart values*@
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="row">
+                    <div class="col-12 col-sm-4 mb-4">
+                        <div class="chart">
+                            <h3>@Html.DisplayFor(x => x.CurrentBlock.GoldText)</h3>
+                            <!-- PLEASE NOTE: JS is expecting the totals to be fully formatted currency with currency symbol, thousands separator if the currency usually uses it e.g. £11,044.66 or €9387.00 and with 2 decimal places; if there's no value, we expect it to be set to zero e.g. £0 -->
+                            <!-- PLEASE NOTE: the weight should be provided in OZ -->
+                            <canvas class="vault vault-content-types" width="200" height="200" data-metal="gold" data-total="@Model.GoldMetal.HoldingMoneyWithUnit" data-weight-oz="@Model.GoldMetal.Metal.QuantityInOz" data-bar="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Gold"))" data-coin="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Gold"))" data-signature="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Gold"))"></canvas>
+                        </div>
+                        <div class="description">
+                            <p class="metal-total">@Model.GoldMetal.HoldingMoneyWithUnit</p>
+                            <p class="metal-weight">@Model.GoldMetal.Metal.QuantityInOz oz</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4 mb-4">
+                        <div class="chart">
+                            <h3>@Html.DisplayFor(x => x.CurrentBlock.SilverText)</h3>
+                            <!-- PLEASE NOTE: JS is expecting the totals to be fully formatted currency with currency symbol, thousands separator if the currency usually uses it e.g. £11,044.66 or €9387.00 and with 2 decimal places; if there's no value, we expect it to be set to zero e.g. £0 -->
+                            <!-- PLEASE NOTE: the weight should be provided in OZ -->
+                            <canvas class="vault vault-content-types" width="200" height="200" data-metal="silver" data-total="@Model.SilverMetal.HoldingMoneyWithUnit" data-weight-oz="@Model.SilverMetal.Metal.QuantityInOz" data-bar="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Silver"))" data-coin="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Silver"))" data-signature="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Silver"))"></canvas>
+                        </div>
+                        <div class="description">
+                            <p class="metal-total">@Model.SilverMetal.HoldingMoneyWithUnit</p>
+                            <p class="metal-weight">@Model.SilverMetal.Metal.QuantityInOz oz</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4 mb-4">
+                        <div class="chart">
+                            <h3>@Html.DisplayFor(x => x.CurrentBlock.PlatinumText)</h3>
+                            <!-- PLEASE NOTE: JS is expecting the totals to be fully formatted currency with currency symbol, thousands separator if the currency usually uses it e.g. £11,044.66 or €9387.00 and with 2 decimal places; if there's no value, we expect it to be set to zero e.g. £0 -->
+                            <!-- PLEASE NOTE: the weight should be provided in OZ -->
+                            <canvas class="vault vault-content-types" width="200" height="200" data-metal="platinum" data-total="@Model.PlatinumMetal.HoldingMoneyWithUnit" data-weight-oz="@Model.PlatinumMetal.Metal.QuantityInOz" data-bar="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Bar_Platinum"))" data-coin="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Coin_Platinum"))" data-signature="@Html.Raw(Model.MetalAndProductTypeHoldingFormatted.TryGet("Signature_Platinum"))"></canvas>
+                        </div>
+                        <div class="description">
+                            <p class="metal-total">@Model.PlatinumMetal.HoldingMoneyWithUnit</p>
+                            <p class="metal-weight">@Model.PlatinumMetal.Metal.QuantityInOz oz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-5 col-sm-10">
+                        <ul class="key d-sm-flex justify-content-center">
+                            <li>
+                                <span class="d-block"><span class="metal gold-coins"></span>Coins</span>
+                                <span class="d-block"><span class="metal gold-bars"></span>Bars</span>
+                                <span class="d-block"><span class="metal gold-digital"></span>Digital</span>
+                            </li>
+                            <li>
+                                <span class="d-block"><span class="metal silver-coins"></span>Coins</span>
+                                <span class="d-block"><span class="metal silver-bars"></span>Bars</span>
+                                <span class="d-block"><span class="metal silver-digital"></span>Digital</span>
+                            </li>
+                            <li>
+                                <span class="d-block"><span class="metal platinum-coins"></span>Coins</span>
+                                <span class="d-block"><span class="metal platinum-bars"></span>Bars</span>
+                                <span class="d-block"><span class="metal platinum-digital"></span>Digital</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /.total-holdings -->
+}

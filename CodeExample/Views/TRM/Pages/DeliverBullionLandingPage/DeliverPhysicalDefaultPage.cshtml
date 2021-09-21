@@ -1,0 +1,134 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.DeliverBullionLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.DeliverBullionLandingViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    }
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2 mb-1x">
+                <div>
+                    @Html.ValidationSummary(false)
+                </div>
+                <!-- Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <div class="page-header">
+                        <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Heading)</h1>
+                    </div>
+                }
+
+                <div id="insufficientFunds">
+                    @Html.Partial("_DeliverFromVaultInsufficientFund", Model.ViewModel)
+                </div>
+
+                @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                {
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                }
+                <h3 class="h6 text-midblue mt-0">
+                    @if (Model.ViewModel.ShippingMethod != null)
+                    {
+                        @Model.ViewModel.ShippingMethod.FriendlyName
+                    }
+                    @Html.TranslateFallback(StringResources.StandardDeliveryToRegisteredInvestmentAddress, " to registered investment address"):
+                </h3>
+                <h6 class="h6 mb-2x">@Model.ViewModel.DeliverAddress</h6>
+                @using (Html.BeginForm("Index", null, FormMethod.Post, new { @id = "deliver-bullion-form" }))
+                {
+                    <input type="hidden" name="VariantCode" id="variant-code" value="@Model.ViewModel.DeliverVariant.Code" />
+                    for (var i = 0; i < Model.ViewModel.WalletItems.Count; i++)
+                    {
+                        <input type="hidden" name="WalletItems[@i].Id" value="@Model.ViewModel.WalletItems[i].Id" />
+                        <input type="hidden" name="WalletItems[@i].RowVersion" value="@Convert.ToBase64String(Model.ViewModel.WalletItems[i].RowVersion)" />
+                    }
+                    <div class="checkout-item-block">
+                        <div class="checkout-item-wrapper">
+                            <div class="item-image hidden-xs">
+                                <img src="@Model.ViewModel.DeliverVariant.ImageUrl">
+                            </div>
+                            <div class="item-info">
+                                <h6 class="h6 mt-0 mb-0">@Model.ViewModel.DeliverVariant.Title</h6>
+                                <p class="text-graylight">@Model.ViewModel.DeliverVariant.Subtitle</p>
+                                <div class="row">
+                                    <div class="clearfix"></div>
+                                    <div class="col-xs-8">
+                                        <strong>@Html.TranslateFallback(StringResources.DeliverVaultQuantity, "Vault Quantity"):</strong>
+                                    </div>
+                                    <div class="col-xs-4 text-right">
+                                        @Model.ViewModel.DeliverVariant.QuantityInVault.ToString("#")
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-xs-8">
+                                        <strong>@Html.TranslateFallback(StringResources.AvailableForDelivery, "Available for Delivery"):</strong>
+                                        <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.TranslateFallback(StringResources.AvailableForDeliveryTooltip, "Available for Delivery")"></i>
+                                    </div>
+                                    <div class="col-xs-4 text-right">
+                                        @Model.ViewModel.DeliverVariant.AvailableToSell.ToString("#")
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-price flex-align-left-sm-up primary-price">
+                                <div class="price-info">
+                                    <p class="h6 text-center">@Html.TranslateFallback(StringResources.DeliverQty, "Deliver Qty")</p>
+                                    <div class="h5 mt-0 mb-0">
+                                        <div class="input-group qty-group mb-xs-1x">
+                                            <span class="input-group-btn decrease-btn">
+                                                <button class="btn qty-btn" type="button" ng-disabled="quantityToDeliver <= 1">
+                                                    <i class="trmi trmi-minus"></i>
+                                                </button>
+                                            </span>
+                                            <input type="text"
+                                                   id="deliver-quantity"
+                                                   class="form-control text-center qty-input"
+                                                   data-min="1"
+                                                   data-max="@Model.ViewModel.DeliverVariant.AvailableToSell.ToString("#")"
+                                                   ng-model="quantityToDeliver"
+                                                   floating-number-only
+                                                   ng-init="quantityToDeliver =  @Model.ViewModel.DeliverVariant.AvailableToSell.ToString("#")"
+                                                   value="@Model.ViewModel.DeliverVariant.QuantityToSellOrDeliver.ToString("#")" name="DeliverQuantity">
+                                            <span class="input-group-btn increase-btn">
+                                                <button class="btn qty-btn" type="button" ng-disabled="quantityToDeliver >= @Model.ViewModel.DeliverVariant.AvailableToSell">
+                                                    <i class="trmi trmi-plus"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="deliverTotal">
+                        @Html.Partial("_DeliverFromVaultTotal", Model.ViewModel)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+    {
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    }
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "sellOrDeliverFromVault").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"$(function () {TrmWalletModule.initForDeliver();});").AtFooter();
+}

@@ -1,0 +1,51 @@
+﻿@using EPiServer.Business.Commerce.Payment.Mastercard.Mastercard
+@using StringResources = TRM.Shared.Constants.StringResources
+@model TRM.Web.Models.ViewModels.PaymentMethodViewModel
+@{
+    var paymentMethodParameters = Model.PaymentMethodRow.GetPaymentMethodParameterRows();
+
+    var sessionJsUrl = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.SessionJsUrl).Value : string.Empty;
+
+    var amexSessionJsUrl = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexSessionJsUrl).Value : string.Empty;
+
+    var countryCodes = paymentMethodParameters.Any(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter) ?
+        paymentMethodParameters.Single(x => x.Parameter == MastercardPaymentGateway.AmexCountryCodesParameter).Value.Split(',') : null;
+
+    var countryCodesJsArray = string.Empty;
+    if (countryCodes != null && countryCodes.Any())
+    {
+        countryCodesJsArray = string.Join(",", countryCodes.Select(x => string.Format("'{0}'", x.Trim())));
+    }
+}
+
+ <script type="text/javascript">
+    var globals = globals || {};
+    globals.paymentMethodParameters = '@Model.PaymentMethodRow.GetPaymentMethodParameterRows()';
+    globals.sessionJsUrl = '@sessionJsUrl';
+    globals.amexSessionJsUrl = '@amexSessionJsUrl';
+    globals.countryCodes = '@countryCodes';
+    globals.countryCodesJsArray = '@countryCodesJsArray';
+    globals.paymentMethodId = '@Model.PaymentMethodRow.PaymentMethodId';
+    globals.chooseACard = '@Html.TranslateFallback(StringResources.MastercardChooseACard, "Choose a card")';
+    globals.allowSavedCards = '@Model.AllowSavedCards';
+    globals.expiredMessage = '@Model.ExpiredMessage';
+    globals.cardEnding = '@Html.TranslateFallback(StringResources.MastercardEnding, "Ending")';
+    globals.cardRemove = '@Html.TranslateFallback(StringResources.MastercardRemoveCard, "Remove")';
+    globals.inputName = '@TRM.Shared.Constants.StringConstants.Payments.SelectedCard"';
+    globals.newCard = '@Html.TranslateFallback(StringResources.MastercardNewCard, "New card")';
+    globals.newCardSubtitle = ""
+    globals.newAmexCard = '@Html.TranslateFallback(StringResources.MastercardNewAmexCard, "New Amex Card")';
+    globals.cardNumber = '@Html.TranslateFallback(StringResources.MastercardCardNumber, "Card Number")';
+    globals.endDate = '@Html.TranslateFallback(StringResources.MastercardEndDate, "End date")';
+    globals.monthPlaceholder = '@Html.TranslateFallback(StringResources.MastercardMonthPlaceholder, "MM")';
+    globals.yearPlaceholder = '@Html.TranslateFallback(StringResources.MastercardYearPlaceholder, "YYYY")';
+    globals.name = '@Html.TranslateFallback(StringResources.MastercardNameOnCard, "Name on Card")';
+    globals.nameSuffix = '@Html.TranslateFallback(StringResources.MastercardNameOnCardSuffix, "(Exactly as it appears on the card)")';
+    globals.namePlaceholder = '@Html.TranslateFallback(StringResources.MastercardNameOnCardPlaceholder, "Name on Card")';
+    globals.cvc = '@Html.TranslateFallback(StringResources.MastercardCcvNumber, "CCV Number")';
+    globals.cvcHelp4Digits = '@Html.TranslateFallback(StringResources.MastercardCcvHelpMessageAmex, "Last 4 digits on the back of the card")';
+    globals.cvcHelp3Digits = '@Html.TranslateFallback(StringResources.MastercardCcvHelpMessage, "Last 3 digits on the back of the card")';
+    globals.saveCard = '@Html.TranslateFallback(StringResources.MastercardSaveCard, "Save card for future use?")';
+</script>

@@ -1,0 +1,35 @@
+﻿@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.TrmImageBlockViewModel
+
+@if (Model == null || !Model.LgExists) { return; }
+
+@if (Model.HasLink)
+{
+    @Html.Raw("<a title='" + Model.ThisBlock.ImageAlt + " - " + Model.ThisBlock.PostfixText + "' href='" + Url.ContentUrlExtension(Model.ThisBlock.ImageLink) + "' class='" + Model.CssClass + "'>")
+}
+
+<picture>
+    @if (Model.XsExists)
+    {
+        <source media="(max-width: @((int)Enums.eBootstrapWidths.Xs)px)" srcset="@Model.XsImageUrl" />
+    }
+    @if (Model.SmExists)
+    {
+        <source media="(max-width: @((int)Enums.eBootstrapWidths.Sm)px)" srcset="@Model.SmImageUrl" />
+    }
+    @if (Model.MdExists)
+    {
+        <source media="(max-width: @((int)Enums.eBootstrapWidths.Md)px)" srcset="@Model.MdImageUrl" />
+    }
+    @if (Model.LgExists)
+    {
+        <source media="(min-width: @((int)Enums.eBootstrapWidths.Md + 1)px)" srcset="@Model.LgImageUrl" />
+    }
+    <img title="@Model.ThisBlock.ImageAlt" alt="@Model.ThisBlock.ImageAlt" class="@Model.ThisBlock.ImageCustomClass @Model.Css" src="@Model.LgImageUrl">
+</picture>
+
+@if (Model.HasLink)
+{
+    @Html.Raw("</a>");
+}

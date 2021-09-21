@@ -1,0 +1,122 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Cart.CartItemViewModel
+
+@if (Model.BullionCartItem != null && Model.BullionCartItem.IsSignatureVariant)
+{
+    <div class="checkout-item-block">
+        <div class="checkout-item-wrapper">
+        <div class="item-image hidden-xs">
+            <img src="@Model.ImageUrl">
+        </div>
+        <div class="item-info">
+            <h6 class="h6 mt-0 mb-0">@Model.DisplayName</h6>
+            <p class="text-graylight">@Model.SubTitle</p>
+            <div class="row">
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutPricePerOzIncludingPremium, "Price per Oz including premium"):</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+
+                    @*need .ToString() regarding to Bull-977*@
+
+                    @Model.BullionCartItem.PricePerUnit.ToString()
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutWeight, "Weight") <span>(@Html.TranslateFallBack(StringResources.BullionQuickCheckOutOz, "oz"))</span>:</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    @Model.BullionCartItem.Weight.ToString("G29")
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutVat, "VAT"):</strong>
+                </div>
+                @if (Model.BullionCartItem.VatAmount != null)
+                {
+                    <div class="col-xs-4 text-right">
+                        <span>
+                            @Model.BullionCartItem.VatAmount.ToString()
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="item-price flex-align-left-sm-up">
+            <div class="price-info">
+                <p class="h6 mt-0">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutRequestedInvestment, "Requested Investment")</p>
+                <h5 class="h5 mt-0 mb-0">
+                    <span>@Model.BullionCartItem.RequestedInvestment.ToString()</span>
+                </h5>
+            </div>
+        </div>
+        <div class="item-price primary-price">
+            <div class="price-info">
+                <p class="h6 mt-0 mb-0 text-uppercase">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutLivePrice, "Live Price")</p>
+                <p class="h5 mt-0 mb-0">
+                    <span class="liveprice" code="@Model.Code" quantity="@Model.Quantity" id="@Model.Code-price">@Model.BullionCartItem.LivePrice.ToString()</span>
+                </p>
+                <p class="mt-0 mb-0">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutExVat, "ex Vat")</p>
+            </div>
+        </div>
+        </div>
+    </div>
+}
+else if (Model.BullionCartItem != null)
+{
+    <div class="checkout-item-block">
+        <div class="checkout-item-wrapper">
+        <div class="item-image hidden-xs">
+            <img src="@Model.ImageUrl">
+        </div>
+        <div class="item-info">
+            <h6 class="h6 mt-0 mb-0">@Model.DisplayName</h6>
+            <p class="text-graylight">@Model.SubTitle</p>
+            <div class="row">
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutPricePerOzIncludingPremium, "Price per Unit, including premium"):</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    @Model.BullionCartItem.PricePerUnit.ToString()
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutQuantity, "Quantity"):</strong>
+                </div>
+                @{
+                    var quantity = Math.Round(Model.BullionCartItem.Quantity, MidpointRounding.AwayFromZero);
+                }
+                <div class="col-xs-4 text-right">
+                    @quantity
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallBack(StringResources.BullionQuickCheckOutVat, "Vat"):</strong>
+                </div>
+                @if (Model.BullionCartItem.VatAmount != null)
+                {
+                    <div class="col-xs-4 text-right">
+                        <span>
+                            @Model.BullionCartItem.VatAmount.ToString()
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="item-price flex-align-left-sm-up primary-price">
+            <div class="price-info">
+                <p class="h6 mt-0 mb-0 text-uppercase">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutLivePrice, "Live Price")</p>
+                <p class="h5 mt-0 mb-0">
+                    <span class="liveprice" code="@Model.Code" quantity="@Model.Quantity" id="@Model.Code-price">@Model.BullionCartItem.LivePrice.ToString()</span>
+                </p>
+                <p class="mt-0 mb-0">@Html.TranslateFallBack(StringResources.BullionQuickCheckOutExVat, "ex Vat")</p>
+            </div>
+        </div>
+        </div>
+    </div>
+}
+
+
+
+

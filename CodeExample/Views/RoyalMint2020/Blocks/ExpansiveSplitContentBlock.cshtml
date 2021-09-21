@@ -1,0 +1,49 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Models.Blocks
+@using EPiServer.Core
+@using Hephaestus.ContentTypes.Business.Extensions;
+@using TRM.Shared.Extensions
+@model ExpansiveSplitContentBlock
+
+@{
+    bool hasImage = Model.Image != null && !ContentReference.IsNullOrEmpty(Model.Image.LgImage);
+}
+
+<div class="mod-hero mod-hero-product flush">
+    <div class="row @Model.CopyPosition.DescriptionAttr()">
+        <div class="col-md-6 content-container @Model.Background.DescriptionAttr()">
+            <div class="row justify-content-center">
+                <div class="col-10 col-lg-8">
+                    <div class="content @Model.TextColour.DescriptionAttr()">
+                        @if (!string.IsNullOrEmpty(Model.Heading))
+                        {
+                            <h2 class="title">@Html.PropertyFor(a => a.Heading)</h2>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.SubHeading))
+                        {
+                            <h3 class="sub-title">@Html.PropertyFor(a => a.SubHeading)</h3>
+                        }
+
+                        @Html.PropertyFor(a => a.Copy)
+
+                        @if (Model.Hyperlink != null)
+                        {
+                            <a href="@Url.ContentUrlExtension(Model.Hyperlink)" class="btn @Model.ButtonStyle.DescriptionAttr()">
+                                @Html.PropertyFor(a => a.LinkText)
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 asset fluid-image">
+            @if (hasImage)
+            {
+                <div class="background">
+                    @Html.PropertyFor(a => a.Image)
+                </div>
+            }
+        </div>
+    </div><!-- /.row -->
+</div>

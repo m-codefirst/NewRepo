@@ -1,0 +1,249 @@
+﻿@using EPiServer.Shell.Web
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.Commerce.Shared.Models
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep5ViewModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+	var thisFeedbackClass = string.Empty;
+	var isLoggedIn = Request.IsAuthenticated;
+}
+
+@functions
+{
+	public bool FieldHasErrors(string fieldName)
+	{
+		return (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any());
+	}
+}
+
+@helper PasswordErrorMessage(MvcHtmlString error)
+{
+	<span class="help-block">
+		@error
+	</span>
+}
+
+<div class="pageContainer">
+	<div class="content-area"></div>
+	<div class="container mb-4x mt-2x">
+		@if (Model.CurrentPage.DisplayPageHeading)
+		{
+			<div class="page-header">
+				<h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+			</div>
+		}
+		<ol class="nav nav-bar nav-progress-bar mb-2x">
+			<li>@Html.DisplayFor(m => m.CurrentPage.Step1Number) <span>@Html.DisplayFor(m => m.CurrentPage.Step1Heading)</span></li>
+			@if (!isLoggedIn)
+			{
+				<li>@Html.DisplayFor(m => m.CurrentPage.Step2Number) <span> @Html.DisplayFor(m => m.CurrentPage.Step2Heading) </span> </li>
+			}
+			<li>@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step2Number) : Html.DisplayFor(m => m.CurrentPage.Step3Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step3Heading) </span> </li>
+			<li>@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step3Number) : Html.DisplayFor(m => m.CurrentPage.Step4Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step4Heading) </span> </li>
+			<li class="active"><a href="#">@(isLoggedIn ? Html.DisplayFor(m => m.CurrentPage.Step4Number) : Html.DisplayFor(m => m.CurrentPage.Step5Number)) <span> @Html.DisplayFor(m => m.CurrentPage.Step5Heading) </span></a></li>
+		</ol>
+		<main class="row">
+			<div class="col-xs-12">
+				@Html.DisplayFor(m => m.CurrentPage.Step5SuccessMessage)
+			</div>
+			@if (Model.CurrentPage.Step5TopContentArea != null)
+			{
+				<div class="col-xs-12">
+					<div class="row mb-2x">
+						@Html.DisplayFor(m => m.CurrentPage.Step5TopContentArea)
+					</div>
+				</div>
+			}
+			<div class="col-xs-12 col-md-7 mb-2x" ng-controller="rmCheckoutController as rmAddInfo">
+				<h3 class="mt-0">@Html.DisplayFor(m => m.CurrentPage.Step5DateLabel)</h3>
+				<h4>@(Model.ViewModel.PurchaseOrder.Modified.Value.Date.ToShortDateString())</h4>
+				<hr>
+				@if (Model.ViewModel.PurchaseOrder.OrderNumbers.Count > 1)
+				{
+					<p>
+						@Html.DisplayFor(m => m.CurrentPage.Step5SplitOrderMessage)
+					</p>
+				}
+
+				<h3>@Html.DisplayFor(m => m.CurrentPage.Step5OrderNumberLabel)</h3>
+
+				@foreach (var orderNo in Model.ViewModel.PurchaseOrder.OrderNumbers)
+				{
+					<h4>@orderNo</h4>
+				}
+
+				<hr>
+				<h3>@Html.DisplayFor(m => m.CurrentPage.Step5StatusLabel)</h3>
+				<h4 class="text-gold">@Model.ViewModel.PurchaseOrder.Status</h4>
+				<hr>
+				<h3>@Html.DisplayFor(m => m.CurrentPage.Step5DeliveryLabel)</h3>
+				@{
+
+					var deliveryAddress = new AddressModel();
+					var shipment = Model.ViewModel.PurchaseOrder.Shipments.FirstOrDefault();
+
+					if (shipment != null)
+					{
+						deliveryAddress = shipment.Address;
+					}
+				}
+				<div class="">
+					<dl>
+						<dd>@Model.ViewModel.PurchaseOrder.OrderDeliveryName</dd>
+						<dd>@deliveryAddress.Line1</dd>
+						@if (!string.IsNullOrWhiteSpace(deliveryAddress.Line2))
+						{
+							<dd>@deliveryAddress.Line2</dd>
+						}
+						<dd>@deliveryAddress.City</dd>
+						@if (!string.IsNullOrWhiteSpace(deliveryAddress.CountryRegion.Region))
+						{
+							<dd>@deliveryAddress.CountryRegion.Region</dd>
+						}
+						<dd>@deliveryAddress.PostalCode</dd>
+						<dd>@deliveryAddress.CountryName</dd>
+					</dl>
+				</div>
+				<hr>
+				<h3>@Html.DisplayFor(m => m.CurrentPage.Step5BillingLabel)</h3>
+				@{
+
+					var billingAddress = new AddressModel();
+					var firstPayment = Model.ViewModel.PurchaseOrder.Payments.FirstOrDefault();
+
+					if (firstPayment != null)
+					{
+						billingAddress = firstPayment.Address;
+					}
+				}
+				@if (billingAddress != null)
+				{
+					<div class="">
+						<dl>
+							<dd>@billingAddress.FirstName @billingAddress.LastName</dd>
+							<dd>@billingAddress.Line1</dd>
+							@if (!string.IsNullOrWhiteSpace(billingAddress.Line2))
+							{
+								<dd>@billingAddress.Line2</dd>
+							}
+							<dd>@billingAddress.City</dd>
+							@if (!string.IsNullOrWhiteSpace(billingAddress.CountryRegion.Region))
+							{
+								<dd>@billingAddress.CountryRegion.Region</dd>
+							}
+							<dd>@billingAddress.PostalCode</dd>
+							<dd>@billingAddress.CountryName</dd>
+						</dl>
+					</div>
+				}
+				<hr>
+				<h3>@Html.DisplayFor(m => m.CurrentPage.Step5PaymentLabel)</h3>
+				<div>
+					@foreach (var payment in Model.ViewModel.PurchaseOrder.Payments)
+					{
+						<dl>
+
+							@if (payment.MethodName == TRM.Shared.Constants.StringConstants.Payments.Mastercard && !string.IsNullOrEmpty(payment.CardType))
+							{
+								<dd>@Model.CurrentPage.Step5CardTypeLabel @payment.CardType</dd>
+								<dd>@Model.CurrentPage.Step5LastFourDigitsLabel @payment.Last4Digits</dd>
+							}
+							else
+							{
+								<dd>@payment.MethodName</dd>
+							}
+
+						</dl>
+					}
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-5 mb-2x">
+				@Html.Partial("_BasketSummaryConfirmation")
+			</div>
+			@if (!Request.IsAuthenticated)
+			{
+				<div class="col-xs-12 col-sm-12 col-md-12">
+					<div>
+						@Html.PropertyFor(m => m.CurrentPage.Step5PasswordFormDescriptione)
+					</div>
+					@using (Html.BeginForm("CreateAccount", null, null, FormMethod.Post, new { id = "aboutYouForm", @class = "form-horizontal" }))
+					{
+						@Html.AntiForgeryToken()
+						<input name="viewModel.ContactId" type="hidden" value="@Model.ViewModel.ContactId" />
+
+						<div class="col-xs-12 col-sm-8 col-md-8">
+							@{thisFeedbackClass = string.Empty;
+								if (FieldHasErrors("viewModel.Password1"))
+								{
+									thisFeedbackClass = "has-error has-feedback";
+								}
+							}
+							<div class="form-group @thisFeedbackClass">
+								<label class="col-sm-4 col-md-3 control-label" for="registerUsrPW1-main">@Html.DisplayFor(m => m.CurrentPage.Step2PasswordLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+								<div class="col-sm-8 col-md-7">
+									@Html.PasswordFor(x => x.ViewModel.Password1, new { @class = "form-control ok-password", @id = "registerUsrPW1-main", @ng_model = "password" })
+									<div class="label password-count" ng-class="password.length > 7 ? 'label-success' : 'label-danger'" ng-show="password.length > 0" ng-cloak>{{pwStrengthLabel}} ({{ password | passwordCount:7 }})</div>
+									<div class="strength-meter" ng-show="password.length > 0" ng-cloak>
+										<div class="strength-meter-fill" data-strength="{{passwordStrength}}"></div>
+									</div>
+									@if (!string.IsNullOrEmpty(thisFeedbackClass))
+									{
+										@PasswordErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.Password1))
+									}
+								</div>
+							</div>
+
+							@{thisFeedbackClass = string.Empty;
+								if (FieldHasErrors("viewModel.Password2"))
+								{
+									thisFeedbackClass = "has-error has-feedback";
+								}
+							}
+							<div class="form-group @thisFeedbackClass">
+								<label class="col-sm-4 col-md-3 control-label" for="registerPassword2">@Html.DisplayFor(m => m.CurrentPage.Step2PasswordConfirmLabel) <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+								<div class="col-sm-8 col-md-7">
+									@Html.PasswordFor(x => x.ViewModel.Password2, new { @class = "form-control", id = "registerPassword2" })
+									@if (!string.IsNullOrEmpty(thisFeedbackClass))
+									{
+										@PasswordErrorMessage(@Html.ValidationMessageFor(x => x.ViewModel.Password2))
+									}
+									<p class="mb-0">@Html.PropertyFor(m => m.CurrentPage.Step2PasswordInfo)</p>
+									@if (!string.IsNullOrEmpty(Model.ViewModel.Message))
+									{
+										<div class="has-error">
+											<span class="help-block">
+												@Model.ViewModel.Message
+											</span>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-12 col-sm-4 col-md-4">
+							@if (string.IsNullOrEmpty(Model.CurrentPage.Step5CreateAccountLabel))
+							{
+								<button type="submit" class="btn btn-secondary">Create Account</button>
+							}
+							else
+							{
+								<button type="submit" class="btn btn-secondary">@Html.DisplayFor(m => m.CurrentPage.Step5CreateAccountLabel)</button>
+							}
+						</div>
+
+								}
+				</div>
+								}
+			<div class="contentArea col-xs-12" @Html.EditAttributes(m => m.CurrentPage.CheckoutFooterContentArea)>
+				<div class="row">
+					@Html.DisplayFor(m => m.CurrentPage.Step5BottomContentArea)
+				</div>
+			</div>
+		</main>
+	</div>
+</div>

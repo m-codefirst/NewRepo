@@ -1,0 +1,88 @@
+﻿@model TRM.Web.Models.ViewModels.AutoInvest.AutoInvestBlockInvestmentViewModel
+@using Newtonsoft.Json
+@using TRM.Shared.Extensions
+@using TRM.Web.Models.ViewModels
+@using TRM.Web.Models.ViewModels.AutoInvest
+
+@{
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem>
+{
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.InvestmentStepperTitle,
+                IsCurrent = true,
+                Number = "1",
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.PaymentDateStepperTitle,
+                Number = "2",
+            },
+            new ProgressBarItem
+            {
+                Heading = Model.CurrentBlock.CompleteStepperTitle,
+                Number = "3",
+            }
+        }
+    };
+
+    string blockDescription = string.Format(@Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockInvestmentStepDescription, "Please use the sliders below to manage your monthly auto-investments. The minimum amount you’ll need to invest for an auto-investment starts from {0} per month."), Model.LowestAutoInvestAmountFormatted);
+    var ViewModel = new
+    {
+        texts = new
+        {
+            specifyAmountLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.SpecifyAmountLabel, "Specify amount"),
+            nextButton = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Next, "Next"),
+            backButton = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Back, "Back"),
+            confirm = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockConfirmInvestmentChanges, "Please confirm you’re happy with the changes before updating your investments"),
+            increaseOverallErrorMessage = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockIncreaseOverallErrorMessage, "Increase your overall monthly amount in order to invest in"),
+            investmentAmountTypeError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsIncorrect, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsIncorrect]),
+            investmentAmountRequiredError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsRequired, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsRequired]),
+            investmentAmountMinimumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsLessThanMinimum, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsLessThanMinimum]),
+            investmentAmountMaximumError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsMoreThanMaximum, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorAmountIsMoreThanMaximum]),
+            confirmUpdateRequireError = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorPleaseConfirmYourChanges, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorPleaseConfirmYourChanges]),
+            sumProductsAmountErrorMessage = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockErrorTotalAmountNotSplitCorrectly, AutoInvestBlockValidationHelper.FallbackValidationMessages[TRM.Web.Constants.StringResources.AutoInvestBlockErrorTotalAmountNotSplitCorrectly]),
+            heading = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockInvestmentStepHeading, "Update your monthly investment"),
+            description = blockDescription,
+            stoppedMessage = @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestBlockAutoInvestStopped, "Auto Invest Stopped"),
+        },
+        actionUrl = @Request.RawUrl,
+        actionName = @AutoInvestAction.Investment,
+        backLinkUrl = Url.ContentUrlExtension(Model.CurrentBlock.FirstStepBackLinkUrl),
+        isCancelled = Model.Cancelled,
+        maxAmountValue = 99999,
+        initialData = new
+        {
+            currencySymbol = Model.CurrencySymbol,
+            investmentAmount = Model.MonthlyInvestmentAmount,
+            products = Model.Products
+        },
+        valiationMessages = Model.ValidationMessages
+    };
+}
+
+<div class="mod-section">
+    <div class="form-spacing">
+        <h1>@Model.CurrentBlock.Heading</h1>
+    </div>
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+    <div data-module="monthly-investment" data-settings="@JsonConvert.SerializeObject(ViewModel)"></div>
+
+    @if (Model.AutoInvestmentActive)
+    {
+        <div class="mt-3">
+            <form action="@Request.RawUrl" method="post">
+                <div class="text-center">
+                    <button class="btn-plain" style="text-transform: none">
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.AutoInvestCancelMonthlyInvestment, "Cancel monthly investment")
+                    </button>
+
+                </div>
+                <input type="hidden" value="@AutoInvestAction.Cancel" name="Action">
+            </form>
+        </div>
+    }
+
+</div>

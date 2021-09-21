@@ -1,0 +1,208 @@
+﻿@using Microsoft.Ajax.Utilities
+@using NuGet
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using StringExtensions = EPiServer.Find.Helpers.Text.StringExtensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariationBase, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var layout = Model.Layout as TrmLayoutModel;
+
+    var showAboutTab = Model.CurrentPage.Description != null && !Model.CurrentPage.Description.IsEmpty ||(Model.CurrentPage.IsAgeRestricted && StringExtensions.IsNotNullOrEmpty(layout.AgeRestrictedMessageString));
+    var showSpecificationTab = !Model.CurrentPage.HideSpecificationOnProductDetailPage && Model.ViewModel.EntrySpecificationViewModel != null && !Model.ViewModel.EntrySpecificationViewModel.SpecificationItems.IsEmpty();
+    var showOptionalTabOne = !Model.CurrentPage.FirstOptionalTabHeading.IsNullOrWhiteSpace();
+    var showOptionalTabTwo = !Model.CurrentPage.SecondOptionalTabHeading.IsNullOrWhiteSpace();
+    var activeTabClass = "active in";
+    var expandedState = true;
+}
+
+<div class="row">
+    <div class="block tabContainerBlock tabHorizontal equalize-group col-xs-12" id="detailTabs">
+        <ul class="nav nav-tabs" role="tablist">
+            @{
+                var isActive = true;
+                const string activeHtml = "active";
+                if (showAboutTab)
+                {
+                    <li role="presentation" class="@activeHtml">
+                        <a target="_self" href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">@Html.TranslateFallback(StringResources.AboutTab, "About")</a>
+                    </li>
+                    isActive = false;
+                }
+
+                if (showSpecificationTab)
+                {
+                    <li role="presentation" class="@(isActive ? activeHtml : string.Empty)">
+                        <a target="_self" href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">@Html.TranslateFallback(StringResources.SpecificationTab, "Specification")</a>
+                    </li>
+                    isActive = false;
+                }
+
+                if (Model.ViewModel.ShowFeefo)
+                {
+                    <li role="presentation" class="@(isActive ? activeHtml : string.Empty)">
+                        <a target="_self" aria-controls="tab3" role="tab" data-toggle="tab" href="#tab3">@Html.TranslateFallback(StringResources.ReviewsTab, "Reviews")</a>
+                    </li>
+                    isActive = false;
+                }
+
+                if (showOptionalTabOne)
+                {
+                    <li role="presentation" class="@(isActive ? activeHtml : string.Empty)">
+                        <a target="_self" href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab">@Html.DisplayFor(m => m.CurrentPage.FirstOptionalTabHeading)</a>
+                    </li>
+                    isActive = false;
+                }
+
+                if (showOptionalTabTwo)
+                {
+                    <li role="presentation" class="@(isActive ? activeHtml : string.Empty)">
+                        <a target="_self" href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab">@Html.DisplayFor(m => m.CurrentPage.SecondOptionalTabHeading)</a>
+                    </li>
+                }
+            }
+        </ul>
+        <div class="tab-content">
+            @if (showAboutTab)
+            {
+                <div role="tabpanel" class="tab-pane  @activeTabClass" id="tab1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" class="@(!expandedState ? "collapsed" : string.Empty)" data-parent=".tab-pane" href="#collapseOne">
+                                    @Html.TranslateFallback(StringResources.AboutTab, "About")
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="block editorialBlock col-xs-12 mb-0 mb-xs-2x" @Html.EditAttributes(m => m.CurrentPage.Description)>
+                                        <div class="blockContent">
+                                            <p itemprop="description">
+                                                @Html.PropertyFor(x => x.CurrentPage.Description)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.CurrentPage.IsAgeRestricted)
+                                {
+                                    <div class="alert__age-restriction mt-2x">
+                                        <span class="badge--age-restriction">
+                                            <small>+18</small>
+                                        </span>
+                                        <strong>
+                                            @Html.DisplayFor(x => layout.AgeRestrictedMessageString)
+                                        </strong>
+                                    </div>
+                                }
+              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                activeTabClass = string.Empty;
+                expandedState = false;
+            }
+            @if (showSpecificationTab)
+            {
+                <div role="tabpanel" class="tab-pane @activeTabClass" id="tab2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent=".tab-pane" class="@(!expandedState ? "collapsed" : string.Empty)"  href="#collapseTwo">
+                                    @Html.TranslateFallback(StringResources.SpecificationTab, "Specification")
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <meta itemprop="weight" content="@Model.CurrentPage.SpecifiedWeight" />
+                                    @{ Html.RenderPartial("SpecificationTableBlock", Model.ViewModel.EntrySpecificationViewModel); }
+                                    @Html.PropertyFor(x => x.CurrentPage.ExtraSpecifications)
+                                    @Html.PropertyFor(x => x.CurrentPage.SpecificationsTabContentArea)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                activeTabClass = string.Empty;
+                expandedState = false;
+
+            }
+
+            @if (Model.ViewModel.ShowFeefo)
+            {
+                <div role="tabpanel" ng-controller="rmFeefo" ng-model="reviews" ng-init="getFeefoReviews('@Model.CurrentPage.Code',10)" ng-cloak class="tab-pane @activeTabClass" id="tab3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" class="@(!expandedState ? "collapsed" : string.Empty)"  data-parent=".tab-pane" href="#collapseThree">
+                                    @Html.TranslateFallback(StringResources.ReviewsTab, "Reviews")
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                @Html.Partial("_VariantPageReviews")
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                activeTabClass = string.Empty;
+                expandedState = false;
+            }
+
+            @if (showOptionalTabOne)
+            {
+
+                <div role="tabpanel" class="tab-pane @activeTabClass" id="tab4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" class="@(!expandedState ? "collapsed" : string.Empty)"  data-parent=".tab-pane" href="#collapseFour">
+                                    @Html.DisplayFor(m => m.CurrentPage.FirstOptionalTabHeading)
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="row">
+                                    @Html.DisplayFor(x => x.CurrentPage.FirstOptionalTabContentArea)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                activeTabClass = string.Empty;
+                expandedState = false;
+            }
+
+            @if (showOptionalTabTwo)
+            {
+                <div role="tabpanel" class="tab-pane @activeTabClass" id="tab5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" class="@(!expandedState ? "collapsed" : string.Empty)"  data-parent=".tab-pane" href="#collapseFive">
+                                    @Html.DisplayFor(m => m.CurrentPage.SecondOptionalTabHeading)
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseFive" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="row">
+                                    @Html.DisplayFor(x => x.CurrentPage.SecondOptionalTabContentArea)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                activeTabClass = string.Empty;
+                expandedState = false;
+            }
+        </div>
+    </div>
+</div>

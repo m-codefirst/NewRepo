@@ -1,0 +1,124 @@
+﻿@using Newtonsoft.Json
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.Invoices.InvoiceHeaderViewModel
+
+@{Layout = null;}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.js"></script>
+    @Html.InlineCss("/Static/trm/css/invoicepdf.css")
+</head>
+<body>
+
+    <div class="da-full">
+        <div class="row">
+            <div class="da-half">
+                <h6>@Model.CustomerName</h6>
+                <h6>@Model.AddressLine1</h6>
+                <h6>@Model.AddressLine2</h6>
+                <h6>@Model.Postcode</h6>
+                <h6>@Model.Country</h6>
+            </div>
+            <div class="da-half">
+                <h4>Invoice</h4>
+                <h6>Account: @Model.Account</h6>
+                <h6>Period: @Model.Period</h6>
+                <h6>Invoice Date: @Model.InvoicedDate.ToString("dd MMMM yyyy")</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="da-half"></div>
+            <div class="da-half">
+                <h4>Invoice Total</h4>
+                <h6>@Model.InvoiceTotal.FormatPrice(Model.Currency)</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="da-full">
+        <h3>Storage and Management Fees</h3>
+        <div id="invoiceDetailsTable"></div>
+    </div>
+
+    <script id="invoice-details-template" type="text/x-handlebars-template">
+        <table class="striped">
+            <thead>
+                <tr>
+                    <td><strong>Product</strong></td>
+                    <td class="text-right"><strong>From</strong></td>
+                    <td class="text-right"><strong>To</strong></td>
+                    <td class="number"><strong>Total Ex Vat</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each items}}
+                <tr>
+                    <td>{{product}}</td>
+                    <td class="text-right">{{from}}</td>
+                    <td class="text-right">{{to}}</td>
+                    <td class="number">{{totalExVat}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">
+                        <strong>Total Ex Vat</strong>
+                    </td>
+                    <td class="number">{{totalExVat}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <strong>Vat</strong>
+                    </td>
+                    <td class="number">{{vat}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <strong>Total</strong>
+                    </td>
+                    <td class="number">{{totalFee}}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </script>
+
+    <div id="shutter"></div>
+    <script type="text/javascript">
+    Handlebars.registerHelper('negative',
+        function(amount) {
+            return amount.includes("-") ? " neg " : "";
+        });
+    var loadTemplate = function(id, model, templateId) {
+        var source = document.getElementById(templateId).innerHTML;
+        var template = Handlebars.compile(source);
+        var html = template(model);
+
+        document.getElementById(id).innerHTML = html;
+    }
+
+    @{
+        var lineItems = Model.InvoiceDetails.Select(x => new
+        {
+            product = x.Product,
+            from = x.From.ToString("dd-MM-yyyy"),
+            to = x.To.ToString("dd-MM-yyyy"),
+            totalExVat = x.TotalExVat.FormatPrice(Model.Currency),
+        });
+    }
+
+    var data = {
+        totalExVat: '@Html.Raw(Model.InvoiceTotalExVat.FormatPrice(Model.Currency))',
+        vat: '@Html.Raw(Model.Vat.FormatPrice(Model.Currency))',
+        totalFee: '@Html.Raw(Model.InvoiceTotal.FormatPrice(Model.Currency))',
+        items: @Html.Raw(JsonConvert.SerializeObject(lineItems))
+    };
+    loadTemplate('invoiceDetailsTable', data, 'invoice-details-template');
+
+    setTimeout(function() { document.getElementById("shutter").className = "close"; }, 10);
+    </script>
+</body>
+</html>

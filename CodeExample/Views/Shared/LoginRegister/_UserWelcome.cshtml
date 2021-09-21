@@ -1,0 +1,17 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+<div class="col-xs-12 col-md-5 col-md-push-1">
+    <h3>@Html.TranslateFallback(StringResources.Hello, "Hello") {{user.user.FirstName;}}</h3>
+    <p>@Html.TranslateFallback(StringResources.AccountMenuIntro, "Welcome to the your account panel where your manage your account, orders or log off.")</p>
+
+    <button class="btn btn-default" ng-click="logout()" id="btn-logout">
+		<div class="spinner hidden"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
+		<span>@Html.TranslateFallback(StringResources.LogOut, "Log Out")</span>
+	</button>
+    <a class="visible-xs-inline-block visible-sm-inline-block btn btn-secondary" href="@Model.MyAccountPage.GetExternalUrl_V2()" title="@Html.TranslateFallback(StringResources.GoToMyAccount, "Go to My Account")">
+        @Html.TranslateFallback(StringResources.GoToMyAccount, "Go to My Account")
+    </a>
+</div>

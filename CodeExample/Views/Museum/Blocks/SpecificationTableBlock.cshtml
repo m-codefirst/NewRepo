@@ -1,0 +1,27 @@
+﻿@model  TRM.Web.Models.ViewModels.SpecificationTableBlockViewModel
+@if (!string.IsNullOrWhiteSpace(Model.SpecificationTableName))
+{
+    <div class="block editorialBlock col-xs-12 pt-1x">
+        <div class="blockContent">
+            <h4>@Model.SpecificationTableName</h4>
+        </div>
+    </div>
+}
+@if (Model.SpecificationItems != null && Model.SpecificationItems.Any())
+{
+    <div class="block editorialBlock col-xs-12">
+        <div class="blockContent">
+            <table class="table table-spec">
+                <tbody>
+                    @foreach (var specificationItem in Model.SpecificationItems)
+                    {
+                        <tr>
+                            <th>@specificationItem.Label</th>
+                            <td>@( specificationItem.Value.Length > 100 ? specificationItem.Value.Substring(0, 100) : specificationItem.Value) </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

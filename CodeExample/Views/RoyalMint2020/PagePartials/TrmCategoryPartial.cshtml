@@ -1,0 +1,20 @@
+﻿@using TRM.Web.Constants
+@using Hephaestus.ContentTypes.Business.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmCategory, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.CategoryPartialViewModel>
+
+<a href="@Model.ViewModel.CategoryUrl" class="category-card">
+    <div class="category-card__image">
+        @if (!string.IsNullOrWhiteSpace(Model.ViewModel.TeaserDto.TeaserImageUrl))
+        {
+            <img class="img-fluid" src="@Model.ViewModel.TeaserDto.TeaserImageUrl?width=500&format=jpg&quality=85" alt="@Model.ViewModel.TeaserDto.TeaserTitle">
+        }
+    </div>
+    <div class="category-card__details">
+        <h3 class="category-card__name">@Model.ViewModel.TeaserDto.TeaserTitle</h3>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ViewModel.TeaserDto.TeaserDescription))
+        {
+            <p>@Model.ViewModel.TeaserDto.TeaserDescription</p>
+        }
+    </div>
+</a>

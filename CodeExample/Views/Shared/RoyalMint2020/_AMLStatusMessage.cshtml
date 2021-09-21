@@ -1,0 +1,26 @@
+﻿@using Newtonsoft.Json
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    string backgroundClass = string.Empty;
+    string buttonClass = string.Empty;
+
+    if (Model.AmlSettingsPageContent != null)
+    {
+        backgroundClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.AmlSettingsPageContent.KycMessageBackground, Enums.eBackgroundColour2020.PurpleLight);
+        buttonClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.AmlSettingsPageContent.KycMessageButtonColour, Enums.eButtonColour2020.Primary);
+    }
+
+    var viewModel = new
+    {
+        message = @Html.PropertyFor(m => m.KycStatusMessage).ToString(),
+        dismissButton = @Html.TranslateFallback(TRM.Web.Constants.StringResources.Dismiss, "Dismiss"),
+        disable = Model.HideAMLStatus,
+        backgroundClass = backgroundClass,
+        buttonClass = buttonClass
+    };
+}
+
+<div data-module="kyc-message" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>

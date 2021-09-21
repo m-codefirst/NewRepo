@@ -1,0 +1,78 @@
+﻿@using EPiServer.ServiceLocation
+@using EPiServer.Web.Mvc.Html
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Extentions
+@using TRM.Web.Helpers
+
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Interfaces.IToggleContent, TRM.Web.Models.ViewModels.Bullion.ToggleBlockViewModel>
+
+@{
+    var blockGuid = Guid.NewGuid();
+    var viewName = string.Format("Blocks/{0}", Model.CurrentBlock.ViewName);
+
+    var isSippContact = false;
+    var bullionContactHelper = ServiceLocator.Current.GetInstance<IAmBullionContactHelper>();
+    if (bullionContactHelper != null)
+    {
+        isSippContact = bullionContactHelper.IsSippContact(CustomerContext.Current.CurrentContact);
+    }
+}
+
+@if (!Model.ViewModel.HideContent)
+{
+
+    if (Model.CurrentBlock.DoNotUseToggle && !string.IsNullOrEmpty(Model.CurrentBlock.ViewName))
+    {
+        Html.RenderPartial(viewName, Model.ViewModel);
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <div class="block-container toggle-block-container panel-box @(Model.CurrentBlock.ShowBackgroundColour ? "bg-gray" : "")">
+                    <div class="blockContent">
+                        @if (!Model.CurrentBlock.HideHeading)
+                        {
+                            <h3 class="title hidden-xs @(Model.CurrentBlock.HideHeaderBorder ? "hide-border-md-up" : "")">
+                                @(isSippContact ? Html.DisplayFor(x => x.CurrentBlock.PensionHeaderTitle) : Html.DisplayFor(x => x.CurrentBlock.HeaderTitle))
+                            </h3>
+                        }
+                        <h3 class="title no-underline visible-xs">
+                            <a data-toggle="collapse" data-collapse-xs-sm data-target="#@blockGuid" role="button" class="@(!Model.CurrentBlock.CollapseDefaultOnXSandSm ? "open" : "")">@Html.DisplayFor(x => x.CurrentBlock.HeaderTitle)</a>
+                        </h3>
+                        <div class="mt-1x @(Model.CurrentBlock.CollapseDefaultOnXSandSm ? "collapse-xs" : "collapse-xs in")" id="@blockGuid">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12">
+                                    @if (!string.IsNullOrEmpty(Model.CurrentBlock.ViewName))
+                                    {
+                                        Html.RenderPartial(viewName, Model.ViewModel);
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+@if (Model.ViewModel.HideContent)
+{
+    @Html.Script(
+        @<script type="text/javascript">
+             $(document).ready(function () {
+                 if (@Json.Encode(Model.ViewModel.HideContent)) {
+                     var blockName = lowerCaseFirstLetter('@Model.CurrentBlock.ViewName');
+                     $('.'+blockName).addClass('no-margin');
+                 }
+
+                 function lowerCaseFirstLetter(name) {
+                     return name.charAt(0).toLowerCase() + name.slice(1);
+                 }
+             })
+         </script>
+        )
+}
+

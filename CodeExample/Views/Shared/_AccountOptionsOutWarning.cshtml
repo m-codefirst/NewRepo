@@ -1,0 +1,26 @@
+﻿@model TRM.Web.Models.Interfaces.IHasAccountOptionsPopup
+
+@if (Model != null)
+{
+    <div class="modal fade" id="optionsOutModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="RegistrationPage.closeGdprWarningDialog();" aria-label="Close" id="jsCloseModal"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">@Html.PropertyFor(x => x.AllOptionsUntickPopupTitle)</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="wysiwyg">
+                        @Html.PropertyFor(x=>x.AllOptionsUntickPopupMessage)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-action btn-mobile-full-width" onclick="RegistrationPage.closeGdprWarningDialog();">Change preferences</button>
+                    <button type="button" class="btn btn-primary btn-action btn-mobile-full-width" onclick="RegistrationPage.proceedRegisterAction();">Proceed with Registration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

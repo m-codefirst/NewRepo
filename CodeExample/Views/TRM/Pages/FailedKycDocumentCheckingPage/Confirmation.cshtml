@@ -1,0 +1,82 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.FailedKycDocumentCheckingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycDetailsViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+<div class="pageContainer kyc-verification-page">
+    <div class="container-fluid no-padding contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+    <div class="container mb-4x mt-2x">
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+
+        @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            </div>
+        }
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <h1 class="h3 mt-0 mb-2x">@Html.PropertyFor(x => x.CurrentPage.ConfirmDetailsMessageHeading)</h1>
+                @if (Model.CurrentPage.TopMiddleContentArea != null)
+                {
+                    <div class="content-area">
+                        <div class="row">
+                            @Html.PropertyFor(x => x.CurrentPage.TopMiddleContentArea)
+                        </div>
+                    </div>
+                }
+                @if (Model.ViewModel.IsSuccecced)
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="alert alert-success p-2x" role="alert">
+                                <h3 class="pb-1x mt-0">@Model.ViewModel.RegisterSuccessfullyMessage</h3>
+                                <p class="lead pb-1x">
+                                    @Html.PropertyFor(x => x.CurrentPage.ApprovedConfirmDetailsMessageContent)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="alert alert-info p-2x" role="alert">
+                                <h1 class="h3 pb-1x mt-0">@Html.PropertyFor(x => x.CurrentPage.RejectedConfirmDetailsMessageTitle)</h1>
+                                <p class="lead pb-1x">
+                                    @Html.PropertyFor(x => x.CurrentPage.RejectedConfirmDetailsMessageContent)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    @Html.PropertyFor(x => x.CurrentPage.BottomMiddleContentArea)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid no-padding contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Blocks
+@model ExpansiveSplitContentBlock
+ @if (Model.BackgroundColour != Enums.eBackgroundColour.None)
+    {
+<div class="block-background @Model.BackgroundColour.DescriptionAttr()"></div>
+    }
+<div class="block-container">
+    <div class="blockContent">
+        <div class="row" @Html.EditAttributes(m=>m.Content)>
+            @Html.DisplayFor(m => m.Content)
+        </div>
+    </div>
+</div>
+<div class="letterbox">
+    <div class="image-main" style="transform: translateY(@(Model.ImageOffSet)px)">
+        @Html.PropertyFor(m => m.Image)
+    </div>
+</div>

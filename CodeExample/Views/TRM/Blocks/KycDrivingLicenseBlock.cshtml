@@ -1,0 +1,39 @@
+﻿@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Blocks.Bullion.kyc.KycDrivingLicenceBlock, TRM.Web.Models.ViewModels.Bullion.KycFurtherDetails.KycDrivingLicenceViewModel>
+
+<div class="col-xs-12 col-sm-12">
+	<div class="row mb-1x">
+		@Html.PropertyFor(x => x.CurrentBlock.MiddleTopContent)
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-7">
+			<div class="form-group mb-2x" id="kyc_licenseIdNumber_formGroup">
+				<label class="control-label" for="">
+					@Html.PropertyFor(x => x.CurrentBlock.LicenceNumberTitle)
+					<span class="text-danger">*</span>
+					<small class="text-greyblue text-nowrap display-inline-block display-block-sm"></small>
+				</label>
+				<input type="text" class="form-control tooltip-input" id="kyc_licenseIdNumber" placeholder="@Html.PropertyFor(x => x.CurrentBlock.LicenceNumberPlaceholder)">
+				<p class="alert alert-danger alert-dismissible mt-1x mb-0 text-left hidden" id="kyc_InvalidLicenceNumber" role="alert">
+					@Html.TranslateFallback(StringResources.InvalidLicenceNumber, "Invalid Licence Number")
+				</p>
+
+				@if (Model.CurrentBlock.LicenceNumberInputMessage != null)
+			    {
+					<p class="tooltip-info alert alert-info alert-dismissible mt-1x mb-0 text-left hidden" role="alert">
+						@Html.PropertyFor(x => x.CurrentBlock.LicenceNumberInputMessage)
+					</p>
+			    }
+				<input type="hidden" class="form-control" id="kyc_surname" value="@Model.ViewModel.Surname">
+			</div>
+			<button id="kyc_validateLicenceId" type="button" data-dismiss="alert" onclick="BullionKycFurtherDetails.ValidateDrivingLicence();" class="btn btn-secondary btn-200 mr-2x">@Html.PropertyFor(x => x.CurrentBlock.ConfirmDetailsButtonText)</button>
+			<a href="@Url.ContentUrlExtension(Model.CurrentBlock.BottomLink)" class="display-block-xs display-inline-block mt-xs-2x mt-md-2x mb-xs-2x">@Html.PropertyFor(x => x.CurrentBlock.BottomLinkText)</a>
+		</div>
+		<div class="col-xs-12 col-sm-5">
+			<div class="row">
+				@Html.PropertyFor(x => x.CurrentBlock.MiddleRightContent)
+			</div>
+		</div>
+	</div>
+</div>

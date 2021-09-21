@@ -1,0 +1,13 @@
+﻿@using EPiServer.Core
+@using EPiServer.Find.Helpers
+@using EPiServer.Personalization
+@using EPiServer.SpecializedProperties
+@model TRM.Web.Models.Blocks.StretcherContainerBlock
+
+<div class="block-container">
+    <div class="blockContent">
+        <div class="row stretch-items-container @(Model.Content.Count == 2 ? "has-two-children" :"") @(Model.ReorderXSandSM ? "reorder-sm-down" : "")">
+            @Html.DisplayFor(x => x.Content)
+        </div>
+    </div>
+</div>

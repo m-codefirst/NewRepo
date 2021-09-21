@@ -1,0 +1,20 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using Newtonsoft.Json
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+        var basketPageUrl = Model.BasketPage.GetExternalUrl_V2();
+        var checkoutPageUrl = Model.CheckoutPage.GetExternalUrl_V2();
+        var bullionOnlyCheckoutUrl = Model.BullionOnlyCheckoutPage.GetExternalUrl_V2();
+        var mixedCheckoutUrl = Model.MixedCheckoutPage.GetExternalUrl_V2();
+        var stoppedTrading = Model.StoppedTrading;
+
+        var viewModel = new {
+            basketPageUrl = Model.BasketPage.GetExternalUrl_V2()
+    };
+}
+
+<div data-module="basket-mini" data-mini-basket-settings="@JsonConvert.SerializeObject(viewModel)"></div>

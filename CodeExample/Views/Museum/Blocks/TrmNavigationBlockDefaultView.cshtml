@@ -1,0 +1,31 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.TrmNavigationBlockViewModel
+@{
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+    var hasChildren = Model.NavigationDto.ChildNavigationItems != null && Model.NavigationDto.ChildNavigationItems.Any();
+}
+<a href="@Model.NavigationDto.MenuItemExternalUrl" title="@Model.NavigationDto.MenuItemDisplayName">
+    @Model.NavigationDto.MenuItemDisplayName
+</a>
+@{
+    if (hasChildren)
+    {
+    <ul>
+        @foreach (var child in Model.NavigationDto.ChildNavigationItems)
+        {
+            if (!child.IsContainer)
+            {
+            <li>
+                <a href="@child.MenuItemExternalUrl"  @(child.OpenInANewWindow ? "target='_blank'" : string.Empty) title="@child.MenuItemDisplayName">@child.MenuItemDisplayName</a>
+            </li>
+            }
+        }
+        @if (!Model.NavigationDto.IsContainer)
+        {
+            <li>
+                <a href="@Model.NavigationDto.MenuItemExternalUrl" @(Model.NavigationDto.OpenInANewWindow ? "target='_blank'" : string.Empty) title="@viewAll">@Model.NavigationDto.MenuItemDisplayName</a>
+            </li>
+        }
+    </ul>
+    }
+}

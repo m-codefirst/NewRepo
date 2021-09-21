@@ -1,0 +1,17 @@
+﻿@using Newtonsoft.Json
+@using TRM.Web.Models.Pages
+@model TRM.Web.Models.ViewModels.Payment.BarclaysPageViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Payment</title>
+</head>
+<body>
+    <h2>Result: @(Model.ReceiptDto != null ? Model.ReceiptDto.decision : "-")</h2>
+</body>
+</html>
+@* @Html.Encode(JsonConvert.SerializeObject(Model.ReceiptDto)) *@

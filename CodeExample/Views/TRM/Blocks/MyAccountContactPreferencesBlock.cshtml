@@ -1,0 +1,46 @@
+﻿@model TRM.Web.Models.ViewModels.MyAccountContactPreferencesViewModel
+
+<div class="panel panel-default panel-secondary">
+
+    <div class="panel-body" ng-controller="rmContactPreferences">
+        <!-- WYSIWYG -->
+        <div class="wysiwyg mb-0">
+            @Html.PropertyFor(a => a.CurrentBlock.IntroductionText)
+        </div>
+        <!--/ WYSIWYG Ends-->
+        <div class="row" ng-init="setupPreferences(@(Model.ByEmail.ToString().ToLower()),@(Model.ByPhone.ToString().ToLower()),@(Model.ByPost.ToString().ToLower()))">
+            <div class="col-xs-12 col-sm-8 col-lg-7 mt-2x" name="changePreferences" id="changePreferences">
+                @Html.AntiForgeryToken()
+                <div class="checkbox small fancy mb-1x">
+                    <input type="checkbox" ng-model="byEmail" value="" tabindex="1" id="checkboxOne" @(Model.ByEmail ? "checked" : string.Empty)>
+                    <label class="" for="checkboxOne">
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.IWouldLikeToBeContactedByEmail, "I would like to receive news and information by e-mail")
+                    </label>
+                </div>
+                <!--/ .checkbox -->
+                <div class="checkbox small fancy mb-1x">
+                    <input type="checkbox" ng-model="byPost" value="" tabindex="2" id="checkboxTwo" @(Model.ByPost ? "checked" : string.Empty)>
+                    <label class="" for="checkboxTwo">
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.IWouldLikeToBeContactedByPost, "I would like to receive news and information by post")
+                        
+                    </label>
+                </div>
+                <!--/ .checkbox -->
+                <div class="checkbox small fancy   mb-1x">
+                    <input type="checkbox" ng-model="byPhone" value="" tabindex="3" id="checkboxThree" @(Model.ByPhone ? "checked" : string.Empty)>
+                    <label class="" for="checkboxThree">
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.IWouldLikeToBeContactedByPhone, "I would like to receive news and information by telephone")
+                    </label>
+                </div>
+                <!--/ .checkbox -->
+                
+                <div class="form-group mt-2x" ng-show="showSuccessMessage">
+                    <p>
+                        @Html.TranslateFallback(TRM.Web.Constants.StringResources.PreferencesUpdated, "Your preferences have been updated")
+                    </p>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary" ng-click="updatePreferences()">Save</button>
+    </div>
+</div>

@@ -1,0 +1,97 @@
+﻿@using TRM.Web.Constants
+<div ng-repeat="variant in shipment.CartItems">
+    <div class="checkout-item-wrapper" ng-if="!variant.BullionCartItem.IsSignatureVariant" ng-cloak>
+        <div class="item-image hidden-xs">
+            <img src="{{variant.ImageUrl}}">
+        </div>
+        <div class="item-info">
+            <h6 class="h6 mt-0 mb-0">{{variant.DisplayName}}</h6>
+            <p class="text-graylight"></p>
+            <div class="row">
+                <div class="col-xs-8">
+                    <strong>
+                        @Html.TranslateFallback(StringResources.BullionQuickCheckOutPriceperUnit, "Price per Unit, including premium"):
+                    </strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    {{getUnitPrice(variant)}}
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>Quantity:</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    {{variant.Quantity}}
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>VAT:</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    <span class="strong">
+                        {{variant.BullionCartItem.VatAmountStr}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="item-price flex-align-left-sm-up primary-price">
+            <div class="price-info">
+                <p class="h6 mt-0 mb-0 text-uppercase">@Html.TranslateFallback(StringResources.BullionQuickCheckOutLivePrice, "Live Price")</p>
+                <p class="h5 mt-0 mb-0">
+                    <span class="">{{variant.DiscountedPrice}}</span>
+                </p>
+                <p class="mt-0 mb-0">@Html.TranslateFallback(StringResources.ExVat, "ex VAT")</p>
+            </div>
+        </div>
+    </div>
+    <div class="checkout-item-wrapper" ng-if="variant.BullionCartItem.IsSignatureVariant" ng-cloak>
+        <div class="item-image hidden-xs">
+            <img src="{{variant.ImageUrl}}">
+        </div>
+        <div class="item-info">
+            <h6 class="h6 mt-0 mb-0">{{variant.DisplayName}}</h6>
+            <p class="text-graylight"></p>
+            <div class="row">
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallback(StringResources.BullionCheckOutPriceperOz, "Price per Oz including premium"):</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    {{getUnitPrice(variant)}}
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallback(StringResources.Weight, "Weight") <span>(oz)</span>:</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    {{variant.BullionCartItem.Weight}}
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>VAT:</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    <span class="strong">
+                        {{variant.BullionCartItem.VatAmountStr}}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="item-price flex-align-left-sm-up">
+            <div class="price-info">
+                <p class="h6 mt-0">@Html.TranslateFallback(StringResources.InvestmentRequested, "Investment Requested")</p>
+                <h5 class="h5 mt-0 mb-0">
+                    <span>{{variant.BullionCartItem.RequestedInvestmentString}}</span>
+                </h5>
+            </div>
+        </div>
+        <div class="item-price primary-price">
+            <div class="price-info">
+                <p class="h6 mt-0 mb-0 text-uppercase">@Html.TranslateFallback(StringResources.BullionQuickCheckOutLivePrice, "Live Price")</p>
+                <p class="h5 mt-0 mb-0">
+                    <span>{{variant.DiscountedPrice}}</span>
+                </p>
+                <p class="mt-0 mb-0">@Html.TranslateFallback(StringResources.ExVat, "ex VAT")</p>
+            </div>
+        </div>
+    </div>
+</div>

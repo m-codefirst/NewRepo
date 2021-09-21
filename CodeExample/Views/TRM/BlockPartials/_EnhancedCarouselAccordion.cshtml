@@ -1,0 +1,46 @@
+﻿@model TRM.Web.Models.Blocks.EnhancedCarouselBlock
+@* ReSharper disable Mvc.PartialViewNotResolved *@
+<div class="sliderAccordion blockContent">
+    @{
+
+        if (Model.Slide1 != null && !string.IsNullOrWhiteSpace(Model.Slide1.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlideBackground", Model.Slide1)
+        }
+        if (Model.Slide2 != null && !string.IsNullOrWhiteSpace(Model.Slide2.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlideBackground", Model.Slide2)
+        }
+        if (Model.Slide3 != null && !string.IsNullOrWhiteSpace(Model.Slide3.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlideBackground", Model.Slide3)
+        }
+        if (Model.Slide4 != null && !string.IsNullOrWhiteSpace(Model.Slide4.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlideBackground", Model.Slide4)
+        }
+    }
+</div>
+
+<div class="container slick-nav">
+    <div class="panel-group">
+
+        @if (Model.Slide1 != null && !string.IsNullOrWhiteSpace(Model.Slide1.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlide", Model.Slide1, new ViewDataDictionary { { "FirstSlide", true } })
+        }
+        @if (Model.Slide2 != null && !string.IsNullOrWhiteSpace(Model.Slide2.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlide", Model.Slide2, new ViewDataDictionary { { "FirstSlide", false } })
+        }
+        @if (Model.Slide3 != null && !string.IsNullOrWhiteSpace(Model.Slide3.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlide", Model.Slide3, new ViewDataDictionary { { "FirstSlide", false } })
+        }
+        @if (Model.Slide4 != null && !string.IsNullOrWhiteSpace(Model.Slide4.Label))
+        {
+            @Html.Partial("_EnhancedCarouselAccordionSlide", Model.Slide4, new ViewDataDictionary { { "FirstSlide", false } })
+        }
+    </div>
+</div>
+

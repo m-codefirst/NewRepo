@@ -1,0 +1,83 @@
+﻿@using Newtonsoft.Json
+@using TRM.Shared.Extensions
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.VaultHoldingsBlockViewModel
+
+@{
+    string GetIndicator(int upOrDown)
+    {
+        return upOrDown == 0 ? string.Empty : upOrDown > 0 ? "up" : "down";
+    }
+
+    var metalTypes = new[]
+    {
+        new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockGold, "Gold"), Color = "gold", Data = Model.HoldingsData.Gold, UpOrDown = GetIndicator(Model.HoldingsData.Gold.PriceChange.UpOrDown), AddMoreUrl = Url.ContentUrlExtension(Model.CurrentBlock.AddMoreGoldUrl), AddMoreLabel = Model.CurrentBlock.AddMoreGoldLabel},
+        new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockPlatinum, "Platinum"), Color = "platinum", Data = Model.HoldingsData.Platinum, UpOrDown = GetIndicator(Model.HoldingsData.Gold.PriceChange.UpOrDown), AddMoreUrl = Url.ContentUrlExtension(Model.CurrentBlock.AddMorePlatinumUrl), AddMoreLabel = Model.CurrentBlock.AddMorePlatinumLabel},
+        new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockSilver, "Silver"), Color = "silver", Data = Model.HoldingsData.Silver, UpOrDown = GetIndicator(Model.HoldingsData.Gold.PriceChange.UpOrDown), AddMoreUrl = Url.ContentUrlExtension(Model.CurrentBlock.AddMoreSilverUrl), AddMoreLabel = Model.CurrentBlock.AddMoreSilverLabel},
+    };
+}
+
+<div class="digi-investments">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            @if (!String.IsNullOrEmpty(Model.CurrentBlock.Heading))
+            {
+                <h2 class="section-head section-head--xl"><span>@Model.CurrentBlock.Heading</span></h2>
+            }
+
+            <div class="row justify-content-center">
+
+                @foreach (var metalType in metalTypes)
+                {
+
+
+                    var bullionTypes = new[]
+                    {
+                new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockCoins, "Coins"), Data = metalType.Data.Coins, Icon = "coins-alt"},
+                new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockBars, "Bars"), Data = metalType.Data.Bars, Icon = "invest"},
+                new {Name = $"{Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockDigital, "Digital")} {metalType.Name}", Data = metalType.Data.Digital, Icon = "digi-investment"},
+                new {Name = Html.TranslateFallBack(TRM.Web.Constants.StringResources.VaultHoldingsBlockLittleTreasures, "Little Treasures"), Data = metalType.Data.LittleTreasure, Icon = "little-treasures"}
+                }.Where(x => x.Data != null);
+
+                    <div class="col-12 col-lg-6 col-xl-4 pb-2">
+
+                        <div class="product product--flex">
+                            <div class="mb-2">
+                                <div class="heading d-flex flex-column align-items-center mb-1">
+
+                                    <div class="heading__name w-100 text-center"> <span>@metalType.Name</span></div>
+                                    <div class="font-dark d-flex justify-content-center" style="line-height: 20px">
+                                        <span class="">@metalType.Data.Amount.ToCurrencyString()</span>
+                                        @if (metalType.Data.PriceChange.Percent != 0)
+                                        {
+                                            <span class="ml-1 @($"triangle-{metalType.UpOrDown}") align-self-center" style="margin-right:4px"></span>
+                                            <span class="percentage @($"percentage--{metalType.UpOrDown}")">@metalType.Data.PriceChange.Percent%</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="details">
+
+                                    @foreach (var bullionType in bullionTypes)
+                                    {
+                                        <div class="details__item">
+                                            <div class="d-flex align-items-center mr-1">
+                                                <span class="icon icon-md mr-1 icon-@metalType.Color"><svg><use xlink:href="#@bullionType.Icon"></use></svg></span>
+
+                                                <span>@bullionType.Name</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-dark">@bullionType.Data.Amount.ToCurrencyString()</span>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                            <a class="btn btn-secondary w-100" href="@metalType.AddMoreUrl">@metalType.AddMoreLabel</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

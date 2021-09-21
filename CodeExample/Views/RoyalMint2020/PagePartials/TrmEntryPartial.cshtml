@@ -1,0 +1,96 @@
+﻿@using EPiServer.Core
+@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.EntryPartialViewModel
+
+@{
+    string dataProductTitle = Model.VariantSchema?.Title;
+    string dataProductCode = Model.VariantSchema?.Code;
+    string dataProductPrice = Model.VariantSchema?.Price;
+    string dataProductBrand = Model.VariantSchema?.Brand;
+    string dataProductQuantity = Model.VariantSchema?.Quantity;
+    string dataProductStock = Model.VariantSchema?.StockStatus;
+    string dataProductPromotion = Model.VariantSchema?.PromoCode;
+    string dataProductListPosition = Model.VariantSchema?.Position;
+}
+
+<div class="product-card product-consumer analytic-data-attribute"
+     data-product-title="@dataProductTitle"
+     data-product-code="@dataProductCode"
+     data-product-price="@dataProductPrice"
+     data-product-brand="@dataProductBrand"
+     data-product-quantity="@dataProductQuantity"
+     data-product-stock="@dataProductStock"
+     data-product-promotion="@dataProductPromotion"
+     data-product-list-position="@dataProductListPosition">
+
+    <a title="@Model.DisplayName" href="@Model.EntryUrl" class="asset">
+        @if (!string.IsNullOrEmpty(Model.Standard) && !string.IsNullOrEmpty(Model.StandardClass))
+        {
+            <div class="standard">@Model.Standard <div class="symbol @Model.StandardClass"></div></div>
+        }
+
+        @Html.GetMyPictureHtmlNoAngular(Model.DefaultImageUrl, new Dictionary<string, string> { { "alt", Model.DisplayName }, { "class", "img-responsive" } }, Model.ImageDisplaySizes)
+        
+        @if (Model.Badge != null && Model.Badge != ContentReference.EmptyReference)
+        {
+            <div class="productBadgeImg">
+                <img
+                    src="@Url.ContentUrl(Model.Badge)"
+                    alt="@Model.DisplayName"
+                    itemProp="image"
+                />
+            </div>
+        }
+        
+        @if (!string.IsNullOrWhiteSpace(Model.TagMessage))
+        {
+            <div class="flare"><span>@Model.TagMessage</span></div>
+        }
+    </a><!-- /.asset -->
+
+    <div class="product-container">
+        <div class="product-information">
+            <h3 class="product-name">
+                <a title="@Model.DisplayName" href="@Model.EntryUrl">
+                    @Html.DisplayFor(r => Model.DisplayName)
+                </a>
+            </h3>
+            @if (!string.IsNullOrEmpty(Model.SubDisplayName))
+            {
+                <h4 class="product-auxiliary">@Html.DisplayFor(m => Model.SubDisplayName)</h4>
+            }
+        </div><!-- /.product-information -->
+
+        <div class="product-data text-left">
+            <div class="row">
+                <div class="col price">
+                    @if (!string.IsNullOrEmpty(Model.OriginalPriceString) && Model.OriginalPriceString != Model.PriceString)
+                    {
+                        <p class="original">
+                            <span class="sr-only">@Html.TranslateFallback(StringResources.OriginalPrice, "Original price:") </span>
+                            <span>@Model.OriginalPriceString</span>
+                        </p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PriceString))
+                    {
+                        <p class="current">
+                            <span class="sr-only">@Html.TranslateFallback(StringResources.Price, "Price:") </span>
+                            @if (Model.IsPreciousMetalsVariant)
+                            {
+                                <span>@Html.TranslateFallback(StringResources.FromPrice, "From") </span>
+                            }
+                            @Model.PriceString
+                        </p>
+                    }
+                </div>
+                <div class="col additional">
+                    @if (Model.StockSummary != null && !string.IsNullOrEmpty(Model.StockSummary.StatusMessage))
+                    {
+                        <p><span class="datetime">@Model.StockSummary.StatusMessage</span></p>
+                    }
+                </div>
+            </div>
+        </div><!-- /.product-data -->
+    </div>
+</div>

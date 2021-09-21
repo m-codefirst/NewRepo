@@ -1,0 +1,38 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Helpers
+@using TRM.Web.Extentions
+@model TRM.Web.Models.Blocks.ToggleContainerBlock
+
+@{
+    var blockGuid = Guid.NewGuid();
+    var isSippContact = false;
+    var bullionContactHelper = ServiceLocator.Current.GetInstance<IAmBullionContactHelper>();
+    if (bullionContactHelper != null)
+    {
+        isSippContact = bullionContactHelper.IsSippContact(CustomerContext.Current.CurrentContact);
+    }
+}
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="block-container toggle-block-container panel-box @(Model.ShowBackgroundColour ? "bg-gray" : "")">
+			<div class="blockContent">
+			    <h3 class="title hidden-xs @(Model.HideHeaderBorder ? "hide-border-md-up" : "")">
+			        @(isSippContact ? Html.DisplayFor(x => x.PensionHeaderTitle) : Html.DisplayFor(x => x.HeaderTitle))
+			    </h3>
+				<h3 class="title no-underline visible-xs">
+					<a data-toggle="collapse" data-collapse-xs-sm data-target="#@blockGuid" role="button" class="@(!Model.CollapseDefaultOnXSandSm ? "open" : "")">@Html.DisplayFor(x => x.HeaderTitle)</a>
+				</h3>
+				<div class="mt-1x @(Model.CollapseDefaultOnXSandSm ? "collapse-xs" : "collapse-xs in")" id="@blockGuid">
+					<div class="row" @Html.EditAttributes(x => x.Content)>
+						@Html.DisplayFor(x => x.Content)
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

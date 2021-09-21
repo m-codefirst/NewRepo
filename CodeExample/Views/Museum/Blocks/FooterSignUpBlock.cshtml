@@ -1,0 +1,39 @@
+﻿@using EPiServer.Core
+@model TRM.Web.Models.Blocks.FooterSignUpBlock
+
+@{
+    var contentId = ((IContent)Model).ContentLink.ID;
+}
+<form name="newsletterSignUp" id="newsletterSignUp" ng-submit="submit()" ng-controller="rmFooterSignUp as SignUp" ng-init="init()">
+
+    <h4 class="no-border" @Html.EditAttributes(a => a.Heading)>@Html.DisplayFor(m => m.Heading)</h4>
+    
+    <p>
+        @Html.DisplayFor(m => m.SupportingMessaging)
+    </p>
+
+    <div class="input-group form-newsletter">
+        <div class="success-message hidden" @Html.EditAttributes(a => a.SuccessMessage)>@Html.DisplayFor(m => m.SuccessMessage) </div>
+        <input type="text" placeholder="@Model.EmailLabelPlaceholder" ng-model="formData.emailaddress" ng-change="resetValidation()" ng-pattern="emailFormat" name="EmailAddress" data-original-title="" title="" required>
+        <span class="input-group-btn" >
+            <button class="btn active collapsed" type="button" data-toggle="collapse" data-target="#newsletter" aria-expanded="false"></button>
+        </span>
+    </div>
+
+    <div class="form-group has-error mb-0 newsleter-validation hidden">
+        <span id="helpBlock2" class="help-block"><i class="trmi trmi-times"></i>{{Message}}</span>
+    </div>
+    
+    <div class="row">
+        <div class="wrap pb-2x collapse" id="newsletter" aria-expanded="false">
+            <div class="col-xs-12">
+                <p class="text-gray-light  hidden-sm" @Html.EditAttributes(a => a.Message)>@Html.DisplayFor(m => m.Message) </p>
+                <button type="submit" ng-disabled="newsletterSignUp.$invalid" class="btn btn-default" @Html.EditAttributes(a => a.SubmitButton)>@Html.DisplayFor(m => m.SubmitButton)</button>
+            </div>
+
+        </div>
+
+    </div>
+    <input type="hidden" ng-init="formData.ContentId=@contentId" name="ContentId" ng-model="formData.ContentId" />
+    @Html.AntiForgeryToken()
+</form>

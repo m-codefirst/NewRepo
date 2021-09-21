@@ -1,0 +1,42 @@
+﻿@using TRM.Web.Models.ViewModels
+
+@model ArticleWithBreadcrumbViewModel
+
+<div class="article row text-center">
+    <div class="col-12 col-sm-4 ml-sm-n3">
+        <a href="@Model.PageUrl" class="fluid-image">
+            <img src="@Model.TeaserImageUrl" alt="">
+        </a>
+    </div>
+    <div class="col-sm-8 text-center text-sm-left">
+        <h3 class="article-title"><a href="@Model.PageUrl">@Model.TeaserTitle</a></h3>
+        <p>@Model.TeaserDescription</p>
+        @if (Model.BreadcrumbItems != null && Model.BreadcrumbItems.Any())
+        {
+            var items = Model.BreadcrumbItems;
+            <p class="location">
+                @for (var i = 0; i < items.Count - 1; i++)
+                {
+                    var item = items[i];
+                    if (item.IsActiveContent)
+                    {
+                        @item.MenuItemDisplayName
+                    }
+                    else if (item.IsContainer)
+                    {
+                        @item.MenuItemDisplayName
+                    }
+                    else
+                    {
+                        <a href="@item.MenuItemExternalUrl" title="@item.MenuItemDisplayName">@item.MenuItemDisplayName</a>
+                    }
+
+                    if (i < items.Count - 2)
+                    {
+                        @:/
+                    }
+                }
+            </p>
+        }
+    </div>
+</div>

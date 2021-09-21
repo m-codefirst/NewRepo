@@ -1,0 +1,233 @@
+﻿@using EPiServer.Editor
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions
+@using EPiServer.Web
+@using TRM.Shared.Extensions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.SpecialEventsPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.SpecialEventsViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+    var mainClass = Model.CurrentPage.ShowMyLeftMenu ? "col-xs-12 col-md-9 col-md-push-3" : "container";
+    var anonymous = Model.ViewModel.ContactId == null || Model.ViewModel.ContactId == Guid.Empty;
+}
+
+@{
+    var menuLabel = Html.TranslateFallback(StringResources.LeftMenuMobileText, StringConstants.TranslationFallback.Menu);
+
+    if (!string.IsNullOrWhiteSpace(Model.CurrentPage.MenuButtonTextXs))
+    {
+        menuLabel = Model.CurrentPage.MenuButtonTextXs;
+    }
+}
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    Html.RenderPartial("_Breadcrumb", myLayout.Breadcrumb);
+}
+<div class="container special-event-container">
+    @if (Model.CurrentPage.FullWidthPageHeading)
+    {
+        @Html.Partial("_PageHeader", myLayout)
+    }
+    <div class="row">
+        <main class="@mainClass" id="content">
+            @if (!Model.CurrentPage.FullWidthPageHeading)
+            {
+                @Html.Partial("_PageHeader", myLayout)
+            }
+            @if (Model.CurrentPage.ShowMyLeftMenu)
+            {<div class="row">
+                    <div class="col-sm-4 hidden-md hidden-lg">
+                        <a class="btn btn-default btn-block sidenav-trigger mb-2x" data-target="#pageMenu">@menuLabel</a>
+                    </div>
+                </div>
+            }
+            @if ((Model.CurrentPage.MainBody != null && !Model.CurrentPage.MainBody.IsEmpty) || PageEditing.PageIsInEditMode)
+            {
+                <div class="xhtmlArea clear" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+
+                    @{ var content = Html.ParseXhtmlString(Model.CurrentPage.MainBody); }
+                    @Html.DisplayFor(m => content)
+
+                </div>
+            }
+            @Html.DisplayFor(x => x.ViewModel.Heading)
+            @if (anonymous)
+            {
+                <div class="contentArea">
+                    <div class="row" @Html.EditAttributes(m => m.CurrentPage.AnonymousContent)>
+                        @Html.DisplayFor(m => m.CurrentPage.AnonymousContent)
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                    <div class="row">
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                </div>
+                <table class="table table-hover" id="tblSpecialEvents">
+                    <thead>
+                        <tr>
+                            <th scope="col">@Model.ViewModel.TableHeadingDate</th>
+                            <th scope="col">@Model.ViewModel.TableHeadingName</th>
+                            <th scope="col">@Model.ViewModel.TableHeadingType</th>
+                            <th scope="col">@Model.ViewModel.TableHeadingNotes</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var appointment in Model.ViewModel.Appointments)
+                        {
+                            var cssClass = appointment.IsExpired ? "danger" : "";
+                            <tr scope="row" class="@cssClass">
+                                <td class="special-event-padding-left col-md-2">@appointment.Date</td>
+                                <td class="col-md-3">@appointment.Name</td>
+                                <td class="col-md-2">@appointment.EventTypeName</td>
+                                <td class="col-md-4">@appointment.Notes</td>
+                                <td class="text-right col-md-1">
+                                    <i class="edit-event-item hand editMe" title="Edit event '@appointment.Name'" data-id="@appointment.Id"></i>
+                                    <i class="delete-event-item hand deleteMe" title="Delete event '@appointment.Name'" data-id="@appointment.Id"></i>
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.ViewModel.Appointments.Count() == 0)
+                        {
+                            <tr scope="row" class="info">
+                                <td colspan="5">
+                                    <div class="special-event-padding-left">@Model.ViewModel.NoRecordFound</div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addSpecialEventModal" id="btnAddEvent" role="button" disabled="@Model.ViewModel.DisableAddButton" title="@(Model.ViewModel.DisableAddButton ? Model.ViewModel.MessageExccededEventItems : string.Empty)">@Model.ViewModel.ButtonTextAddEvent</button>
+                <div id="txtExccededItems" class="panel-info info @(Model.ViewModel.DisableAddButton ? string.Empty:"hidden") exccededItem">@Model.ViewModel.MessageExccededEventItems</div>
+            }
+        </main>
+        @if (Model.CurrentPage.ShowMyLeftMenu)
+        {
+            <aside class="col-xs-12 col-sm-3 col-sm-pull-9">
+                <div class="row">
+                    @{
+                        if (Model.CurrentPage.ShowManualLeftNavigation)
+                        {
+                            Html.RenderPartial("_ManualLeftMenu", myLayout);
+                        }
+
+                        if (Model.CurrentPage.ShowAutomaticLeftNavigation)
+                        {
+                            Html.RenderPartial("_AutomaticLeftMenu", myLayout);
+                        }
+                    }
+                </div>
+                <div class="row">
+
+                    @Html.PropertyFor(m => m.CurrentPage.BottomNavContentArea)
+
+
+                </div>
+            </aside>
+        }
+    </div>
+    <div class="row margin-bottom-5px"></div>
+</div>
+
+
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+
+
+
+<div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <div class="row">
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+<div class="modal fade" id="addSpecialEventModal" tabindex="-1" role="dialog" aria-labelledby="addSpecialEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="addSpecialEventModalLabel">@Model.CurrentPage.FormTextHeading</h5>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        @Html.Raw(Model.CurrentPage.FormTextIntro)
+                    </div>
+                    <div class="form-group required">
+                        @Html.LabelFor(x => x.ViewModel.Appointment.Name, Model.CurrentPage.NameLabelText, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(x => x.ViewModel.Appointment.Name, new { @class = "form-control eventName", maxlength = 50 })
+                        <small>Maximum 50 characters are allowed.</small>
+                    </div>
+                    <div class="form-group required">
+                        @Html.LabelFor(x => x.ViewModel.EventType, Model.CurrentPage.EventTypeLabelText, new { @class = "col-form-label" })
+                        @Html.DropDownListFor(x => x.ViewModel.EventType, new SelectList(Model.ViewModel.EventTypes, "Code", "EventTypeName"), "Event types", new { @class = "form-control eventTypeCode" })
+                    </div>
+                    <div class="form-group required">
+                        <div class="row">
+                            <label class="col-sm-4 col-md-3 control-label col-form-label" for="dobDay">@Html.LabelFor(a => a.ViewModel.Appointment.Date, Model.CurrentPage.DateLabelText) </label>
+                            <div class="col-sm-9 col-md-9">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <div class="select-form">
+                                            @Html.DropDownListFor(x => x.ViewModel.Appointment.Day, new SelectList(Model.ViewModel.Appointment.DayList), "Day", new { @class = "form-control eDay", data_required = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="select-form">
+                                            @Html.DropDownListFor(x => x.ViewModel.Appointment.Month, new SelectList(Model.ViewModel.Appointment.MonthList), "Month", new { @class = "form-control eMonth", data_required = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <div class="select-form">
+                                            @Html.DropDownListFor(x => x.ViewModel.Appointment.Year, new SelectList(Model.ViewModel.Appointment.YearList), "Year", new { @class = "form-control eYear", data_required = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <small style="display:none" class="warning-event-date text-danger">@Model.ViewModel.MessageWarningEventDate</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(x => x.ViewModel.Appointment.Notes, Model.CurrentPage.NotesLabelText, new { @class = "col-form-label" }):
+                        @Html.TextAreaFor(x => x.ViewModel.Appointment.Notes, new { @class = "form-control eventNote", maxlength = 255 })
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Model.CurrentPage.FormButtonTextClose</button>
+                <button type="button" class="btn btn-primary add-special-event">@Model.CurrentPage.FormButtonTextSave</button>
+                <input type="hidden" id="submitUrl" name="submitUrl" value="@Url.ContentUrlExtension(Model.CurrentPage.ContentLink)" />
+                <input type="hidden" id="eventId" value="" />
+                <input type="hidden" id="eYear" value="" />
+                <input type="hidden" id="RepeatsAnnually" value="false" />
+                <input type="hidden" id="lblDeleteMessage" value="@Model.ViewModel.MessageDeleteConfirmation" />
+            </div>
+        </div>
+    </div>
+</div>
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "specialEvents").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireStyle("/bundles/" + SiteDefinition.Current.Name + "specialEventsCss").AtHeader();
+}

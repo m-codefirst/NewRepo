@@ -1,0 +1,23 @@
+﻿@using System.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@model Hephaestus.CMS.Models.PreviewModel
+@{
+    Layout = "~/Views/Shared/_previewLayout.cshtml";
+}
+
+@foreach (var area in Model.Areas)
+{
+    if (area.Supported)
+    {
+        @Html.Partial("_templateHint", @Html.TranslateFallBack("/preview/heading", "The Block '{0}' when displayed as {1}", Model.PreviewContent.Name, area.AreaName))
+        <div class="row preview clearfix">@Html.DisplayFor(x => area.ContentArea, new { Tag = area.AreaTag })</div>
+    }
+    else
+    {
+        @Html.Partial("_templateHint", @Html.TranslateFallBack("/preview/norenderer", "The Block '{0}' cannot be displayed as {1}", Model.PreviewContent.Name, area.AreaName))
+    }
+}
+@if (!Model.Areas.Any())
+{
+    @Html.Partial("_templateHint", @Html.TranslateFallBack("/preview/norendereratall", "No renderer found for '{0}'", Model.PreviewContent.Name))
+}

@@ -1,0 +1,26 @@
+﻿@using Newtonsoft.Json
+
+@model TRM.Web.Models.ViewModels.BullionDocumentViewModel
+
+@{
+    var viewModel = new
+    {
+        yearList = Model.Years,
+        filterLabel = Html.PropertyFor(x => x.CurrentBlock.FilterText).ToHtmlString(),
+    };
+}
+
+<div class="mod-section">
+    <h2 class="section-head"><span>@Html.PropertyFor(model => model.CurrentBlock.Heading)</span></h2>
+
+    @if (Model.Documents.Count > 0)
+    {
+        <div data-module="bullion-statements" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+    }
+    else
+    {
+        <div id="bullion-statement-history" class="bg-white p-1 p-md-2">
+            @Html.PropertyFor(x => x.CurrentBlock.NoStatementsMessage)
+        </div>
+    }
+</div>

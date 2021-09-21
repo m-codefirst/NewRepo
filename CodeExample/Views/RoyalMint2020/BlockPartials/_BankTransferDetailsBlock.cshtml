@@ -1,0 +1,37 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.BullionAccountAddCreditBlockViewModel
+
+@if (Model.BankAccountDetail != null)
+{
+    <script type="text/javascript">
+    var globals = globals || {};
+    globals.bankTransfer = {
+        bankName: '@Model.BankAccountDetail.BankName',
+        accountName: '@Model.BankAccountDetail.AccountName',
+        sortCode: '@Model.BankAccountDetail.SortCode',
+        bankAccountNo: '@Model.BankAccountDetail.BankAccountNo',
+        beneficiaryReference: '@Model.BankAccountDetail.BeneficiaryReference',
+        ibanNo: '@Model.BankAccountDetail.IbanNo',
+        swiftCode: '@Model.BankAccountDetail.SwiftCode',
+        accordion2CollapseAsDefault: '@Model.BullionAccountAddCreditBlock.Accordion2CollapseAsDefault',
+        accordionTitle2: '@Model.BullionAccountAddCreditBlock.AccordionTitle2',
+        accordion2RestrictionMessage: '@Model.BullionAccountAddCreditBlock.Accordion2RestrictionMessage',
+        fundWithBankTransferDescription: '@Model.BullionAccountAddCreditBlock.FundWithBankTransferDescription',
+        transferNotAvailable: '@Html.TranslateFallback(StringResources.BankTransferNotAvaliable, "You can deposit by card but not by bank transfer.")',
+        bankNameTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsBankNameTitle, "Bank Name")',
+        accountNameTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsAccountNameTitle, "Account Name")',
+        sortCodeTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsSortCodeTitle, "Sort Code")',
+        bankAccountNoTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsBankAccountNoTitle, "Bank Account No")',
+        beneficiaryReferenceTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsBeneficiaryReferenceTitle, "Beneficiary Reference")',
+        beneficiaryReferenceTooltip: '@Html.TranslateFallback(StringResources.BankTransferDetailsBeneficiaryReferenceTooltip, "We accept Visa, Mastercard, American Express.")',
+        additionalInformationSubHeadingTitle: "Additional information for International customers", //TODO
+        additionalInformationSubHeading: '@Html.TranslateFallback(TRM.Web.Constants.StringResources.BankTransferDetailsAdditionalInformationSubHeading, "For some International banks you may also be asked to provide the following information:")',
+        ibanNoTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsIbanNoTitle, "IBAN No")',
+        swiftCodeTitle: '@Html.TranslateFallback(StringResources.BankTransferDetailsSwiftCodeTitle, "SWIFT Code")',
+        showDetails: '@(Model.BankAccountDetail != null)',
+        showIban: '@string.IsNullOrEmpty(Model.BankAccountDetail.IbanNo)',
+        showSwiftCode: '@string.IsNullOrEmpty(Model.BankAccountDetail.SwiftCode)',
+        showTransfer: '@Model.ShowBankTranfer'
+    };
+    </script>
+}

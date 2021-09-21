@@ -1,0 +1,131 @@
+﻿
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer request-funds">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+
+	<div class="container clear hidden-xs">
+		@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	</div>
+
+	@if (Model.CurrentPage.DisplayPageHeading)
+	{
+		<div class="page-header">
+			@Html.PropertyFor(m => m.CurrentPage.Heading)
+		</div>
+	}
+	@Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+
+	<div class="container">
+
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-sm-4">
+					<a class="btn btn-default btn-block sidenav-trigger mb-2x hidden-md hidden-lg mt-xs-2x" data-target="#catFilters">Account Menu</a>
+				</div>
+			</div>
+		</div>
+
+		<aside class="mobile-sidenav col-md-3" id="catFilters">
+			<a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+			<div class="row">
+				<div class="account navigationBlock col-xs-12" id="account-menu">
+					<div class="blockContent">
+						<ul class="level0 contentNav">
+							<li class="">
+								<a href="#" title="My Account">My Account</a>
+							</li>
+							<li class="has-children">
+								<a class="btn-collapse" data-target="#page-menu-1" data-toggle="collapse" title="Show/Hide More">Your Orders</a>
+								<ul class="level1 collapse in" id="page-menu-1">
+									<li><a href="/my-account/your-orders/how-to-return-an-item/" title="How to Return an item">How to Return an item</a></li>
+									<li><a href="/my-account/your-orders/view-closed-orders/" title="View Closed Orders">View Closed Orders</a></li>
+									<li><a href="/my-account/your-orders/view-open-orders/" title="View Open Orders">View Open Orders</a></li>
+								</ul>
+							</li>
+							<li class=" has-children">
+								<a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+								<ul class="level1 collapse in" id="your-orders1">
+									<li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+									<li><a href="#" title="View Statement History">View Statement History</a></li>
+									<li><a href="#" title="View Transaction History">View Transaction History</a></li>
+									<li><a href="#" title="Manage Your Bank Account Details">Manage Your Bank Account Details</a></li>
+									<li><a href="#" title="Withdraw Funds from Wallet">Withdraw Funds from Wallet</a></li>
+									<li><a href="#" title="Add Funds To Wallet">Add Funds To Wallet</a></li>
+								</ul>
+							</li>
+							<li class="has-children">
+								<a class="btn-collapse" data-target="#page-menu-2" data-toggle="collapse" title="Show/Hide More">Contact and Delivery</a>
+								<ul class="level1 collapse in" id="page-menu-2">
+									<li><a href="#" title="Change Password">Change Password</a></li>
+									<li><a href="#" title="Contact Preferences">Contact Preferences</a></li>
+									<li><a href="#" title="Manage Addresses">Manage Addresses</a></li>
+									<li><a href="#" title="Edit personal Details">Edit personal Details</a></li>
+								</ul>
+							</li>
+							<li class="has-children">
+								<a class="" title="Show/Hide More">Wishlist</a>
+								<ul class="level1 collapse in" id="page-menu-1"></ul>
+							</li>
+						</ul>
+					</div><!-- /.blockContent -->
+				</div><!-- /. navigation block -->
+			</div>
+		</aside>
+
+		<div class="col-xs-12 col-md-9 mb-xs-2x">
+			<div class="header-wrapper">
+				<div class="page-header">
+					<h1>Withdrawing Funds</h1>
+				</div>
+			</div>
+			<div class="row">
+				@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+			</div>
+			<div class="panel panel-default panel-secondary">
+				<div class="panel-body">
+					<h2 class="mt-0">Request a Withdrawal</h2>
+					<p>Please Submit the form below to malke a withdrawl. Transfers to UK Bank accounts are free of charge</p>
+					<p>Transfers to International Bank Accounts will attract a &pound;10 charge which will be deducted from your wallet</p>
+					<hr />
+					<h3>Available cash you can Withdraw today: <span class="text-danger">&pound;0.00</span></h3>
+					<div class="row">
+						<div class="col-xs-12 mt-2x">
+							<form action="/" method="post">
+								<div class="alert alert-warning">
+									You have no available funds to withdraw today, If you have an effective balance you may need to wait forfunds to clear. Please contact customer services on <a href="0000 0000 0000">0000 0000 0000</a> if you have any other further questions
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="row mb-2x">
+						<div class="col-xs-12">
+							<hr />
+							<p>To withdraw funds from your investment wallet you need to have a bank account recorded on file. You can manage your linked back accounts in <a href="#">Linked Bank Accounts</a></p>
+							<p>Withdrawal requests are typically processed within 5 working days although exact transfers times may vary depending on your banks time zone and service level.</p>
+							<p>We reserve the right to request documentary evidence of a customer’s bank account prior to releasing any funds for withdrawal. This procedure is carried out to protect our customers from withdrawals being transferred to unauthorised bank accounts.</p>
+						</div>
+					</div>
+					<div class="row mt-1x">
+						@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+	</div>
+</div>

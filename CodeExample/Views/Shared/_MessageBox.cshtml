@@ -1,0 +1,27 @@
+﻿@using EPiServer.Business.Commerce
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.DTOs.MessageDto
+
+@if (Model != null)
+{
+    <div class="container clear">
+        <div class="alert @Model.MessageType.DescriptionAttr()" role="alert">
+            @if (!string.IsNullOrEmpty(Model.Title))
+            {
+                <p>
+                    <strong>@Html.TranslateFallback(Model.Title, string.Format("The string {0} has not been set up", Model.Title))</strong>
+                </p>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <p>
+                    @Html.TranslateFallback(Model.Message, string.Format("The string {0} has not been set up", Model.Message))
+                </p>
+            }
+        </div>
+    </div>
+    @* Once we've shown the message delete the cookie *@
+    TRM.Web.Helpers.CookieHelper.RemoveCookie(StringConstants.Cookies.MessageCookie);
+}

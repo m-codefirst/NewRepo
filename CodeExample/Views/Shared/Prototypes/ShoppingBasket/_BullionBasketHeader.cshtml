@@ -1,0 +1,18 @@
+﻿@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+@model  TrmLayoutModel
+
+<div class="header-container">
+    <div class="container">
+        <!-- MetaPrice -->
+        @{ Html.RenderContentData(Model.TrmMetalBlockHeader, false); }
+        <header class="brand-header">
+            <figure class="site-logo-container pull-left">
+                <a href="@(Url.ContentUrlExtension(Model.BaseUri))" title="The Royal Mint">
+                    <img class="img-responsive" src="@Url.ContentUrlExtension(Model.SiteLogo)" alt="RoyalMint">
+                </a>
+            </figure>
+            @Html.Partial("ShoppingBasket/_BullionBasketMegaMenu", Model)
+        </header>
+    </div>
+</div>

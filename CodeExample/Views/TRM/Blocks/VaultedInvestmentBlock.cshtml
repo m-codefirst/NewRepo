@@ -1,0 +1,84 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Shared.Extensions 
+@model TRM.Web.Models.ViewModels.Bullion.VaultedInvestmentBlockViewModel
+
+<div class="row vaulted-investment-block">
+    <div class="col-xs-12">
+        @if (Model.IsSippContact && Model.CurrentBlock.PensionDescription != null)
+        {
+            @Html.DisplayFor(x => x.CurrentBlock.PensionDescription)
+        }
+
+        @if (!Model.IsSippContact && Model.CurrentBlock.Description != null)
+        {
+            @Html.DisplayFor(x => x.CurrentBlock.Description)
+        }
+
+        <div class="row vault-hodding-item">
+            <div class="col-xs-12">
+                <div class="total-vault">
+                    <p class="price">@Html.DisplayFor(x => x.TotalHoldings)</p>
+                    <p class="type">@Html.DisplayFor(x => x.CurrentBlock.TotalHoldingsText)</p>
+                </div>
+
+                @if (Model.NoHoldings)
+                {
+                    <div class="alert alert-info text-center">
+                        <h6 class="h6 mt-0 mb-0">
+                            @Html.DisplayFor(x => x.CurrentBlock.NoHoldingsMessage)
+                        </h6>
+                    </div>
+                }
+            </div>
+            <div class="col-xs-12">
+                @if (!Model.IsSippContact && !Model.NoHoldings)
+                {
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="sub-total-vault gold">
+                                <p class="price">@Model.GoldMetal.HoldingMoneyWithUnit</p>
+                                <p class="quantity">
+                                    @Model.GoldMetal.Metal.QuantityInOz<span>oz</span>
+                                </p>
+                                <p class="type">@Html.DisplayFor(x => x.CurrentBlock.GoldText)</p>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="sub-total-vault silver">
+                                <p class="price">@Model.SilverMetal.HoldingMoneyWithUnit</p>
+                                <p class="quantity">
+                                    @Model.SilverMetal.Metal.QuantityInOz<span>oz</span>
+                                </p>
+                                <p class="type">@Html.DisplayFor(x => x.CurrentBlock.SilverText)</p>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="sub-total-vault platium">
+                                <p class="price">@Model.PlatinumMetal.HoldingMoneyWithUnit</p>
+                                <p class="quantity">
+                                    @Model.PlatinumMetal.Metal.QuantityInOz<span>oz</span>
+                                </p>
+                                <p class="type">@Html.DisplayFor(x => x.CurrentBlock.PlatinumText)</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="vault-actions text-center">
+                    @if (Model.CurrentBlock.LinkOneHyperLink != null && !string.IsNullOrEmpty(Model.CurrentBlock.LinkOneDisplayText))
+                    {
+                        <a href="@Url.ContentUrlExtension(Model.CurrentBlock.LinkOneHyperLink)" class="btn btn-block btn-secondary mb-1x">@Html.DisplayFor(x => x.CurrentBlock.LinkOneDisplayText)</a>
+                    }
+                    @if (!Model.IsSippContact && Model.CurrentBlock.LinkTwoHyperLink != null && !string.IsNullOrEmpty(Model.CurrentBlock.LinkTwoDisplayText))
+                    {
+                        <a href="@Url.ContentUrlExtension(Model.CurrentBlock.LinkTwoHyperLink)" class="cta-link">@Html.DisplayFor(x => x.CurrentBlock.LinkTwoDisplayText)</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,140 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions;
+@using Newtonsoft.Json
+@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionRegistrationPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionRegistration.RegistrationStep2ViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var currentUrl = Model.CurrentPage.ContentLink.GetExternalUrl_V2();
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = new List<ProgressBarItem>
+{
+            new ProgressBarItem {
+                Heading = "Account",
+                Number = "1",
+                IsComplete = true,
+            },
+            new ProgressBarItem {
+                Heading = "Personal",
+                Number = "2",
+                Url = string.Format("{0}Step2", currentUrl),
+                IsCurrent = true,
+            },
+            new ProgressBarItem {
+                Heading = "Verify",
+                Number = "3",
+                Url = string.Format("{0}Step3", currentUrl),
+            },
+            new ProgressBarItem {
+                Heading = "Security",
+                Number = "4",
+                Url = string.Format("{0}Step4", currentUrl)
+            },
+            new ProgressBarItem {
+                Heading = "Complete",
+                Number = "5",
+                Url = string.Format("{0}Step4", currentUrl)
+            }
+        }
+    };
+
+    var FormViewModel = new
+    {
+        actionUrl = Url.Action("Step2"),
+        ReturnUrl = Request.IsAuthenticated ? myLayout.MyAccountPage.GetExternalUrl_V2() : currentUrl,
+        Step2Heading = Model.CurrentPage.Step2Heading,
+        MiddleContentStep2 = @Html.DisplayFor(m => m.CurrentPage.MiddleContentStep2).ToString(),
+        Step2ContinueButtonText = Model.CurrentPage.Step2ContinueButtonText,
+        Step2BackButtonText = Model.CurrentPage.Step2BackButtonText,
+        TitleLabel = Model.CurrentPage.TitleLabel,
+        TitleRequired = Html.TranslateFallback(StringResources.RequiredTitle, "Title is required"),
+        TitleErrorMessage = ErrorMessage("Title"),
+        FirstNameLabel = Model.CurrentPage.FirstNameLabel,
+        FirstNameMessage = Model.CurrentPage.FirstNameMessage,
+        FirstNamePlaceholder = Model.CurrentPage.FirstNamePlaceholder,
+        FirstNameRequired = Html.TranslateFallback(StringResources.RequiredFirstname, "First Name is required"),
+        FirstNameMaxLength = string.Format(Html.TranslateFallback(StringResources.FirstNameMaxlengthError, "First Name cannot be longer than {0} characters"), 64),
+        FirstNameErrorMessage = ErrorMessage("FirstName"),
+        LastNameLabel = Model.CurrentPage.LastNameLabel,
+        LastNameMessage = Model.CurrentPage.LastNameMessage,
+        LastNamePlaceholder = Model.CurrentPage.LastNamePlaceholder,
+        LastNameRequired = Html.TranslateFallback(StringResources.RequiredLastname, "Last Name is required"),
+        LastNameMaxLength = string.Format(Html.TranslateFallback(StringResources.LastNameMaxlengthError, "Last Name cannot be longer than {0} characters"), 64),
+        LastNameErrorMessage = ErrorMessage("LastName"),
+        MiddleNameLabel = Model.CurrentPage.MiddleNameLabel,
+        MiddleNameMessage = Model.CurrentPage.MiddleNameMessage,
+        MiddleNamePlaceholder = Model.CurrentPage.MiddleNamePlaceholder,
+        MiddleNameMaxLength = string.Format(Html.TranslateFallback(StringResources.MiddleNameMaxlengthError, "Middle Name cannot be longer than {0} characters"), 64),
+        MiddleNameErrorMessage = ErrorMessage("MiddleName"),
+        GenderLabel = Model.CurrentPage.GenderLabel,
+        GenderRequired = Html.TranslateFallback(StringResources.RequiredGender, "Gender is required"),
+        GenderErrorMessage = ErrorMessage(" Gender"),
+        DateOfBirthLabel = Model.CurrentPage.DateOfBirthLabel,
+        DateOfBirthMessage = Model.CurrentPage.DateOfBirthMessage,
+        DateOfBirthRequired = Html.TranslateFallback(StringResources.RequiredDateOfBirth, "Date Of Birth is required"),
+        DateOfBirthNotEqualToDate = Html.TranslateFallback(StringResources.NotEqualToDate, "Please enter a valid date"),
+        DateOfBirthHistoricDate = Html.TranslateFallback(StringResources.HistoricDate, "Date Of Birth cannot be in the future"),
+        DateOfBirthErrorMessage = ErrorMessage("DateOfBirth"),
+        TitleList = Model.ViewModel.TitleList,
+        GenderList = Model.ViewModel.GenderList,
+        DayList = Model.ViewModel.DayList,
+        MonthList = Model.ViewModel.MonthList,
+        YearList = Model.ViewModel.YearList,
+    };
+}
+
+@functions
+{
+    public string ErrorMessage(string fieldName)
+    {
+        var fieldKey = string.Format("viewModel.{0}", fieldName);
+        if (ViewData.ModelState[fieldKey] != null && ViewData.ModelState[fieldKey].Errors.Any())
+        {
+            return @Html.ValidationMessage(fieldKey).ToString();
+
+        }
+        else
+        {
+            return "";
+
+        }
+
+    }
+}
+
+<div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="mod-section">
+    @if (!Model.CurrentPage.HideStepProgressBar)
+    {
+        Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel);
+    }
+
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <h1>@Html.DisplayFor(x => x.CurrentPage.Heading)</h1>
+    }
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    </div>
+
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <div data-module="bullion-checkout-personal-information" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>

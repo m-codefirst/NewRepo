@@ -1,0 +1,82 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer bull-registration">
+
+    <!-- BULL-151 - Bullion Registration Step 5 - Application Successful -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                <!-- Step bar -->
+                <ol class="nav nav-bar nav-progress-bar">
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/AccountDetailsError_01a-01/"><span>1.</span></a></li>
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/PersonalDetailsError_02-01/"><span>2.</span></a></li>
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/VerifyYourIdentityError_03a-01/"><span>3.</span></a></li>
+                    <li class="done"><a href="/prototypes/bullion/registration/populated/SecurityQuestionError_04-01/"><span>4.</span></a></li>
+                </ol>
+                <!-- / Step bar -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <!-- Sub Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+            {
+                    <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+                }
+                <!-- / Sub Headline -->
+                <!-- Content Area -->
+                @*<div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>*@
+                <!-- / Content Area -->
+
+                <main class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-success p-2x" role="alert">
+                            <h2 class="pb-1x mt-0">Congratulations Holli</h2>
+                            <p class="lead pb-1x">
+                                Your investement account has now been created and <strong class="text-nowrap">you're ready to fund.</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- toolbar -->
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-7">
+                                <a href="" type="" class="btn btn-default btn-block pb-1x pt-1x pl-0 pr-0">Browse the site, I’ll fund my wallet later</a>
+                            </div>
+                            <div class="col-xs-12 col-sm-5 mt-1x mt-sm-0x mt-md-0x mt-lg-0x">
+                                <a href="" type="" class="btn btn-secondary btn-block p-1x">Fund your Wallet Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 text-center mt-1x mb-2x">
+                        <a href="" type="" class="btn btn-link text-britannia mb-1x">Open your Account Dashboard</a>
+                    </div>
+                    <!-- / toolbar -->
+
+                </main>
+                <!-- / BULL-147 - Bullion Registration Step 1 - Account Details -->
+            </div>
+        </div>
+
+            <!-- Content Area -->
+        @*<div class="row">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>*@
+            <!-- / Content Area -->
+    </div>
+
+</div>
+
+<!-- / BULL-151 - Bullion Registration Step 5 - Application Successful -->

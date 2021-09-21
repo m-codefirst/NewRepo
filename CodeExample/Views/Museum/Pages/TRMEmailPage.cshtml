@@ -1,0 +1,12 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TRMEmailPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+@Html.Raw(Model.CurrentPage.Header)
+<body>
+    @Html.PropertyFor(m => m.CurrentPage.Body)
+</body>
+</html>

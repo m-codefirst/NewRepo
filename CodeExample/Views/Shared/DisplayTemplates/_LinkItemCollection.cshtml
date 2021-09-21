@@ -1,0 +1,15 @@
+﻿@using EPiServer.SpecializedProperties
+@using TRM.Shared.Extensions 
+@model LinkItemCollection
+
+<ul id="@ViewData["id"]" class="@ViewData["class"]" role="@ViewData["role"]">
+    @foreach (var linkItem in Model ?? Enumerable.Empty<LinkItem>())
+    {
+        var url = Url.ContentUrlExtension(linkItem.Href);
+        <li class="@ViewData["listItemClass"]">
+            <a href="@url" target="@linkItem.Target" title="@linkItem.Title" class="@ViewData["anchorClass"]">
+                @linkItem.Text
+            </a>
+        </li>
+    }
+</ul>

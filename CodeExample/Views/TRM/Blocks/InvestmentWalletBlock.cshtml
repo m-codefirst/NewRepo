@@ -1,0 +1,59 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.Bullion.InvestmentWalletViewModel
+
+<div class="row investment-wallet-block">
+    <div class="col-xs-12">
+        @(Model.IsSippContact ? Html.PropertyFor(x => x.CurrentBlock.PensionInvestmentWalletSubHeading) : Html.PropertyFor(x => x.CurrentBlock.InvestmentWalletSubHeading) )
+            <div class="fund-wrapper @(Model.CurrentBlock.HideButtons || Model.IsSippContact ? "no-action" : "")">
+                <div class="fund-histories">
+                    <div class="investment-history">
+                        <div class="vault-box total-history">
+                            <span class="price mt-0 h4 @(Model.EffectiveBalance.Amount < 0 ? "text-danger" : "")">
+                                @Model.EffectiveBalance.ToString()
+                            </span>
+                            <p class="type">
+                                <span>@Html.PropertyFor(x => x.CurrentBlock.TotalBalanceTitle)</span>
+                                <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentBlock.TotalBalanceTooltip)"></i>
+                            </p>
+                        </div>
+                        <div class="vault-box total-history">
+                            <span class="price mt-0 h4 @(Model.AvailableToInvest.Amount >= 0 ? "text-success" : "text-danger")">
+                                @Model.AvailableToInvest.ToString()
+                            </span>
+                            <p class="type">
+                                <span>@Html.PropertyFor(x => x.CurrentBlock.AvailableToInvestTitle)</span>
+                                <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentBlock.AvailableToInvestTooltip)"></i>
+                            </p>
+                        </div>
+                        @if (!Model.IsSippContact)
+                        {
+                            <div class="vault-box total-history">
+                                <span class="price mt-0 h4 @(Model.AvailableToWithdraw.Amount < 0 ? "text-danger" : "")">
+                                    @Model.AvailableToWithdraw.ToString()
+                                </span>
+                                <p class="type">
+                                    <span>@Html.PropertyFor(x => x.CurrentBlock.AvailableToWithdrawTitle)</span>
+                                    <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentBlock.AvailableToWithdrawTooltip)"></i>
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if (!Model.CurrentBlock.HideButtons && !Model.IsSippContact)
+                {
+                    <div class="fund-actions">
+                        <a class="btn btn-block btn-bg-purple icon-btn @(Model.AvailableToWithdraw.Amount <= 0 ? "single-btn" : "")" href="@Model.BullionAddFundUrl">
+                            <span>@Html.PropertyFor(x => x.CurrentBlock.AddFundsButtonText)</span>
+                        </a>
+                        @if (Model.AvailableToWithdraw.Amount > 0)
+                        {
+                            <a class="btn btn-block btn-bg-white icon-btn" href="@Model.BullionWithdrawFundsUrl">
+                                <span>@Html.PropertyFor(x => x.CurrentBlock.WithdrawButtonText)</span>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+    </div>
+</div>

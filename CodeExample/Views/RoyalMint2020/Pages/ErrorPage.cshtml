@@ -1,0 +1,72 @@
+﻿@using Castle.Core.Internal
+@using EPiServer.Find.Helpers
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using EPiServer.Web
+@using System.Web.Optimization
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.ErrorPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "errorPageCss")
+}
+
+<div class="mod-section">
+    @if (!Model.CurrentPage.Heading.IsNullOrEmpty())
+    {
+        <div class="section-head" @Html.EditAttributes(m => m.CurrentPage.Heading)>
+            <span>@Html.DisplayFor(m => m.CurrentPage.Heading)</span>
+        </div>
+    }
+
+    @if (!Model.CurrentPage.MainBody.IsNull() && !Model.CurrentPage.MainBody.IsEmpty)
+    {
+        <div class="row justify-content-center">
+            <div class="col-10 col-md-6" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                @Html.DisplayFor(m => m.CurrentPage.MainBody)
+            </div>
+        </div>
+    }
+
+    @if (!myLayout.IsSippContact)
+    {
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-6 col-md-4">
+                @Html.Partial("RoyalMint2020/_GlobalSearch", Model, new ViewDataDictionary { { "buttonClass", "btn-light" },
+                                        { "placeholder", Html.TranslateFallback(StringResources.SearchPlaceholder, "Search for a product, service or article") },
+                                        { "buttonName", Html.TranslateFallback(StringResources.SearchButtonName, "Search") },
+                                        { "includingResultsFor", Html.TranslateFallback(StringResources.SearchIncludingResultsFor, "Including Results For") },
+                                        { "viewMoreResults", Html.TranslateFallback(StringResources.SearchViewMoreResults, "View More Results") },
+                                        { "seeFullSearchResults", Html.TranslateFallback(StringResources.SearchSeeFullSearchResults, "See Full Search Results") },
+                                        { "noresultsFound", Html.TranslateFallback(StringResources.SearchNoresultsFound, "No results found") }, })
+            </div>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-xl-8">
+            <div class="recommended">
+                <div class="row justify-content-center">
+                    <div class="col-10">
+                        @if (!Model.CurrentPage.ErrorPageContentArea.IsNull() && !Model.CurrentPage.ErrorPageContentArea.IsEmpty)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-md-10" @Html.EditAttributes(m => m.CurrentPage.ErrorPageContentArea)>
+                                    @Html.DisplayFor(m => m.CurrentPage.ErrorPageContentArea)
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div> <!-- /.recommended -->
+        </div>
+    </div>
+</div><!-- /.mod-section -->

@@ -1,0 +1,230 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+
+@using Newtonsoft.Json
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Models.ViewModels
+@using TRM.Shared.Extensions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep2ViewModel>
+
+@functions
+{
+
+    public string ErrorMessage(string fieldName)
+    {
+        if (ViewData.ModelState[fieldName] != null && ViewData.ModelState[fieldName].Errors.Any())
+        {
+            return @Html.ValidationMessage(fieldName).ToString();
+
+        }
+        else
+        {
+            return "";
+
+        }
+    }
+}
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var url = string.Empty;
+    if (Request != null && Request.Url != null)
+    {
+        var trmLayout = (TrmLayoutModel)Model.Layout;
+        url = trmLayout.CheckoutPage.GetExternalUrl_V2();
+    }
+    var isLoggedIn = Request.IsAuthenticated;
+    var thisFeedbackClass = string.Empty;
+
+    var progressBarViewModel = new ProgressBarViewModel
+    {
+        Steps = isLoggedIn
+            ? new List<ProgressBarItem> {
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step1Heading,
+        Number = Model.CurrentPage.Step1Number,
+        Url = url,
+        IsCurrent = true,
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step3Heading,
+        Number = Model.CurrentPage.Step3Number,
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step4Heading,
+        Number = Model.CurrentPage.Step4Number
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step5Heading,
+        Number = Model.CurrentPage.Step5Number
+    }
+                                                                                                                                                                                                            }
+            : new List<ProgressBarItem> {
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step1Heading,
+        Number = Model.CurrentPage.Step1Number,
+        Url = url,
+        IsComplete = true
+
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step2Heading,
+        Number = Model.CurrentPage.Step2Number,
+        IsCurrent = true,
+
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step3Heading,
+        Number = Model.CurrentPage.Step3Number
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step4Heading,
+        Number = Model.CurrentPage.Step4Number
+    },
+    new ProgressBarItem {
+        Heading = Model.CurrentPage.Step5Heading,
+        Number = Model.CurrentPage.Step5Number
+    }
+                                                                                                                                                                                                            }
+    };
+
+    var FormViewModel = new
+    {
+        displayPageHeading = Model.CurrentPage.DisplayPageHeading,
+        isAuthenticated = Request.IsAuthenticated,
+        heading = Model.CurrentPage.Heading,
+        step2ContentHeading = Model.CurrentPage.Step2ContentHeading,
+        titleField = new
+        {
+            label = Model.CurrentPage.Step2TitleLabel,
+            placeholder = Model.CurrentPage.Step2TitlePlaceholder,
+            existing = Model.ViewModel.Title,
+            error = Html.TranslateFallback(StringResources.RequiredTitle, "Title is required"),
+            errorMessage = ErrorMessage("Title")
+        },
+        firstNameField = new
+        {
+            label = Model.CurrentPage.Step2FirstNameLabel,
+            placeholder = Model.CurrentPage.Step2FirstNamePlaceholder,
+            existing = Model.ViewModel.FirstName,
+            error = Html.TranslateFallback(StringResources.RequiredFirstname, "First Name is required"),
+            maxlength = 64,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.FirstNameMaxlengthError, "First Name cannot be longer than {0} characters"), 64),
+            errorMessage = ErrorMessage("FirstName")
+
+        },
+        middleNameField = new
+        {
+
+            label = Model.CurrentPage.Step2MiddleNameLabel ?? "Middle name",
+            placeholder = Model.CurrentPage.Step2MiddleNamePlaceholder,
+            maxlength = 64,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.MiddleNameMaxlengthError, "Middle Name cannot be longer than {0} characters"), 64),
+            errorMessage = ErrorMessage("MiddleName")
+
+        },
+        lastNameField = new
+        {
+            label = Model.CurrentPage.Step2LastNameLabel,
+            placeholder = Model.CurrentPage.Step2LastNamePlaceholder,
+            existing = Model.ViewModel.LastName,
+            error = Html.TranslateFallback(StringResources.RequiredLastname, "Last Name is required"),
+            maxlength = 64,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.LastNameMaxlengthError, "Last Name cannot be longer than {0} characters"), 64),
+            errorMessage = ErrorMessage("LastName")
+
+        },
+        genderField = new
+        {
+
+            label = Model.CurrentPage.Step2GenderLabel ?? "Gender",
+            error = Html.TranslateFallback(StringResources.RequiredGender, "Gender is required"),
+            genderList = Model.ViewModel.GenderList,
+            errorMessage = ErrorMessage("Gender")
+        },
+        dateOfBirthField = new
+        {
+            label = Model.CurrentPage.Step2DateOfBirthLabel,
+            error = Html.TranslateFallback(StringResources.RequiredDateOfBirth, "Date Of Birth is required"),
+            notEqualToDate = Html.TranslateFallback(StringResources.NotEqualToDate, "Please enter a valid date"),
+            historicDate = Html.TranslateFallback(StringResources.HistoricDate, "Date Of Birth cannot be in the future"),
+            dayList = Model.ViewModel.DayList,
+            monthList = Model.ViewModel.MonthList,
+            yearList = Model.ViewModel.YearList,
+            message = Model.CurrentPage.Step2DateOfBirthMessage,
+            errorMessage = ErrorMessage("DateOfBirth")
+        },
+        passwordField = new
+        {
+            label = Model.CurrentPage.Step2PasswordLabel,
+            placeholder = Model.CurrentPage.Step2PasswordPlaceholder,
+            errorMessage = ErrorMessage("Password"),
+            error = Html.TranslateFallback(StringResources.PasswordRequired, "Password is required"),
+            passwordNotMatch = Html.TranslateFallback(StringResources.PasswordNotMatch, "The password provided do not match"),
+            passwordMin = 8,
+            passwordMinLength = Html.TranslateFallback(StringResources.PasswordMinLength, "Password too weak"),
+            passwordMax = 256,
+            passwordInvalid = Html.TranslateFallback(StringResources.PasswordInvalid, StringConstants.TranslationFallback.PasswordInvalid),
+            passwordMaxLength = string.Format(Html.TranslateFallback(StringResources.PasswordMaxLength, "Password cannot be longer than {0} characters"), 256),
+
+        },
+        passwordConfirmField = new
+        {
+            label = Model.CurrentPage.Step2PasswordConfirmLabel,
+            errorMessage = ErrorMessage("ConfirmPassword"),
+            placeholder = Model.CurrentPage.Step2PasswordConfirmPlaceholder,
+        },
+
+        emailField = new
+        {
+            label = Model.CurrentPage.Step2EmailLabel,
+            placeholder = Model.CurrentPage.Step2EmailPlaceholder,
+            existing = Model.ViewModel.EmailAddress,
+            errors = Model.ViewModel.Errors,
+
+            validationError = Html.TranslateFallback(StringResources.EmailRequiredMessage, "Email Address is required"),
+            validEmailError = Html.TranslateFallback(StringResources.FormInvalidEmailText, "Please enter a valid email address"),
+            maxlength = 256,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.EmailAddressMaxLengthError, "Email Address cannot be longer than {0} characters"), 256),
+            notMatchError = Html.TranslateFallback(StringResources.EmailNotMatchError, "The email addresses provided do not match"),
+            confirmError = Html.TranslateFallback(StringResources.EmailConfirmError, "Confirm Email Address is required"),
+            errorMessage = ErrorMessage("EmailAddress"),
+            errorMessage2 = ErrorMessage("EmailAddress2"),
+            emailAlreadyExists = Html.TranslateFallback(StringResources.EmailAddressInUse, "This e-mail address is already in use, please try logging in or if you've forgotten your password, try resetting your password"),
+        },
+        telephoneField = new
+        {
+            existing = Model.ViewModel.Telephone,
+            label = Model.CurrentPage.Step2TelephoneNumberLabel,
+            info = Html.TranslateFallback(StringResources.TelephoneInfo, "We only use your phone number to send you text updates or call if we need more delivery information."),
+            error = Html.TranslateFallback(StringResources.TelephoneError, "Telephone is required"),
+            maxlength = 32,
+            maxlengthError = string.Format(Html.TranslateFallback(StringResources.TelephoneMaxlengthError, "Telephone cannot be longer than {0} characters"), 32),
+            errorMessage = ErrorMessage("Telephone"),
+        },
+        titles = Model.ViewModel.TitleList,
+        nextStepLabel = Model.CurrentPage.Step2NextStepLabel,
+        nextStepButton = Model.CurrentPage.NextButtonText,
+        emailConfirmationLabel = Model.CurrentPage.Step2EmailConfirmLabel,
+        actionAuthenticated = Url.Action("CheckoutStep3"),
+        actionNotAuthenticated = Url.Action("CheckoutStep2"),
+        isAmlTriggered = Model.ViewModel.IsAmlTriggered,
+        IsAmlTriggeredInput = @Html.HiddenFor(m => m.ViewModel.IsAmlTriggered).ToString(),
+        step2AmlTriggeredMessage = Model.CurrentPage.Step2AmlTriggeredMessage?.ToString() ?? "message ALM"
+    };
+}
+
+
+<div class="mod-section">
+    @{ Html.RenderPartial("RoyalMint2020/_ProgressBar", progressBarViewModel); }
+    <div data-module="personal-information" data-settings="@JsonConvert.SerializeObject(FormViewModel)"></div>
+</div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Three })

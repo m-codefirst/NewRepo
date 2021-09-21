@@ -1,0 +1,210 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions;
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionOnlyCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.BullionOnlyCheckout.BullionOnlyCheckoutStep1ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+@Html.Partial("_BullionSyncWithPampErrorInformTemplate")
+<div class="pageContainer">
+    <div class="pageContainer">
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>
+        }
+        <div class="container mb-4x mt-2x">
+            @Html.ValidationSummary(false)
+            @if (Model.CurrentPage.Step1Heading != null)
+            {
+                <div class="page-header">
+                    <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Step1Heading)</h1>
+                </div>
+            }
+            @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+            {
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+            }
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+                        <li class="active"><a href="">1.<span>@Html.PropertyFor(x => x.CurrentPage.Step1TabHeading)</span></a></li>
+                        <li><a href="">2.<span>@Html.PropertyFor(x => x.CurrentPage.Step2TabHeading)</span></a> </li>
+                    </ol>
+                </div>
+                <div class="col-xs-12 col-md-9 mb-1x">
+
+                    @if (!string.IsNullOrEmpty(Model.CurrentPage.Step1SubHeading))
+                    {
+                        <h2 class="h2 mt-0">@Html.PropertyFor(x => x.CurrentPage.Step1SubHeading)</h2>
+                    }
+
+                    <form action="@Model.CurrentPage.ContentLink.GetExternalUrl_V2()Step1" method="post" ng-submit="onSubmitCheckout($event)"
+                          ng-init="onCheckSyncWithPamp(@Json.Encode(Model.ViewModel.IsSyncWithPampError), @Json.Encode(Model.ViewModel.IsNotEnoughMoney), @Json.Encode(Model.ViewModel.ValidForPayment)); getBasketSummary()" name="checkoutForm" id="checkoutForm">
+                        <div ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress">
+                            <h3 class="h3">@Html.PropertyFor(x => x.CurrentPage.ItemsForDeliveryHeading)</h3>
+                            <div class="vaulted-header">
+                                <div class="intro-text">
+                                    @if (Model.ViewModel.DeliveryAddress != null)
+                                    {
+                                        var delivery = Model.ViewModel.DeliveryAddress;
+                                        <p class="mb-0">
+                                            @(!string.IsNullOrEmpty(delivery.Line1) ? delivery.Line1 + ", " : "")
+                                            @(!string.IsNullOrEmpty(delivery.Line2) ? delivery.Line2 + ", " : "")
+                                            @delivery.City, @delivery.PostalCode
+                                        </p>
+                                        <p>
+                                            @Html.PropertyFor(x => x.CurrentPage.DeliveryCostTitle): <strong ng-bind="getInvestmentDelivery()"></strong>
+                                        </p>
+                                    }
+                                </div>
+                                <div class="price-notify-text">
+                                    <p class="alert alert-info text-slateblue mb-0 text-center">
+                                        @Html.PropertyFor(x => x.CurrentPage.PricesAreNowLiveTitle)
+                                        <i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.PricesAreNowLiveToothTip)"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="checkout-item-block" ng-repeat="shipment in rmCommerce.shipments | filter:{ShipmentUniqueId:'BullionCart-Delivered'}">
+                                @Html.Partial("_InvestmentBullionItems")
+                            </div>
+                        </div>
+
+                        <div ng-if="rmCommerce.hasItemToBeStored">
+                            <h3 class="h3">@Html.PropertyFor(x => x.CurrentPage.ItemsForVaultedHeading)</h3>
+                            <div class="vaulted-header">
+                                <div class="intro-text">
+                                    @Html.PropertyFor(x => x.CurrentPage.ItemsForVaultedDescription)
+                                </div>
+                                <div ng-if="!rmCommerce.hasItemDeliveredToInvestmentAddress" class="price-notify-text">
+                                    <p class="alert alert-info text-slateblue mb-0 text-center">
+                                        @Html.PropertyFor(x => x.CurrentPage.PricesAreNowLiveTitle)
+                                        <i class="trmi trmi-question inline" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.PricesAreNowLiveToothTip)"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="checkout-item-block" ng-repeat="shipment in rmCommerce.shipments | filter:{ShipmentUniqueId:'BullionCart-Vaulted'}">
+                                @Html.Partial("_InvestmentBullionItems")
+                            </div>
+                        </div>
+
+                        <div class="checkout-total">
+                            <div class="row">
+                                <div class="col-xs-6 col-md-3 col-md-offset-6" ng-if="showInvestmentTotalDiscount()">
+                                    <strong class="pull-right">Saved Amount</strong>
+                                </div>
+                                <div class="col-xs-6 col-md-3 text-right" ng-if="showInvestmentTotalDiscount()">
+                                    {{getBullionSavedAmount()}}
+                                </div>
+                                <div class="clearfix"></div>
+
+                                <div class="col-xs-6 col-md-3 col-md-offset-6">
+                                    <strong class="pull-right">Sub Total</strong>
+                                </div>
+                                <div class="col-xs-6 col-md-3 text-right">
+                                    {{getInvestmentSubTotal()}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-md-3 col-md-offset-6">
+                                    <strong class="pull-right">Bullion Delivery</strong>
+                                </div>
+                                <div class="col-xs-6 col-md-3 text-right">
+                                    <span class="strong">
+                                        {{getInvestmentDeliveryTotal()}}
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-6 col-md-3 col-md-offset-6">
+                                    <strong class="pull-right">VAT</strong>
+                                </div>
+                                <div class="col-xs-6 col-md-3 text-right">
+                                    {{getInvestmentVat()}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <hr>
+                            </div>
+                            <div class="row center-items-sm-up reorder-sm">
+                                <div class="col-xs-12 col-sm-6">
+                                    @if (!Model.ViewModel.ShowInsufficientFunds)
+                                    {
+                                        <span class="h6 mt-0 mb-0 coundown-timer inline alert alert-info text-slateblue" ng-init="countDown(@Model.CurrentPage.LivePriceValidTime, @Json.Encode(Model.ViewModel.ShowInsufficientFunds))">
+                                            LIVE Prices valid for <span class="h5">{{coundowntimer}}</span> seconds
+                                        </span>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">Investment Total</p>
+                                        </div>
+                                        <div class="col-xs-6 text-right-sm-up">
+                                            <p class="h4 h3-lg-down strong mt-0 mb-0">{{getInvestmentTotal()}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="h6 mt-20 wallet-balance text-right-sm-up">
+                            Available Wallet Balance: <span class="@(Model.ViewModel.ShowInsufficientFunds ? "text-danger" : "text-success")">@Model.ViewModel.AvailableToInvest.ToString()</span>
+                        </h3>
+                        <hr>
+                        @if (!Model.ViewModel.ShowInsufficientFunds)
+                        {
+                            if (!Model.ViewModel.HideFixPriceButton)
+                            {
+                                <button type="submit" id="payment-btn" @(!Model.ViewModel.ValidForPayment ? "disabled" : "") class="btn btn-secondary mb-1x">@Html.PropertyFor(x => x.CurrentPage.FixPriceAndBuyInvestmentsButtonText)</button>
+                            }
+                        }
+                    </form>
+
+                    <div id="add-fund-container" class="@(!Model.ViewModel.ShowInsufficientFunds ? "hidden" : "")">
+                        @using (Html.BeginForm("AddFunds", null, FormMethod.Post, new { name = "checkoutAddFundsForm", id = "checkoutAddFundsForm" }))
+                        {
+                            <div class="checkout-funds-insufficient alert alert-info text-slateblue">
+                                <h3 class="h3 mt-0">@Html.PropertyFor(x => x.CurrentPage.InsufficientFundsHeading)</h3>
+                                <p>@Html.PropertyFor(x => x.CurrentPage.InsufficientFundsDescription)</p>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5 class="h5">Investment Order Total: {{getInvestmentTotal()}}</h5>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5 class="h5 wallet-balance text-right-sm">
+                                            Available to invest:<span class="text-danger">@Model.ViewModel.AvailableToInvest.ToString()</span>
+                                            <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" data-original-title="@Html.PropertyFor(x => x.CurrentPage.AvailableToInvestTooltip)"></i>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            if (!myLayout.IsSippContact)
+                            {
+                                <button type="submit" class="btn btn-secondary mb-1x">@Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds")</button>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3 mb-1x content-area">
+                    <div class="row">
+                        @Html.PropertyFor(x => x.CurrentPage.Step1RightColumnContentArea)
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+</div>

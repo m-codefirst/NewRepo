@@ -1,0 +1,21 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions;
+@using TRM.Shared.Constants
+@using Resources = TRM.Web.Constants.StringResources
+@model TRM.Web.Models.ViewModels.AccountOrderViewModel
+
+<div class="mod-section">
+    @if (!String.IsNullOrWhiteSpace(Model.ThisBlock.Heading))
+    {<h2 class="section-head"><span>@Html.PropertyFor(model => model.ThisBlock.Heading)</span></h2>}
+
+    @if (Model.Orders.Count > 0)
+    {
+        var orderPage = string.Empty;
+        if (Model.ThisBlock.OrderDetailsPage != null)
+        {
+            orderPage = Model.ThisBlock.OrderDetailsPage.GetExternalUrl_V2();
+        }
+
+        @Html.Partial("_AccountOrderItems", Model.Orders, new ViewDataDictionary { { "orderPage", orderPage }, { "isImpersonating", Model.IsImpersonating } })
+    }
+</div>

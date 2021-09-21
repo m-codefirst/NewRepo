@@ -1,0 +1,35 @@
+﻿@using EPiServer.Business.Commerce
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+
+@if (Model != null)
+{
+    <div class="modal fade" id="emailBackInStockModal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="BackInStock.closeEmailAddressEntryModal()" aria-label="Close" id="jsCloseModal"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="wish-list">@Model.ViewModel.EmailAddressEntryHeading</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="wysiwyg">
+                        <p>@Html.Raw(Model.ViewModel.EmailAddressEntryContent)</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="emailBackInStock" placeholder="Enter your email address..." class="form-control input-email-back-in-stock" required>
+                        <span id="backInStockMessage"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel-email-back-in-stock btn-action" onclick="BackInStock.closeEmailAddressEntryModal()">@Model.ViewModel.CancelButtonText</button>
+                    <button type="button" class="btn btn-primary btn-action" onclick="BackInStock.saveSignupEmail('@Model.ViewModel.Code')">@Model.ViewModel.ContinueButtonText</button>
+                    <div class="mb-xs-1x hidden loader" id="backInStockLoader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

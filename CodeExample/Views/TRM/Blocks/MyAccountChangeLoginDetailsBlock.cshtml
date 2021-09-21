@@ -1,0 +1,175 @@
+﻿@model TRM.Web.Models.Blocks.MyAccountChangeLoginDetailsBlock
+@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions;
+<div class="panel panel-default panel-secondary">
+    <div class="panel-body">
+        <div class="wysiwyg mb-0">
+            @Html.PropertyFor(a => a.IntroductionText)
+        </div>
+        <div class="row" ng-controller="rmChangeLoginDetails" ng-init="init()">
+            <div class="col-xs-12 col-sm-9">
+                <form name="changeLoginDetailsForm"
+                      id="changeLoginDetailsForm"
+                      novalidate=""
+                      role="form"
+                      ng-submit="updateUserPassword(changeLoginDetailsForm)">
+                    @Html.AntiForgeryToken()
+                    <h3>
+                        <label class="control-label">
+                            User Name
+                        </label>
+                    </h3>
+                    <div class="form-group">
+                        <label class="control-label change-login-caption">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.ChangeLoginDetailsIntroduction, "To change your username please contact our customer services team on 01234 657 891")
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.Username, "Username")
+                        </label>
+
+                        <p class="control-label">
+                            {{userName}}
+                        </p>
+                    </div>
+                    <h3>
+                        <label class="control-label">
+                            Security Question
+                        </label>
+                    </h3>
+                    <div class="form-group">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.Questions, "Questions")
+                        </label>
+
+                        <select name="securityQuestion" ng-model="securityQuestionSelected" class="form-control">
+                            <option value="" selected>@Html.TranslateFallback(TRM.Web.Constants.StringResources.ChangeSecurityQuestionAndAnswer, "Select security question if you wish to change your security question and answer")</option>
+                            <option ng-repeat="(key, value) in securityQuestions" value="{{key}}" ng-if="key!='Select a question'">
+                                {{value}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': ((changeLoginDetailsForm.securityAnswer.$error.maxlength || changeLoginDetailsForm.securityAnswer.$error.minlength) || changeLoginDetailsForm.securityAnswer.$error.required ) && changeLoginDetailsForm.$submitted}">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.EnterNewSecurityAnswer, "Answer")
+                            <span class="text-danger" ng-if="securityQuestionSelected.length>0">*</span>
+                        </label>
+                        <input type="text"
+                               ng-minlength="1"
+                               ng-maxlength="50"
+                               class="form-control"
+                               ng-class="(changeLoginDetailsForm.securityAnswer.$dirty && changeLoginDetailsForm.securityAnswer.$invalid) ? 'error' : ''"
+                               name="securityAnswer"
+                               placeholder=""
+                               ng-required="securityQuestionSelected.length>0"
+                               ng-model="securityAnswer">
+                        <span class="text-danger" ng-show="(changeLoginDetailsForm.securityAnswer.$error.maxlength || changeLoginDetailsForm.securityAnswer.$error.minlength) && changeLoginDetailsForm.securityAnswer.$dirty">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.IncorrectLengthOfQA, "Answer must be 1 to 50 characters ")
+                        </span>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': securityQuestionSelected.length>0 && changeLoginDetailsForm.confirmSecurityAnswer.$invalid && changeLoginDetailsForm.$submitted}">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.ConfirmSecurityAnswer, "Confirm Answer")
+                            <span class="text-danger" ng-if="securityQuestionSelected.length>0">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               name="confirmSecurityAnswer"
+                               ng-required="securityAnswer.length>0"
+                               ng-model="confirmSecurityAnswer"
+                               compare-to="securityAnswer" />
+                        <span class="text-danger" ng-show="changeLoginDetailsForm.confirmSecurityAnswer.$error.compareTo && changeLoginDetailsForm.securityAnswer.$dirty && changeLoginDetailsForm.$submitted">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.NeedSameAsNewSercurityAnswer, "Need same as the new sercurity answer")
+                        </span>
+                    </div>
+                    <h3><label class="control-label">Password</label></h3>
+                    <div class="form-group" ng-class="{'has-error': password==originalPassword}">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.EnterNewPassword, "Please enter your new password")
+                        </label>
+                        <input type="password"
+                               class="form-control ok-password"
+                               ng-class="(changeLoginDetailsForm.password.$dirty && changeLoginDetailsForm.password.$invalid) ? 'error' : ''"
+                               name="password"
+                               placeholder=""
+                               ng-required="false"
+                               ng-model="password"
+                               id="registerUsrPW1-main">
+                        <div class="label password-count"
+                             ng-class="password.length > 8 ? 'label-success' : 'label-danger'"
+                             ng-show="password.length > 0"
+                             ng-cloak>
+                            {{pwStrengthLabel}} ({{ password | passwordCount:8 }})
+                        </div>
+                        <div class="strength-meter"
+                             ng-show="password.length > 0"
+                             ng-cloak>
+                            <div class="strength-meter-fill"
+                                 data-strength="{{passwordStrength}}">
+                            </div>
+                        </div>
+                        <label class="control-label" ng-show="password.length > 0 && passwordStrength < 2 && changeLoginDetailsForm.password.$dirty">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.PasswordTooWeak, "Password Too Weak")
+                        </label>
+                        <label class="control-label" ng-show="password==originalPassword">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.MustNotTheSameWithTheOldPassword, "The new password mustn't the same with the old password")
+                        </label>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': password.length> 0 && changeLoginDetailsForm.confirmPassword.$invalid && changeLoginDetailsForm.$submitted}">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.PleaseConfirmNewPassword, "Please confirm your new password")
+                            <span class="text-danger" ng-if="password.length>0">*</span>
+                        </label>
+                        <input type="password"
+                               class="form-control"
+                               name="confirmPassword"
+                               ng-required="password.length>0"
+                               ng-model="confirmPassword"
+                               compare-to="password"/>
+                        <span class="text-danger" ng-show="changeLoginDetailsForm.confirmPassword.$error.compareTo && changeLoginDetailsForm.password.$dirty && changeLoginDetailsForm.$submitted">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.NeedSameAsNewPassword, "Need Same As New Password")
+                        </span>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': changeLoginDetailsForm.originalPassword.$error.required && changeLoginDetailsForm.$submitted}">
+                        <label class="control-label">
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.EnterOriginalPassword, "Please enter your current password")
+                            <span class="text-danger" ng-if="securityQuestionSelected.length > 0|| password.length>0">*</span>
+                        </label>
+                        <input type="password"
+                               class="form-control"
+                               ng-model="originalPassword"
+                               name="originalPassword"
+                               ng-required="true" />
+                    </div>
+                    <div class="form-group">
+                            <button class="btn btn-secondary" id="change-login-detail" ng-disabled="password.length<=0 && securityQuestionSelected.length<=0"
+                                    type="submit">
+                                <div class="spinner hidden"><div class="bounce1"></div><div class="bounce2"></div></div>
+                                <span>@Html.TranslateFallback(TRM.Web.Constants.StringResources.SaveChangePasswordChanges, "Save")</span>
+                            </button>
+                    </div>
+
+                    <!-- success message-->
+                    <div class="form-group" ng-show="hasSuccess">
+                        <p>
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.LoginDetailChanged, "Login Detail Changed")
+                        </p>
+                    </div>
+                    <!-- success message END-->
+                    <!-- fail message-->
+                    <div class="form-group" ng-show="hasFailure">
+                        <p>
+                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.FailToChangeLoginDetail, "Fail To Change Login Detail")
+                        </p>
+                    </div>
+                    <!-- fail message END-->
+                </form>
+            </div>
+
+            <script>
+                 var redirectTo = '@Model.RedirectSubmited.GetExternalUrl_V2()'
+            </script>
+        </div>
+    </div>
+</div>

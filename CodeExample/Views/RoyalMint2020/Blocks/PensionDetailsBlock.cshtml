@@ -1,0 +1,97 @@
+﻿@using EPiServer.ServiceLocation
+@using EPiServer
+@using EPiServer.Core
+@using EPiServer.AddOns.Helpers
+@using Newtonsoft.Json
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+
+@model TRM.Web.Models.ViewModels.Bullion.PensionDetailsModel
+
+@{
+    var viewModel = new
+    {
+        content = new
+        {
+            sendEmailButtonText = @Html.TranslateFallBack(StringResources.SendWelcomeEmail, StringConstants.TranslationFallback.SendWelcomeEmail)
+        }
+    };
+}
+
+<div class="mod-copy">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <h2 class="section-head"><span>@Html.PropertyFor(x => x.CurrentBlock.HeaderTitle)</span></h2>
+        </div>
+    </div>
+</div>
+<div class="mod-section pt-0">
+    <div class="row justify-content-center">
+        <table class="table col-12">
+            @if (!string.IsNullOrEmpty(Model.CompanyName))
+            {
+                <tr>
+                    <th>@Html.PropertyFor(x => x.CurrentBlock.CompanyTitle)</th>
+                    <td>@Model.CompanyName</td>
+                </tr>
+            }
+            @if (!string.IsNullOrEmpty(Model.CompanyPhone))
+            {
+                <tr>
+                    <th>@Html.PropertyFor(x => x.CurrentBlock.CompanyPhoneTitle)</th>
+                    <td>@Model.CompanyPhone</td>
+                </tr>
+            }
+            @{
+                var delivery = Model.CompanyAddress;
+                if (delivery != null)
+                {
+                    <tr>
+                        <th>@Html.PropertyFor(x => x.CurrentBlock.CompanyAddressTitle)</th>
+                        <td>
+                            <address>
+                                @Html.PropertyFor(x => x.CurrentBlock.CompanyAddressTitle)<br />
+                                @(!string.IsNullOrEmpty(delivery.Line1) ? delivery.Line1 : string.Empty)<br />
+                                @(!string.IsNullOrEmpty(delivery.Line2) ? delivery.Line2 : string.Empty)<br />
+                                @delivery.City<br />
+                                @delivery.PostalCode
+                            </address>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (!string.IsNullOrEmpty(Model.SchemeType))
+            {
+                <tr>
+                    <th>@Html.PropertyFor(x => x.CurrentBlock.SchemeTypeTitle)</th>
+                    <td>@Model.SchemeType</td>
+                </tr>
+            }
+            @if (!string.IsNullOrEmpty(Model.HMRCRef))
+            {
+                <tr>
+                    <th>@Html.PropertyFor(x => x.CurrentBlock.HRMCRefTitle)</th>
+                    <td>@Model.HMRCRef</td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="row btns justify-content-center mt-3">
+        @if (Model.IsPensionProvider)
+        {
+            var sippSassAdminPageUrl = ServiceLocator.Current.GetInstance<IContentLoader>()
+                .Get<TRM.Web.Models.Pages.StartPage>(ContentReference.StartPage)
+                .SIPPSSASAdminPage.GetPublicUrl();
+            <div class="col-md-6">
+                <a class="btn btn-secondary mb-lg-0" href="@sippSassAdminPageUrl">@Html.TranslateFallBack(StringResources.PensionDetailsSchemeCustomers, StringConstants.TranslationFallback.PensionDetailsSchemeCustomers)</a>
+            </div>
+        }
+
+        @if (Model.AccountBeforeImpersonatingIsCustomerServiceAccount && (Model.IsPensionProvider || Model.IsSippCustomer))
+        {
+            <div class="col-md-6">
+                <div data-module="pension-details" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+            </div>
+        }
+    </div>
+</div>

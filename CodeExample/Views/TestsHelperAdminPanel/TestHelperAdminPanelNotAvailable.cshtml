@@ -1,0 +1,36 @@
+﻿@using System.Configuration
+@using EPiServer.Framework.Web.Resources
+@model TRM.Web.Plugins.TestsHelperAdminPanel.TestsHelperAdminPanelViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Test Helper Admin Panel</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    @Html.Raw(ClientResources.RenderResources("ShellCore"))
+    @Html.Raw(ClientResources.RenderResources("ShellCoreLightTheme"))
+</head>
+<body>
+    <div class="epi-padding">
+        <div class="epi-contentArea">
+            <div class="EP-systemImage">
+                <h1 class="EP-prefix">
+                    Tests Helper Admin Panel
+                </h1>
+                <p class="EP-systemInfo">
+                    Tool to create needed content for Tests. Available only in Integration.
+                </p>
+                <p class="EP-systemInfo">
+                    Current Environment: @ConfigurationManager.AppSettings["episerver:EnvironmentName"]
+                </p>
+                <h2>
+                    This tool is not available in this environment!
+                </h2>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

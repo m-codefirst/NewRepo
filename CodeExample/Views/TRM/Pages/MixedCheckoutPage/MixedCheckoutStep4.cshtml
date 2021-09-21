@@ -1,0 +1,249 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using Hephaestus.CMS.Extensions
+@using Hephaestus.Commerce.Shared.Models
+@using Mediachase.Commerce.Orders
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions 
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.MixedCheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.MixedCheckout.MixedCheckoutStep4ViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+
+<div class="pageContainer">
+    <div class="pageContainer">
+        @if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>
+        }
+        <div class="container mb-4x mt-2x">
+            @Html.ValidationSummary(false)
+            <div class="page-header">
+                <h1 class="h1">@Html.PropertyFor(x => x.CurrentPage.Step4PageHeading)</h1>
+            </div>
+            @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+            {
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                </div>
+            }
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="nav nav-bar nav-progress-bar mb-2x mixed-checkout-nav">
+                        <li><a href="">1.<span>@Html.PropertyFor(x => x.CurrentPage.Step1TabHeading)</span></a></li>
+                        <li><a href="">2. <span>@Html.PropertyFor(x => x.CurrentPage.Step2TabHeading)</span></a> </li>
+                        <li><a href="">3. <span>@Html.PropertyFor(x => x.CurrentPage.Step3TabHeading)</span></a></li>
+                        <li class="active"><a href="">4. <span>@Html.PropertyFor(x => x.CurrentPage.Step4TabHeading)</span></a></li>
+                    </ol>
+                </div>
+                <div class="col-xs-12">
+                    @if (Model.ViewModel.InvestmentPurchaseOrder.OrderStatus != OrderStatus.Cancelled)
+                    {
+                        <div class="alert alert-success inline-text-info">
+                            <i class="trmi trmi-check text-success mr-1x"></i>@Html.PropertyFor(x => x.CurrentPage.Step4SuccessfulMessage)
+                        </div>
+                    }
+                    @if (Model.ViewModel.InvestmentPurchaseOrder.OrderStatus == OrderStatus.InProgress)
+                    {
+                        <div class="alert alert-success inline-text-info">
+                            <i class="trmi trmi-check text-success mr-1x"></i>@Html.PropertyFor(x => x.CurrentPage.PendingInvestmentOrderConfirmationMessage)
+                        </div>
+                    }
+                </div>
+                <div class="col-xs-12 col-md-7 mb-2x">
+                    @if (Model.CurrentPage.Step4TopContentArea != null)
+                    {
+                        <div class="row mb-1x">
+                            @Html.DisplayFor(x => x.CurrentPage.Step4TopContentArea)
+                        </div>
+                    }
+
+                    <h3 class="h3 mt-0 mb-1x">Order Date: @Model.ViewModel.OrderDate.ToString("dd/MM/yyyy")</h3>
+                    @{
+                        var retailOrder = Model.ViewModel.RetailPurchaseOrder;
+                    }
+                    <h4 class="h4 mb-0 header-font-color">@Html.PropertyFor(x => x.CurrentPage.Step4RetailOrderText) - @retailOrder.Total</h4>
+                    @foreach (var orderNumber in retailOrder.OrderNumbers)
+                    {
+                        <h5 class="h5 mt-0 header-font-color">@orderNumber</h5>
+                    }
+                    <p>@Html.PropertyFor(x => x.CurrentPage.Step4RetailOrderNote)</p>
+                    <div class="row">
+                        @{
+                            var deliveryAddress = new AddressModel();
+                            var shipment = retailOrder.Shipments.FirstOrDefault();
+
+                            if (shipment != null)
+                            {
+                                deliveryAddress = shipment.Address;
+                            }
+                        }
+                        <div class="col-xs-6 col-sm-4">
+                            <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.Step4DeliveryToTitle)</h6>
+                            <p class="mb-0">@deliveryAddress.Line1</p>
+                            @if (!string.IsNullOrWhiteSpace(deliveryAddress.Line2))
+                            {
+                                <b class="mb-0">@deliveryAddress.Line2</b>
+                            }
+                            <p class="mb-0">@deliveryAddress.City</p>
+                            @if (!string.IsNullOrWhiteSpace(deliveryAddress.CountryRegion.Region))
+                            {
+                                <p class="mb-0">@deliveryAddress.CountryRegion.Region</p>
+                            }
+                            <p class="mb-0">@deliveryAddress.PostalCode</p>
+                            <p class="mb-0">@deliveryAddress.CountryName</p>
+                        </div>
+                        <div class="col-xs-6 col-sm-4">
+                            <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.Step4BillingAddressTitle)</h6>
+                            @{
+                                var billingAddress = new AddressModel();
+                                var firstPayment = retailOrder.Payments.FirstOrDefault();
+
+                                if (firstPayment != null)
+                                {
+                                    billingAddress = firstPayment.Address;
+                                }
+                            }
+                            <p class="mb-0">@billingAddress.Line1</p>
+                            @if (!string.IsNullOrWhiteSpace(billingAddress.Line2))
+                            {
+                                <b class="mb-0">@billingAddress.Line2</b>
+                            }
+                            <p class="mb-0">@billingAddress.City</p>
+                            @if (!string.IsNullOrWhiteSpace(billingAddress.CountryRegion.Region))
+                            {
+                                <p class="mb-0">@billingAddress.CountryRegion.Region</p>
+                            }
+                            <p class="mb-0">@billingAddress.PostalCode</p>
+                            <p class="mb-0">@billingAddress.CountryName</p>
+                        </div>
+                        <div class="col-xs-6 col-sm-4">
+                            <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.Step4PaymentTitle)</h6>
+                            @foreach (var payment in retailOrder.Payments)
+                            {
+                                <p class="mb-0">
+
+                                    @if (payment.MethodName == TRM.Shared.Constants.StringConstants.Payments.Mastercard && !string.IsNullOrEmpty(payment.CardType))
+                                    {
+                                    <p class="mb-0"> @payment.CardType</p>
+                                    <p class="mb-0">@Model.CurrentPage.Step4LastFourDigitsLabel @payment.Last4Digits</p>
+                                }
+                                else
+                                {
+                                    <p class="mb-0">@payment.MethodName</p>
+                                }
+                                    </p>
+                                }
+                        </div>
+                    </div>
+
+                    @{
+                        var investmentOrder = Model.ViewModel.InvestmentPurchaseOrder;
+                    }
+
+                    @if (investmentOrder.OrderStatus == OrderStatus.Cancelled)
+                    {
+                        <h4 class="h4 mb-0 header-font-color">@Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderText)</h4>
+                        <div class="alert alert-danger inline-text-info">
+                            <i class="trmi trmi-check text-warning mr-1x"></i>
+                            @Model.ViewModel.OrderRejectedMsg
+                        </div>
+                    }
+                    else
+                    {
+                        <h4 class="h4 mb-0 header-font-color">@Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderText) - @investmentOrder.Total</h4>
+
+                        foreach (var orderNumber in investmentOrder.OrderNumbers)
+                        {
+                            <h5 class="h5 mt-0 header-font-color">@orderNumber</h5>
+                        }
+
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-4">
+                                <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.Step4DeliveryToTitle)</h6>
+                                @{
+                                    var investmentDelivery = investmentOrder.DeliveryAddress;
+                                }
+                                @if (investmentDelivery.Name.Equals("VaultShippingAddress"))
+                                {
+                                    @Html.TranslateFallBack(StringResources.BullionDeliveryToVault, "Vault")
+                                }
+                                else
+                                {
+                                    <p class="mb-0">@investmentDelivery.Line1</p>
+                                    if (!string.IsNullOrWhiteSpace(investmentDelivery.Line2))
+                                    {
+                                        <b class="mb-0">@investmentDelivery.Line2</b>
+                                    }
+                                    <p class="mb-0">@investmentDelivery.City</p>
+                                    if (!string.IsNullOrWhiteSpace(investmentDelivery.CountryRegion.Region))
+                                    {
+                                        <p>@investmentDelivery.CountryRegion.Region</p>
+                                    }
+                                    <p class="mb-0">@investmentDelivery.PostalCode</p>
+                                    <p class="mb-0">@investmentDelivery.CountryName</p>
+                                }
+
+                            </div>
+                            <div class="col-xs-6 col-sm-4">
+                                <h6 class="h6">@Html.PropertyFor(x => x.CurrentPage.Step4PaymentTitle)</h6>
+                                @{
+                                    var investmentPayment = investmentOrder.Payment;
+                                }
+                                <p class="mb-0">@investmentPayment.MethodName</p>
+                            </div>
+                        </div>
+                        if (Model.CurrentPage.Step4MiddleContentArea != null)
+                        {
+                            <div class="row mt-1x">
+                                @Html.DisplayFor(x => x.CurrentPage.Step4MiddleContentArea)
+                            </div>
+                        }
+                        <div class="@(Model.CurrentPage.Step4MiddleContentArea != null ? "" : "mt-2x") mb-2x">
+                            @Html.PropertyFor(x => x.CurrentPage.Step4InvestmentOrderDescription)
+                        </div>
+                        <div class="confirm-detail bg-gray p-1x mb-1x">
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <h5 class="h5 mt-0 mb-0">
+                                        @Html.PropertyFor(x => x.CurrentPage.Step4CombinedOrderTotalTitle):
+                                    </h5>
+                                </div>
+                                <div class="col-xs-4 text-right">
+                                    <h5 class="h5 mt-0 mb-0">
+                                        @Model.ViewModel.CombinedOrderTotal
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <a href="@Url.ContentUrlExtension(myLayout.MyAccountPage)" class="btn btn-secondary mt-1x mb-1x mr-1x">@Html.PropertyFor(x => x.CurrentPage.Step4OpenDashboardButtonText)</a>
+                    <a href="@Url.ContentUrlExtension(myLayout.StartPageReference)" class="btn btn-default mt-1x mb-1x">@Html.PropertyFor(x => x.CurrentPage.Step4VisitHomepageButtonText)</a>
+                </div>
+                <div class="col-xs-12 col-md-5 mb-2x">
+                    @Html.Partial("_RetailOrderSummaryConfirmation", Model.ViewModel.RetailPurchaseOrder)
+                    @if (investmentOrder.OrderStatus != OrderStatus.Cancelled)
+                    {
+                        <div>
+                            @Html.Partial("_InvestmentSummaryConfirmation", Model.ViewModel.InvestmentPurchaseOrder)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+        {
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        }
+    </div>
+</div>

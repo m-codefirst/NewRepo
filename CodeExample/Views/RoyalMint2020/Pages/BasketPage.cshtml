@@ -1,0 +1,125 @@
+﻿@using Hephaestus.CMS.Extensions
+@using System.Globalization
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using Newtonsoft.Json
+@using System.Web.Optimization
+@using EPiServer.Web
+@using TRM.Shared.Extensions;
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.BasketPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var checkoutPageUrl = myLayout.CheckoutPage.GetExternalUrl_V2();
+    var bullionOnlyCheckoutUrl = myLayout.BullionOnlyCheckoutPage.GetExternalUrl_V2();
+    var mixedCheckoutUrl = myLayout.MixedCheckoutPage.GetExternalUrl_V2();
+    var stopTrading = myLayout.StoppedTrading;
+}
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "basketCss")
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "investSignaturePageCss")
+
+}
+
+@{
+    var viewModel = new
+    {
+        middleContent = @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent).ToString(),
+        promotions = new
+        {
+            title = Html.TranslateFallback(StringResources.PromotionsTitle, StringConstants.TranslationFallback.PromotionsTitle),
+            placeholder = Html.TranslateFallback(StringResources.PromotionPlaceholder, StringConstants.TranslationFallback.PromotionPlaceholder),
+            button = Html.TranslateFallback(StringResources.PromotionsButton, StringConstants.TranslationFallback.PromotionsButton),
+            description = Html.TranslateFallback(StringResources.PromotionsDescription, StringConstants.TranslationFallback.PromotionsDescription),
+            applied = Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied),
+            couponNotValidMessage = Html.TranslateFallback(StringResources.CouponNotValidMessage, "Coupon Not Valid: Unable to Apply Promotion"),
+            remove = Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove),
+        },
+        someAgeRestrictedMessage = Model.CurrentPage.SomeAgeRestrictedMessage,
+        productQuantityLabel = Model.CurrentPage.ProductQuantityLabel,
+        productPriceLabel = Model.CurrentPage.ProductPriceLabel,  // NOT USED
+        productSubTotalLabel = Model.CurrentPage.ProductSubTotalLabel,  // NOT USED
+        itemsToBeDelivered = @Html.TranslateFallback(StringResources.ItemsToBeDelivered, "Items to be delivered"),
+        deliveredToSpecifiedAddress = @Html.TranslateFallback(StringResources.DeliveredToSpecifiedAddress, "Delivered to specified address"),
+        selectDeliveryAddressAtCheckout = @Html.TranslateFallback(StringResources.SelectDeliveryAddressAtCheckout, "You can select a delivery address at the checkout"),
+        deliveredToYourInvestmentAccountAddress = @Html.TranslateFallback(StringResources.DeliveredToYourInvestmentAccountAddress, "Delivered to your investment account address"),
+        deliveredToYourInvestmentAccountAddressInfo = @Html.TranslateFallback(StringResources.DeliveredToYourInvestmentAccountAddressInfo, "Investment purchases will only be delivered to your registered account address. Any amendments are to be requested via customer services on "),
+        customerServiceNumber = @Html.TranslateFallback(StringResources.CustomerServiceNumber, "0161 946 0000"),
+        beforeCheckout = @Html.TranslateFallback(StringResources.BeforeCheckout, "before checkout"),
+        basketItemsForStorageTitle = @Html.TranslateFallback(StringResources.BasketItemsForStorageTitle, "Items for storage at the royal mint"),
+        basketItemsForStorageSubtitle = @Html.TranslateFallback(StringResources.BasketItemsForStorageSubtitle, "Metal prices are subject to fluctuation. The live price and weights will be calculated in the next step, as applicable"),
+        basketItemsStoreInVault = @Html.TranslateFallback(StringResources.BasketItemsStoreInVault, "Store in Vault"),
+        basketItemsStorageFeesApplied = @Html.TranslateFallback(StringResources.BasketItemsStorageFeesApplied, "Storage fees applied, to be paid quarterly!"),
+        basketItemsForStorageTooltip = @Html.TranslateFallback(StringResources.BasketItemsForStorageTooltip, "We charge a monthly storage fee that is invoiced and debited from your wallet"),
+        estimatedStorageFee = @Html.TranslateFallback(StringResources.EstimatedStorageFee, "Estimated storage fee"),
+        perAnnum = @Html.TranslateFallBack(StringResources.PerAnnum, "p.a."),
+        exVat = @Html.TranslateFallback(StringResources.ExVat, "ex VAT"),
+        estimated = @Html.TranslateFallback(StringResources.Estimated, "estimated"),
+        stopTradingMessage = @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage),
+        insufficientFundsHeading = Model.CurrentPage.InsufficientFundsHeading ?? "Insufficient funds",
+        insufficientFundsDescription = Model.CurrentPage.InsufficientFundsDescription ?? "You have unsufficient funds for this investment - Please top up your wallet with a credit or debit card",
+        availableFunds = @Html.TranslateFallback(StringResources.AvailableFunds, "Available Funds"),
+        availableToInvestTooltip = Model.CurrentPage.AvailableToInvestTooltip,
+        getBullionAccountAddCreditPage = Url.ContentUrlExtension(Model.CurrentPage.GetBullionAccountAddCreditPage()),
+        bullionQuickCheckOutAddFundsButton = @Html.TranslateFallback(StringResources.BullionQuickCheckOutAddFundsButton, "Add funds"),
+        availableFundsBasketTotal = @Html.TranslateFallback(StringResources.AvailableFundsBasketTotal, "Available FundsBasket Total"),
+        basketTotal = @Html.TranslateFallback(StringResources.BasketTotal, "Basket Total"),
+        retailBasket = @Html.TranslateFallback(StringResources.RetailBasket, "Retail Basket"),
+        includeVat = @Html.TranslateFallback(StringResources.IncludeVat, "Inc VAT"),
+        investmentBasket = @Html.TranslateFallback(StringResources.InvestmentBasket, "Investments Basket"),
+        investmentVat = @Html.TranslateFallback(StringResources.InvestmentVat, "Investment VAT"),
+        deliveryLabel = Model.CurrentPage.DeliveryLabel,
+        basketDeliveryCostStatus = @Html.TranslateFallback(StringResources.BasketDeliveryCostStatus, "calculated at checkout"),
+        total = @Html.TranslateFallback(StringResources.Total, "Total"),
+        checkoutPageUrl = checkoutPageUrl,
+        bullionOnlyCheckoutUrl = bullionOnlyCheckoutUrl,
+        mixedCheckoutUrl = mixedCheckoutUrl,
+        stopTrading = myLayout.StoppedTrading,
+        checkoutButtonText = Model.CurrentPage.CheckoutButtonText,
+        basketValidationRemovedItems = @Html.TranslateFallback(StringResources.BasketValidationRemovedItems, "Removed Items"),
+        basketValidationResonTitle = @Html.TranslateFallback(StringResources.BasketValidationResonTitle, "Reason"),
+        continueShoppingUrl = @Url.ContentUrlExtension(Model.CurrentPage.ContinueShoppingUrl),
+        continueShoppingButtonText = Model.CurrentPage.ContinueShoppingButtonText,
+        isSippContact = myLayout.IsSippContact,
+        wouldLikeDelivered = Html.TranslateFallback(StringResources.WouldLikeDelivered, "Delivered to me"),
+        wouldLikeToVault = Html.TranslateFallback(StringResources.WouldLikeToVault, "Store at The Royal Mint"),
+        wouldLikeToVaultExtraInfo = Html.TranslateFallback(StringResources.WouldLikeToVaultExtraInfo, "Annual fee applies"),
+        hasBeenPersonalised = Html.TranslateFallback(StringResources.HasBeenPersonalised, ""),
+        editPersonalizationText = Model.CurrentPage.EditPersonalizationText,
+        annualSubscriptionText = Model.CurrentPage.AnnualSubscriptionText,
+        continuityProductText = Model.CurrentPage.ContinuityProductText,
+        recalculateLabel = Html.TranslateFallback(StringResources.Recalculate, "Recalculate"),
+        bullionShipmentValidationError = Html.TranslateFallback(StringResources.BullionShipmentValidationError, "Please select a delivery option"),
+        selectBullionDeliveryOptionMessage = Html.TranslateFallback(StringResources.SelectBullionDeliveryOptionMessage, "  Please select delivery or storage options for your bullion products"),
+        savedAmountLabel = Model.CurrentPage.SavingsLabel,
+        couponNotValidMessage = Html.TranslateFallback(StringResources.CouponNotValidMessage, "Coupon Not Valid: Unable to Apply Promotion"),
+        selectedToBeStoredInVault = Html.TranslateFallback(StringResources.SelectedToBeStoredInVault, "selected to be stored in vault"),
+    }; }
+
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+
+<div>
+    <div data-module="basket" data-basket-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+    <div class="mod-section row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.One })
+@section HeaderScripts{
+    @Html.Partial("_RedirectOutsideTheIframe")
+}

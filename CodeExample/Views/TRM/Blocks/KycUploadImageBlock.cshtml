@@ -1,0 +1,35 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Web
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.Bullion.kyc.KycUploadImageBlock
+<div class="col-xs-12 mb-1x">
+    <div class="row">
+        @Html.PropertyFor(x => x.MiddleTopContent)
+    </div>
+</div>
+<div class="col-xs-12 col-sm-4">
+    <div class="input-upload-box mb-2x" id="userActions" ondrop="dragdrop.drop(event)" ondragover="dragdrop.drag(event)">
+        <div class="image-input-box">
+            <input class="upload-file" type="file" name="fileUpload" id="fileUpload">
+            <label for="fileUpload" class="upload-title text-silver text-center p-1x">
+                <img src="@Url.ContentUrlExtension(Model.ImageLink)">
+                @Html.PropertyFor(x => x.ImagePlaceholder)
+            </label>
+            <img id="imgPreview" class="preview-img" src="">
+        </div>
+        <i id="removeFile" class="trm trmi-close" data-toggle="tooltip" data-placement="top" data-original-title="Remove"></i>
+    </div>
+    <p class="alert alert-danger display-inline-block hidden" id="fileTypeError">@Html.TranslateFallback(StringResources.InvalidImage, "Invalid image.")</p>
+    <button id="uploadFileBtn" disabled type="submit" class="btn btn-secondary btn-150 mb-2x">@Html.PropertyFor(x => x.UploadButtonText)</button>
+    <a href="@Url.ContentUrlExtension(Model.BottomLink)" class="display-block mb-xs-1x">@Html.PropertyFor(x => x.BottomLinkText)</a>
+</div>
+<div class="col-xs-12 col-sm-8">
+    <div class="row">
+        @Html.PropertyFor(x => x.MiddleRightContent)
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "commonFuntions").AtFooter();
+}
+

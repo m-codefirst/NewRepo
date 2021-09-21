@@ -1,0 +1,11 @@
+﻿@model TRM.Web.Models.Interfaces.IBlockViewModel<TRM.Web.Models.Interfaces.IToggleContent, TRM.Web.Models.ViewModels.Bullion.ToggleBlockViewModel>
+
+@{
+    var viewName = string.Format("Blocks/{0}", Model.CurrentBlock.ViewName);
+}
+
+@if (!string.IsNullOrEmpty(Model.CurrentBlock.ViewName))
+{
+    Html.RenderPartial(viewName, Model.ViewModel);
+}
+

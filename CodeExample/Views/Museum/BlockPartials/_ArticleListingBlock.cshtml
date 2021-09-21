@@ -1,0 +1,25 @@
+﻿@model TRM.Web.Models.ViewModels.ArticleListingViewModel
+@if (Model == null) { return; }
+
+<div class="row"  ng-controller="rmArticleListing as ArticleListing" ng-init="init(@Model.ThisBlock.ArticlesReference, @Model.ThisBlock.NumberOfArticlesToShow, '@Url.Action("LoadMore", "ArticleListingBlock")', @Model.TotalArticles,  '@Model.ThisBlock.ShowLoadMore')">
+    @* ReSharper disable once Mvc.PartialViewNotResolved *@
+    <div class="articleBlockGridView">
+        @if (Model.Articles != null)
+        {
+            @Html.Partial("_ArticleListingView", Model.Articles)
+        }
+        else
+        {
+            <div class="col-xs-12">
+                no articles where found.
+              
+            </div>
+        }
+    </div>
+    @if (Model.ThisBlock.ShowLoadMore && Model.ThisBlock.NumberOfArticlesToShow < Model.TotalArticles)
+    {
+        <div ng-if="moreToLoad" class="col-xs-8 col-sm-6 col-md-4 col-xs-offset-2 col-sm-offset-3 col-md-offset-4 clear">
+            <button id="loadMoreArticlesBlock" class="btn btn-default btn-block" ng-click="loadMoreArticles()">@Html.PropertyFor(m => m.ThisBlock.LoadMoreButtonText)</button>
+        </div>
+    }
+</div>

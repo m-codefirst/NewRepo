@@ -1,0 +1,75 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel
+
+<input type="hidden" name="PremiumRequestId" id="premium-request" value="@Model.PremiumRequestId" />
+<input type="hidden" name="QuantityToSell" id="quantityInOz" value="@Model.SellVariant.QuantityToSellOrDeliver" />
+<div class="checkout-item-block">
+    <div class="checkout-item-wrapper">
+        <div class="item-image hidden-xs">
+            <img src="@Model.SellVariant.ImageUrl" />
+        </div>
+        <div class="item-info">
+            <h6 class="h6 mt-0">@Model.SellVariant.Title</h6>
+            <p class="text-graylight">@Model.SellVariant.Subtitle</p>
+            <div class="row">
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallback(StringResources.WeightInVaultOz, "Weight in vault (oz)"):</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    @Model.SellVariant.QuantityInVault.ToString("0.###")
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-xs-8">
+                    <strong>@Html.TranslateFallback(StringResources.AvailableToSellOz, "Available to sell (oz)"):</strong>
+                </div>
+                <div class="col-xs-4 text-right">
+                    @Model.SellVariant.AvailableToSell.ToString("0.###")
+                </div>
+            </div>
+        </div>
+        <div class="item-price flex-align-left-sm-up primary-price">
+            <div class="price-info">
+                <p class="strong mt-0 mb-0 text-center">@Html.TranslateFallback(StringResources.WeightInSaleOz, "Weight in sale (oz)")</p>
+                <p class="mt-0 mb-0 text-center">
+                    @Model.CombinedWeightInSale.ToString("0.###")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="checkout-total">
+    <div class="row">
+        <div class="col-xs-6 col-sm-4 col-sm-offset-5 text-right-sm-up">
+            <strong>@Html.TranslateFallback(StringResources.PricePerOzIncludingPremium, "Price per Oz including premium")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            @Model.PremiumPricePerOzIncludingPremium.ToString()
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-xs-6 col-sm-4 col-sm-offset-5 text-right-sm-up">
+            <strong>@Html.TranslateFallback(StringResources.WeightInSaleOz, "Weight in sale (oz)")</strong>
+        </div>
+        <div class="col-xs-6 col-sm-3 text-right-sm-up">
+            @Model.CombinedWeightInSale.ToString("0.###")
+        </div>
+        <div class="clearfix"></div>
+        <hr>
+    </div>
+    <div class="row center-items-sm-up">
+        <div class="col-xs-12 col-sm-6">
+            <span class="h6 mt-0 mb-0 coundown-timer inline alert alert-info text-slateblue">
+                LIVE Prices valid for <span class="h5" id="coundown-timer">0</span> seconds
+            </span>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="row">
+                <div class="col-xs-6">
+                    <p class="h4 mt-0 mb-0 text-right-sm-up">@Html.TranslateFallback(StringResources.SellTodayFor, "Sell today for")</p>
+                </div>
+                <div class="col-xs-6 text-right-sm-up">
+                    <p class="h4 mt-0 mb-0">@Model.SellTotal.ToString()</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

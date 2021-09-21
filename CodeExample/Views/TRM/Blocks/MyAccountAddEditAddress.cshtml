@@ -1,0 +1,144 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.MyAccountAddEditAddressViewModel
+
+
+@{
+    var addressName = "";
+    var addressFirstName = "";
+    var addressLastName = "";
+    var addressLine1 = "";
+    var addressLine2 = "";
+    var addressCity = "";
+    var addressRegion = "";
+
+
+    if (Model.Address != null)
+    {
+        addressName = Model.Address.Name == null ? "" : Model.Address.Name.Replace("'", "\\'");
+        addressFirstName = Model.Address.FirstName == null ? "" : Model.Address.FirstName.Replace("'", "\\'");
+        addressLastName = Model.Address.LastName == null ? "" : Model.Address.LastName.Replace("'", "\\'");
+        addressLine1 = Model.Address.Line1 == null ? "" : Model.Address.Line1.Replace("'", "\\'");
+        addressLine2 = Model.Address.Line2 == null ? "" : Model.Address.Line2.Replace("'", "\\'");
+        addressCity = Model.Address.City == null ? "" : Model.Address.City.Replace("'", "\\'");
+
+        if (Model.Address.CountryRegion != null && !string.IsNullOrWhiteSpace(Model.Address.CountryRegion.Region))
+        {
+            addressRegion = Model.Address.CountryRegion.Region.Replace("'", "\\'");
+        }
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.PostcodeAnywhereLicense))
+{
+    <link rel="stylesheet" type="text/css" href="https://services.postcodeanywhere.co.uk/css/captureplus-2.30.min.css?key=@(Model.PostcodeAnywhereLicense) " />
+    <script type="text/javascript" src="https://services.postcodeanywhere.co.uk/js/captureplus-2.30.min.js?key=@(Model.PostcodeAnywhereLicense) "></script>
+}
+<div class="panel panel-primary panel-secondary">
+    <div class="panel-body" ng-controller="rmCheckoutController as rmAddInfo" ng-init="setupAddEditAddress('@Model.Address.AddressId','@addressName', '@addressFirstName', '@addressLastName', '@addressLine1', '@addressLine2', '@addressCity', '@addressRegion', '@Model.Address.PostalCode', '@Model.Address.CountryCode')">
+        <form id="AddEditAddress" name="AddEditAddress">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-xs-12 col-sm-8">
+                    <div ng-class="(erroredFields.indexOf('Name') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+                        <label for="first-name" class="control-label">@Html.TranslateFallback(TRM.Web.Constants.StringResources.AddressNickname, "Address Nickname")</label>
+                        <input type="text" class="form-control " ng-required="true" ng-model="AddressNickname" id="Nickname" data-original-title="" title="">
+                        <span ng-show="(erroredFields.indexOf('Name') >= 0)" class="help-block">
+                            @Html.TranslateFallback(StringResources.FirstNameRequiredErrorMessage, "Address name is required and must be unique")
+                        </span>
+                        <div class="help-block contentArea">
+                            @Html.TranslateFallback(StringResources.AddressNameMessage, "This will allow you to easily identify your address for future purchases")
+                        </div>
+                    </div>
+
+                    <div ng-class="(erroredFields.indexOf('Firstname') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+                        <label for="first-name" class="control-label">@Html.TranslateFallback(TRM.Web.Constants.StringResources.FirstName, "First Name") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        <input type="text" maxlength="128" class="form-control " ng-required="true" ng-model="FirstName" id="first-name" data-original-title="" title="">
+                        <span ng-show="(erroredFields.indexOf('Firstname') >= 0)" class="help-block">
+                            @Html.TranslateFallback(StringResources.FirstNameRequiredErrorMessage, "First name is required")
+                        </span>
+                    </div>
+                    <div ng-class="(erroredFields.indexOf('Lastname') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+                        <label for="first-name" class="control-label">@Html.TranslateFallback(TRM.Web.Constants.StringResources.LastName, "Last Name") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                        <input type="text" class="form-control " ng-required="true" ng-model="LastName" id="last-name" data-original-title="" title="">
+                        <span ng-show="(erroredFields.indexOf('Lastname') >= 0)" class="help-block">
+                            @Html.TranslateFallback(StringResources.LastNameRequiredErrorMessage, "Last name is required")
+                        </span>
+                    </div>
+                    <div>
+                        <div>
+                            <div ng-class="(erroredFields.indexOf('Address') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'" ng-hide="manualAddress == true">
+                                <label class="control-label" for="checkoutFName">@Html.TranslateFallback(TRM.Web.Constants.StringResources.PostCodeZipCode, "PostCode/Zip Code") <span class="text-danger">@Html.TranslateFallback(StringResources.FormRequiredAsterisk, "*")</span></label>
+                                <input maxlength="20" type="text" class="form-control pcaPredictInput" name="inputPCAnywhere" id="inputPCAnywhere" ng-model="Postcode" ng-required="true" placeholder="Post/Cip Code" />
+                                <span ng-show="(erroredFields.indexOf('Address') >= 0)" class="help-block">
+                                    @Html.TranslateFallback(StringResources.AddressRequiredErrorMessage, "Address is required")
+                                </span>
+                            </div>
+                            <div class="form-group" ng-hide="manualAddress == true">
+                                <a class="" href="javascript:;" ng-click="manualAddress = true; selectedAddress = []">@Html.TranslateFallback(StringResources.EnterManuallyAccountCreate, "Enter Manually")</a>
+                            </div>
+                            <div class="form-group" ng-show="manualAddress == true" ng-cloak>
+                                <a class="" href="javascript:;" ng-click="manualAddress = false; selectedAddress = null">@Html.TranslateFallback(StringResources.Cancel, "Cancel")</a>
+                            </div>
+                        </div>
+                        <div ng-show="manualAddress == true" ng-cloak>
+                            <div ng-class="(erroredFields.indexOf('AddressLine1') >= 0) ? 'form-group has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+                                <label for="manDelAdd1">Address Line 1 <span class="text-danger">*</span></label>
+                                <input maxlength="80" class="form-control" type="text" name="manDelAdd1" id="manDelAdd1" value="{{AddressLine1}}" ng-model="AddressLine1">
+                                <span ng-show="(erroredFields.indexOf('AddressLine1') >= 0)" class="help-block">
+                                    @Html.TranslateFallback(StringResources.AddressLineOneRequiredErrorMessage, "Address is required")
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelAdd2">@Html.TranslateFallback(StringResources.AddressLineTwo, "Address Line 2")</label>
+                                <input maxlength="80" class="form-control" type="text" name="manDelAdd2" id="manDelAdd2" value="{{AddressLine2}}" ng-model="AddressLine2">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelAdd2">@Html.TranslateFallback(StringResources.Town, "Town")</label>
+                                <input maxlength="80" class="form-control" type="text" name="manDelTown" id="manDelTown" value="{{Town}}" ng-model="Town">
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelCounty">@Html.TranslateFallback(StringResources.County, "County")</label>
+                                <input maxlength="64" class="form-control" type="text" name="manDelCounty" id="manDelCounty" value="{{AddressLine5}}" ng-model="AddressLine5">
+                            </div>
+                            <div ng-class="(erroredFields.indexOf('Postcode') >= 0 || AddEditAddress.manDelPostcode.$invalid) ? 'has-error has-feedback' : hasEditFeedback ? 'form-group has-success has-feedback' : 'form-group'">
+                                <label for="manDelPostcode">
+                                    @Html.TranslateFallback(StringResources.PostCode, "PostCode") <span class="text-danger">*</span>
+                                </label>
+                                <input maxlength="20" class="form-control" type="text" name="manDelPostcode" id="manDelPostcode" value="{{Postcode}}" ng-blur="checkPostCodeFormat(CountryCode)" ng-model="Postcode" capitalize postcode-disable="!manualAddress" postcode-validator="CountryCode">
+                                <span ng-show="(erroredFields.indexOf('Postcode') >= 0)" class="help-block">
+                                    @Html.TranslateFallback(StringResources.PostcodeRequiredErrorMessage, "Postcode is required")
+                                </span>
+                                <span class="help-block" ng-show="AddEditAddress.manDelPostcode.$invalid && AddEditAddress.manDelPostcode.$dirty">@Html.TranslateFallback(StringResources.InvalidPostcode, "Postcode is invalid")</span>                                
+                            </div>
+                            <div class="form-group">
+                                <label for="manDelCountry">@Html.TranslateFallback(StringResources.Country, "Country")</label>
+                                @Html.DropDownListFor(m => m.Address.CountryCode, new SelectList(Model.CountryList, "Value", "Key"), new { @class = "form-control", @ng_model = "CountryCode" })
+                            </div>
+                        </div>
+                        <div ng-show="hasSelectedAddress" ng-cloak>
+                            <h5>@Html.TranslateFallback(StringResources.YourDeliveryAddress, "Your Delivery Address")</h5>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    {{AddressLine1}}<br ng-if="AddressLine1">
+                                    {{AddressLine2}}<br ng-if="AddressLine2">
+                                    {{AddressLine3}}<br ng-if="AddressLine3">
+                                    {{AddressLine4}}<br ng-if="AddressLine4">
+                                    {{Town}}<br ng-if="Town">
+                                    {{AddressLine5}}<br ng-if="AddressLine5">
+                                    {{Postcode}}<br ng-if="Postcode">
+                                    {{CountryCode}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="javascript:;" ng-click="addUpdateAddress('@Model.AddressBookPageUrl')" class="btn btn-secondary">@Html.TranslateFallback(StringResources.SaveAccountCreate, "Save")</a>
+
+                    <a href="@Model.AddressBookPageUrl" class="btn btn-secondary">@Html.TranslateFallback(StringResources.Cancel, "Cancel")</a>
+                    <div class="form-group" ng-show="showSuccessMessage">
+                        <p>@Html.TranslateFallback(StringResources.AddressSavedMessage, "Address Saved")</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

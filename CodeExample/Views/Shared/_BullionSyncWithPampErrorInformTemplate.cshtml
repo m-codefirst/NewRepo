@@ -1,0 +1,29 @@
+﻿@using EPiServer.Framework.Localization
+@using EPiServer.Globalization
+@using TRM.Web.Constants
+
+<div class="modal fade" id="syncWithPampError" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" aria-label="Close" data-dismiss="modal" ng-click="closeSyncPampErrorPopup()"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">
+                    @LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorTitle, "Pamp Error", ContentLanguage.PreferredCulture)
+                </h4>
+			</div>
+			<div class="modal-body">
+				<div class="wysiwyg">
+                    <p id="pamp-sync-error">
+                        @LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampErrorMessage, "Pamp Error!!!", ContentLanguage.PreferredCulture)
+                    </p>
+				    <p id="pamp-not-enough-money">
+				        @LocalizationService.Current.GetStringByCulture(StringResources.BullionCheckoutSyncWithPampNotEnoughMoney, "Pamp Not Enough Money!!!", ContentLanguage.PreferredCulture)
+				    </p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary btn-action btn-mobile-full-width" aria-label="Close" data-dismiss="modal" ng-click="closeSyncPampErrorPopup()"><span aria-hidden="true">@Html.TranslateFallback(StringResources.BullionCheckoutSyncWithPampErrorConfirmButtonLabel, "Ok")</span></button>
+			</div>
+		</div>
+	</div>
+</div>

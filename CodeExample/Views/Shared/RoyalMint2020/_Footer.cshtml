@@ -1,0 +1,61 @@
+﻿@using TRM.Web.Models.Layouts
+@model  TrmLayoutModel
+
+<div class="trust-bar d-print-none">
+    <div class="container">
+        <div class="row">
+            <div class="col col-12 col-sm-6">
+                <div class="trust-bar-feefo-container">
+                    @Html.Raw(Model.FeefoBadge)
+                </div>
+
+            </div>
+            <div class="col col-12 col-sm-6 payment-options">
+                <span class="icon icon-visa"><svg><use xlink:href="#visa" /></svg></span>
+                <span class="icon icon-mastercard"><svg><use xlink:href="#mastercard" /></svg></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@if (Model.DisplayCompactFooter)
+{
+    <footer id="footer" class="footer footer-checkout d-print-none">
+        <div class="container">
+            <div class="footer-columns row no-gutters justify-content-center">
+                @Html.PropertyFor(m => m.CompactFooter)
+            </div>
+        </div>
+    </footer>
+}
+else
+{
+    <footer id="footer" class="footer d-print-none">
+        <div class="container">
+            <div class="footer-columns row no-gutters justify-content-center">
+                @Html.PropertyFor(m => m.SiteFooter)
+            </div>
+        </div>
+    </footer>
+}
+
+@if (Model.Copyright != null)
+{
+    <div class="copyright d-print-none">
+        <div class="container">
+            @if (Model.SiteLogoBlock != null)
+            {
+                Model.SiteLogoBlock.PostfixText = "Copyright";
+                Html.RenderContentData(Model.SiteLogoBlock, false);
+            }
+            @Html.PropertyFor(m => m.Copyright)
+        </div>
+    </div>
+}
+
+@if (Model.MegaMenu != null && Model.MegaMenu.MegaMenuDto != null)
+{
+    Html.RenderPartial("RoyalMint2020/_Toolbar", Model.MegaMenu);
+}
+

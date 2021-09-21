@@ -1,0 +1,34 @@
+﻿@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Blocks.ContentNavBlock
+
+<article class="blockContent">
+    @Html.PropertyFor(a => a.BackgroundImage)
+    <div class="block-content">
+        <h2>
+            @if (Model.HasHeaderLink)
+            {
+                <a title="@Model.HeaderText" href="@Url.ContentUrlExtension(Model.HeaderLink)">
+                    @Html.PropertyFor(a => a.HeaderText)
+                </a>
+            }
+            else if (Model.HeaderText != null)
+            {
+                @Html.PropertyFor(a => a.HeaderText)
+            }
+        </h2>
+        <div class="xhtml">
+            @{ var content = Html.ParseXhtmlString(Model.Content); }
+            @Html.PropertyFor(a => content)
+        </div>
+        @if (!String.IsNullOrEmpty(Model.ButtonText))
+        {
+            <div class="">
+                @if (Model.ButtonLink != null)
+                {
+                    <a title="@Model.ButtonText" class="btn btn-sm @Model.ButtonColour.DescriptionAttr() btn-wrap" href="@Url.ContentUrlExtension(Model.ButtonLink)">@Html.PropertyFor(a => a.ButtonText)</a>
+                }
+            </div>
+        }
+    </div>
+</article>

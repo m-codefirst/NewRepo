@@ -1,0 +1,150 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.Blocks.Bullion.TrmMetalBlock
+
+@{
+    var elementId = Guid.NewGuid();
+    var tooltipFormatId = string.Format("{0}_Tooltip_Format", elementId);
+    var tooltip = string.Format("{0}_Tooltip", elementId);
+    var updatedTimeDesc = string.Format("{0}_UpdatedTimeDesc", elementId);
+}
+
+@if (Model.ShouldDisplay && Model.TrmMetalBlockPartial!=null && Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems != null && Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems.Any())
+{
+    <input type="hidden" id="@elementId" value="@Model.IntervalUpdateTime" />
+    <div class="row">
+        <div class="table-overflow col-12 col-sm-12">
+            <table class="table table-standard table-meta-price mb-10">
+                <tbody>
+                    @{
+                        var index = 0;
+                    }
+                    @if (Model.TrmMetalBlockPartial.ShouldDisplayHeaderView)
+                    {
+                        <tr class="meta-price__header">
+                            @if (Model.TrmMetalBlockPartial.DisplayBuy || Model.TrmMetalBlockPartial.DisplaySell)
+                            {
+                                <th width="@(Model.TrmMetalBlockPartial.IsSameColumnWidth ? "25%" : "20%")">@Html.TranslateFallback(StringResources.TrmMetalBlockMetalLabel, "Metal")</th>
+                            }
+                            @if (Model.TrmMetalBlockPartial.DisplayBuy)
+                            {
+                                <th width="@(Model.TrmMetalBlockPartial.IsSameColumnWidth ? "25%" : "20%")">@Html.TranslateFallback(StringResources.TrmMetalBlockBuyLabel, "Buy")</th>
+                            }
+                            @if (Model.TrmMetalBlockPartial.DisplaySell)
+                            {
+                                <th width="@(Model.TrmMetalBlockPartial.IsSameColumnWidth ? "25%" : "20%")">@Html.TranslateFallback(StringResources.TrmMetalBlockSellLabel, "Sell")</th>
+                            }
+                            @if (Model.TrmMetalBlockPartial.DisplayBuy || Model.TrmMetalBlockPartial.DisplaySell)
+                            {
+                                <th width="@(Model.TrmMetalBlockPartial.IsSameColumnWidth ? "25%" : "40%")">@Html.TranslateFallback(StringResources.TrmMetalBlockChangeLabel, "Change")</th>
+                            }
+                        </tr>
+
+                        foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                        {
+                            index = index + 1;
+                            var diffBuyPercentId = string.Format("{0}_{1}_DiffBuyPercent", elementId, item.Metal.Name);
+                            var currentSellPriceId = string.Format("{0}_{1}_CurrentSellPrice", elementId, item.Metal.Name);
+
+                            var currentBuyPriceId = string.Format("{0}_{1}_CurrentBuyPrice", elementId, item.Metal.Name);
+                            <tr class="@(index % 2 == 0 ? "meta-price__alternate" : "")">
+                                <td class="text-bold">@Html.TranslateFallback(string.Format("{0}/{1}", StringResources.TrmMetalBlockMetalName, item.Metal.Name), item.Metal.Name)</td>
+                                @if (Model.TrmMetalBlockPartial.DisplayBuy)
+                                {
+                                    <td id="@currentBuyPriceId">@item.BuyPriceChange.CurrentPrice.ToString()</td>
+                                }
+                                @if (Model.TrmMetalBlockPartial.DisplaySell)
+                                {
+                                    <td id="@currentSellPriceId">@item.SellPriceChange.CurrentPrice.ToString()</td>
+                                }
+                                <td>
+                                    @if (item.BuyPriceChange.UpOrDown > 0)
+                                    {
+                                        <i class="trmi trmi-angle-up"></i>
+                                        <span id="@diffBuyPercentId" class="text-green">@item.BuyPriceChange.Percent%</span>
+                                    }
+                                    else if (item.BuyPriceChange.UpOrDown < 0)
+                                    {
+                                        <i class="trmi trmi-angle-down"></i>
+                                        <span id="@diffBuyPercentId" class="text-red">@item.BuyPriceChange.Percent%</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="trmi"></i>
+                                        <span id="@diffBuyPercentId" class="text-green">@item.BuyPriceChange.Percent%</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        foreach (TRM.Web.Models.ViewModels.MetalPrice.PampMetalPriceItemViewModel item in Model.TrmMetalBlockPartial.FilteredPampMetalPriceItems)
+                        {
+                            index = index + 1;
+                            var diffBuyPercentId = string.Format("{0}_{1}_DiffBuyPercent", elementId, item.Metal.Name);
+                            var currentSellPriceId = string.Format("{0}_{1}_CurrentSellPrice", elementId, item.Metal.Name);
+
+                            var currentBuyPriceId = string.Format("{0}_{1}_CurrentBuyPrice", elementId, item.Metal.Name);
+                            <tr class="@(index % 2 == 0 ? "meta-price__alternate" : "")">
+                                @if (Model.TrmMetalBlockPartial.DisplayBuy || Model.TrmMetalBlockPartial.DisplaySell)
+                                {
+                                    <td class="d-block">
+                                        <div class="meta-price--left @Model.TrmMetalBlockPartial.CustomCssClass">@Html.TranslateFallback(StringResources.TrmMetalBlockMetalLabel, "Metal")</div>
+                                        <div class="meta-price--right @Model.TrmMetalBlockPartial.CustomCssClass text-bold">@Html.TranslateFallback(string.Format("{0}/{1}", StringResources.TrmMetalBlockMetalName, item.Metal.Name), item.Metal.Name)</div>
+                                    </td>
+                                }
+                                @if (Model.TrmMetalBlockPartial.DisplayBuy)
+                                {
+                                    <td class="d-block">
+                                        <div class="meta-price--left @Model.TrmMetalBlockPartial.CustomCssClass">@Html.TranslateFallback(StringResources.TrmMetalBlockBuyLabel, "Buy")</div>
+                                        <div class="meta-price--right @Model.TrmMetalBlockPartial.CustomCssClass" id="@currentBuyPriceId">@item.BuyPriceChange.CurrentPrice.ToString()</div>
+                                    </td>
+                                }
+                                @if (Model.TrmMetalBlockPartial.DisplaySell)
+                                {
+                                    <td class="d-block">
+                                        <div class="meta-price--left @Model.TrmMetalBlockPartial.CustomCssClass">@Html.TranslateFallback(StringResources.TrmMetalBlockSellLabel, "Sell")</div>
+                                        <div class="meta-price--right @Model.TrmMetalBlockPartial.CustomCssClass" id="@currentSellPriceId">@item.SellPriceChange.CurrentPrice.ToString()</div>
+                                    </td>
+                                }
+                                @if (Model.TrmMetalBlockPartial.DisplayBuy || Model.TrmMetalBlockPartial.DisplaySell)
+                                {
+                                    <td class="d-block">
+                                        <div class="meta-price--left @Model.TrmMetalBlockPartial.CustomCssClass">@Html.TranslateFallback(StringResources.TrmMetalBlockChangeLabel, "Change")</div>
+                                        <div class="meta-price--right @Model.TrmMetalBlockPartial.CustomCssClass">
+                                            @if (item.BuyPriceChange.UpOrDown > 0)
+                                            {
+                                                <i class="trmi trmi-angle-up"></i>
+                                                <span id="@diffBuyPercentId" class="text-green">@item.BuyPriceChange.Percent%</span>
+                                            }
+                                            else if (item.BuyPriceChange.UpOrDown < 0)
+                                            {
+                                                <i class="trmi trmi-angle-down"></i>
+                                                <span id="@diffBuyPercentId" class="text-red">@item.BuyPriceChange.Percent%</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="trmi"></i>
+                                                <span id="@diffBuyPercentId" class="text-green">@item.BuyPriceChange.Percent%</span>
+                                            }
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <input id="@tooltipFormatId" type="hidden" value="@Model.Tooltip" />
+            @if (Model.Tooltip != null)
+            {
+                <i id="@tooltip" class="trmi trmi-info mr-5" data-toggle="tooltip" data-placement="top" data-original-title="@Model.Tooltip.Replace("#datetime#", Model.TrmMetalBlockPartial.UpdatedTime)"></i>
+                <span id="@updatedTimeDesc" class="small-text">@Model.Tooltip.Replace("#datetime#", Model.TrmMetalBlockPartial.UpdatedTime)</span>
+            }
+        </div>
+    </div>
+
+    {
+        EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"window.addEventListener('load', function () { TrmMetalPriceBlock.addBlockId('" + elementId + "')});").AtFooter();
+    }
+}

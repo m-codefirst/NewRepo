@@ -1,0 +1,86 @@
+﻿@using EPiServer.Editor
+@using EPiServer.Web.Mvc.Html
+@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Extentions
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionExistingAccountLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+
+	@Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+}
+<div class="container-fluid no-padding">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+<div class="container signature-page">
+  
+
+    <div class="container mb-4x mt-2x">
+
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+
+                <!-- Sub Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <div class="row">
+                        <h1 class="h3 mt-0 mb-2x">@Html.DisplayFor(x => x.CurrentPage.Heading)</h1>
+                    </div>
+                }
+                <!-- / Sub Headline -->
+                <!-- Content Area -->
+                <div class="row content-area">
+                    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                </div>
+                <!-- / Content Area -->
+                <!-- Form -->
+                <main class="row">
+                    <div class="col-xs-12 alert alert-info">
+                        <h4 class="text-info">
+                            @Html.DisplayFor(x => Model.CurrentPage.SubHeading)
+                        </h4>
+                            @Html.DisplayFor(x => Model.CurrentPage.MainBody)
+
+                    </div>
+
+                    <!-- toolbar -->
+                    <div class="row">
+                        <div class="col-xs-12 mt-1x mb-2x">
+                            <a href="#navSectionAccount" type="" class="btn btn-secondary btn-200 mb-1x p-1x pl-2x pr-2x nav-toggle mr-1x">@Html.PropertyFor(x => x.CurrentPage.LoginAndContinueButtonText)</a>
+                            <a href="@Url.ContentUrlExtension(Model.GetBullionRegistrationPage())" type="" class="btn btn-default btn-200 mb-1x  p-1x pl-2x pr-2x p-1x ">@Html.PropertyFor(x => x.CurrentPage.CreateAnAccountButtonText)</a>
+                        </div>
+                    </div>
+                    
+                    <!-- / toolbar -->
+
+                </main>
+                <!-- / Form -->
+
+            </div>
+        </div>
+
+        <!-- Content Area -->
+      
+        <!-- / Content Area -->
+        <!-- / BULL-146 - Introductory Step if Email has been recognised -->
+
+    </div>
+</div>
+<div class="container-fluid no-padding">
+    <div class="content-area">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    </div>
+</div>
+
+

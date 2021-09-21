@@ -1,0 +1,195 @@
+﻿@model TRM.Web.Models.ViewModels.MyAccountStatementHistoryViewModel
+
+<div class="panel panel-default panel-secondary mb-2x" ng-controller="rmAccountStatement">
+    <div class="panel-body">
+        @if (Model.Statements.Count == 0)
+        {
+            <!-- WYSIWYG -->
+            <div class="wysiwyg">
+                @Html.DisplayFor(a => a.ThisBlock.IntroductionText)
+            </div>
+            <!-- WYSIWYG Ends -->
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 mb-2x">
+                    @Html.DisplayFor(a => a.ThisBlock.NoStatementsMessage)
+                </div>
+            </div>
+        }
+        else
+        {
+
+            <!-- WYSIWYG -->
+            <div class="wysiwyg">
+                @Html.DisplayFor(a => a.ThisBlock.IntroductionText)
+            </div>
+            <!-- WYSIWYG Ends -->
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-8 mb-2x">
+                            <div class="form-group">
+                                <label class="control-label" for="statementSelect">@Html.TranslateFallback(TRM.Web.Constants.StringResources.ViewStatementHistory, "View Statement History")</label>
+                                <div class="select-form">
+                                    <select ng-model="selectedStatement" name="statementSelect" class="form-control" tabindex="1" id="payment-type">
+                                        <option value="select" disabled="">
+                                            @Html.TranslateFallback(TRM.Web.Constants.StringResources.SelectDate, "Select Date")
+                                        </option>
+                                        @foreach (var item in Model.Statements.OrderByDescending(a => a.StatementDate))
+                                        {
+                                            <option value="@item.Id"> @item.StatementDate.ToString("dd MMMM yyyy") </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6  width-auto">
+                                    <button ng-click="getStatementData()" role="button" class="btn btn-secondary  ">@Html.TranslateFallback(TRM.Web.Constants.StringResources.View, "View")</button>
+                                </div>
+                                <div class="col-xs-6  width-auto">
+                                    <span class="pull-left mt-1x">@Html.TranslateFallback(TRM.Web.Constants.StringResources.MostRecentFirst, "(most recent first)")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" ng-hide="!hasStatementData" id="view-history">
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.StatementDate, "Statement Date")</h5>
+                                    {{statement.StatementDateString}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.CustomerCode, "Customer Code")</h5>
+                                    {{statement.CustomerRef}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.CreditLimit, "Credit Limit")</h5>
+                                    &pound;{{statement.CreditLimit | number: 2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.NameAndAddress, "Name & Address")</h5>
+                                            <p>{{statement.LocationName}}</p>
+                                            <p>
+                                                <span ng-repeat="street in statement.FormattedStreet">
+                                                    {{street}},
+                                                </span>
+                                                {{statement.City}}<span ng-if="statement.City">,</span>
+                                                {{statement.County}}<span ng-if="statement.County">,</span>
+                                                {{statement.PostCode}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.BalanceBroughtForward, "Balance brought forward (from last statement)")</h5>
+                                            <p class="lead">&pound;{{statement.BalanceBroughtForward | number: 2}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <table class="table table-stack table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Date, "Date")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.InvoiceNumber, "Invoice No")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Qty, "Qty")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Description, "Description")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Amount, "Amount")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.PandP, "P & P")</th>
+                                    <th>@Html.TranslateFallback(TRM.Web.Constants.StringResources.Credits, "Credits")</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in statement.Items">
+                                    <td>{{item.TransactionDateString}}</td>
+                                    <td>{{item.InvoiceNumber}}</td>
+                                    <td>{{item.Quantity}}</td>
+                                    <td>{{item.Description}}</td>
+                                    <td>&pound;{{item.Amount | number:2}}</td>
+                                    <td>&pound;{{item.Postage | number:2}}</td>
+                                    <td>&pound;{{item.Credits | number:2}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <p>{{statement.Note}}</p>
+
+                            <p>@string.Format(Html.TranslateFallback(TRM.Web.Constants.StringResources.ForEaseOfPayment, "For ease of payment please call our payment line on {0}"), Model.ThisBlock.PaymentLineNumber)</p>
+                            <p>@string.Format(Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentsRecievedAfter, "Any payments received or items returned after {0} not shown above, will appear on your next statement."), "{{statement.StatementDateString}}")</p>
+
+                            <hr class="mt-2x mb-2x">
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.NewBalance, "New Balance")</h5>
+                                    &pound;{{statement.NewBalance | number: 2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.MinimumPayment, "Minimum Payment")</h5>
+                                    &pound;{{statement.MinPayment | number: 2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-4">
+                            <div class="panel panel-item">
+                                <div class="panel-body">
+                                    <h5>@Html.TranslateFallback(TRM.Web.Constants.StringResources.PaymentDueDate, "Payment Due Date")</h5>
+                                    {{statement.PaymentDueDateString}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wysiwyg col-xs-12">
+                            @Html.DisplayFor(a => a.ThisBlock.WaysToPay)
+                            @*
+                                <h3 class="h4-xs h3-sm-up">Ways to pay</h3>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5>Secure Online Payment</h5>
+                                        <a href="#">Click here to pay your statement online now</a>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <h5>By Telephone</h5>
+                                        <p>
+                                            Pay by calling our payment line on 0345 60 88 333
+                                        </p>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <h5>Your statement by e-mail</h5>
+                                        <p>Opt-in to receive your Monthly Statement online, and reduce the amount of post you get. We will send you a free notification e-mail every month when your statement is available. Please ensure that your e-mail address and communication preference is up-to-date</p>
+                                        <p>Download Continuous Payment Authority Form (Setup a Direct Debit)</p><a href="" class="btn btn-default mt-1x">Download form</a>
+                                    </div>
+                                </div>
+                            *@
+                        </div>
+                    </div>
+        }
+    </div>
+</div>
+
+@Html.DisplayFor(a => a.ThisBlock.BottomContentArea)

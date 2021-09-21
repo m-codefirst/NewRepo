@@ -1,0 +1,101 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using EPiServer.Web
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.SellBullionDefaultLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.SellBullionDefaultLandingViewModel>
+
+<div class="pageContainer">
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 col-md-offset-2 mb-1x">
+                <div class="page-header">
+                    <h1 class="h1 text-success">
+                        <i class="trmi trmi-check text-success mr-1x"></i>
+                        @Html.TranslateFallback(StringResources.ThisSaleHasBeenCompleted, "This Sale has been completed")
+                    </h1>
+                </div>
+                
+                @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                {
+                    <div class="row">
+                        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                }
+
+                <div class="alert alert-success">
+                    <span>@Html.TranslateFallBack(StringResources.SellSignatureConfirmText, "Your sale has been processed with a price per oz of {0} and it will be added to your secure wallet within 5 working days. You will receive an email with your sale confirmation shortly.", Model.ViewModel.PremiumPricePerOzIncludingPremium.ToString())</span>
+                </div>
+                <h2 class="h3">@Html.TranslateFallback(StringResources.TransactionNumber, "Transaction Number")</h2>
+                <h3 class="h6 mb-2x strong">#@Model.ViewModel.SellTransactionNumber</h3>
+                <div class="row">
+                </div>
+                <h2 class="h3 mt-0">@Html.TranslateFallback(StringResources.SellSummary, "Sell Summary")</h2>
+                <div class="checkout-item-block">
+                    <div class="checkout-item-wrapper">
+                        <div class="item-image hidden-xs">
+                            <img src="@Model.ViewModel.SellVariant.ImageUrl">
+                        </div>
+                        <div class="item-info">
+                            <h6 class="h6 mt-0 mb-0">@Model.ViewModel.SellVariant.Title</h6>
+                            <p class="text-graylight">@Model.ViewModel.SellVariant.Subtitle</p>
+                        </div>
+                        <div class="item-price flex-align-left-sm-up primary-price">
+                            <div class="price-info">
+                                <p class="h6 mb-0 text-center">@Html.TranslateFallback(StringResources.WeightInVaultOz, "Weight in vault (oz)")</p>
+                                <p class="h5 text-center mt-0 mb-0">
+                                    @Model.ViewModel.SellVariant.AvailableToSell.ToString("0.###")
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout-total">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-4 col-sm-offset-4 text-right-sm-up">
+                            <strong>@Html.TranslateFallback(StringResources.WeightInVaultOz, "Weight in vault (oz)")</strong>
+                        </div>
+                        <div class="col-xs-6 col-sm-4 text-right-sm-up">
+                            @Model.ViewModel.CombinedWeightInSale.ToString("0.###")
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="col-xs-6 col-sm-4 col-sm-offset-4 text-right-sm-up">
+                            <strong>@Html.TranslateFallback(StringResources.PricePerOzIncludingPremium, "Price per Oz including premium")</strong>
+                        </div>
+                        <div class="col-xs-6 col-sm-4 text-right-sm-up">
+                            @Model.ViewModel.PremiumPricePerOzIncludingPremium
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                    </div>
+                    <div class="row center-items-sm-up">
+                        <div class="col-xs-12 col-sm-8 col-sm-offset-4">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <p class="h4 h3-lg-down strong mt-0 mb-0 text-right-sm-up">@Html.TranslateFallback(StringResources.SalePrice, "Sale price")</p>
+                                </div>
+                                <div class="col-xs-6 text-right-sm-up">
+                                    <p class="h4 h3-lg-down strong mt-0 mb-0">@Model.ViewModel.SellTotal.ToString()</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-10 col-md-5 pull-right-sm-up">
+                        <a href="@Model.ViewModel.BullionAccountDashboardUrl" class="btn btn-secondary btn-block mt-2x">@Html.TranslateFallback(StringResources.GoToAccountDashboard, "Go To Account Dashboard")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "sellOrDeliverFromVault").AtFooter();
+}

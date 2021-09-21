@@ -1,0 +1,223 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var isLoggedIn = Request.IsAuthenticated;
+
+    CustomerContact contact = null;
+
+    if (isLoggedIn)
+    {
+        contact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+    }
+    else
+    {
+        contact = CustomerContact.CreateInstance();
+    }
+
+    var contactFirstName = contact.FirstName ?? string.Empty;
+    var contactLastName = contact.LastName ?? string.Empty;
+    var contactEmail = contact.Email ?? string.Empty;
+
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+}
+<div class="nav-section" ng-controller="rmLogin" id="navSectionAccount">
+    <div ng-init="setupLogin('@(contactFirstName.Replace("'", "\\'"))', '@(contactLastName.Replace("'", "\\'"))', '@(contactEmail.Replace("'", "\\'"))', @isLoggedIn.ToString().ToLower())" class="section-body">
+        <div class="row" ng-hide="userLoggedIn == true" ng-cloak>
+
+            <div class="col-xs-12 col-md-5 col-lg-4 col-lg-offset-1">
+                @Html.Partial("/AccountLogin/_AccountLoginForm")
+                <div class="hidden mb-2x" id="forgottenPW-header">
+                    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.ForgottenYourPassword, "Forgotten your password?")</h4>
+                    <h6 class="mt-0">Request a reset link</h6>
+                    <form class="" ng-submit="resetPassword()">
+                        <div class="form-group mb-2x input-subtle">
+                            <label class="sr-only" for="Email1">@Html.TranslateFallback(StringResources.EmailAddress, "Email address")</label>
+                            <input type="email" class="form-control" id="Email1" ng-required="true" ng-model="resetEmail" placeholder="@Html.TranslateFallback(StringResources.EmailAddress, "Email address")*">
+                        </div>
+                        <div class="row mb-1x">
+                            <div class="col-xs-12 col-md-8">
+                                <button class="btn btn-secondary btn-block" type="submit">@Html.TranslateFallback(StringResources.ResetPassword, "Reset Password")</button>
+                            </div>
+                        </div>
+                        <div class="row mb-2x">
+                            <div class="block containerBlock col-xs-12 col-md-8" ng-show="(!resetSent && resetError) || resetSent">
+                                @Html.TranslateFallback(StringResources.ResetPasswordCustomerSuccessMessage, "Thank you for your request, if this user exists you will receive an email to update your password.")
+                            </div>
+                        </div>
+                        <p>
+                            <a href="#" data-hide="#forgottenPW-header" data-show="#loginForm-header" class="pw-link">@Html.TranslateFallback(StringResources.Cancel, "Cancel")</a>
+                        </p>
+                    </form>
+                </div>
+                <div class="mb-2x hidden" id="activateForm-header">
+                    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.PlacedAnOfflineOrder, "Placed an offline order?")</h4>
+                    <h6 class="mt-0">@Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your account")</h6>
+                    <p>@Html.TranslateFallback(StringResources.FillInFormBelow, "Please fill in the form below to turn your account into an online account.")</p>
+                    <form action="" class="" autocomplete="off">
+                        <div class="row mb-3x mt-2x">
+                            <div class="col-xs-6">
+                                <a href="@Model.ActivateAccountPage.GetExternalUrl_V2()" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.Activate, "Activate")</a>
+                            </div>
+                            <div class="col-xs-6">
+                                <button class="btn btn-default btn-block" type="submit">@Html.TranslateFallback(StringResources.Cancel, "Cancel")</button>
+                            </div>
+                        </div>
+                        <p>
+                            <a href="#" data-hide="#activateForm-header" data-show="#loginForm-header" class="pw-link">@Html.TranslateFallback(StringResources.ReturnToLogin, "Return to login")</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-1 col-lg-1 hidden-xs hidden-sm">
+                <div class="separator">
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-5 col-lg-4 col-md-offset-1 account-create">
+                <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.NewToRoyalMint, "New to The Royal Mint Bullion")</h4>
+                <h6 class="mt-0">@Html.TranslateFallback(StringResources.CreateYourAccount, "Create your account")</h6>
+                <a href="@Model.RegistrationPage.GetExternalUrl_V2()" class="btn btn-secondary btn-block hidden-lg hidden-md">@Html.TranslateFallback(StringResources.Register, "Register")</a>
+                <div class="hidden-xs hidden-sm">
+                    <form autocomplete="off" ng-submit="AttemptRegistration()" ng-controller="rmRegistration">
+                        <div class="form-group input-subtle mb-1x">
+                            <label class="sr-only" for="registerFirstName-header">@Html.TranslateFallback(StringResources.FirstName, "First Name")</label>
+                            <input type="text" class="form-control" id="registerFirstName-header" ng-required="true" ng-model="registerFirstName" placeholder="@Html.TranslateFallback(StringResources.FirstName, "First Name")">
+                        </div>
+                        <div class="form-group input-subtle mb-1x">
+                            <label class="sr-only" for="registerLastName-header">@Html.TranslateFallback(StringResources.LastName, "Last Name")</label>
+                            <input type="text" class="form-control" id="registerLastName-header" ng-required="true" ng-model="registerLastName" placeholder="@Html.TranslateFallback(StringResources.LastName, "Last Name")">
+                        </div>
+                        <div class="form-group input-subtle mb-1x">
+                            <label class="sr-only" for="registerEmail1-header">@Html.TranslateFallback(StringResources.EmailAddress, "Email address")</label>
+                            <input type="email" class="form-control" id="registerEmail1-header" ng-required="true" ng-model="registerEmail" placeholder="@Html.TranslateFallback(StringResources.EmailAddress, "Email Address")">
+                        </div>
+                        <div class="alert alert-danger" ng-show="regError == true" ng-cloak>
+                            @Html.TranslateFallback(StringResources.EmailAddressInUse, "This email address is already in use, please try logging in or if you've forgotten your password, try resetting your password")
+                        </div>
+                        <div class="row mt-2x">
+                            <div class="col-xs-12 col-md-6">
+                                <button class="btn btn-default" type="submit">@Html.TranslateFallback(StringResources.Continue, "Continue")</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="col-xs-12">
+                <!-- here for the new-->
+                <div class="username-request">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2 class="mt-1x h2">Username Requested</h2>
+                            <h4 class="mb-2x">If we recognise your e-mail address your username(s) will be sent by email..</h4>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 mb-1x pl-0 pr-0">
+                        <div class="row">
+                            <!-- Content Area Here -->
+                            <div class="html-content-area">
+                                <p class="html-content-area-text">content-area</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-md-3 mt-1x">
+                            <button class="btn btn-secondary btn-block request-goto-login" type="submit">Go to Login</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <p class="mt-2x"><a href="" class="nav-close-return">Return to our homepage</a></p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="password-request">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2 class="mt-1x h2">Password reset sent</h2>
+                            <h4 class="mb-2x">You will receive an email shortly with instructions on how to reset your password.</h4>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 mb-1x pl-0 pr-0">
+                        <div class="row">
+                            <!-- Content Area Here -->
+                            <div class="html-content-area">
+                                <p class="html-content-area-text">content-area</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-md-3 mt-1x">
+                            <button class="btn btn-secondary btn-block request-goto-login" type="submit">Go to Login</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <p class="mt-2x"><a href="" class="nav-close-return">Return to our homepage</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-cloak ng-show="userLoggedIn == true">
+            @if (Model.UseManualAccountMenu)
+            {
+                @Html.PropertyFor(x => x.ManualAccountMenu)
+            }
+            else
+            {
+                <div class="col-xs-12 col-sm-6 hidden-xs hidden-sm">
+                    <ul class="rm-account-nav">
+                        @if (Model.MyAccountHoverMenu != null && Model.MyAccountHoverMenu.MyAccountMenuItemDto != null)
+                        {
+                            foreach (var item in Model.MyAccountHoverMenu.MyAccountMenuItemDto.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                            {
+                                <li class="level0 @(item.ChildNavigationItems.Any() ? "has-children" : string.Empty)">
+                                    <a href="@(item.ChildNavigationItems.Any() ? string.Empty : item.MenuItemExternalUrl)" @(item.OpenInANewWindow ? "target=\"_blank\"" : string.Empty)>@item.MenuItemDisplayName</a>
+                                    @if (item.ChildNavigationItems.Count > 0)
+                                    {
+                                        <ul>
+                                            @foreach (var child in item.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                                            {
+                                                <li class="level1">
+                                                    <a href="@child.MenuItemExternalUrl">
+                                                        @child.MenuItemDisplayName
+                                                    </a>
+                                                </li>
+                                            }
+
+                                            @if (!item.IsContainer && !item.CurrentBlock.DontOutputLabelWithHyperlink)
+                                            {
+                                                <li>
+                                                    <a href="@item.MenuItemExternalUrl" title="@viewAll">@viewAll</a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="col-xs-12 col-md-5 col-md-push-1">
+                <h3>@Html.TranslateFallback(StringResources.Hello, "Hello") {{user.user.FirstName;}}</h3>
+                <p>@Html.TranslateFallback(StringResources.AccountMenuIntro, "Welcome to the your account panel where your manage your account, orders or log off.")</p>
+
+                <button class="btn btn-default" ng-click="logout()">@Html.TranslateFallback(StringResources.LogOut, "Log Out")</button>
+                <a class="visible-xs-inline-block visible-sm-inline-block btn btn-secondary" href="@Model.MyAccountPage.GetExternalUrl_V2()" title="@Html.TranslateFallback(StringResources.GoToMyAccount, "Go to My Account")">
+                    @Html.TranslateFallback(StringResources.GoToMyAccount, "Go to My Account")
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

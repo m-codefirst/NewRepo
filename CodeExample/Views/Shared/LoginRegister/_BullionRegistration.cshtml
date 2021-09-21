@@ -1,0 +1,30 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var contentGuid = Guid.NewGuid();
+}
+<div class="col-xs-12 col-md-5 col-lg-4 col-md-offset-1  ">
+    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.NewToRoyalMintBullion, "New to The Royal Mint Bullion?")</h4>
+    <h6 class="mt-0">@Html.TranslateFallback(StringResources.CreateYourAccountBullion, "Create your Bullion account")</h6>
+    <a href="@Model.GetBullionRegistrationPage()" class="btn btn-secondary btn-block hidden-lg hidden-md">@Html.TranslateFallback(StringResources.Register, "Register")</a>
+    <div class="hidden-xs hidden-sm">
+        <form onsubmit="javascript:BullionRegistration.getStart('@contentGuid', event);return false;" method="post" id="registrationentryblock_@contentGuid">
+            <div class="form-group input-subtle mb-1x">
+                <input type="email" class="form-control" id="registrationEntryBlockEmail_@contentGuid" name="email" placeholder="@Html.TranslateFallback(StringResources.EmailAddressPlaceholderInBullionRegistration, "Email address")*">
+            </div>
+            <div class="alert alert-danger invalidMessage hide" id="invalidMessage_@contentGuid">
+                @Html.TranslateFallback(StringResources.InvalidEmail, StringConstants.TranslationFallback.InvalidEmail)
+            </div>
+            <div class="row mt-2x">
+                <div class="col-xs-12 col-md-6">
+                    <button class="btn btn-default" id="btn-register" onclick="BullionRegistration.getStart('@contentGuid', event);" type="button">
+                        <div class="spinner hidden"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
+                        <span>@Html.TranslateFallback(StringResources.LetsGetStarted, "Let get Started")</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

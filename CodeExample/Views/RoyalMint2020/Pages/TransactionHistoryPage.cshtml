@@ -1,0 +1,117 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@using EPiServer.Web
+@using EPiServer.Web.Mvc.Html
+@using Hephaestus.ContentTypes.Business.Extensions
+@using Newtonsoft.Json
+@using System.Web.Optimization
+@using TRM.Web.Extentions
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.TransactionHistoryPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.TransactionHistoryViewModel>
+
+@{
+    var trmLayoutModel = Model.Layout as TrmLayoutModel;
+    if (trmLayoutModel == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+
+    bool showAutomaticMenu = Model.CurrentPage.ShowAutomaticLeftNavigation && trmLayoutModel.LeftMenu != null && trmLayoutModel.LeftMenu.AutomaticLeftMenuDto != null && trmLayoutModel.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems != null && trmLayoutModel.LeftMenu.AutomaticLeftMenuDto.ChildNavigationItems.Any();
+    bool showManualMenu = Model.CurrentPage.ShowManualLeftNavigation && trmLayoutModel.LeftMenu != null && trmLayoutModel.LeftMenu.ManualLeftMenuDto != null && trmLayoutModel.LeftMenu.ManualLeftMenuDto.ChildNavigationItems != null && trmLayoutModel.LeftMenu.ManualLeftMenuDto.ChildNavigationItems.Any();
+
+    bool hasMenu = showAutomaticMenu || showManualMenu;
+
+    string mainClass = hasMenu ? "col-md-9 py-2" : string.Empty;
+    string copyClass = Model.CurrentPage.TextAlignment.DescriptionAttr();
+    string colClass = Model.CurrentPage.IsFullWidthContainer ? "col-12" : "col-md-9";
+    string firstSectionClass = hasMenu ? "pt-0" : string.Empty;
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    <!-- Breadcrumbs -->
+    @if (!trmLayoutModel.HideSiteBreadcrumb)
+    {
+        if (hasMenu)
+        {
+            trmLayoutModel.Breadcrumb.IsWide = true;
+        }
+        Html.RenderPartial("RoyalMint2020/_Breadcrumb", trmLayoutModel.Breadcrumb);
+    }
+</div>
+
+<div class="row">
+    <!-- Left Menu -->
+    @if (Html.IsValidToShowManualMenu(Model))
+    {
+        Html.RenderPartial("RoyalMint2020/_ManualLeftMenu", trmLayoutModel, new ViewDataDictionary { { "DisplayCustomerServiceButton", Model.CurrentPage.DisplayCustomerServiceButton } });
+    }
+
+    @if (Html.IsValidToShowAutomaticMenu(Model))
+    {
+        Html.RenderPartial("RoyalMint2020/_AutomaticLeftMenu", trmLayoutModel, new ViewDataDictionary { { "DisplayCustomerServiceButton", Model.CurrentPage.DisplayCustomerServiceButton } });
+    }
+
+    <!-- Main Content -->
+    <div class="col-12 @mainClass">
+        @* TODO: Add legacy code for CustomerServicePage  *@
+
+        @if (trmLayoutModel.HasMessage)
+        {
+            Html.RenderPartial("_MessageBox", trmLayoutModel.Message);
+        }
+
+        <!-- Main Body -->
+        <div class="mod-section mod-section-copy mod-section-first @firstSectionClass">
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass" @Html.EditAttributes(m => m.CurrentPage.MainBody)>
+                    @if (Model.CurrentPage.DisplayPageHeading)
+                    {
+                        <h2 class="section-head mb-2"><span>@trmLayoutModel.PageHeading</span></h2>
+                    }
+                    @Html.DisplayFor(m => m.CurrentPage.MainBody)
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Content -->
+        <div class="mod-section mod-section-copy">
+            <div class="row justify-content-center">
+                <div class="@copyClass @colClass">
+                    <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                    </div>
+                    @{
+                        var viewModel = new
+                        {
+                            pageSize = Model.ViewModel.PageSize,
+                            pageSizes = Model.ViewModel.PageSizes,
+                            totalSize = Model.ViewModel.TotalRecords,
+                            filterList = Model.ViewModel.TransactionFilterOptions.ToDictionary(k => k.Key.ToString(), v => v.Value),
+                            title = Model.CurrentPage.Name,
+                            filterLabel = Html.TranslateFallback(StringResources.FilterBy, "Filter By"),
+                        };
+                    }
+                    <div data-module="transaction-history" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bottom Content -->
+<div class="mod-section mod-section-copy">
+    <div class="row justify-content-center">
+        <div class="@copyClass @colClass">
+            <div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "transactionHistoryCss")
+}

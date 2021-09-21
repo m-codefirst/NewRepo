@@ -1,0 +1,57 @@
+﻿@using System.Text.RegularExpressions
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@model TRM.Web.Models.ViewModels.EntryPartialViewModel
+@{
+    var hasAltImage = !string.IsNullOrEmpty(Model.AltImageUrl);
+    var imageFlipClass = hasAltImage ? "image-flip" : string.Empty;
+}
+<div class="row ng-scope">
+    <div class="col-xs-4 col-sm-2">
+        <a ng-href="@Model.EntryUrl" title="@Model.DisplayName" class="ng-scope" href="@Model.EntryUrl">
+            <figure class="@imageFlipClass" ng-class="@imageFlipClass">
+                <span class="frontImg">
+                    @if (!string.IsNullOrWhiteSpace(Model.TagMessage))
+                    {
+                        <span class="promoTag">
+                            @Model.TagMessage
+                        </span>
+                    }
+                    @Html.GetMyPictureHtml(Model.DefaultImageUrl,
+                        new Dictionary<string, string> { { "alt", Model.DisplayName }, { "class", "img-responsive" } },
+                        Model.ImageDisplaySizes)
+                </span>
+                @if (hasAltImage)
+                {
+                    <span class="backImg">
+                        @Html.GetMyPictureHtml(Model.AltImageUrl,
+                            new Dictionary<string, string> { { "alt", Model.DisplayName }, { "class", "img-responsive" } },
+                            Model.ImageDisplaySizes)
+                    </span>
+                }
+            </figure>
+        </a>
+    </div>
+    <div class="col-xs-8 col-sm-8 col-sm-push-2 mb-xs-1x item-details">
+        <h3 class="h6 item-title mb-0 mt-0">
+            <a title="@Model.DisplayName" href="@Model.EntryUrl">
+                @Html.DisplayFor(m => m.DisplayName)
+            </a>
+        </h3>
+        <p class="item-subtitle">@Html.DisplayFor(m => m.SubDisplayName)</p>
+        <p class="variant-description text-graylight " id="variantdescription">@Html.Raw(Model.Description)</p>
+        @if (!string.IsNullOrWhiteSpace(Model.ObverseDesigner))
+        {
+            <p>@Html.TranslateFallback(StringResources.DesignedBy, "Designed by:") @Html.DisplayFor(m => m.ObverseDesigner)</p>
+        }
+
+    </div>
+    <div class="col-xs-8 col-xs-push-4 col-sm-push-0 col-sm-2 col-sm-pull-8 clear-xs">
+        <div class="item-title ">
+            @if (Model.YearOfIssue != 0)
+            {
+                @Html.DisplayFor(m => m.YearOfIssue) @(Model.YearOfWidthdrawal == 0 ? string.Empty : " - " + Model.YearOfWidthdrawal)
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿@using EPiServer.Framework.Localization
+@using EPiServer.Globalization
+@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+
+@model List<TRM.Web.Models.ViewModels.DocumentDto>
+
+<div class="panel panel-default panel-order">
+    @foreach (var document in Model)
+    {
+        <div class="panel-body item-row">
+            <div class="row">
+                <div class="col-xs-12 col-sm-4">
+                    <span class="visible-xs-inline strong">
+                        @LocalizationService.Current.GetStringByCulture(StringResources.BullStatementDate, "Date", ContentLanguage.PreferredCulture):
+                    </span> @document.Created
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <span class="visible-xs-inline strong">@LocalizationService.Current.GetStringByCulture(StringResources.BullStatementType, "Type", ContentLanguage.PreferredCulture):</span>
+                    @document.Type
+                    @(!string.IsNullOrEmpty(document.Month) && !document.Type.Equals("Invoice") ? string.Format("{0}{1}", "- ", document.Month) : "")
+                </div>
+                <div class="col-xs-12 col-sm-4 text-right-sm-up mb-xs-1x mt-xs-1x">
+                    <a href="/bullion/document/download?id=@document.ID">
+                        <i class="fa fa-download"></i>&nbsp;&nbsp;
+                        @LocalizationService.Current.GetStringByCulture(StringResources.BullStatementDownload, "Download", ContentLanguage.PreferredCulture)
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

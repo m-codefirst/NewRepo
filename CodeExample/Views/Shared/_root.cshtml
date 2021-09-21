@@ -1,0 +1,213 @@
+﻿@using System.Web.Optimization
+@using EPiServer.Editor
+@using EPiServer.Framework.Web
+@using EPiServer.Framework.Web.Mvc.Html
+@using EPiServer.Globalization
+@using StackExchange.Profiling
+@using TRM.Web.Constants
+@using TRM.Web.Extentions
+@using TRM.Web.Models.Layouts
+@using TRM.Web.Models.Pages
+@using EPiServer.ServiceLocation
+@using EPiServer.Web
+@using TRM.Web.Services;
+@using TRM.Web.Helpers;
+@using Mediachase.Commerce.Customers
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<EPiServer.Core.IContent, Hephaestus.CMS.ViewModels.ILayoutModel>
+
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var pageTypeCss = string.Empty;
+
+    if (Model.CurrentPage.Property.Keys.Contains("PageTypeName"))
+    {
+        pageTypeCss = Model.CurrentPage.Property["PageTypeName"].ToString().ToCssClassName();
+    }
+
+    var recaptchaHelper = ServiceLocator.Current.GetInstance<IGoogleRecaptchaHelper>();
+
+    var userService = ServiceLocator.Current.GetInstance<IUserService>();
+}
+
+<!DOCTYPE html>
+<html ng-app="rmApp" lang="@ContentLanguage.PreferredCulture.Name">
+
+@* ReSharper disable once MissingTitleTag *@
+<head>
+    @if (!PageEditing.PageIsInEditMode && !string.IsNullOrWhiteSpace(myLayout.GoogleTagManagerHeaderSnippet))
+    {
+        @Html.Raw(myLayout.GoogleTagManagerHeaderSnippet)
+    }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    @{
+        Html.RenderPartial("_Seo");
+        Html.RenderPartial("_StyleSheets");
+        Html.RenderPartial("_Icons");
+
+        if (myLayout.EnableCustomerCss && !string.IsNullOrWhiteSpace(myLayout.CustomerCssUrl))
+        {
+            <link href="@myLayout.CustomerCssUrl" rel="stylesheet" media="all" type="text/css" />
+        }
+
+    }
+    @Html.RequiredClientResources(RenderingTags.Header)
+    <!--[if (lte IE 11) | (!IE)]><!-->
+    <script>
+        // Picture element HTML5 shiv
+        document.createElement("picture");
+    </script>
+
+
+    <script type="text/javascript">
+		var currencySymbol = '@Html.Raw(myLayout.DefaultCurrencySymbol)';
+    </script>
+    <!--<![endif]-->
+    @{ Html.RenderPartial("_GoogleTagManagerDataLayer", myLayout); }
+</head>
+
+<body class="page-@Model.CurrentPage.Name.ToCssClassName() @pageTypeCss " ng-controller="rmCommerceController as rmCommerce" breakpoint="{0:'body-xs', 767:'body-sm', 991:'body-md', 1199:'body-lg'}" id="pageTop">
+    @if (!PageEditing.PageIsInEditMode && !string.IsNullOrWhiteSpace(Model.Layout.GoogleTagManagerSnippet))
+    {
+        @Html.Raw(Model.Layout.GoogleTagManagerSnippet)
+    }
+
+    @Html.RenderEPiServerQuickNavigator()
+    @{
+        var page = Model.CurrentPage as ErrorPage;
+        if (page == null)
+        {
+            @Html.AntiForgeryToken()
+        }
+    }
+
+    @if (!Model.Layout.HideSiteHeader)
+    {
+        if (Model.CurrentPage is IControlCustomHeaderView && myLayout.HasCustomHeaderView)
+        {
+            Html.RenderPartial(myLayout.CustomHeaderView, myLayout);
+        }
+        else
+        {
+            Html.RenderPartial("_Header", myLayout);
+        }
+    }
+    @{ Html.RenderPartial("_AMLStatusMessage", myLayout); }
+    <div class="pageContainer">
+        @if (Request.IsAuthenticated && userService.IsImpersonating())
+        {
+            var stopImperonatingUrl = myLayout.IsSippContact ? "mvcApi/sippssasadmin/StopImpersonating" : "mvcApi/customerservice/StopImpersonating";
+            <div class="impersonating-notification">
+                <div class="container impersonating-notification__content">
+                    [@userService.GetImpersonatingUserName()] You are impersonating user [@userService.GetUsername()]
+                    <button type="button" class="btn btn-default mb-1x btn-custom-impersonating" onclick="location.href='@stopImperonatingUrl'">Stop Impersonating</button>
+                </div>
+            </div>
+        }
+
+        @RenderBody()
+    </div>
+    @{
+
+        if (!Model.Layout.HideSiteFooter)
+        {
+            if (Model.CurrentPage is IControlCustomFooterView && myLayout.HasCustomFooterView)
+            {
+                Html.RenderPartial(myLayout.CustomFooterView, myLayout);
+            }
+            else
+            {
+                Html.RenderPartial("_Footer", myLayout);
+            }
+        }
+        <a data-scrollto="#pageTop" data-spy="affix" data-offset-top="400" class="btn btn-secondary backToTop affix-top" title="Back to top"><span class="sr-only">back to top</span><i class="trmi trmi-angle-up"></i></a>
+
+    }
+
+    <div id="menuOverlay" class=""></div>
+
+    @{
+        Html.RenderPartial("_CookieLawAlert", myLayout);
+    }
+
+    <div class="modal fade" id="rmMessagesModal" tabindex="-1" role="dialog" aria-labelledby="rmMessagesModalLabel" ng-controller="rmMessagesModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close trmi trmi-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                    <h4 class="modal-title" id="rmMessagesModalLabel">{{errorHandler.title}}</h4>
+                </div>
+                <div class="modal-body" id="rmMessagesModalContent" ng-bind-html="errorHandler.content"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button ng-show="errorHandler.showTarget" type="button" class="btn btn-primary" ng-click="action(errorHandler.action, errorHandler.target);">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Scripts.RenderFormat("<script src=\"{0}\"></script>", "~/bundles/" + SiteDefinition.Current.Name + "jquery")
+    @Scripts.RenderFormat("<script src=\"{0}\" defer></script>", "~/bundles/" + SiteDefinition.Current.Name + "bootstrap")
+    @Scripts.RenderFormat("<script src=\"{0}\" defer></script>", "~/bundles/" + SiteDefinition.Current.Name + "angular")
+
+    @Scripts.RenderFormat("<script src=\"{0}\" defer></script>", "~/bundles/" + SiteDefinition.Current.Name + "footscripts")
+    @Scripts.RenderFormat("<script src=\"{0}\" defer></script>", "~/bundles/" + SiteDefinition.Current.Name + "app")
+    @Scripts.RenderFormat("<script src=\"{0}\" defer></script>", "~/bundles/" + SiteDefinition.Current.Name + "legacyFunctions")
+
+    @RenderSection("JustBeforeBodyTag", false)
+
+    @if (recaptchaHelper.IsEnabled())
+    {
+        <script type="text/javascript">
+            var registrationRecaptcha;
+            var forgotPasswordRecaptcha;
+            var forgotUserNameOrPasswordRecaptcha;
+            var recaptchaForgotPasswordOnCheckoutPage;
+            var onloadRecaptchaCallback = function () {
+                if ($('#registrationRecaptcha').length > 0) {
+                    registrationRecaptcha = grecaptcha.render('registrationRecaptcha', {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+                }
+
+                // All pages
+                if ($('#recaptchaForgotPasswordDiv').length > 0) {
+                    forgotPasswordRecaptcha = grecaptcha.render('recaptchaForgotPasswordDiv', {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+                }
+
+                // Forgot username or password
+                if ($('#recaptchaForgotUserNameOrPasswordDiv').length > 0) {
+                    forgotUserNameOrPasswordRecaptcha = grecaptcha.render('recaptchaForgotUserNameOrPasswordDiv', {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+                }
+
+                // On checkoutpage
+                if ($('#recaptchaForgotPasswordOnCheckoutPageDiv').length > 0) {
+                    recaptchaForgotPasswordOnCheckoutPage = grecaptcha.render('recaptchaForgotPasswordOnCheckoutPageDiv', {
+                        'sitekey': '@recaptchaHelper.SiteKey'
+                    });
+                }
+            };
+        </script>
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadRecaptchaCallback&render=explicit" async defer></script>
+    }
+    @Html.RenderPartialViewScripts()
+    @Html.RequiredClientResources(RenderingTags.Footer)
+    @if (!string.IsNullOrWhiteSpace(myLayout.FooterScriptSnippet))
+    {
+        @Html.Raw(myLayout.FooterScriptSnippet)
+    }
+    @MiniProfiler.RenderIncludes()
+
+</body>
+</html>

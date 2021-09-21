@@ -1,0 +1,187 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.GBCHCategory, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.GBCH.CoinBuilderPageViewModel>
+
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+}
+
+<script type="text/javascript">
+    var CATEGORY_INFO = @Html.Raw(Model.ViewModel.GBCHCategoryInfo);
+    var GBCH_SETTING = @Html.Raw(Model.ViewModel.GBCHSettingsInfo);
+</script>
+
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+}
+
+<div class="contentArea">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+</div>
+
+<div class="gbch-search-container" ng-controller="gbchSearchCoin as ctrl">
+    <div id="gbch-search-container-step-5" class="image-container" ng-show="ctrl.step === 5">
+        <img ng-src="{{ctrl.moduleSetting.step4ThankYouImage}}" width="100%">
+    </div>
+    <h1 class="title text-sovereign-red" ng-bind="ctrl.step === 5 ? ctrl.addBasketSuccessfulText : ctrl.title"></h1>
+    <div class="description" ng-show="ctrl.step === 1" ng-bind-html="ctrl.trustAsHtml(ctrl.description)"></div>
+    <div class="description" ng-show="ctrl.step === 5" ng-bind-html="ctrl.trustAsHtml(ctrl.step4Description)"></div>
+    <div class="coin-search" ng-if="ctrl.step < 5">
+        <input tabindex=1 type="text" name="coin-search" ng-model-options="{ allowInvalid: true, debounce: 500 }" ng-model="ctrl.tfSearchCoinValue" ng-change="ctrl.searchCoins()" ng-paste="ctrl.searchCoins($event)" ng-class="{'border-sovereign-red': ctrl.errorMessage !== ''}" ng-focus="ctrl.focusSearchField()" />
+        <span class="coin-search-remain-characters no-select" ng-bind="ctrl.remainSearchString"></span>
+        <div class="quick-input" ng-class="{'error': ctrl.errorMessage !== ''}">
+            <a class="btn btn-black btn-ribbon" ng-enter="ctrl.getAllCoins()" tabindex=2 ng-click="ctrl.getAllCoins()">
+                <object data="/static/img/global/triangle-left-3.svg" type="image/svg+xml" class="triangle-left-top-1x triangle-left"></object>
+                <div class="btn-inner" ng-bind="ctrl.cta_secondary"></div>
+            </a>
+        </div>
+    </div>
+    <div class="intro-quick-tip" ng-if="ctrl.step < 5">
+        <div class="intro-left">
+            <span ng-bind="ctrl.quickti"></span>
+            <div class="error-message text-white bg-sovereign-red" ng-if="ctrl.errorMessage !== ''" ng-bind="ctrl.errorMessage"></div>
+        </div>
+    </div>
+    <div class="displayed-box">
+        <div ng-repeat="box in ctrl.tfSearchCoinValueDisplayWord" class="coin-box-word">
+            <div class="coin-box-item" ng-repeat="c in box[0] track by $index" ng-class="{'empty-string': c.letter === ' ', 'default-box': c.letter !== ' '}" style="background: url({{c.defaultImageUrl}}), url(/static/img/content/default.jpg)">
+                <span class="coin-symbol" ng-class="{'indent': c.defaultImageUrl !== ''}" ng-bind="c.letter"></span>
+            </div>
+        </div>
+    </div>
+    <div id="gbch-search-container-step-2" class="category-container" ng-show="ctrl.step > 1 && ctrl.step < 5">
+        <h2 class="title text-britannia" ng-bind="ctrl.step2Title"></h2>
+        <div ng-repeat="cate in ctrl.categories track by $index" class="category-item" ng-class="{'active': ctrl.activeCategory === $index}">
+            <div class="left-panel">
+                <div class="cate-name" ng-bind="cate.displayName"></div>
+                <div class="cate-description" ng-bind-html="ctrl.trustAsHtml(cate.description)"></div>
+                <!-- <div class="cate-content">
+                    <div ng-repeat="content in cate.content track by $index">- {{content}}</div>
+                </div> -->
+            </div>
+            <div class="right-panel">
+                <div class="cate-price" ng-bind="(ctrl.currencySymbol) + (cate.price)"></div>
+                <a tabindex=4 class="btn btn-nocolor btn-ribbon" ng-class="{'btn-warm-red': ctrl.activeCategory === $index, 'btn-britannia': ctrl.activeCategory !== $index}" ng-enter="ctrl.selectCategory($index)" ng-click="ctrl.selectCategory($index)">
+                    <object data="/static/img/global/triangle-left-4.svg" type="image/svg+xml" class="triangle-left"></object>
+                    <div class="btn-inner" ng-bind="ctrl.activeCategory === $index ? 'Selected' : ctrl.step2ButtonText"></div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="gbch-search-container-step-3" class="gift-container" ng-show="ctrl.step >= 3 && ctrl.step <= 5">
+        <h2 class="title text-britannia" ng-show="ctrl.step >= 3 && ctrl.step <= 4" ng-bind="ctrl.step3Title"></h2>
+        <div class="options-container" ng-if="ctrl.step >= 3 && ctrl.step < 4">
+            <div class="left-panel item-option" ng-if="ctrl.packagingOptions !== undefined">
+                <div class="image-option" style="background: url({{ctrl.packagingOptions.defaultImageUrl}}), url(/static/img/content/default.jpg)"></div>
+                <div class="name-option" ng-bind="ctrl.packagingOptions.displayName"></div>
+                <div class="note-option" ng-bind-html="ctrl.trustAsHtml(ctrl.packagingOptions.description)"></div>
+                <div class="price-option" ng-bind="'+' + (ctrl.currencySymbol) + ((ctrl.packagingOptions.price | number: 2))"></div>
+                <div tabindex=5 class="btn btn-nocolor btn-ribbon" ng-click="ctrl.upgradePackage()" ng-enter="ctrl.upgradePackage()" ng-class="{'btn-warm-red': ctrl.packagingOptions.isUpgrade, 'btn-britannia': !ctrl.packagingOptions.isUpgrade}">
+                    <object data="/static/img/global/triangle-left-2.svg" type="image/svg+xml" class="triangle-left"></object>
+                    <div class="btn-inner btn-triangle-horizontal" ng-bind="ctrl.packagingOptions.isUpgrade ? ctrl.step3DowngradeText : ctrl.step3UpgradeText"></div>
+                    <object data="/static/img/global/triangle-right-2.svg" type="image/svg+xml" class="triangle-right"></object>
+                </div>
+            </div>
+            <slick class="slick-container right-panel" ng-if="ctrl.step === 3" settings="ctrl.slickConfig" ng-class="{'center': ctrl.packagingOptions === undefined, 'mobile-no-upgrade': ctrl.slickConfig.slidesToShow == 2}">
+                <div class="item-option" ng-repeat="gift in ctrl.giftOptions">
+                    <div class="image-option" style="background: url({{gift.defaultImageUrl}}), url(/static/img/content/default.jpg)"></div>
+                    <div class="name-option" ng-bind="gift.displayName"></div>
+                    <div class="note-option" ng-bind="gift.description"></div>
+                    <div class="price-option" ng-bind="ctrl.currencySymbol + (gift.price.amount | number: 2)"></div>
+                    <div class="btn-circle-container">
+                        <a class="btn-circle" ng-click="ctrl.minusVolume(gift)" ng-class="{'disable': gift.quantity < 1}"><i class="trmi trmi-minus"></i></a>
+                        <span ng-bind="gift.quantity"></span>
+                        <a class="btn-circle" ng-click="ctrl.plusVolume(gift)" ng-class="{'disable': gift.quantity >= gift.maxQuantity}"><i class="trmi trmi-plus"></i></a>
+                    </div>
+                </div>
+            </slick>
+            <div class="clear"></div>
+        </div>
+        <div class="confirmation-container" ng-show="ctrl.step === 4 || ctrl.step === 5">
+            <slick class="slick-container gift-options" ng-if="ctrl.step === 4" settings="ctrl.slickConfig">
+                <div class="item-option" ng-repeat="gift in ctrl.giftOptions">
+                    <div class="image-option" style="background: url({{gift.defaultImageUrl}}), url(/static/img/content/default.jpg)"></div>
+                    <div class="name-option" ng-bind="gift.displayName"></div>
+                    <div class="price-option" ng-bind="ctrl.currencySymbol + gift.price.amount"></div>
+                    <div class="field-quantity">
+                        <label>Qty:</label>
+                        <input type="number" name="quantity" min="0" max="{{gift.maxQuantity}}" ng-model="gift.quantity" ng-change="ctrl.updateRelatedVariantQuantity(gift, '{{gift.quantity}}')" />
+                    </div>
+                </div>
+            </slick>
+            <div class="summary">
+                <div class="title" ng-bind="ctrl.step4SummaryTitle"></div>
+                <table class="table-summary">
+                    <tr>
+                        <th ng-bind="ctrl.step4ItemsText"></th>
+                        <th ng-bind="ctrl.step4QtyText"></th>
+                        <th ng-bind="ctrl.step4PriceText"></th>
+                    </tr>
+                    <tr ng-repeat="item in ctrl.summaryBasket track by $index">
+                        <td class="col-name" ng-bind-html="ctrl.trustAsHtml(item.name)"></td>
+                        <td class="col-quantity" ng-bind="item.quantity"></td>
+                        <td class="col-price" ng-bind="ctrl.currencySymbol + (item.price | number: 2)"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="total-price" ng-bind="(ctrl.step3TotalText) + ' ' + (ctrl.currencySymbol) + (ctrl.totalPrice | number: 2)"></div>
+        <!-- <div class="end-step-buttons"> -->
+        <div class="end-step-buttons" ng-show="ctrl.step === 5">
+            <a tabindex=7 class="btn btn-white btn-ribbon" ng-enter="ctrl.restart()" ng-click="ctrl.restart()">
+                <object data="/static/img/global/triangle-left-6.svg" type="image/svg+xml" class="triangle-left"></object>
+                <div class="btn-inner btn-triangle-horizontal" ng-bind="ctrl.step4SecondaryCTA"></div>
+                <object data="/static/img/global/triangle-right-6.svg" type="image/svg+xml" class="triangle-right"></object>
+            </a>
+            <a tabindex=8 class="btn btn-nocolor btn-warm-red btn-ribbon" href="{{ctrl.moduleSetting.basketUrl}}">
+                <object data="/static/img/global/triangle-left-2.svg" type="image/svg+xml" class="triangle-left"></object>
+                <div class="btn-inner btn-triangle-horizontal" ng-bind="ctrl.step4PrimaryCTA"></div>
+                <object data="/static/img/global/triangle-right-2.svg" type="image/svg+xml" class="triangle-right"></object>
+            </a>
+        </div>
+        <a class="btn btn-red" ng-show="ctrl.step === 4" ng-click="ctrl.saveToBasket()">Add to Basket</a>
+        <a tabindex=6 class="btn btn-nocolor btn-warm-red btn-addToBasket btn-ribbon" ng-show="ctrl.step >= 3 && ctrl.step < 4" ng-click="ctrl.saveToBasket()" ng-enter="ctrl.saveToBasket()">
+            <div ng-show="ctrl.isRequesting" class="btn-mask-loading"></div>
+            <object data="/static/img/global/triangle-left-2.svg" type="image/svg+xml" class="triangle-left"></object>
+            <div class="btn-inner btn-triangle-horizontal" ng-bind="ctrl.step3AddToBasketText"></div>
+            <object data="/static/img/global/triangle-right-2.svg" type="image/svg+xml" class="triangle-right"></object>
+        </a>
+        <div class="image-basket-coin" ng-show="ctrl.step === 3"></div>
+    </div>
+    <div class="social-link" ng-show="ctrl.step === 1 || ctrl.step === 2 || ctrl.step === 5">
+        <a tabindex=3 ng-show="ctrl.step === 1" class="btn btn-black btn-ribbon choose-metal" ng-enter="ctrl.showCategory()" ng-click="ctrl.showCategory()">
+            <object data="/static/img/global/triangle-left-5.svg" type="image/svg+xml" class="triangle-left"></object>
+            <div class="btn-inner btn-triangle-horizontal" ng-bind="ctrl.cta_primary"></div>
+            <object data="/static/img/global/triangle-right-5.svg" type="image/svg+xml" class="triangle-right"></object>
+        </a>
+        <div class="image-customise-and-grow" ng-show="ctrl.step === 1"></div>
+        <div class="image-coin-magnify" ng-show="ctrl.step === 1"></div>
+        @Html.Raw(Model.CurrentPage.SocialHtmlSnippet)
+    </div>
+</div>
+
+<div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <div class="row">
+        @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+</div>
+
+<div class="container">
+    @if (!myLayout.PerformanceMode && !Model.CurrentPage.HideRecentlyViewed)
+    {
+        <div class="row" ng-cloak>
+            @{Html.RenderPartial("_VariantPageRecentlyViewed", @Model.CurrentPage.Code);
+
+            }
+        </div>
+                }
+</div>

@@ -1,0 +1,133 @@
+﻿
+@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer ManageAddress">
+    <div class="container">
+        @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+    </div>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+           @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+
+    <div class="container">
+
+        <aside class="mobile-sidenav col-md-3" id="catFilters">
+            <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+            <div class="row">
+                <div class="account navigationBlock col-xs-12" id="account-menu">
+                    <div class="blockContent">
+                        <ul class="level0 contentNav">
+                            <li class="">
+                                <a href="#" title="My Account">My Account</a>
+                            </li>
+                            <li class=" has-children">
+                                <a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+                                <ul class="level1 collapse in" id="your-orders1">
+                                    <li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+                                    <li><a href="#" title="View Statement History">View Statement History</a></li>
+                                    <li><a href="#" title="View Transaction History">View Transaction History</a></li>
+                                    <li><a href="#" title="Manage Your Bank Account Details">Manage Your Bank Account Details</a></li>
+                                    <li><a href="#" title="Withdraw Funds from Wallet">Withdraw Funds from Wallet</a></li>
+                                    <li><a href="#" title="Add Funds To Wallet">Add Funds To Wallet</a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a class="btn-collapse" data-target="#page-menu-1" data-toggle="collapse" title="Show/Hide More">Contact and Delivery Details</a>
+                                <ul class="level1 collapse in" id="page-menu-1">
+                                    <li><a href="#" title="Change Password">Change Password</a></li>
+                                    <li><a href="#" title="Contact preferences">Contact preferences</a></li>
+                                    <li><a href="#" title="Registered Investment Address">Registered Investment Address</a></li>
+                                    <li><a href="#" title="Personal Details">Personal Details</a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a class="" title="Show/Hide More">Wishlist</a>
+                                <ul class="level1 collapse in" id="page-menu-1">
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </div><!-- /.blockContent -->
+                </div><!-- /. navigation block -->
+            </div>
+        </aside>
+
+        <div class="col-xs-12 col-md-9 mb-xs-2x mt-xs-1x">
+            <div class="header-wrapper">
+                <div class="page-header">
+                    <h1>Manage Addresses</h1>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 mb-xs-2x">
+                        <a class="btn btn-default btn-block sidenav-trigger hidden-md hidden-lg" data-target="#catFilters">Account Menu</a>
+                    </div>
+                </div>
+            </div>
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+            <div class="wysiwyg"></div>
+            <div class="panel panel-default panel-secondary">
+                <div class="panel-body">
+                    <div class="panel panel-transparent mb-0">
+                        <div class="panel-heading hidden-xs">
+                            <div class="row">
+
+                                <div class="col-xs-12 col-sm-3">
+                                    Address Nickname
+                                </div>
+                                <div class="col-xs-12 col-sm-3">
+                                    Name
+                                </div>
+                                <div class="col-xs-12 col-sm-4">
+                                    Address
+                                </div>
+                                <div class="col-xs-12 col-sm-2">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+
+                                <div class="col-xs-6 col-sm-3 mb-xs-1x">
+                                    <span class="visible-xs-inline strong">Address Nickname <br></span> Registered Investment Address
+                                </div>
+                                <div class="col-xs-6 col-sm-3">
+                                    <span class="visible-xs-inline strong">Name <br></span>  Carl Simpson
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4">
+                                    <span class="visible-xs-inline strong">Address <br></span>
+                                    <dl>
+                                        <dd>7 Hazelhurst Road</dd>
+                                        <dd>Worsley</dd>
+                                        <dd>Manchester</dd>
+                                        <dd>United Kingdom</dd>
+                                        <dd>M28 2SX</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-xs-12 col-sm-2 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @Html.PropertyFor(m => m.CurrentPage.EcomPrototypeContentArea)
+            </div>
+        </div>
+    </div>
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+</div>

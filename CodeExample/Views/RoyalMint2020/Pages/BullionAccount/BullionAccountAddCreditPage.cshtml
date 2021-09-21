@@ -1,0 +1,33 @@
+﻿@using TRM.Web.Models.ViewModels
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.BullionAccountAddCreditPage, Hephaestus.CMS.ViewModels.ILayoutModel>
+<div class="pageContainer">
+    <div class="content-area"></div>
+    <div class="container mb-4x mt-2x">
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="page-header">
+                <h1 class="h2">@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+            </div>
+        }
+        <main class="row" ng-controller="rmCheckoutController as rmAddInfo">
+
+            @using (Html.BeginForm("SubmitPayment", null))
+            {
+                <div><input type="number" name="paymentAmount" id="paymentAmount" /></div>
+
+                var result = ViewEngines.Engines.FindPartialView(Html.ViewContext.Controller.ControllerContext, "Mastercard");
+                if (result != null && result.View != null && null != Model.CurrentPage.CurrentPaymentMethod)
+                {
+                    Html.RenderPartial("Mastercard", new PaymentMethodViewModel
+                    {
+                        PaymentMethodRow = Model.CurrentPage.CurrentPaymentMethod,
+                        AllowSavedCards = false
+                    });
+                }
+
+                <div><input type="submit" value="Submit" /></div>
+            }
+        </main>
+    </div>
+</div>
+

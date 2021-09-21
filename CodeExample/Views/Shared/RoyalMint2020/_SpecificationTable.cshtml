@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TRM.Web.Models.DTOs.SpecificationItemDto>
+
+@{
+
+    var splitSpecification = new
+    {
+        FirstTable = Model.Take(5),
+        SecondTable = Model.Skip(5),
+    };
+}
+<div class="col-lg-6">
+    <table class="table">
+        <thead class="sr-only">
+            <tr>
+                <th scope="col">Specification</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in splitSpecification.FirstTable)
+            {
+                <tr>
+                    <th>@i.Label</th>
+                    <td>@(i.Value.Length > 100 ? i.Value.Substring(0, 100) : i.Value) </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="col-lg-6">
+    <table class="table">
+        <thead class="sr-only">
+            <tr>
+                <th scope="col">Specification</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in splitSpecification.SecondTable)
+            {
+                <tr>
+                    <th>@i.Label</th>
+                    <td>@(i.Value.Length > 100 ? i.Value.Substring(0, 100) : i.Value) </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

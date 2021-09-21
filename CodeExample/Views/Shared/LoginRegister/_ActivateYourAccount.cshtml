@@ -1,0 +1,27 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions;
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+
+<div class="mb-2x hidden" id="activateForm-header">
+    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.PlacedAnOfflineOrder, "Placed an offline order?")</h4>
+    <h6 class="mt-0">@Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your account")</h6>
+    <p>@Html.TranslateFallback(StringResources.FillInFormBelow, "Please fill in the form below to turn your account into an online account.")</p>
+    <form action="" class="" autocomplete="off">
+        <div class="row mb-3x mt-2x">
+            <div class="col-xs-6">
+                <a href="@Model.ActivateAccountPage.GetExternalUrl_V2()" class="btn btn-secondary btn-block">@Html.TranslateFallback(StringResources.Activate, "Activate")</a>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-default btn-block" type="submit">@Html.TranslateFallback(StringResources.Cancel, "Cancel")</button>
+            </div>
+        </div>
+        <p>
+            <a href="#" data-hide="#activateForm-header" data-show="#loginForm-header" class="pw-link">@Html.TranslateFallback(StringResources.ReturnToLogin, "Return to login")</a>
+        </p>
+        <p>
+            <a href="#" data-hide="#activateForm-header" data-show="#loginForm-header" class="pw-link">Return homepage</a>
+        </p>
+    </form>
+</div>

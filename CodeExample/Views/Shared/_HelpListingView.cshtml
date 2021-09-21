@@ -1,0 +1,24 @@
+﻿@using TRM.Web.Constants
+@model IList<TRM.Web.Models.ViewModels.TeaserViewModel>
+@if (!Model.Any())
+{
+    <div class="col-xs-12">
+        <div class="alert alert-info text-center">
+            @Html.TranslateFallback(StringResources.NoResultsFound, "Your search returned no results, please try searching again")
+        </div>
+    </div>
+}
+@foreach (var helppage in Model)
+{
+    <article class="helpPage">
+        <h3 class="h5 item-title">
+            <a ng-href="@helppage.PageUrl" title="@helppage.Teaser.TeaserTitle">
+                @helppage.Teaser.TeaserTitle
+            </a>
+        </h3>
+        <p class="item-subtitle">@helppage.Teaser.TeaserDescription</p>
+        <p>
+            <a ng-href="@helppage.PageUrl" title="@helppage.Teaser.TeaserTitle">@Html.TranslateFallback(StringResources.ReadMore, "Read more")</a>
+        </p>
+    </article>
+}

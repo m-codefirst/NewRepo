@@ -1,0 +1,31 @@
+﻿@using Newtonsoft.Json
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@using TRM.Web.Constants
+@using EPiServer.ServiceLocation
+@using TRM.Web.Services;
+@using Hephaestus.ContentTypes.Business.Extensions;
+
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var userService = ServiceLocator.Current.GetInstance<IUserService>();
+}
+@if (Request.IsAuthenticated && userService.IsImpersonating())
+{
+    var stopImpersonatingUrl = Model.IsSippContact ? "mvcApi/sippssasadmin/StopImpersonating" : "mvcApi/customerservice/StopImpersonating";
+    var backgroundClass = Enums.eBackgroundColour2020.Pink.DescriptionAttr();
+    var buttonClass = Enums.eButtonColour2020.Light.DescriptionAttr();
+
+    <div class="mod-header-message @backgroundClass">
+        <div>
+            <p>[@userService.GetImpersonatingUserName()] You are impersonating user [@userService.GetUsername()]</p>
+        </div>
+        <a href=""
+           class="btn @buttonClass"
+           role="button"
+           onClick="location.href = '@stopImpersonatingUrl'; return false;">
+            Stop Impersonating
+        </a>
+    </div>
+}

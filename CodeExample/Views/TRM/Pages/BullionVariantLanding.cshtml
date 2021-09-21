@@ -1,0 +1,401 @@
+﻿@using EPiServer.ServiceLocation
+@using Hephaestus.CMS.Extensions
+@using NuGet
+@using TRM.Web.Constants
+@using TRM.Web.Helpers
+@using TRM.Web.Models.Catalog.Bullion
+@using TRM.Web.Models.Layouts
+@using Hephaestus.ContentTypes.Business.Extensions
+@using Mediachase.Commerce.Customers
+@using TRM.Web.Extentions
+@using TRM.Shared.Extensions 
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+
+    var showAboutTab = Model.CurrentPage.Description != null && !Model.CurrentPage.Description.IsEmpty || (Model.CurrentPage.IsAgeRestricted && EPiServer.Find.Helpers.Text.StringExtensions.IsNotNullOrEmpty(myLayout.AgeRestrictedMessageString));
+    var showSpecificationTab = !Model.CurrentPage.HideSpecificationOnProductDetailPage && Model.ViewModel.EntrySpecificationViewModel != null && !Model.ViewModel.EntrySpecificationViewModel.SpecificationItems.IsEmpty();
+    var startPage = Model.CurrentPage.GetAppropriateStartPageForSiteSpecificProperties();
+
+    var isPensionProvider = false;
+    var impertionatedByPensionProvider = false;
+
+    if (Request.IsAuthenticated)
+    {
+        var currentContact = ServiceLocator.Current.GetInstance<CustomerContext>().CurrentContact;
+        if (currentContact != null)
+        {
+            isPensionProvider = myLayout.IsPensionProviderContact;
+            impertionatedByPensionProvider = myLayout.IsImpertionatedByPensionProvider;
+        }
+    }
+}
+
+<script type="text/javascript">
+	var quantityBreaks = @Html.Raw(SerializeToJsonHelper.SerializeToJson(Model.ViewModel.BullionVariant.BuyPremiumQuantityBreaks.ToList()));
+</script>
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+<div class="contentArea content-area">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.TopContent)>
+        @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.TopContent)
+    </div>
+</div>
+
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+}
+
+<div class="container productTemplate product-display-page">
+    <div class="row" itemscope itemtype="http://schema.org/Product">
+        <div class="col-xs-12 col-md-7">
+            <div class="row">
+                @{
+                    Html.RenderPartial("_VariantPageImageCarousel", Model);
+                }
+                <div class="content-area mt-2x"></div>
+                @if (Model.ViewModel.TaxIconList != null && Model.ViewModel.TaxIconList.Any())
+                {
+                    <div class="variantCTA pdp-usp--lg-md">
+                        <div class="pdp-usp trm-product-usp col-xs-12 mt-1x mb-5 panel panel-default thumbnail p-1x pl-sm-0x pr-sm-0x pl-xs-0x pr-xs-0x pt-xs-3x">
+                            <div class="thumbnail text-center p-1x">
+                                <div class="row pdp-usp--wrapper display-block-xs">
+                                    @foreach (var taxtIcon in Model.ViewModel.TaxIconList)
+                                    {
+                                        <div class="col-xs-12 col-sm-4 pdp-usp--item">
+                                            <div class="pdp-usp--bg center-block display-inline-block margin--bottom-10 borders img-circle text-uppercase mb-1x @(!string.IsNullOrEmpty(taxtIcon.BackgroundColour.DescriptionAttr()) ? taxtIcon.BackgroundColour.DescriptionAttr() : "bg-aquamarine") @(!string.IsNullOrEmpty(taxtIcon.ContentColour.DescriptionAttr()) ? taxtIcon.ContentColour.DescriptionAttr() : "text-white")">
+                                                <h2 class="pdp-usp--headline h2 text-center mb-0">@taxtIcon.Title</h2>
+                                                <p class="pdp-usp--subline mb-0 lead">@taxtIcon.SubTitle</p>
+                                            </div>
+                                            @Html.DisplayFor(x => taxtIcon.Description)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-5">
+            <div class="variantHeading mb-1x w-100">
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.TagMessage))
+                {
+                    <p class="promoTag">@Model.CurrentPage.TagMessage</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.ViewModel.DisplayName))
+                {
+                    <h1 class="h2 mt-0" itemprop="name">@Model.ViewModel.DisplayName</h1>
+                }
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.SubDisplayName))
+                {
+                    <h2 class="mt-0 mb-0 text-silver h4" itemprop="alternateName">@Model.CurrentPage.SubDisplayName</h2>
+                }
+
+                <meta itemprop="sku" content="@Model.CurrentPage.Code" />
+                <meta itemprop="brand" content="The Royal Mint" />
+            </div>
+            @{
+                if (Model.ViewModel.ShowFeefo)
+                {
+                    Html.RenderPartial("_VariantPageReviewStars", Model);
+                }
+
+                Html.RenderPartial("_VariantPageQuickInfo", Model);
+
+                Html.RenderPartial("_BullionVariantPageInventoryItems", Model);
+            }
+            <!--Price-->
+
+            <div class="variantAddToBaksetContainer" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                @if (!string.IsNullOrEmpty(Model.ViewModel.PriceString))
+                {
+                    <div class="pdp-prod-info mt-1x thumbnail p-1x bg-pearl text-center">
+                        <div class="row pdp-prod-info--wrapper display-block-xs">
+                            <div class="col-xs-6 col-sm-4 pdp-prod-info--item pr-0 pl-0" ng-init="unitPrice = '@Model.ViewModel.PriceString'; singleUnitPrice = @Model.ViewModel.Price">
+
+                                <meta itemprop="priceCurrency" content="@Model.ViewModel.CurrencyCode" />
+                                <meta itemprop="price" content="@Model.ViewModel.PriceString.Substring(1).Replace(",", "")" />
+                                <span class="price-label h6">@Html.TranslateFallback(StringResources.Price, "Unit Price")</span>
+                                <span class="h4 display-block mt-5 mb-5">{{unitPrice}}</span>
+                                <span class="small">
+                                    @Html.TranslateFallback(StringResources.SingleUnitPrice, "Single unit") @Model.ViewModel.BullionVariant.SingleUnitPrice
+                                    <i class="trmi trmi-question" data-toggle="tooltip" data-placement="top" title="" data-original-title="@Html.TranslateFallback(StringResources.QuestionSingleUnitPrice, "The price for single unit")"></i>
+                                </span>
+                            </div>
+                            <div class="col-xs-6 col-sm-4 pdp-prod-info--item pr-0 pl-0" ng-init="setupQuantity('@Model.ViewModel.StockSummary.MinQuantity.ToString("N0")', '@Model.ViewModel.StockSummary.MaxQuantity.ToString("N0")')">
+                                <p class="h6 mt-0" for="quantity">@Html.TranslateFallback(StringResources.Quantity, "Quantity")</p>
+                                <div class="display-inline-block mt-10 mb-xs-1x">
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn pr-5">
+                                            <button class="btn qty-btn" type="button" ng-click="updateBullionQuantity('@Model.ViewModel.EntryUrl', (quantityToAdd - 1))" ng-disabled="quantityToAdd <= @Model.ViewModel.StockSummary.MinQuantity">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" id="quantity" ng-model="quantityToAdd" ng-change="updateBullionQuantity('@Model.ViewModel.EntryUrl', quantityToAdd)" class="form-control text-center qty-input" ng-init="quantityToAdd = @Model.ViewModel.StockSummary.MinQuantity" floating-number-only />
+                                        <span class="input-group-btn pl-5">
+                                            <button class="btn qty-btn" type="button" ng-click="updateBullionQuantity('@Model.ViewModel.EntryUrl', (quantityToAdd + 1))" ng-disabled="quantityToAdd >= @Model.ViewModel.StockSummary.MaxQuantity">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Sub total-->
+                            <div class="pdp-prod-info--item pdp-prod-info--price-wrapper col-xs-12 col-sm-4 pr-0 pl-0 pt-xs-1x" ng-init="subTotalExVat = '@Model.ViewModel.PriceString'">
+                                <meta itemprop="priceCurrency" content="@Model.ViewModel.CurrencyCode" />
+                                <meta itemprop="price" content="{{subTotalExVat}}" />
+                                <span class="h6">@Html.TranslateFallback(StringResources.SubTotal, "Sub Total") <small class="text-nowrap"> (EXC. VAT)</small></span>
+                                <span class="pdp-prod-info--price h4 display-block mt-5 mb-5">{{subTotalExVat}}</span>
+                                <span class="estimated mt-5 display-inline-block">estimated</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="variantCTA mt-1x">
+                        <div class="row">
+
+                            @if (isPensionProvider || impertionatedByPensionProvider)
+                            {
+                                <div class="col-xs-12">
+                                    <div class="alert @startPage.CanNotPensionMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                        @Html.TranslateFallback(StringResources.ItemNotAvailableForPensionProvider, "This product cannot be bought within a pension provider")
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.ViewModel.ShouldShowEmailBackInStockButton)
+                            {
+                                <div class="col-xs-12">
+                                    <div class="contentArea">
+                                        <button class="btn btn-block btn-secondary btn-70-percent" id="btnEmailBackInStock" onclick="BackInStock.emailBackInStockClick('@Model.ViewModel.Code', @(Request.IsAuthenticated.ToString().ToLower()))">@Model.ViewModel.EmailMeWhenInStockButtonText</button>
+                                        @if (Request.IsAuthenticated)
+                                        {
+                                            <span id="backInStockMessage"></span>
+                                            <div class="mb-xs-1x hidden loader" id="backInStockLoader"></div>
+                                        }
+                                    </div>
+                                    @if (!Request.IsAuthenticated)
+                                    {
+                                        Html.RenderPartial("_EmailAddressEntry", Model);
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                if (null != Model.ViewModel.BullionVariant)
+                                {
+                                    if (Model.ViewModel.StockSummary.CanAddToBasket)
+                                    {
+                                        if (Model.ViewModel.BullionVariant.ShowActiveYourBullionAccount)
+                                        {
+                                            <div class="col-xs-12 col-md-9">
+                                                <button class="btn btn-block btn-secondary" onclick="window.location.href = '@Url.ContentUrlExtension(Model.ViewModel.BullionVariant.BullionRegistrationPageUrl)'">@Html.TranslateFallback(StringResources.ActivateYourAccount, "Activate your Bullion account")</button>
+                                            </div>
+                                        }
+                                        @*else if (Model.ViewModel.BullionVariant.ShowNeedConfirmKyc)
+                                            {
+                                                <div class="col-xs-12">
+                                                    <div class="alert @startPage.ConfirmKycMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                                        @if (myLayout.KycRefered)
+                                                        {
+                                                            @Html.TranslateFallback(StringResources.BullionConfirmIdentity, "In order to purchase this product you'll need to confirm your identity")
+                                                        }
+                                                        @if (myLayout.KycRejected)
+                                                        {
+                                                            @Html.TranslateFallback(StringResources.BullionKYCRejected, "In order to purchase this product you'll need to contact with customer service")
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }*@
+                                        else if (startPage.StopTrading)
+                                        {
+
+                                            <div class="col-xs-12">
+                                                <div class="alert @startPage.StopTradingMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                                    @Html.TranslateFallback(StringResources.StopTrading, StringConstants.TranslationFallback.StopTradingMessage)
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (Model.ViewModel.BullionVariant.ShowUnableToPurchasePreciousMetals)
+                                        {
+                                            <div class="col-xs-12">
+                                                <div class="alert @startPage.UnableToPurchasePreciousMetalsMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                                    @Html.TranslateFallback(StringResources.UnableToPurchasePreciousMetals, "Customer flagged as unable to purchase precious metals")
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (Model.ViewModel.BullionVariant.ShowCanNotPensionMessage)
+                                        {
+                                            <div class="col-xs-12">
+                                                <div class="alert @startPage.CanNotPensionMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                                    @Html.TranslateFallback(StringResources.ItemNotAvailableForSIPPCustomer, "This product cannot be bought within a pension")
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (Model.ViewModel.BullionVariant.ShowCannotHaveVariantsDelivered)
+                                        {
+                                            <div class="col-xs-12">
+                                                <div class="alert @startPage.CannotHaveVariantsDeliveredMessageColour.DescriptionAttr() no-margins-v mb-0">
+                                                    @Html.TranslateFallback(StringResources.CannotHaveVariantsDelivered, "SIPP/SSAS customers can't have variants delivered")
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            if (Model.ViewModel.BullionVariant.ShowBuyNow)
+                                            {
+                                                <div class="@(!Model.ViewModel.BullionVariant.ShowAddToBasket ? "col-xs-12" : "col-xs-6")">
+                                                    <button class="btn btn-block btn-secondary @(!Model.ViewModel.BullionVariant.ShowAddToBasket ? "btn-70-percent" : "")" id="item_buynow_@Model.ViewModel.Code" ng-click="quickCheckout({id:'@Model.ViewModel.Code'},'@myLayout.QuickCheckoutPage.GetExternalUrl_V2()')">Buy Now</button>
+                                                </div>
+                                            }
+
+                                            if (Model.ViewModel.BullionVariant.ShowAddToBasket)
+                                            {
+                                                <div class="@(!Model.ViewModel.BullionVariant.ShowBuyNow ? "col-xs-12" : "col-xs-6")">
+                                                    <button class="btn btn-block btn-primary @(!Model.ViewModel.BullionVariant.ShowBuyNow ? "btn-70-percent" : "")" id="item_@Model.ViewModel.Code" ng-click="addToBasket({id:'@Model.ViewModel.Code'},'@myLayout.BasketPage.GetExternalUrl_V2()')">@Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket")</button>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    var coinVariantPage = Model.CurrentPage as PhysicalVariantBase;
+                    if (coinVariantPage != null)
+                    {
+                        Html.RenderPartial("_BullionPremiumArea", Model.ViewModel.BullionVariant.BuyPremiumQuantityBreaks);
+                    }
+
+                    if (!Model.ViewModel.BullionVariant.HideBullionDiscountDescription)
+                    {
+                        <div class="variantBullionMessage mt-1x">
+                            @Html.PropertyFor(x => x.ViewModel.BullionVariant.BullionDiscountDescription)
+                        </div>
+                    }
+                    if (myLayout.ShowSocialShareOnSellableEntryDetails)
+                    {
+                        <div class="social-items mb-1x pull-right">
+                            @Html.Raw(myLayout.SocialSharesSnippetOnEntryDetails)
+                        </div>
+                    }
+
+                    if ((int)Model.CurrentPage.RecurrenceType > 0)
+                    {
+                        Html.RenderPartial("_VariantPageContinuityMessage");
+                    }
+
+                }
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.MiddleContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.MiddleContent)
+                </div>
+            </div>
+            @if (showAboutTab)
+            {
+                <div class="variantDescription">
+                    <h2 class="h2 mt-0">@Html.TranslateFallback(StringResources.ProductDescription, "Product Description")</h2>
+                    <div class="">
+                        @Html.PropertyFor(x => x.CurrentPage.Description)
+
+                        @if (Model.CurrentPage.IsAgeRestricted)
+                        {
+                            <div class="alert__age-restriction mt-2x">
+                                <span class="badge--age-restriction">
+                                    <small>+18</small>
+                                </span>
+                                <strong>
+                                    @Html.DisplayFor(x => myLayout.AgeRestrictedMessageString)
+                                </strong>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (showSpecificationTab)
+            {
+                <div class="variantSpecifications">
+                    <div class="">
+                        <h2 class="mt-0">@Html.TranslateFallback(StringResources.SpecificationTab, "Specifications")</h2>
+                        <div class="row">
+                            <meta itemprop="weight" content="@Model.CurrentPage.SpecifiedWeight" />
+                            @{ Html.RenderPartial("SpecificationTableBlock", Model.ViewModel.EntrySpecificationViewModel); }
+                            @Html.PropertyFor(x => x.CurrentPage.ExtraSpecifications)
+                            @Html.PropertyFor(x => x.CurrentPage.SpecificationsTabContentArea)
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row variantReviews" ng-controller="rmFeefo" ng-model="reviews" ng-init="getFeefoReviews('@Model.CurrentPage.Code',10)" ng-cloak>
+                <div class="block tabContainerBlock tabHorizontal equalize-group col-xs-12">
+                    <h2 class="title mt-0 hidden-xs hidden-sm">
+                        Reviews
+                    </h2>
+                    <h2 class="title no-underline visible-xs visible-sm">
+                        <a data-toggle="collapse" data-collapse-xs-sm data-target="#pdpReview" role="button">Reviews</a>
+                    </h2>
+                    <hr class="mt-1x visible-xs visible-sm" />
+                    <div class="mt-1x collapse-xs collapse-sm collapse" id="pdpReview">
+                        @Html.Partial("_VariantPageReviews")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="contentArea content-area">
+    <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.BottomContent)>
+        @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.BottomContent)
+    </div>
+</div>
+
+@section JustBeforeBodyTag
+{
+    @if (Model.ViewModel.ImagesFor360 != null && Model.ViewModel.ImagesFor360.Any())
+    {
+        <script type='text/javascript'>
+            var IMAGES_360 = @Html.Raw(SerializeToJsonHelper.SerializeToJson(Model.ViewModel.ImagesFor360));
+        </script>
+    }
+}
+
+<!--temporary Css for demo-->
+<style type="text/css">
+    .inventory-bullion-items li {
+        display: inline-block;
+        margin: 0;
+        padding: 0 7px;
+        border: solid #878787;
+        border-width: 0 1px 0 0;
+    }
+
+        .inventory-bullion-items li:last-child {
+            display: inline-block;
+            margin: 0;
+            padding: 0 7px;
+            border: solid #878787;
+            border-width: 0 0 0 0;
+        }
+
+    .items-price {
+        width: 100%;
+    }
+</style>

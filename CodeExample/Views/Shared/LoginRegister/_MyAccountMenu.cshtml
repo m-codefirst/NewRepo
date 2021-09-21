@@ -1,0 +1,40 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var viewAll = Html.TranslateFallback(StringResources.LeftMenuViewAll, StringConstants.TranslationFallback.ViewAll);
+}
+<div class="col-xs-12 col-sm-6 hidden-xs hidden-sm">
+    <ul class="rm-account-nav">
+        @if (Model.MyAccountHoverMenu != null && Model.MyAccountHoverMenu.MyAccountMenuItemDto != null)
+        {
+            foreach (var item in Model.MyAccountHoverMenu.MyAccountMenuItemDto.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+            {
+                <li class="level0 @(item.ChildNavigationItems.Any() ? "has-children" : string.Empty)">
+                    <a href="@(item.ChildNavigationItems.Any() ? string.Empty : item.MenuItemExternalUrl)" @(item.OpenInANewWindow ? "target=\"_blank\"" : string.Empty)>@item.MenuItemDisplayName</a>
+                    @if (item.ChildNavigationItems.Count > 0)
+                    {
+                        <ul>
+                            @foreach (var child in item.ChildNavigationItems.Where(i => i.VisibleInLeftNav))
+                            {
+                                <li class="level1">
+                                    <a href="@child.MenuItemExternalUrl">
+                                        @child.MenuItemDisplayName
+                                    </a>
+                                </li>
+                            }
+
+                            @if (!item.IsContainer && !item.CurrentBlock.DontOutputLabelWithHyperlink)
+                            {
+                                <li>
+                                    <a href="@item.MenuItemExternalUrl" title="@viewAll">@viewAll</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        }
+    </ul>
+</div>

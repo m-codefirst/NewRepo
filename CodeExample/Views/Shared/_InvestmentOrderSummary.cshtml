@@ -1,0 +1,178 @@
+﻿@using TRM.Web.Constants
+@{
+    var showCollapse = (bool)ViewData["ShowCollapse"];
+    var isCollapse = (bool)ViewData["IsCollapse"];
+}
+
+<div class="row" ng-init="getBasketSummary()">
+    <div class="col-xs-12">
+        <div class="investment-order-summary">
+            <div class="summary-header">
+                <div class="title">
+                    <h5 class="h5 mt-0 mb-0">@Html.TranslateFallback(StringResources.InvestmentOrderSummary, "Investment order summary")</h5>
+                    @if (isCollapse == true)
+                    {
+                        <p class="mt-0 mb-0">
+                            @Html.TranslateFallback(StringResources.InvestmentTotal, "Investment Total"): {{getInvestmentTotal()}} <span class="small">(@Html.TranslateFallback(StringResources.IncludeVat, "inc VAT"))</span>
+                            <span class="estimated status display-xs">Estimated</span>
+                        </p>
+                    }
+                </div>
+                @if (isCollapse == true)
+                {
+                    <div class="cta-action">
+                        <a data-toggle="collapse" href="#investmentSummaryDetails" role="button" aria-expanded="@(showCollapse ? "true" : "false")" class="@(showCollapse ? "" : "collapsed")" aria-controls="investmentSummaryDetails">
+                            <span class="hide-label">@Html.TranslateFallback(StringResources.HideItems, "Hide")</span>
+                            <span class="show-label">@Html.TranslateFallback(StringResources.InvestmentTotal, "View Items")</span>
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="summary-details collapse @(showCollapse ? "in" : "")" aria-expanded="@(showCollapse ? "true" : "false")" id="investmentSummaryDetails">
+                <!--- Item delivery -->
+                <div class="row table-row" ng-if="rmCommerce.hasItemDeliveredToInvestmentAddress">
+                    <div class="col-xs-12">
+                        <p class="header-font-color strong">@Html.TranslateFallback(StringResources.BullionCheckOutDeliverHeader, "Items being Delivered")</p>
+                    </div>
+                    <div ng-repeat="variant in rmCommerce.deliveryBullionShipment[0].CartItems">
+                        <div class="col-xs-12 col-md-7">
+                            <p class="mt-0 strong mb-0">{{variant.DisplayName}}</p>
+                        </div>
+                        <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                            <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x{{variant.Quantity}}
+                        </div>
+                        <div class="col-xs-6 col-md-4 pl-0 text-right">
+                            <p class="mb-0">{{variant.DiscountedPrice}}</p>
+                            <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                        </div>
+                        <div class="col-xs-6 col-sm-8">
+                            <p class="small mb-0 text-success">{{variant.StockSummary.StatusMessage}}</p>
+                            <p class="small mb-0">{{variant.StockSummary.ShippingMessage}}</p>
+                        </div>
+                        <div class="col-xs-6 col-sm-4 mt-1x text-right">
+                            <span class="estimated status display-xs">Estimated</span>
+                        </div>
+                        <div class="col-xs-12">
+                            <hr class="mb-0">
+                        </div>
+                    </div>
+
+                </div>
+                <!--- Item delivery -->
+                <!--- Item to vault -->
+                <div ng-if="rmCommerce.hasItemToBeStored">
+                    <div class="row table-row" ng-cloak>
+                        <div class="col-xs-12">
+                            <p class="header-font-color strong">@Html.TranslateFallback(StringResources.BullionCheckOutVaultedHeader, "Items to be stored in The Royal Mint Vault")</p>
+                        </div>
+                    </div>
+                    <div ng-repeat="variant in rmCommerce.vaultBullionShipment[0].CartItems" ng-cloak>
+                        <div class="row table-row" ng-if="variant.BullionCartItem && !variant.BullionCartItem.IsSignatureVariant">
+                            <div class="col-xs-12 col-md-7">
+                                <p class="mt-0 strong mb-0">{{variant.DisplayName}}</p>
+                            </div>
+                            <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+                                <span class="visible-xs-inline visible-sm-inline strong mr-1x">@Html.TranslateFallback(StringResources.MixCheckoutQty, "Qty"): </span>x{{variant.Quantity}}
+                            </div>
+                            <div class="col-xs-6 col-md-4 pl-0 text-right">
+                                <p class="mb-0">{{variant.DiscountedPrice}}</p>
+                                <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                            </div>
+                            <div class="col-xs-6 col-sm-8">
+                                <p class="small mb-0 text-success">{{variant.StockSummary.StatusMessage}}</p>
+                                <p class="mb-0 strong">{{variant.SupplierMessage}}</p>
+                            </div>
+                            <div class="col-xs-6 col-sm-4 mt-1x text-right">
+                                <span class="estimated status display-xs">Estimated</span>
+                            </div>
+                            <div class="col-xs-12">
+                                <hr class="mb-0">
+                            </div>
+                        </div>
+                        <div class="row table-row" ng-if="variant.BullionCartItem && variant.BullionCartItem.IsSignatureVariant">
+                            <div class="col-xs-12 col-md-7">
+                                <p class="mt-0 strong mb-0">{{variant.DisplayName}}</p>
+                            </div>
+                            <div class="col-xs-6 col-md-1 pl-0 pl-sm-1x pl-xs-1x pr-0 text-center-md-up">
+
+                            </div>
+                            <div class="col-xs-6 col-md-4 pl-0 text-right">
+                                <p class="mb-0">{{variant.DiscountedPrice}}</p>
+                                <p class="small mb-0">(@Html.TranslateFallback(StringResources.ExVat, "ex VAT"))</p>
+                            </div>
+                            <div class="col-sm-12">
+                                <p class="strong mb-0">@Html.TranslateFallback(StringResources.InvestmentRequested, "Investment Requested"): {{variant.BullionCartItem.RequestedInvestmentString}}</p>
+                                <p class="small mb-0">@Html.TranslateFallback(StringResources.ApproxWeight, "Approx weight"): {{variant.BullionCartItem.Weight}}oz</p>
+                                <p class="small mb-0 text-success">{{variant.StockSummary.StatusMessage}}</p>
+                            </div>
+                            <div class="col-xs-12">
+                                <hr class="mb-0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row background-lightergray" ng-if="rmCommerce.bullionPromotions.length > 0" ng-cloak>
+                    <div class="col-xs-12">
+                        <div class="panel panel-info" >
+                            <div class="panel-heading">
+                                <h4 class="panel-title">@Html.TranslateFallback(StringResources.PromotionsApplied, StringConstants.TranslationFallback.PromotionsApplied)</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row" ng-repeat="promo in rmCommerce.bullionPromotions">
+                                    <div ng-class="!!promo.Code ? 'col-xs-6' : 'col-xs-12'" >
+                                        <p>
+                                            <i class="trmi trmi-check text-success"></i> {{promo.Code || promo.Description}}
+                                        </p>
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        <a href="" title="@Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)" ng-if="!!promo.Code" ng-click="removeCoupon(promo.Code)" class="small">
+                                            @Html.TranslateFallback(StringResources.PromotionsRemove, StringConstants.TranslationFallback.PromotionsRemove)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--- Item to vault -->
+                <div class="row table-footer">
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.InvestmentBasketTotal, "Investment Basket Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        {{getInvestmentSubTotal()}}
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.MixedCheckoutDelivery, "Delivery")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        {{getInvestmentDeliveryTotal()}}
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.InvestmentVat, "Investment VAT")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        {{getInvestmentVat()}}
+                    </div>
+                    <div ng-show="showInvestmentTotalDiscount()" class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.BasketSavings, StringConstants.TranslationFallback.BasketSavings)</strong>
+                    </div>
+                    <div ng-show="showInvestmentTotalDiscount()" class="col-xs-4 text-right">
+                        {{getBullionSavedAmount()}}
+                    </div>
+
+                    <div class="col-xs-8 text-right">
+                        <strong>@Html.TranslateFallback(StringResources.InvestmentTotal, "Investments Total")</strong>
+                    </div>
+                    <div class="col-xs-4 text-right">
+                        <span class="strong">
+                            {{getInvestmentTotal()}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

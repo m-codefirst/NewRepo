@@ -1,0 +1,227 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Helpers
+@using EPiServer.Web
+@using TRM.Web.Models.Layouts
+@using TRM.Shared.Extensions
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Catalog.TrmVariant, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.VariantViewModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+}
+
+@if (!myLayout.HideSiteBreadcrumb)
+{
+    @Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+}
+
+@if (myLayout.HasMessage)
+{
+    Html.RenderPartial("_MessageBox", myLayout.Message);
+}
+
+<div class="container productTemplate">
+    <div class="row" itemscope itemtype="http://schema.org/Product">
+        @{
+            Html.RenderPartial("_VariantPageImageCarousel", Model);
+        }
+        <div class="col-xs-12 col-md-5 mb-2x">
+            <div class="variantHeading">
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.TagMessage))
+                {
+                    <p class="text-warmred">@Model.CurrentPage.TagMessage</p>
+                }
+                @if (!string.IsNullOrEmpty(Model.ViewModel.DisplayName))
+                {
+                    <h1 class="h2 mt-0 mb-0" itemprop="name">@Model.ViewModel.DisplayName</h1>
+                }
+                <meta itemprop="sku" content="@Model.CurrentPage.Code" />
+                <meta itemprop="brand" content="The Royal Mint" />
+                @if (!string.IsNullOrEmpty(Model.CurrentPage.SubDisplayName))
+                {
+                    <h2 class="mt-0 mb-0 text-silver h4" itemprop="alternateName">@Model.CurrentPage.SubDisplayName</h2>
+                }
+            </div>
+            @{
+                if (Model.ViewModel.ShowFeefo)
+                {
+                    Html.RenderPartial("_VariantPageReviewStars", Model);
+                }
+
+                Html.RenderPartial("_VariantPageQuickInfo", Model);
+            }
+            <div class="variantAddToBakset" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                @if (!string.IsNullOrEmpty(Model.ViewModel.PriceString))
+                {
+                    <div class="clearfix">
+                        <div class="item-price">
+                            <h6>
+                                <meta itemprop="priceCurrency" id="priceCurrency" content="@Model.ViewModel.CurrencyCode" />
+                                <meta itemprop="price" id="price" content="@Model.ViewModel.PriceString.Substring(1).Replace(",", "")" />
+                                <span class="price-label">@Html.TranslateFallback(StringResources.Price, "Price: ")</span>
+                                <span id="priceString">@Html.DisplayFor(m => m.ViewModel.PriceString)</span>
+                            </h6>
+                        </div>
+                    </div>
+
+                    if (Model.ViewModel.StockSummary.CanAddToBasket)
+                    {
+                        <div class="mt-1x mb-2x clearfix">
+                            <div class="input-group pull-left mt-1x mr-5">
+                                <label class="sr-only" for="quantity">@Html.TranslateFallback(StringResources.Quantity, "Quantity")</label>
+                                <input type="text" id="quantity" ng-model="quantityToAdd" class="form-control text-center qty-alt" ng-init="quantityToAdd = @Model.ViewModel.StockSummary.MinQuantity" />
+                            </div>
+                            <button class="btn btn-primary pull-left mt-1x mr-5 ml-5 col-lg-4 col-xs-8" id="item_@Model.ViewModel.Code" ng-disabled="!isValidToAdd({MinQuantity:@Model.ViewModel.StockSummary.MinQuantity, MaxQuantity:@Model.ViewModel.StockSummary.MaxQuantity, Code:'@Model.ViewModel.Code'})" ng-click="addToBasket({id:'@Model.ViewModel.Code', isPl: '@Model.ViewModel.CanBePersonalised.ToString()'},'@myLayout.BasketPage.GetExternalUrl_V2()')">@Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket")</button>
+
+                            @if (Model.ViewModel.CanBePersonalised)
+                            {
+                                <a class="btn btn-secondary pull-left mt-1x ml-5 col-lg-6 col-xs-8" data-id="@Model.ViewModel.Code" data-unique="@Model.ViewModel.PWOrderId" id="btnModalGifting" onclick="PrintzwareModal.openDialog('@Model.ViewModel.PrintzwareOpenUrl');">
+                                    @Model.ViewModel.PersonalisationMeMessage
+                                </a>
+
+                                <div class="bootstrap-wrapper">
+                                    <div class="modal fade" id="pw_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body">
+                                                    <iframe id="pw_iframe" style="border: 0px;" src="about:blank" width="100%" height="100%"></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    if (Model.ViewModel.ShouldShowEmailBackInStockButton)
+                    {
+                        <div class="item-add">
+                            <button class="btn btn-email-back-in-stock btn-block margin-bottom-5px" id="btnEmailBackInStock" onclick="BackInStock.emailBackInStockClick('@Model.ViewModel.Code', @(Request.IsAuthenticated.ToString().ToLower()))">@Model.ViewModel.EmailMeWhenInStockButtonText</button>
+                            @if (Request.IsAuthenticated)
+                            {
+                                <span id="backInStockMessage"></span>
+                                <div class="display-inline-block pull-right pull-left-xs mb-xs-1x hidden loader" id="backInStockLoader"></div>
+                            }
+                        </div>
+                        if (!Request.IsAuthenticated)
+                        {
+                            Html.RenderPartial("_EmailAddressEntry", Model);
+                        }
+                    }
+
+                    Html.RenderPartial("_VariantPageInventoryItems", Model);
+
+                    if ((int)Model.CurrentPage.RecurrenceType > 0)
+                    {
+                        Html.RenderPartial("_VariantPageContinuityMessage");
+                    }
+
+                }
+            </div>
+            @{
+                if (myLayout.ShowSocialShareOnSellableEntryDetails)
+                {
+                    <div class="social-items mb-1x">
+                        @Html.Raw(myLayout.SocialSharesSnippetOnEntryDetails)
+                    </div>
+                }
+            }
+            <div class="shopping-actions">
+                @if (Model.ViewModel.ShowCompare)
+                {
+                    <div class="checkbox fancy checkbox-inline hidden-xs">
+                        <input type="checkbox" value="" id="checkboxCompare">
+                        <label class="" for="checkboxCompare">
+                            @Html.TranslateFallback(StringResources.Compare, "Compare")
+                        </label>
+                    </div>
+                }
+                @if (!Model.ViewModel.HideAddToWishList && Request.RequestContext.HttpContext.User.Identity.IsAuthenticated && Model.ViewModel.StockSummary.CanAddToBasket)
+                {
+
+                    if (Model.ViewModel.IsItemExistingInWishList)
+                    {
+                        <div class="display-inline-block pull-right pull-left-xs mb-xs-1x">
+                            This is already on your <a href="@Url.ContentUrlExtension(myLayout.WishListPage)">wishlist</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <button title="Add to Wish List" id="item_@Model.ViewModel.Code" class="btn btn-default btn-sm pull-right pull-left-xs mb-xs-1x jsWishlist" data-code="@Model.ViewModel.Code" role="button"><i class="fa fa-heart"></i> Add To Wish list</button>
+                        <div class="display-inline-block pull-right pull-left-xs mb-xs-1x hidden loader"></div>
+                        <div class="display-inline-block pull-right pull-left-xs mb-xs-1x hidden jsWishlistAdded">
+                            <i class="trmi trmi-check"></i> Item added to <a href="@Url.ContentUrlExtension(myLayout.WishListPage)">Wish List</a>
+                        </div>
+                        <div class="display-inline-block pull-right pull-left-xs hidden mb-xs-1x showError">
+                            <i class="trmi trmi-close"> Can't add to Wish List. Please try again. </i>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.TopContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.TopContent)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="detailTabs">
+        <div class="col-xs-12 col-md-10 col-md-offset-2">
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.MiddleContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.MiddleContent)
+                </div>
+            </div>
+            @{
+                Html.RenderPartial("_VariantPageTabArea", Model);
+            }
+            @if (Model.ViewModel.RelatedEntries != null && Model.ViewModel.RelatedEntries.Any())
+            {
+                Html.RenderPartial("_RelatedEntries", Model);
+            }
+            <div class="contentArea">
+                <div class="row" @Html.EditAttributes(m => m.CurrentPage.OptionalContentAreas.BottomContent)>
+                    @Html.PropertyFor(x => x.CurrentPage.OptionalContentAreas.BottomContent)
+                </div>
+
+            </div>
+
+            @if (!myLayout.PerformanceMode && !Model.CurrentPage.HideRecentlyViewed)
+            {
+                <div class="row" ng-cloak>
+                    @{Html.RenderPartial("_VariantPageRecentlyViewed", @Model.CurrentPage.Code);}
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section JustBeforeBodyTag
+{
+    @if (Model.ViewModel.ImagesFor360 != null && Model.ViewModel.ImagesFor360.Any())
+    {
+        <script type='text/javascript'>
+            var IMAGES_360 = @Html.Raw(SerializeToJsonHelper.SerializeToJson(Model.ViewModel.ImagesFor360));
+        </script>
+    }
+}
+
+@{
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "products").AtFooter();
+}
+
+<script type="text/javascript">
+    var PrintzwareConfig = {
+        ApiUrl: '@Model.ViewModel.PrintzwareApiUrl',
+        EditYourPersonalisationMessage: '@Model.ViewModel.EditPersonalisationMessage',
+        PersonalisedCharge: '@Model.ViewModel.PersonalisedCharge',
+        SessionTimeoutMessage: '@Model.ViewModel.SessionTimeoutMessage',
+    }
+</script>

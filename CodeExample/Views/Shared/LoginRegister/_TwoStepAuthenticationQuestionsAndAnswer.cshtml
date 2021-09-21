@@ -1,0 +1,30 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+<div class="mb-2x" id="securityQuestion-header" autocomplete="off" ng-show="showTwoStepAuthentication == true">
+    <h4 class="mt-0 mb-0">@Html.TranslateFallback(StringResources.LoginTwoStepAuthenticationQuestionHeader, "Please complete your Security Question")</h4>
+    <form class="ng-pristine ng-valid" autocomplete="off" id="formSecurityQuestion" name="formSecurityQuestion" ng-submit="login()" ng-cloak>
+        <h6 class="mt-2x">{{securityQuestion}}</h6>
+        <div class="form-group" ng-class="{'has-error has-feedback' : hasError}">
+            <input class="form-control" auto-focus="{{ showTwoStepAuthentication }}" ng-required="true" type="text" value="" ng-model="securityAnswer" placeholder="Enter your answer here ...">
+            <span class="trmi trmi-close form-control-feedback" aria-hidden="true" ng-hide="!hasError"></span>
+        </div>
+
+        <p ng-cloak ng-hide="!hasError" class="has-error">
+            <span class="help-block">{{ loginMessage }}</span>
+        </p>
+        <div ng-cloak ng-show="showSuccessMsg" class="help-block">
+            {{ loginMessage }}
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-md-8">
+                <button class="btn btn-secondary btn-block" id="login-securityQuestion" type="submit">
+					<div class="spinner hidden"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
+					<span>@Html.TranslateFallback(StringResources.ProceedWithLogin, "Proceed With Login")</span>
+				</button>
+            </div>
+        </div>
+    </form>
+</div>

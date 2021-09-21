@@ -1,0 +1,57 @@
+﻿@using System.Web.Mvc
+@using TRM.Web.Constants
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.DeliverBullionLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.DeliverBullionLandingViewModel>
+
+@{
+    var textAlignmentClass = TRM.Web.Extentions.EnumExtensions.GetEnumDescriptionAttrWithFallback(Model.CurrentPage.TextAlignment, Enums.eTextAlignment.Center);
+}
+
+@if (Model.CurrentPage.ThreeContentAreas.TopContent != null)
+{
+    <div class="row justify-content-center">
+        <!-- Top Area (Banner) -->
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    </div>
+}
+
+@if (Model.CurrentPage.DisplayPageHeading)
+{
+    <!-- Heading -->
+    <div class="row justify-content-center mod-section mod-section-copy mod-section-first">
+        <div class="col-md-9 @textAlignmentClass">
+            <h1>@Html.PropertyFor(m => m.CurrentPage.Heading)</h1>
+        </div>
+    </div>
+}
+
+@if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+{
+    <!-- Middle Content -->
+    <div class="row justify-content-center mod-section mod-section-copy">
+        <div class="col-md-9">
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+        </div>
+    </div>
+}
+
+<div class="row justify-content-center text-center mod-section mod-section-copy">
+    <div class="col-md-9">
+        <div class="row justify-content-center text-center">
+            <div class="col-md-10 col-lg-10">
+                <div class="form-container deliver-sell">
+                    <div class="form-spacing">
+                        @Html.Partial("RoyalMint2020/_BullionCheckoutAddFunds", Model.ViewModel.AddFundsViewModel, new ViewDataDictionary { { "IsQuickcheckout", true } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+{
+    <!-- Bottom Content -->
+    <div class="row justify-content-center mod-section mod-section-copy">
+        @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+    </div>
+}

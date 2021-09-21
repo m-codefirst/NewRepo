@@ -1,0 +1,146 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var activationPage = Model.ActivateAccountPage.GetExternalUrl_V2();
+}
+
+
+<div class="mb-2x loginForm-header" id="loginForm-header">
+    <div class="default-display">
+        <h4 class="mt-0 mb-0">Already Registered</h4>
+        <h6 class="mt-0">Log in to your account</h6>
+        <form class="ng-pristine ng-valid" id="loginform" vautocomplete="off" ng-submit="login()">
+            <div class="form-group mb-1x input-subtle">
+                <label class="sr-only" for="bullionUsrEmail">Email Address / Username</label>
+                <input type="email" class="form-control" value="" ng-model="email" ng-required="true" required="required"  id="bullionUsrEmail" placeholder="Please enter your email or username" />
+            </div>
+            <div class="form-group input-subtle mb-1x">
+                <label class="sr-only" for="bullionUsrPassword">Password</label>
+                <input type="password" class="form-control" value="" ng-model="password" ng-required="true" required="required" id="bullionUsrPassword" placeholder="Please enter your password" />
+            </div>
+            <p ng-cloak ng-hide="!hasError" class="has-error">
+                <span class="help-block">{{ loginMessage }}</span>
+            </p>
+            <div ng-cloak ng-show="showSuccessMsg" class="help-block">
+                {{ loginMessage }}
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-6 mt-1x">
+                    <button class="btn btn-secondary btn-block hidden" id="bullion-user-submit" type="submit" >Log in</button>
+                    <button class="btn btn-secondary btn-block" id="bullion-user-step" type="button">Log in</button>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <p class="mt-2x"><a href="" class="forgottenUsr">Forgotten your Username or Password?</a></p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="security-question">
+        <h4 class="mb-2x">Please complete your security question</h4>
+        <div class="form-group input-subtle mb-1x">
+            <label class="sr-only" for="securityQuestion">What was the name of your first pet?</label>
+            <input type="text" class="form-control" id="securityQuestion" placeholder="Please enter your answer here...">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-8 mt-1x">
+                <!-- use a label to fake the button for form submission -->
+                <label for="bullion-user-submit" class="btn btn-secondary">Proceed with Login </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="forgotten-username">
+        <h4 class="mt-0 mb-0">Forgotten your Username or Password?</h4>
+        <h6 class="mt-0">We will send a reminder to your email.</h6>
+        <div class="form-group input-subtle mb-1x">
+            <label class="sr-only" for="email-reminder">Email Address</label>
+            <input type="email" class="form-control" placeholder="Please enter your email">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-8 mt-1x">
+                <button class="btn btn-secondary btn-block" id="request-username" type="submit">Request Reminder</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <p class="mt-2x"><a href="" class="rtrnToLogin">Return to login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="forgotten-password">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4 class="mt-0 mb-0">Forgotten your password?</h4>
+                <h6 class="mt-0">Request a reset link.</h4>
+            </div>
+        </div>
+        <div class="form-group input-subtle mb-1x">
+            <input type="email" class="form-control" placeholder="Email Address">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-6 mt-1x">
+                <button class="btn btn-secondary btn-block" id="request-password" type="submit">Reset Password</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <p class="mt-2x"><a href="" class="rtrnToLogin">Cancel</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bullion-registration">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4 class="mt-0 mb-0">Already Registered</h4>
+                <h6 class="mt-0">Login to your account</h6>
+            </div>
+        </div>
+        <div class="form-group input-subtle mb-1x">
+            <label class="sr-only" for="email-reminder">Email Address / Username</label>
+            <input type="email" class="form-control" placeholder="Please enter your email or username">
+        </div>
+        <div class="form-group input-subtle mb-1x">
+            <label class="sr-only">Password</label>
+            <input type="password" class="form-control" placeholder="Please enter your password">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-6 mt-1x">
+                <button class="btn btn-secondary btn-block" type="submit">Login</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <p class="mt-1x"><a href="">Forgotten your Username</a></p>
+                <p class="mt-1x"><a href="">Forgotten your Password</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bullion-registration">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4 class="mt-0 mb-0">New to The Royal Mint Bullion?</h4>
+                <h6 class="mt-0">Create your Bullion account</h6>
+            </div>
+        </div>
+        <div class="form-group input-subtle mb-1x">
+            <label class="sr-only" for="email-reminder">Email Address</label>
+            <input type="email" ng-model="" class="form-control" placeholder="Please enter your email address">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-6 mt-1x">
+                <button class="btn btn-secondary outline btn-block" type="submit">Lets get Started</button>
+            </div>
+        </div>
+    </div>
+</div>

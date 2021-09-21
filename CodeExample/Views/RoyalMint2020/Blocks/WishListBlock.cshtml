@@ -1,0 +1,172 @@
+﻿@using EPiServer
+@using EPiServer.Core
+@using TRM.Shared.Extensions 
+@using StartPage = TRM.Web.Models.Pages.StartPage
+@model TRM.Web.Models.ViewModels.Cart.LargeOrderGroupViewModel
+@{
+    var repository = EPiServer.ServiceLocation.ServiceLocator.Current.GetInstance<IContentRepository>();
+    var basketpage = repository.Get<StartPage>(ContentReference.StartPage).BasketPage;
+}
+@if (Model.Shipments != null && Model.Shipments.Any())
+{
+    <div class="row">
+        <div class="col-xs-12 block image-text-table">
+            <div class="row table-heading hidden-xs">
+                <div class="col-sm-2">
+                    <div class="checkbox small fancy">
+                        <input type="checkbox" value="" id="selectAll" data-original-title="" title="">
+                        <label class="" for="selectAll">
+                            Select All
+                        </label>
+                    </div>
+                    <!--/ .checkbox -->
+                </div>
+                <div class="col-sm-2">
+                    Products
+                </div>
+                <div class="col-sm-7">
+                    <div class="row">
+                        <div class="col-sm-8">
+
+                        </div>
+
+                        <div class="col-sm-3 pr-0">
+                            Item Price
+                        </div>
+
+                    </div>
+                </div>
+                <div class=" col-sm-1 text-right pl-0">
+                    Delete
+                </div>
+                <div class="col-xs-12">
+                    <hr>
+                </div>
+            </div>
+
+            @foreach (var variant in Model.Shipments)
+            {
+                if (variant.CartItems != null && variant.CartItems.Any())
+                {
+                    foreach (var item in variant.CartItems)
+                    {
+                        if (item.Code != null)
+                        {
+                            <div class="row table-row">
+                                <div class="col-sm-2">
+                                    <div class="checkbox small fancy">
+                                        <input type="checkbox" value="@item.Code#@item.Quantity" id="checkbox_@item.Code" class="chk cbx_WishListItem">
+                                        <label class="" for="checkbox_@item.Code">
+                                            Select
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4 col-sm-2">
+                                    <a class="text-slateblue" href="@Url.ContentUrlExtension(item.Url)" title="@item.DisplayName">
+                                        <img title="@item.DisplayName" alt="" class="img-responsive" src="@Url.ContentUrlExtension(item.ImageUrl)">
+                                    </a>
+                                </div>
+
+                                <div class="col-xs-6 col-sm-7">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-8">
+                                            @if (!string.IsNullOrEmpty(item.TagMessage))
+                                            {
+                                                <p class="bg-gold text-white display-inline-block p-1xs mb-10">
+                                                    @item.TagMessage
+                                                </p>
+                                            }
+
+                                            <p class="strong mb-0">
+                                                <a class="text-slateblue " href="@Url.ContentUrlExtension(item.Url)" title="@item.DisplayName">@item.DisplayName</a>
+                                            </p>
+                                            @if (!string.IsNullOrEmpty(item.SubTitle))
+                                            {
+                                                <p class="text-silver">@item.SubTitle</p>
+                                            }
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-3">
+                                            <span class="visible-xs visible-xs-inline-block">
+                                                <strong>Item Price</strong>
+                                            </span>
+                                            <br>
+                                            <span>@item.DiscountedPrice</span>
+                                        </div>
+                                        <div class="col-xs-12">
+                                            <p>
+                                                <span class="text-info">@item.StockSummary.StatusMessage</span> <br>
+                                                <!-- Shiping within --> @item.StockSummary.ShippingMessage
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-sm-1 text-right pull-right">
+                                    <button href="#" class="btn-remove jsRemoveFromWishlist" data-code="@item.Code">
+                                        <i class="trmi trmi-close" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="col-xs-12"><hr></div>
+                            </div>
+                        }
+                    }
+                }
+            }
+
+            <a class="btn btn-default jsShowModalEmail" href="javascript:void(0)" onclick="showWishListModal()" data-target="#emailWishList">Email Wish List</a>
+            <button class="btn btn-primary pull-right jsAddToBasket" data-urlredirect="@Url.ContentUrlExtension(basketpage)">Add to Basket</button><br />
+            <span class="pull-right  jsErrorAddBasket hidden showError">Can't add to Basket</span>
+            <span class="pull-right jsNoProduct hidden showError">No selected products</span>
+        </div>
+    </div>
+
+    <div class="modal fade" id="emailWishList" tabindex="-1" role="dialog" aria-labelledby="wish-list" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" onclick="closeWishListModal()" aria-label="Close" id="jsCloseModal"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="wish-list">Email My Wish List</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="wysiwyg">
+                        <p>Please note we will share your full name with the Recipient of this email.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Recipient Email</label>
+                        <input type="email" placeholder="Enter your Email Address..." class="form-control" required data-original-title="" id="requiredEmail" title="">
+                        <div class="jsValidEmail  errorcolor hidden">Your Email Address is empty or invalid</div>
+                        <span class="jsErrorSendMail hidden errorcolor">Can't send Wish List to Email</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancelModal" onclick="closeWishListModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary jsSendEmailWistList">Send</button>
+                    <div class="display-inline-block pull-right pull-left-xs mb-xs-1x hidden loader jsSendingEmail"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade in" id="successEmailModal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close trmi trmi-close" onclick="closeSuccessEmail()" aria-label="Close"><span aria-hidden="true"></span></button>
+                    <h4 class="modal-title" id="rmMessagesModalLabel">Email My Wish List</h4>
+                </div>
+                <div class="modal-body">
+                    Email was sent
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeSuccessEmail()" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @Html.PropertyFor(x => x.EmptyWishListContent)
+}

@@ -1,0 +1,73 @@
+﻿@using EPiServer.Editor
+@using TRM.Web.Constants
+@using Newtonsoft.Json
+@using EPiServer.ServiceLocation
+@using TRM.Web.Helpers
+@using TRM.Shared.Extensions
+
+@model TRM.Web.Models.ViewModels.LoginViewModel
+
+@{
+    var recaptchaHelper = ServiceLocator.Current.GetInstance<IGoogleRecaptchaHelper>();
+    var id = Guid.NewGuid().ToString().Replace("-", "");
+
+    var viewModel = new
+    {
+        displayPageHeading = true,
+        pageHeading = Model.ThisBlock.PageHeading,
+        options = new
+        {
+            label = Model.ThisBlock.Heading,
+            small = Model.ThisBlock.SubHeading,
+            description = Model.ThisBlock.EditorialContent,
+            login = new
+            {
+                emailLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressOrUsernamePlaceholder, "Email address or Username"),
+                passwordLabel = Model.ThisBlock.PasswordLabel,
+                forgottenPasswordText = Model.ThisBlock.ForgottenPassword,
+                buttonText = Model.ThisBlock.LoginButtonText,
+                loginErrorMessage = Model.LoginFailedMessage,
+            },
+            forgottenPassword = new
+            {
+                heading = Model.ThisBlock.ForgottenPassword,
+                description = Model.ThisBlock.ForgottenPasswordSubHeading,
+                label = Model.ThisBlock.EmailLabel,
+                placeholder = Model.ThisBlock.EmailPlaceholder,
+                cancel = Model.ThisBlock.ReturnToLoginButtonText,
+                buttonText = Model.ThisBlock.ForgottenPasswordButtonText,
+                isRecaptchaEnabled = recaptchaHelper.IsEnabled(),
+                recaptchaSiteKey = recaptchaHelper.SiteKey,
+            },
+            twoStepLogin = new
+            {
+                questionLabel = Model.ThisBlock.TwoStepAuthenticationHeading,
+                responseLabel = Model.ThisBlock.TwoStepAuthenticationPlaceholder,
+                buttonText = Model.ThisBlock.TwoStepAuthenticationButtonText,
+            },
+            passwordConfirmation = new
+            {
+                heading = Model.ThisBlock.ForgottenPasswordSuccessHeaderMessage,
+                description = Model.ThisBlock.ForgottenPasswordSuccessMessage,
+                content = Model.ThisBlock.ForgottenPasswordConfirmationContentArea,
+                goToLogin = Model.ThisBlock.ReturnToLoginButtonText,
+
+            },
+            guestCheckout = new
+            {
+                url = Model.ThisBlock.CreateAccountURL != null ? Model.ThisBlock.CreateAccountURL.GetExternalUrl_V2() : Request.Url.ToString(),
+                label = Model.ThisBlock.CreateAccountHeading,
+                description = Model.ThisBlock.CreateAccountSubHeading,
+                emailLabel = Model.ThisBlock.EmailLabel,
+                emailPlaceholder = @Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressPlaceholder, "Please enter your email"),
+                submit = Model.ThisBlock.CreateAccountButtonText,
+            }
+        }
+    };
+}
+
+
+@if (!(Request.IsAuthenticated && !PageEditing.PageIsInEditMode))
+{
+    <div data-module="checkout-step1" data-checkout-step1-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+}

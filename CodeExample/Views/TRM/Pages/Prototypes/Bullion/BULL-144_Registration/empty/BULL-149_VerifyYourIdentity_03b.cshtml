@@ -1,0 +1,135 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+
+    <!-- BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+        <div class="container mb-4x mt-2x">
+            <!-- Step bar -->
+            <ol class="nav nav-bar nav-progress-bar mb-2x">
+                <li><a href="/prototypes/bullion/registration/empty/AccountDetails_01b/">1.&nbsp;<span>Account Details</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/empty/PersonalDetails_02/">2.&nbsp;<span>Personal Details</span>&nbsp;</a></li>
+                <li class="active"><a href="/prototypes/bullion/registration/empty/VerifyYourIdentity_03b/">3.&nbsp;<span>Verify your identity</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/empty/SecurityQuestion_04/">4.&nbsp;<span>Security Question</span>&nbsp;</a></li>
+                <li><a href="/prototypes/bullion/registration/empty/ApplicationSuccessful_05/" class="text-nowrap">5.&nbsp;<span>Application Successful</span>&nbsp;</a></li>
+            </ol>
+            <!-- / Step bar -->
+            <!-- Sub Headline -->
+            @if (Model.CurrentPage.DisplayPageHeading)
+            {
+                <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+            }
+            <!-- / Sub Headline -->
+            
+            <!-- Content Area -->
+            <div class="row">
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+            </div>
+            <!-- / Content Area -->
+
+            <!-- Form -->
+            <main class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+                    <div class="form-group">
+                        <label class="control-label" for="">
+                            Address
+                            <span class="text-danger">*</span>
+                            <span class="text-nowrap">
+                                <small class="text-greyblue">(Please provide your permanent residential address) 
+                                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip for please provide your permanent residential address"></i>
+                                </small> 
+                            </span>
+                        </label>
+                        <input type="text" class="form-control" id="" placeholder="Please enter your Postcode" value="FL 33127" data-original-title="" title="">
+                    </div>
+
+                    <!-- text - address -->
+                    <p>2390 NW 2nd Ave,</p>
+                    <p>Miami,</p>
+                    <p>FL 33127,</p>
+                    <p>USA</p>
+                    <!-- / text - address -->
+                    <!-- button - Enter Manually -->
+                    <div class="mt-1x">
+                        <a type="" class="">Enter Manually</a>
+                    </div>
+                    <!-- / button - Enter Manually -->
+                </div>
+                <div class="col-xs-12">
+                    <div class="row">
+                        <!-- Input - Telephone -->
+                        <div class="col-xs-12 col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" for="">
+                                    Telephone
+                                    <span class="text-danger">*</span>
+                                    <small class="text-greyblue text-nowrap">(Please provide your primary contact number)</small>
+                                </label>
+                                <input type="text" class="form-control" id="" placeholder="+1" data-original-title="" title="">
+                            </div>
+                        </div>
+                        <!-- / Input - Telephone -->
+                        <!-- Input - Mobile Phone -->
+                        <div class="col-xs-12 col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" for="">
+                                    Mobile Phone
+                                    <small class="text-greyblue text-nowrap">(Please provide your mobile contact number)</small>
+                                </label>
+                                <input type="text" class="form-control" id="" placeholder="Provide your mobile contact number here" data-original-title="" title="">
+                            </div>
+                        </div>
+                        <!-- / Input - Mobile Phone -->
+                        <!-- Select - Currency -->
+                        <div class="form-group col-xs-12">
+                            <div class="row">
+                                <label class="control-label col-xs-12" for="">
+                                    Choose currency
+                                    <span class="text-danger">*</span>
+                                    <span class="text-nowrap">
+                                        <small class="text-greyblue">(This will be the currency used to trade) 
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip for this will be the currency used to trade"></i>
+                                        </small>
+                                           
+                                    </span>
+                                </label>
+
+                                <div class="select-form col-xs-4 col-sm-3 col-md-2 col-lg-2 pr-0">
+                                    <select class="form-control" id="" name="" " style="">
+                                        <option selected="selected" value="$ USD">$ USD</option>
+                                        <option value="£ Pound">£ Pound</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / Select - Currency -->
+                    </div>
+                </div>
+
+                <!-- toolbar -->
+                <div class="col-xs-12 mb-2x">
+                    <a href="/prototypes/bullion/registration/empty/PersonalDetails_02/" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                    <a href="/prototypes/bullion/registration/empty/SecurityQuestion_04/" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+                </div>
+                <!-- / toolbar -->
+            </main>
+            <!-- / Form -->
+            
+            <div class="row">
+                <!-- Content Area -->
+                @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                <!-- / Content Area -->
+            </div>
+            <!-- / BULL-149 - Bullion Registration Step 3b - Verify your identity -->
+
+        </div>
+
+    </div>

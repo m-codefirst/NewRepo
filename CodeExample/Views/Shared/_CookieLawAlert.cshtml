@@ -1,0 +1,12 @@
+﻿@model TRM.Web.Models.Layouts.TrmLayoutModel
+<div class="cookie-policy-container bg-slateblue" id="cookiePolicyContainer" ng-controller="cookieController" ng-show="cookiePolicy != 'true'" ng-class="{accepted : cookiePolicy == 'true'}" ng-cloak>
+    <div class="container pt-1x pb-2x">
+        <div class="row">
+            <div class="block editorialBlock col-xs-12 mb-0">
+                <div class="h4 text-white mt-0">@Html.PropertyFor(x => x.CookieTitle)</div>
+                <a role="button" class="btn btn-default btn-white btn-sm pull-right" ng-click="setCookie()">@Html.PropertyFor(x => x.CookieButtonText)</a>
+                @Html.PropertyFor(x => x.CookieWarningMessage)
+            </div>
+        </div>
+    </div>
+</div>

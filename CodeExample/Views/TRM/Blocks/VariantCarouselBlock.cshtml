@@ -1,0 +1,27 @@
+﻿@using EPiServer.Web
+@model TRM.Web.Models.ViewModels.VariantCarouselBlockViewModel
+@if (Model.Item.Any())
+{
+    <div class="block variantCarouselBlock col-xs-12">
+        <div class="bg-pearl" data-slides-lg="4" data-slides-md="4" data-slides-sm="3" data-slides-xs="2">
+            <div class="contentArea" style="padding-top:15px">
+                <div class="row">
+                    @Html.PropertyFor(m => m.VariantCarouselHeadingContentArea)
+                </div>
+            </div>
+            <div class="variantCarousel">
+                @foreach (var filter in Model.Item)
+                {
+                    <div class="trmVariant col-xs-12 col-sm-3">
+                        @{ Html.RenderPartial("PagePartials/TrmEntryPartial", filter); }
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScript("/bundles/" + SiteDefinition.Current.Name + "vartiantCarousel").AtFooter();
+    EPiServer.Framework.Web.Resources.ClientResources.RequireScriptInline(@"var timer; $(function () {
+timer = setTimeout(function(){ variantCarousel(); clearTimeout(timer);},500);
+});", "initializeCarousel", new[] { "/bundles/vartiantCarousel" }).AtFooter();
+}

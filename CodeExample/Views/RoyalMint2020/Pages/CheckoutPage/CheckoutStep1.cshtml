@@ -1,0 +1,93 @@
+﻿@using EPiServer.Web.Mvc.Html
+@using TRM.Web.Constants
+@using Newtonsoft.Json
+@using TRM.Web.Models.Layouts
+@using EPiServer.ServiceLocation
+@using TRM.Web.Helpers;
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.CheckoutPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Checkout.CheckoutStep1ViewModel>
+@{
+    var recaptchaHelper = ServiceLocator.Current.GetInstance<IGoogleRecaptchaHelper>();
+
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    var url = string.Empty;
+    if (Request != null && Request.Url != null)
+    {
+        url = Request.Url.AbsoluteUri.ToLowerInvariant();
+    }
+    var isLoggedIn = Request.IsAuthenticated;
+
+
+    var viewModel = new
+    {
+
+        url = url,
+        isLoggedIn = isLoggedIn,
+        displayPageHeading = Model.CurrentPage.DisplayPageHeading,
+        pageHeading = Model.CurrentPage.Heading,
+        options = new
+        {
+            label = Model.CurrentPage.Step1LeftPanelHeading,
+            small = Model.CurrentPage.Step1LeftPanelSubHeading,
+            description = Model.CurrentPage.Step1LeftPanelEditorialContent,
+            login = new
+            {
+                emailLabel = @Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressOrUsernamePlaceholder, "Email address or Username"),
+                passwordLabel = Model.CurrentPage.Step1LeftPanelPasswordPrompt,
+                forgottenPasswordText = Model.CurrentPage.Step1LeftPanelForgottenPasswordPrompt,
+                buttonText = Model.CurrentPage.Step1LeftPanelLoginButtonText,
+                loginErrorMessage = Model.ViewModel.LoginFailedMessage,
+            },
+            twoStepLogin = new
+            {
+                questionLabel = Html.TranslateFallback(TRM.Web.Constants.StringResources.LoginTwoStepAuthenticationQuestionHeader, "Security question"),
+                buttonText = Html.TranslateFallback(TRM.Web.Constants.StringResources.SubmitButtonText, "Submit"),
+            },
+            forgottenPassword = new
+            {
+                heading = Model.CurrentPage.Step1LeftPanelForgottenPasswordHeading,
+                description = Model.CurrentPage.Step1LeftPanelForgottenPasswordSubHeading,
+                label = @Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddress, "Email address or username"),
+                placeholder = @Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressPlaceholder, "Please enter your email"),
+                cancel = @Html.TranslateFallback(StringResources.Cancel, "Return to login"),
+                buttonText = @Html.TranslateFallback(StringResources.ResetPassword, "Reset Password"),
+                isRecaptchaEnabled = recaptchaHelper.IsEnabled(),
+                recaptchaSiteKey = recaptchaHelper.SiteKey  // in order to test in Localhost env. set recaptchaSiteKey = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'  and in GoogleRecaptchaHelper.cs set  var privateKey = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
+
+            },
+            passwordConfirmation = new
+            {
+                heading = @Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationHeading, "Password reset sent"),
+                description = @Html.TranslateFallback(StringResources.ForgottenPasswordConfirmationSubHeading, "You will receive an email shortly with instructions on how to reset your password."),
+                content = Model.CurrentPage.Step1ForgottenPasswordConfirmationContentArea,
+                goToLogin = @Html.TranslateFallback(StringResources.GoToLogin, "Go to login")
+
+            },
+            guestCheckout = new
+            {
+                url = string.Format("{0}/{1}", url, "checkoutstep2"),
+                shouldHideGuestCheckoutOption = Model.ViewModel.ShouldHideGuestCheckoutOption,
+                noGuestCheckoutDescription = Model.CurrentPage.ContentWhenHideGuestCheckoutOption,
+                heading = "Guest Checkout",// sr-only
+                label = Model.CurrentPage.Step1RightPanelHeading,
+                description = Model.CurrentPage.Step1RightPanelSubHeading,
+                editorial = Model.CurrentPage.Step1RightPanelEditorialContent,
+                emailLabel = Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddress, "Email Address"),
+                emailSmall = Html.TranslateFallback(TRM.Web.Constants.StringResources.ForReceiptsAndOrderInformationOnly, "For receipts and order information only"),
+                emailPlaceholder = Html.TranslateFallback(TRM.Web.Constants.StringResources.EmailAddressPlaceholderInBullionRegistration, "Enter your email"),
+                submit = Html.TranslateFallback(TRM.Web.Constants.StringResources.ProceedWithCheckout, "Proceed with checkout"),
+
+            }
+        }
+    };
+}
+
+<div data-module="checkout-step1" data-checkout-step1-settings="@JsonConvert.SerializeObject(viewModel)"></div>
+
+<!-- Fill DataLayer -->
+@Html.Action("PushDataLayerBasketCart", "Shared", new { step = Step.Two })

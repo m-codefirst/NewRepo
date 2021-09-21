@@ -1,0 +1,125 @@
+﻿@using Hephaestus.CMS.Extensions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.Layouts.TrmLayoutModel
+
+@{
+    var basketPageUrl = Model.BasketPage.GetExternalUrl_V2();
+    var checkoutPageUrl = Model.CheckoutPage.GetExternalUrl_V2();
+}
+<div class="nav-section basket-mini" id="navSectionBasket">
+    <div class="section-body minibasket-fixed" id="miniBasket">
+        <div class="row" ng-if="getBasketQty() >= 1" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <h4>@Html.TranslateFallback(StringResources.BasketRecentlyAddedToYourBasket, StringConstants.TranslationFallback.BasketRecentlyAddedToYourBasket)</h4>
+                <div class="basket-container">
+                    <table class="table mini-basket-table">
+                        <thead>
+                            <tr>
+                                <th width="70%">@Html.TranslateFallback(StringResources.BasketItems, StringConstants.TranslationFallback.BasketItems)</th>
+                                <th width="15%">@Html.TranslateFallback(StringResources.BasketQuantity, StringConstants.TranslationFallback.BasketQuantity)</th>
+                                <th></th>
+                                <th class="text-right" width="15%">@Html.TranslateFallback(StringResources.BasketPrice, StringConstants.TranslationFallback.BasketPrice)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="headerBasketItem" ng-fade>
+                                <td>
+                                    <span class="mb-0 mt-0">
+                                        <a href="#" class="text-slateblue">1kg Gold Bar Cast</a>
+                                        <p class="text-silver mb-0">Second title line, if populated</p>
+                                    </span>
+
+                                    <div class="pt-5">
+                                        <span class="bg-lightgray p-1xs mr-1x">
+                                            @Html.TranslateFallback(StringResources.ItemPersonalised, StringConstants.TranslationFallback.ItemPersonalised)
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group qty-group mb-xs-1x">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button">
+                                                <i class="trmi trmi-minus"></i>
+                                            </button>
+                                        </span>
+                                        <input type="text" class="form-control text-center qty-input" placeholder="Qty" value="1">
+                                        <span class="input-group-btn">
+                                            <button class="btn qty-btn" type="button">
+                                                <i class="trmi trmi-plus"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code);"><span class="product-removal mb-xs-1x"><span class="text-danger">Remove</span> </span></button>
+                                </td>
+                                <td class="text-right"><span>£33,286.43</span><p class="mini-basket-vat">(ex VAT)</p><p class="estimated pull-right">estimated</p></td>
+                            </tr>
+
+                            <tr class="headerBasketItem no-border no-padding-bottom">
+                                <td colspan="5">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h3 class="mt-0 mb-0 h6">Items for Storage at the royal mint</h3>
+                                            <p class="strong header-font-color mt-0 mb-0 pt-5">Store In Vault</p>
+
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="headerBasketItem" ng-fade>
+                                <td>
+                                    <p class="mb-0 mt-0">
+                                        <a href="#" class="text-slateblue">Signature Gold</a>
+                                    </p>
+                                    <p class="mb-0">I Want to invest £500</p>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code);"><span class="product-removal mb-xs-1x"><span class="text-danger">Remove</span> </span></button>
+                                </td>
+                                <td class="text-right"><span>£500</span><p class="mini-basket-vat">(ex VAT)</p></td>
+                            </tr>
+
+                            <tr class="headerBasketItem" ng-fade>
+                                <td>
+                                    <p class="mb-0 mt-0">
+                                        <a href="#" class="text-slateblue">5kg Gold Bar Cast</a>
+                                    </p>
+                                    <p class="text-silver mb-0">Second title line, if populated</p>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-sm btn-link pt-0 pb-0" ng-click="removeFromBasket(variant.ShipmentId, variant.Code);"><span class="product-removal mb-xs-1x"><span class="text-danger">Remove</span> </span></button>
+                                </td>
+                                <td class="text-right"><span>£999,286.43</span><p class="mini-basket-vat">(ex VAT)</p><p class="estimated pull-right">estimated</p></td>
+                            </tr>
+                            <tr class="no-border">
+                                <td colspan="5">
+                                    <h3 class="text-right mt-1x">All 3 Items Subtotal: &nbsp;&nbsp; &pound;116.00</h3>
+                                    <p class="text-right mb-1x">VAT breakdown available in full basket</p>
+                                </td>
+                            </tr>
+                        </tbody>
+
+
+                    </table>
+                </div>
+                <div class="text-right">
+                    <a class="btn btn-default mr-20" href="@basketPageUrl">@Html.TranslateFallback(StringResources.BasketFullBasketBtnText, StringConstants.TranslationFallback.BasketFullBasketBtnText)</a>
+                    <a class="btn btn-primary" href="@checkoutPageUrl">@Html.TranslateFallback(StringResources.BasketCheckoutBtnText, StringConstants.TranslationFallback.BasketCheckoutBtnText)</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="getBasketQty() == 0" ng-cloak>
+            <div class="col-md-9 col-md-offset-3">
+                <div class="alert alert-warning">
+                    @Html.TranslateFallback(StringResources.BasketEmpty, StringConstants.TranslationFallback.BasketEmpty)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                                                                                                      

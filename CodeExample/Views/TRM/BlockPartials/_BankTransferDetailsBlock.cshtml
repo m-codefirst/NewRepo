@@ -1,0 +1,120 @@
+﻿@using TRM.Web.Constants
+@model TRM.Web.Models.ViewModels.Bullion.BullionAccountAddCreditBlockViewModel
+
+@{
+    var newGuid = Guid.NewGuid();
+}
+
+@if (Model.BankAccountDetail != null)
+{
+    <div class="add-funds-dropdown bank-dd mb-1x cta-action mb-1x">
+        <a class="h6 @(Model.BullionAccountAddCreditBlock.Accordion2CollapseAsDefault ? "collapsed" : "")" data-toggle="collapse" href="#add-with-bank@(newGuid)" role="button" aria-expanded="@(Model.BullionAccountAddCreditBlock.Accordion2CollapseAsDefault ? "false" : "true")" aria-controls="collapseExample">
+            <span class="pr-1x" href="">
+                <i class="trmi trmi-bank" aria-hidden="true"></i>
+            </span>
+            <span>
+                @Html.PropertyFor(x => x.BullionAccountAddCreditBlock.AccordionTitle2)
+            </span>
+            <span class="right">
+                <i class="trmi trmi-angle-up"></i>
+                <i class="trmi trmi-angle-down"></i>
+            </span>
+        </a>
+    </div>
+    <div class="add-with-bank collapse @(Model.BullionAccountAddCreditBlock.Accordion2CollapseAsDefault ? "" : "in")" id="add-with-bank@(newGuid)">
+        @if (!Model.ShowBankTranfer)
+        {
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="alert alert-danger mb-0">
+						@if (!Model.ShowBankTranfer)
+						{
+							@(Model.BullionAccountAddCreditBlock.Accordion2RestrictionMessage == null ? "You can deposit by card but not by bank transfer." : Model.BullionAccountAddCreditBlock.Accordion2RestrictionMessage)
+						}
+						else
+						{
+							@Html.Raw("Please set up Bank Transfer Detail on DDS")
+						}
+					</div>
+				</div>
+			</div>
+        }
+        else
+        {
+            <div class="row mt-1x">
+                <div class="col-xs-12">
+                    @Html.PropertyFor(x => x.BullionAccountAddCreditBlock.FundWithBankTransferDescription)
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <table class="table-bordered">
+                        <tbody>
+                            <tr>
+                                <td class="left-cell">
+                                    @Html.TranslateFallback(StringResources.BankTransferDetailsBankNameTitle, "Bank Name")
+                                </td>
+                                <td class="right-cell">@Model.BankAccountDetail.BankName</td>
+                            </tr>
+                            <tr>
+                                <td class="left-cell">
+                                    @Html.TranslateFallback(StringResources.BankTransferDetailsAccountNameTitle, "Account Name")
+                                </td>
+                                <td class="right-cell">@Model.BankAccountDetail.AccountName</td>
+                            </tr>
+                            <tr>
+                                <td class="left-cell">
+                                    @Html.TranslateFallback(StringResources.BankTransferDetailsSortCodeTitle, "Sort Code")
+                                </td>
+                                <td class="right-cell">@Model.BankAccountDetail.SortCode</td>
+                            </tr>
+                            <tr>
+                                <td class="left-cell">
+                                    @Html.TranslateFallback(StringResources.BankTransferDetailsBankAccountNoTitle, "Bank Account No")
+                                </td>
+                                <td class="right-cell">@Model.BankAccountDetail.BankAccountNo</td>
+                            </tr>
+                            <tr>
+                                <td class="left-cell strong">
+                                    @Html.TranslateFallback(StringResources.BankTransferDetailsBeneficiaryReferenceTitle, "Beneficiary Reference")
+                                    <i class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="@Html.TranslateFallback(StringResources.BankTransferDetailsBeneficiaryReferenceTooltip, "We accept Visa, Mastercard, American Express.")"></i>
+                                </td>
+                                <td class="right-cell strong">@Model.BankAccountDetail.BeneficiaryReference</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.BankAccountDetail.IbanNo) || !string.IsNullOrEmpty(Model.BankAccountDetail.SwiftCode))
+                {
+                    <div class="col-xs-12 col-sm-6">
+                        <p class="mt-xs-1x mb-2x">
+                            @Html.TranslateFallback(StringResources.BankTransferDetailsAdditionalInformationSubHeading, "Additional information for International customers For some International banks you may also be asked to provide the following information:")
+                        </p>
+                        <table class="table-bordered">
+                            <tbody>
+                                @if (!string.IsNullOrEmpty(Model.BankAccountDetail.IbanNo))
+                                {
+                                    <tr>
+                                        <td class="left-cell">
+                                            @Html.TranslateFallback(StringResources.BankTransferDetailsIbanNoTitle, "IBAN No")
+                                        </td>
+                                        <td class="right-cell">@Model.BankAccountDetail.IbanNo</td>
+                                    </tr>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.BankAccountDetail.SwiftCode))
+                                {
+                                    <tr>
+                                        <td class="left-cell">
+                                            @Html.TranslateFallback(StringResources.BankTransferDetailsSwiftCodeTitle, "SWIFT Code")
+                                        </td>
+                                        <td class="right-cell">@Model.BankAccountDetail.SwiftCode</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+

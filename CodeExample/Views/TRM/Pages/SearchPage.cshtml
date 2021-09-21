@@ -1,0 +1,333 @@
+﻿@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.SearchPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.SearchPageViewModel>
+@using EPiServer.Find.Helpers
+@using Hephaestus.ContentTypes.Business.Extensions
+@using TRM.Web.Constants
+@using TRM.Web.Models.Find
+@using TRM.Web.Models.Layouts
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+
+    @Html.FullRefreshPropertiesMetaData(new[] { "ThreeContentAreas" })
+    var searchPageUrl = Request.Url.AbsolutePath;
+    var filters = Model.ViewModel.Filters;
+
+}
+
+<script type="text/javascript">
+    function searchKeyPress(e) {
+          e = e || window.event;
+          if (e.keyCode === 13) {
+              document.getElementById("doMainSearch").click();
+              return false;
+          }
+        return true;
+    }
+
+
+    function doSearch() {
+        if (document.getElementById("mainSearch").value.length > 1) {
+            window.location = "@(searchPageUrl)?q=" + document.getElementById("mainSearch").value;
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+    function updateFilters(newUrl) {
+        if (isBreakpoint('xs') || isBreakpoint('sm')) {
+            return null;
+        } else {
+            location.assign(newUrl);
+        }
+        return newUrl;
+    }
+    
+    var currentEntryPage = 1;
+    var currentArticlePage = 1;
+    var currentHelpPage = 1;
+
+    var url = '@Url.Action("GetData", "SearchPage")';
+
+    function updateSortOrder(sortOrderSelect) {
+        location.assign(sortOrderSelect.value);
+    }
+    function loadMoreEntries(maxEntryPage,filters) {
+
+        filters.IsEntries = true;
+        filters.IsArticles = false;
+        filters.IsHelp = false;
+        currentEntryPage = currentEntryPage + 1;
+        filters.CurrentPage = currentEntryPage;
+        $.post(url,filters,
+            function(response) {
+                var scope = angular.element(document.body).scope();
+                var $GridView = response.entryGridView;
+                angular.element(document)
+                    .injector()
+                    .invoke(function($compile) {
+                        $("#entryGridView").append($compile($GridView)(scope));
+                    });
+                scope.$digest();
+            });
+        if (currentEntryPage >= maxEntryPage) {
+            $("#loadMoreEntries").hide();
+        }
+        return false;
+    }
+    function loadMoreArticles(maxArticlePage, filters) {
+
+        filters.IsEntries = false;
+        filters.IsArticles = true;
+        filters.IsHelp = false;
+        currentArticlePage = currentArticlePage + 1;
+        filters.CurrentPage = currentArticlePage;
+        $.post(url, filters, function(response) {
+            $("#articleGridView").append(response.gridView);
+        });
+        if (currentArticlePage >= maxArticlePage) {
+            $("#loadMoreArticles").hide();
+        }
+        return false;
+    }
+    function loadMoreHelp(maxHelpPage, filters) {
+
+        filters.IsEntries = false;
+        filters.IsArticles = false;
+        filters.IsHelp = false;
+        currentArticlePage = currentArticlePage + 1;
+        filters.CurrentPage = currentArticlePage;
+        $.post(url, filters, function(response) {
+            $("#helpGridView").append(response.gridView);
+        });
+        if (currentHelpPage >= maxHelpPage) {
+            $("#loadMoreHelp").hide();
+        }
+        return false;
+    }
+</script>
+<div class="pageContainer">
+    <div class="contentArea">
+        <div class="row" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+        </div>
+    </div>
+
+    @if (!myLayout.HideSiteBreadcrumb)
+    {
+        Html.RenderPartial("_Breadcrumb", myLayout.Breadcrumb);
+    }
+
+    @if (myLayout.HasMessage)
+    {
+        Html.RenderPartial("_MessageBox", myLayout.Message);
+    }
+
+    <div class="container">
+        @if (Model.CurrentPage.DisplayPageHeading)
+        {
+            <div class="heading-pag">
+                <h1 class="h2 mt-0 pull-left">@Html.TranslateFallback(StringResources.SearchResultsHeading, "Search Results")</h1>
+            </div>
+        }
+        <div class="row mb-2x">
+            <div class="col-xs-12 col-md-8 col-md-offset-2">
+                <form id="searchFormBody">
+                    <label class="text-center display-block h4">@Html.TranslateFallback(StringResources.ShowingResultsFor, "You searched for:") </label>
+                    <div class="input-group mb-1x">
+                        <input type="text" class="form-control" placeholder="@Html.TranslateFallback(StringResources.SearchFor, "Search for...")" value="@Model.ViewModel.Filters.Query" id="mainSearch" onkeypress="return searchKeyPress(event);" />
+                        <span class="input-group-btn">
+                            <button id="doMainSearch" class="btn btn-secondary" type="button" onclick="doSearch();"><span class="visible-md visible-lg">@Html.TranslateFallback(StringResources.SearchAgain, "Search again")</span><span class="trmi trmi-search visible-xs-inline visible-sm-inline"></span></button>
+                        </span>
+                    </div><!-- /input-group -->
+                    <p class="help-block text-center">
+                        @{
+                            var entryCount = Model.ViewModel.TotalEntryCount;
+                            var articleCount = Model.ViewModel.TotalArticleCount;
+                            var helpCount = Model.ViewModel.TotalHelpCount;
+                            var totalResults = entryCount + articleCount + helpCount;
+                            var tmp = "Your search returned {0} result";
+                            if (totalResults != 1)
+                            {
+                                tmp += "s";
+                            }
+                            var showResults = string.Format(Html.TranslateFallback(StringResources.ResultsFound, tmp), totalResults);
+
+                            @showResults
+                        }
+
+
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        @if (Model.ViewModel.BaseTotalItems > 0 || articleCount > 0 || helpCount > 0)
+            {
+            <div class="row">
+
+                <main class="col-xs-12 col-md-9 col-md-push-3 mb-2x">
+                    @if (entryCount > 0 || articleCount > 0 || helpCount > 0 )
+                    {
+                        <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+                            <div class="row">
+                                @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                            </div>
+                        </div>
+                        if (entryCount > 0 )
+                        { <div class="pull-right hidden-xs hidden-sm select-subtle ecomSort">
+
+                            <select class="form-control" onchange="updateSortOrder(this)" id="entrySortTop">
+                                @foreach (EntrySortOrder order in Enum.GetValues(typeof(EntrySortOrder)))
+                                {
+                                    var selected = (order == filters.SelectedEntrySortOrder ? "selected" : "");
+                                    <option value="@filters.GetEntrySortOrderUrl(order)" @selected>@Html.TranslateFallback(order.DescriptionAttr(), order.ToString())</option>
+                                }
+                            </select>
+                        </div>
+                        }
+
+
+                        var filterDto = Json.Encode(Model.ViewModel.SearchPageHeader.FilterDto);
+                        <ul class="nav nav-tabs" role="tablist">
+                            @if (entryCount > 0)
+                    {
+                                <li role="presentation" class="active">
+                                    <a data-target="#tabProductsMain" aria-controls="tabProductsMain" role="tab" data-toggle="tab" data-show="#ecommerceFilters, .ecomSort">@Html.TranslateFallback(StringResources.Products, "Products") (@entryCount)</a>
+                                </li>
+                            }
+
+                            @if (articleCount > 0)
+                    {
+                        var liActive = entryCount == 0 ? "class='active in " : "";
+                                <li role="presentation" @liActive>
+                                    <a data-target="#tabArticleMain" aria-controls="tabArticleMain" role="tab" data-toggle="tab" data-hide="#ecommerceFilters, .ecomSort">@Html.TranslateFallback(StringResources.Articles, "Articles") (@articleCount)</a>
+                                </li>
+                            }
+                            @if (helpCount > 0)
+                            {
+                                var liActive = entryCount == 0 && articleCount ==0 ? "class=active in " : "";
+                                <li role="presentation" @liActive>
+                                    <a data-target="#tabHelpMain" aria-controls="tabHelpMain" role="tab" data-toggle="tab" data-hide="#ecommerceFilters, .ecomSort">@Html.TranslateFallback(StringResources.Articles, "Help") (@helpCount)</a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="tab-content pt-1x" ng-cloak>
+                            @{
+                                var divActive = entryCount > 0 ? "active in" : "";
+                                <div role="tabpanel" class="tab-pane fade @divActive" id="tabProductsMain">
+                                    <div class="pag-mob visible-xs visible-sm row mb-2x">
+                                        <div class="col-xs-6 col-sm-4">
+                                            <a class="btn btn-default btn-block sidenav-trigger" data-target="#catFilters">@Html.TranslateFallback(StringResources.FilterResults, "Filter Results")</a>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-4 col-sm-push-4 select-subtle ecomSort">
+                                            <select class="form-control" onchange="updateSortOrder(this)" id="entrySortTop">
+                                                @foreach (EntrySortOrder order in Enum.GetValues(typeof(EntrySortOrder)))
+                                                {
+                                                    var selected = (order == filters.SelectedEntrySortOrder ? "selected" : "");
+                                                    <option value="@filters.GetEntrySortOrderUrl(order)" @selected>@Html.TranslateFallback(order.DescriptionAttr(), order.ToString())</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <div id="entryGridView" class="rmGridView">
+                                        @Html.Partial("_VariantListingView", Model.ViewModel.Entries)
+                                    </div>
+
+                                    @if (entryCount > Model.ViewModel.Entries.Count)
+                                    {
+                                        <div class="col-sm-4 col-sm-offset-4">
+
+                                            <a id="loadMoreEntries" class="btn btn-default btn-block" role="button" onclick="return loadMoreEntries(@Model.ViewModel.SearchPageHeader.TotalEntryPages, @filterDto);">@Html.TranslateFallback(StringResources.ViewMore, "View More") </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @if(articleCount > 0)
+                            {
+                                divActive = entryCount == 0 ? "active in" : "";
+                                <div role="tabpanel" class="tab-pane fade @divActive" id="tabArticleMain">
+                                    <div id="articleGridView" class="rmGridView">
+                                        @Html.Partial("_ArticleListingView", Model.ViewModel.Articles)
+
+                                    </div>
+                                    @if (articleCount > Model.ViewModel.Articles.Count)
+                                    {
+                                        <div class="col-sm-4 col-sm-offset-4">
+                                            <a id="loadMoreArticles" class="btn btn-default btn-block" role="button" onclick="loadMoreArticles(@Model.ViewModel.SearchPageHeader.TotalArticlePages, @filterDto);">@Html.TranslateFallback(StringResources.ViewMore, "View More")</a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            @if(helpCount > 0)
+                            {
+                                divActive = entryCount == 0 && articleCount == 0 ? "active in" : "";
+                                <div role="tabpanel" class="tab-pane fade @divActive" id="tabHelpMain">
+                                    <div id="helpGridView" class="rmGridView">
+                                        @Html.Partial("_HelpListingView", Model.ViewModel.Help)
+
+                                    </div>
+                                    @if (articleCount > Model.ViewModel.Articles.Count)
+                                    {
+                                        <div class="col-sm-4 col-sm-offset-4">
+                                            <a id="loadMoreHelp" class="btn btn-default btn-block" role="button" onclick="loadMoreHelp(@Model.ViewModel.SearchPageHeader.TotalHelpPages, @filterDto);">@Html.TranslateFallback(StringResources.ViewMore, "View More")</a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                        </div>
+
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info text-center">
+                                        @Html.TranslateFallback(StringResources.NoResultsFound, "Your search returned no results, please try searching again")
+
+                                    </div>
+                                }
+                </main>
+                <aside class="mobile-sidenav col-md-3 col-md-pull-9 mb-2x" id="catFilters">
+                    <a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+                    @if (Model.CurrentPage.AboveFilterContent.IsNotNull())
+                    {
+                        <div class="contentArea hidden-xs hidden-sm">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="alert alert-warning text-center no-margins-v hidden-xs hidden-sm">
+                                        @Model.CurrentPage.AboveFilterContent
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (entryCount > 0)
+                    {
+                        @Html.Partial("_SearchFilters", Model.ViewModel.Filters)
+                    }
+                   
+
+                </aside>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                @Html.TranslateFallback(StringResources.NoResultsFound, "Your search returned no results, please try searching again")
+
+            </div>
+        }
+
+    </div>
+    <div class="contentArea" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+        <div class="row">
+            @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+        </div>
+    </div>
+</div>

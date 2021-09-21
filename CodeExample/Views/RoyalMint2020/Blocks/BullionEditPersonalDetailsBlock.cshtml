@@ -1,0 +1,49 @@
+﻿@using TRM.Web.Constants
+@using Newtonsoft.Json
+@model TRM.Web.Models.ViewModels.EditPersonalDetailsViewModel
+
+@{
+    var viewModel = new
+    {
+        isBullion = true,
+        titleLabel = @Html.TranslateFallback(StringResources.Title, "Title"),
+        firstNameLabel = @Html.TranslateFallback(StringResources.FirstName, "First Name"),
+        middleNameLabel = @Html.TranslateFallback(StringResources.MiddleName, "Middle Name"),
+        lastNameLabel = @Html.TranslateFallback(StringResources.LastName, "Last Name"),
+        dateOfBirthLabel = @Html.TranslateFallback(StringResources.DateOfBirth, "Date Of Birth"),
+        genderLabel = @Html.TranslateFallback(StringResources.Gender, "Gender"),
+        emailLabel = @Html.TranslateFallback(StringResources.EmailAddress, "Email Address"),
+        telephoneLabel = @Html.TranslateFallback(StringResources.Telephone, "Telephone"),
+        confirmPasswordLabel = @Html.TranslateFallback(StringResources.ReEnterPassword, "Confirm Password"),
+        submitButton = Html.TranslateFallback(StringResources.Save, "Save"),
+        successMessage = Html.TranslateFallback(StringResources.ProfileUpdated, "Personal details updated"),
+        primaryAddress = new
+        {
+            line1 = string.IsNullOrWhiteSpace(Model.PrimaryAddress.Line1) ? string.Empty : Model.PrimaryAddress.Line1.Replace("'", "\\'"),
+            line2 = string.IsNullOrWhiteSpace(Model.PrimaryAddress.Line2) ? string.Empty : Model.PrimaryAddress.Line2.Replace("'", "\\'"),
+            town = string.IsNullOrWhiteSpace(Model.PrimaryAddress.City) ? string.Empty : Model.PrimaryAddress.City.Replace("'", "\\'"),
+            region = string.IsNullOrWhiteSpace(Model.PrimaryAddress.CountryRegion.Region) ? string.Empty : Model.PrimaryAddress.CountryRegion.Region,
+            postcode = string.IsNullOrWhiteSpace(Model.PrimaryAddress.PostalCode) ? string.Empty : Model.PrimaryAddress.PostalCode,
+            countryCode = string.IsNullOrWhiteSpace(Model.PrimaryAddress.CountryCode) ? string.Empty : Model.PrimaryAddress.CountryCode,
+        },
+        title = Model.Title,
+        firstName = Model.FirstName,
+        middleName = Model.MiddleName,
+        lastName = Model.LastName,
+        dateOfBirthDay = Model.DateOfBirthDay,
+        dateOfBirthMonth = Model.DateOfBirthMonth,
+        dateOfBirthYear = Model.DateOfBirthYear,
+        gender = Model.Gender,
+        email = Model.Email,
+        telephone = Model.Telephone,
+        password = string.Empty,
+        titleList = Model.TitleList,
+        dayList = Model.DayList,
+        monthList = Model.MonthList,
+        yearList = Model.YearList,
+    };
+}
+
+@Html.AntiForgeryToken()
+
+<div data-module="edit-personal-details" data-settings="@JsonConvert.SerializeObject(viewModel)"></div>

@@ -1,0 +1,80 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer bull-registration">
+
+    <!-- BULL-149 - Bullion Registration Step 3a - Verify your identity -->
+    <div class="container mb-4x mt-2x">
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 mt-2x mb-3x">
+                <!-- Step bar -->
+                <ol class="nav nav-bar nav-progress-bar">
+                    <li class="done"><a href="/prototypes/bullion/registration/empty/AccountDetails_01a-01/"><span>1.</span></a></li>
+                    <li class="done"><a href="/prototypes/bullion/registration/empty/PersonalDetails_02-01/"><span>2.</span></a></li>
+                    <li class="active"><a href="/prototypes/bullion/registration/empty/VerifyYourIdentity_03a-01/"><span>3.</span></a></li>
+                    <li><a href="/prototypes/bullion/registration/empty/SecurityQuestion_04-01/"><span>4.</span></a></li>
+                </ol>
+                <!-- / Step bar -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+                <!-- Sub Headline -->
+                @if (Model.CurrentPage.DisplayPageHeading)
+                {
+                    <h3 class="mt-0 mb-2x">@Html.PropertyFor(m => m.CurrentPage.Heading)</h3>
+                }
+                <!-- / Sub Headline -->
+                <!-- Content Area -->
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+                </div>
+                <!-- / Content Area -->
+                <!-- Form -->
+                <main class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group mb-0">
+                            <label class="control-label" for="">
+                                Address
+                                <span class="text-danger">*</span>
+                                <small class="text-greyblue">
+                                    (Please provide your permanent residential address)
+                                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tooltip for please provide your permanent residential address"></i>
+                                </small>
+
+                            </label>
+                            <input type="text" class="form-control" id="" placeholder="Please enter your Postcode" data-original-title="" title="">
+                        </div>
+                        <div class="mt-2x mb-2x">
+                            <a type="">Enter Manually</a>
+                        </div>
+                    </div>
+
+                    <!-- toolbar -->
+                    <div class="col-xs-12 mt-1x mb-2x">
+                        <a href="/prototypes/bullion/registration/empty/PersonalDetails_02-01/" type="" class="btn btn-default mb-1x p-1x">Back</a>
+                        <a href="/prototypes/bullion/registration/empty/SecurityQuestion_04-01/" type="" class="btn btn-secondary mb-1x ml-1x p-1x pl-2x pr-2x">Continue</a>
+                    </div>
+                    <!-- / toolbar -->
+                </main>
+                <!-- / Form -->
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Content Area -->
+            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+            <!-- / Content Area -->
+        </div>
+        <!-- / BULL-149 - Bullion Registration Step 3a - Verify your identity -->
+    </div>
+
+</div>

@@ -1,0 +1,103 @@
+﻿@using TRM.Web.Constants
+@using EPiServer.Web
+@using System.Web.Optimization
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.Bullion.DeliverBullionLandingPage, Hephaestus.CMS.ViewModels.ILayoutModel, TRM.Web.Models.ViewModels.Bullion.DeliverBullionLandingViewModel>
+
+@section PageStyles
+{
+    @Styles.Render("~/bundles/" + SiteDefinition.Current.Name + "deliverPageCss")
+}
+
+<div class="row justify-content-center" @Html.EditAttributes(m => m.CurrentPage.ThreeContentAreas)>
+    <!-- Top Area (Banner) -->
+    @Html.DisplayFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+</div>
+
+<div class="row justify-content-center">
+    <!-- Main Content -->
+    <div class="col-12 col-md-9 py-2">
+        <div class="form-container deliver-sell">
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-8">
+                    <!-- Header & Delivery Message -->
+                    <h2 class="section-head"><span>@Html.TranslateFallback(StringResources.DeliveryConfirmation, "Delivery Confirmation")</span></h2>
+                    <p>@Html.TranslateFallback(StringResources.DeliveryConfirmationDescription, "The below investment have successfully been requested for delivery. Your investment wallet will be reduced immediately and your items will be removed from the vault when delivery has been organised. An email confirmation will follow shortly.")</p>
+
+                    <!-- Middle Content -->
+                    @if (Model.CurrentPage.ThreeContentAreas.MiddleContent != null)
+                    {
+                        <div class="row">
+                            @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+                        </div>
+                    }
+
+                    <!-- Delivery Details -->
+                    <div class="order-ref">
+                        @Html.TranslateFallback(StringResources.DeliverySummary, "Delivery Summary") #@Model.ViewModel.DeliverTransactionNumber
+                    </div>
+                    <div class="product-card product-card-horizontal product-order product-consumer">
+                        <div class="row justify-content-center">
+                            <!-- Product Image -->
+                            <div class="col-12 col-sm-4 col-lg-3">
+                                <div class="asset">
+                                    <img src="@Model.ViewModel.DeliverVariant.ImageUrl" alt="">
+                                </div>
+                            </div><!-- /.asset -->
+                            <!-- Product Info -->
+                            <div class="col-12 col-sm-8 col-lg-9">
+                                <div class="row">
+                                    <div class="col-12 product-information">
+                                        <h3 class="product-name">@Model.ViewModel.DeliverVariant.Title</h3>
+                                        <h4 class="product-auxiliary">@Model.ViewModel.DeliverVariant.Subtitle</h4>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="product-quantity">@Html.TranslateFallback(StringResources.QuantityToDeliver, "Quantity") <span>@Model.ViewModel.DeliverVariant.QuantityToSellOrDeliver.ToString("####")</span></div>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.product-information -->
+                                </div><!-- /.row -->
+                            </div><!-- /.product-container -->
+                        </div><!-- /.row -->
+                    </div><!-- /.product-card -->
+                    <div class="delivery-options bg-beige">
+                        <div class="row">
+                            <div class="offset-lg-3 col">
+                                <div class="delivery-address">
+                                    <strong>@Model.ViewModel.ShippingMethod.FriendlyName @Html.TranslateFallback(StringResources.StandardDeliveryToRegisteredInvestmentAddress, "to registered investment address")</strong>
+                                    <address>@Model.ViewModel.DeliverAddress</address>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Totals -->
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-8">
+                    <div class="form-spacing">
+                        <div class="order-totals">
+                            <div>@Html.TranslateFallback(StringResources.DeliverInvestmentVat, "Investment VAT"): <span>@Model.ViewModel.InvestmentVat.ToString()</span></div>
+                            <div>@Html.TranslateFallback(StringResources.DeliveryFee, "Delivery"): <span>@Model.ViewModel.DeliverCost.ToString()</span></div>
+                            <div>@Html.TranslateFallback(StringResources.DeliveryVat, "Delivery VAT"): <span>@Model.ViewModel.DeliverVat.ToString()</span></div>
+                            <div class="order-total">@Html.TranslateFallback(StringResources.DeliveryTotal, "Delivery Total"): <span>@Model.ViewModel.DeliveryTotal.ToString()</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Go to Account Button -->
+                    <div class="text-center">
+                        <a href="@Model.ViewModel.BullionAccountDashboardUrl" class="btn btn-primary m-0">@Html.TranslateFallback(StringResources.GoToAccountDashboard, "Go To Account Dashboard")</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Content -->
+            @if (Model.CurrentPage.ThreeContentAreas.BottomContent != null)
+            {
+                <div class="row">
+                    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+                </div>
+            }
+        </div> <!-- /.form-container -->
+    </div>
+</div>

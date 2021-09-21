@@ -1,0 +1,281 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+	var myLayout = Model.Layout as TrmLayoutModel;
+	if (myLayout == null)
+	{
+		throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+	}
+}
+<div class="pageContainer">
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+	</div>
+
+	<div class="container clear hidden-xs">
+		@Html.Partial("_Breadcrumb", myLayout.Breadcrumb)
+	</div>
+
+	@if (Model.CurrentPage.DisplayPageHeading)
+	{
+		<div class="page-header">
+			@Html.PropertyFor(m => m.CurrentPage.Heading)
+		</div>
+	}
+
+	<div class="container adding-funds">
+
+		<div class="col-xs-12 hidden-md hidden-lg">
+			<div class="row">
+				<div class="col-xs-12 mt-2x">
+					<a class="btn btn-default btn-block sidenav-trigger mb-2x" data-target="#catFilters"> Menu</a>
+				</div>
+			</div>
+		</div>
+
+		<aside class="mobile-sidenav col-md-3" id="catFilters">
+			<a class="btn btn-default pull-right visible-sm visible-xs closeButton"><i class="trmi trmi-close"></i></a>
+			<div class="row">
+				<div class="account navigationBlock col-xs-12" id="account-menu">
+					<div class="blockContent">
+						<ul class="level0 contentNav">
+							<li class="">
+								<a href="#" title="My Account">My Account</a>
+							</li>
+							<li class=" has-children">
+								<a class="btn-collapse" data-target="#your-orders1" data-toggle="collapse" title="Show/Hide More">Investments</a>
+								<ul class="level1 collapse in" id="your-orders1">
+									<li><a href="#" title="Change Password">Change Password</a></li>
+									<li><a href="#" title="Manage Vaulted Holdings">Manage Vaulted Holdings</a></li>
+									<li><a href="#" title="View Statement History">View Statement History</a></li>
+									<li><a href="#" title="Manage Your Bank Account details">Manage Your Bank Account details</a></li>
+									<li><a href="#" title="Withdraw Funds From Wallet">Withdraw Funds From Wallet</a></li>
+									<li><a href="#" title="Add Funds to Wallet">Add Funds to Wallet</a></li>
+								</ul>
+							</li>
+							<li class=" has-children">
+								<a class="btn-collapse" data-target="#credit-account2" data-toggle="collapse" title="Show/Hide More">Credit Account</a>
+								<ul class="level1 collapse in" id="credit-account2">
+									<li><a href="/my-account/contact-and-delivery-details/change-password/" title="Change Password">Change Password</a></li>
+									<li><a href="/my-account/contact-and-delivery-details/contact-preferences/" title="Contact Preferences">Contact Preferences</a></li>
+									<li><a href="/my-account/contact-and-delivery-details/manage-addresses/" title="Manage Addresses">Manage Addresses</a></li>
+									<li><a href="/my-account/contact-and-delivery-details/edit-personal-details/" title="Edit personal details">Edit personal details</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div><!-- /.blockContent -->
+				</div><!-- /. navigation block -->
+			</div>
+		</aside>
+
+		<main class="col-xs-12 col-md-9 mb-2x">
+			<div class="header-wrapper">
+				<div class="page-header hidden-xs hidden-sm">
+					<h1>Add Funds</h1>
+				</div>
+			</div>
+
+
+			<div class="panel panel-default panel-secondary">
+				<div class="panel-body">
+
+					<div class="row">
+						<div class="col-xs-12 col-sm-8">
+							@Html.PropertyFor(m => m.CurrentPage.MainBody)
+						</div>
+						@*<div class="col-xs-12 col-sm-4">
+								<a href="" class="btn btn-default mt-xs-1x mb-xs-1x col-xs-12">View Funding Information</a>
+							</div>*@
+					</div>
+
+					<div class="add-funds-dropdown debit-dd cta-action mt-2x bb-none">
+						<a class="h6 collapsed" data-toggle="collapse" href="#add-with-debit" role="button" aria-expanded="true" aria-controls="collapseExample">
+							<span class="pr-1x" href="">
+								<i class="trmi trmi-credit-card" aria-hidden="true"></i>
+							</span>
+							<span>
+								Fund with Debit/Credit Card
+							</span>
+							<span class="right">
+								<i class="trmi trmi-angle-up"></i>
+								<i class="trmi trmi-angle-down"></i>
+							</span>
+						</a>
+					</div>
+					<div class="add-with-debit collapse in" id="add-with-debit">
+						<div class="row">
+							<div class="col-xs-12 col-sm-8 mt-1x">
+								<p class="">Fund up to £50,000 on a debit card and £20,000 on a credit card.</p>
+								<form action="/" method="post" class="mt-1x mb-1x form-horizontal">
+									<div class="row mb-1x">
+										<div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+											<label class="control-label">Amount of funds (&pound;)<span class="text-danger">&nbsp;*</span></label>
+										</div>
+										<div class="col-xs-12 col-sm-6">
+											<div class="input-group subtle mb-0">
+												<div class="input-group-addon">£</div>
+												<input type="number" class="form-control" id="exampleInputAmount" value="50.00" placeholder="Amount" data-original-title="" title="">
+											</div>
+										</div>
+									</div>
+									<div class="row mb-1x">
+										<div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+											<label class="control-label">Name on card<span class="text-danger">&nbsp;*</span></label>
+										</div>
+										<div class="col-xs-12 col-sm-6">
+											<input type="text" name="name" value="" class="form-control" />
+										</div>
+									</div>
+									<div class="row mb-1x">
+										<div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+											<label class="control-label">Card Number<span class="text-danger">&nbsp;*</span></label>
+										</div>
+										<div class="col-xs-12 col-sm-6">
+											<input type="number" name="name" value="0000 0000 0000" class="form-control" />
+										</div>
+									</div>
+									<div class="row mb-1x">
+										<div class="col-xs-12 col-sm-5 text-left text-right-sm-up">
+											<label class="control-label">Expiry Date<span class="text-danger">&nbsp;*</span></label>
+										</div>
+										<div class="col-xs-6 col-sm-3">
+											<div class="select-form">
+												<select class="form-control form-select">
+													<option value="MM">MM</option>
+													<option value="01">January</option>
+													<option value="02">February</option>
+													<option value="03">March</option>
+													<option value="04">April</option>
+													<option value="05">May</option>
+													<option value="06">June</option>
+													<option value="07">July</option>
+													<option value="08">August</option>
+													<option value="09">September</option>
+													<option value="10">October</option>
+													<option value="11">November</option>
+													<option value="12">December</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-xs-6 col-sm-3">
+											<div class="select-form">
+												<select class="form-control">
+													<option value="YYYY">YYYY</option>
+													<option value="2018">2018</option>
+													<option value="2017">2017</option>
+													<option value="2016">2016</option>
+													<option value="2015">2015</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="row mb-1x">
+										<div class="col-sm-5 text-left text-right-sm-up">
+											<label class="control-label">CCV / CV2<span class="text-danger">&nbsp;*</span></label>
+										</div>
+										<div class="col-xs-6 col-sm-3">
+											<input type="type" name="name" value="123" class="form-control" />
+										</div>
+										<div class="col-xs-6 col-sm-3 form-helper question-padding">
+											<i class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="The last 3 digits on, the back of your card."></i>
+										</div>
+									</div>
+									<div class="row mt-1x">
+										<div class="col-xs-6 ssl-secure">@*<img class="img-responsive mt-1x mb-1x" src="Static/img/global/ssl-secure.png">*@</div>
+										<div class="col-xs-12 col-sm-5 pt-xs-2x">
+											<a href="/prototypes/bullion/securelogin/BULL-268_AddingFundsSuccess" class="button btn btn-block btn-secondary">Fund Account</a>
+										</div>
+										<div class="col-xs-12 mobile-ssl-img mt-1x">
+											<img class="img-responsive mt-1x" src="Static/img/global/ssl-secure.png">
+										</div>
+									</div>
+								</form>
+							</div>
+
+							<div class="col-xs-12 col-sm-4">
+								<div class="row">
+									@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- seperator -->
+					<div class="add-funds-dropdown bank-dd mb-1x cta-action mb-1x">
+						<a class="h6 collapsed" data-toggle="collapse" href="#add-with-bank" role="button" aria-expanded="true" aria-controls="collapseExample">
+							<span class="pr-1x" href="">
+								<i class="trmi trmi-bank" aria-hidden="true"></i>
+							</span>
+							<span>
+								Fund with Bank Transfer
+							</span>
+							<span class="right">
+								<i class="trmi trmi-angle-up"></i>
+								<i class="trmi trmi-angle-down"></i>
+							</span>
+						</a>
+					</div>
+
+					<div class="add-with-bank collapse in" id="add-with-bank">
+						<div class="row mt-1x">
+							<div class="col-xs-12">
+								<p>When making a bank transfer, please use the details below including the Beneficiary Reference code below as your transaction reference in order to match funds to your account</p>
+							</div>
+							<div class="col-xs-12 col-sm-6">
+								<table class="table-bordered">
+									<tr>
+										<td class="left-cell">Bank Name</td>
+										<td class="right-cell">Barclays Bank</td>
+									</tr>
+									<tr>
+										<td class="left-cell">Account Name</td>
+										<td class="right-cell">RM Bullion Client</td>
+									</tr>
+									<tr>
+										<td class="left-cell">Sort Code</td>
+										<td class="right-cell">20-18-76</td>
+									</tr>
+									<tr>
+										<td class="left-cell">Bank Account No</td>
+										<td class="right-cell">03648214</td>
+									</tr>
+									<tr>
+										<td class="left-cell strong">Beneficiary Reference <i class="trmi trmi-question" data-toggle="tooltip" title="" data-original-title="We accept Visa, Mastercard, American Express."></i></td>
+										<td class="right-cell strong">31705348Benson</td>
+									</tr>
+								</table>
+
+							</div>
+							<div class="col-xs-12 col-sm-6">
+								<p class="mt-xs-1x mb-2x">Additional information for International customers For some International banks you may also be asked to provide the following information:</p>
+
+								<table class="table-bordered">
+									<tr>
+										<td class="left-cell">IBAN No</td>
+										<td class="right-cell">GB31 BARC 2018 7603 6482 14</td>
+									</tr>
+									<tr>
+										<td class="left-cell">SWIFT Code</td>
+										<td class="right-cell">BARCGB22</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+
+						<div class="row mt-2x">
+							<div class="col-xs-12">
+								<p class="strong">Your current address is: Whiskey St London, London, SW3 5BY, GBR </p>
+								<p>For your debit or credit card transaction to be authorised, this address needs to match the address which is displayed on your bank statement. If you need to change your address please <a href="#">contact us</a></p>
+								<p>Anti Money Laundering Policy: The Royal Mint complies with all the laws and regulations related to money laundering and anti-terrorism. The Royal Mint reserves all the rights to report and block the assets under all applicable foreign and domestic laws. The Royal Mint monitors the account activity for evidence of suspicious transactions that may indicate money laundering activities. This may include monitoring of cash in-flows and out-flows, source and destination of bank transfers and/or any activity outside the normal course of business.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+		</main>
+	</div>
+	<div class="row">
+		@Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+	</div>
+</div>

@@ -1,0 +1,43 @@
+﻿@model TRM.Web.Models.ViewModels.TrmNavigationBlockViewModel
+@using TRM.Web.Constants
+@using Hephaestus.ContentTypes.Business.Extensions
+
+@{
+    var hasChildren = Model.NavigationDto.ChildNavigationItems != null && Model.NavigationDto.ChildNavigationItems.Any();
+}
+
+<div class="grid-item">
+    <div class="category">
+        <h3 class="title">
+            <a href="@Model.NavigationDto.MenuItemExternalUrl">
+                @if (@Model.NavigationDto.MenuIcon > 0)
+                {
+                    <span class="icon"><svg><use xlink:href="#@Model.NavigationDto.MenuIcon.DescriptionAttr()" /></svg></span>
+                }
+
+                @Model.NavigationDto.MenuItemDisplayName
+            </a>
+        </h3>
+        <p>@Model.NavigationDto.Description</p>
+
+        @if (hasChildren)
+        {
+            <ul class="btn-list">
+                @foreach (var child in Model.NavigationDto.ChildNavigationItems)
+                {
+                    <li>
+                        <a href="@child.MenuItemExternalUrl" class="btn btn-primary" @(child.OpenInANewWindow ? "target='_blank'" : string.Empty) title="@child.MenuItemDisplayName">
+                            @child.MenuItemDisplayName <span class="icon"><svg><use xlink:href="#chevron-right" /></svg></span>
+                        </a>
+                    </li>
+                }
+            </ul>
+            if (Model.NavigationDto.ShowViewAll)
+            {
+                <a href="@Model.NavigationDto.MenuItemExternalUrl" class="view-all">View all @Model.NavigationDto.ChildNavigationItems.Count subjects</a>
+            }
+        }
+    </div>
+</div>
+
+

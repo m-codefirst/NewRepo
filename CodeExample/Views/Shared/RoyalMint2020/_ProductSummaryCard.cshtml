@@ -1,0 +1,61 @@
+﻿@using TRM.Web.Models.ViewModels
+@using TRM.Web.Constants
+
+@model TRM.Web.Models.ViewModels.ProductSummaryCardViewModel
+<div class="product-summary-card p-1 p-sm-2 border-bottom-print padding-left-none-print page-break-print">
+    <div class="row">
+        <div class="col-12 col-md-4 col-4-print">
+            <div class="asset fluid-image">
+                <img src="@Model.Item.ImageUrl" alt="@Model.Item.DisplayName" />
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-8-print ">
+            <div class="info">
+                <h4 class="title mb-1">@Model.Item.DisplayName</h4>
+                @if (Model.Item.HasbeenPersonalised)
+                {
+                    <p>@Html.TranslateFallback(StringResources.HasBeenPersonalised, StringConstants.TranslationFallback.HasBeenPersonalised)</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Item.StockSummary.StatusMessage))
+                {
+                    <p>@Model.Item.StockSummary.StatusMessage</p>
+                }
+                @if (string.IsNullOrEmpty(Model.Item.SupplierMessage))
+                {
+                    <p>@Model.Item.FulfilledBy</p>
+                }
+                else
+                {
+                    <p>@Model.Item.SupplierMessage)</p>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Item.StockSummary.ShippingMessage))
+                {
+                    <p>@Model.Item.StockSummary.ShippingMessage</p>
+                }
+
+                @if (Model.Item.RecurrenceType == TRM.Shared.Constants.Enums.eRecurrenceType.Optional)
+                {
+                    <p>@Model.Item.RecurringConfirmationMessage</p>
+                }
+
+                @if (Model.Item.RecurrenceType == TRM.Shared.Constants.Enums.eRecurrenceType.Mandatory)
+                {
+                    <p>@Model.Item.RecurringConfirmationMessage</p>
+                }
+                <div class="qty">
+                    <span>@Html.TranslateFallback(StringResources.MixCheckoutQty, "Quantity")</span> @((int)Model.Item.Quantity)
+                </div>
+
+                <div class="price">
+                    <div class="total">
+                        @{
+                            var price = !string.IsNullOrEmpty(Model.Item.DiscountedPrice) ? Model.Item.DiscountedPrice : Model.Item.PlacedPrice;
+                        }
+                        @price
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

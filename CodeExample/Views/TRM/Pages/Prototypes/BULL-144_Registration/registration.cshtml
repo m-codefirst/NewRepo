@@ -1,0 +1,126 @@
+﻿@using TRM.Web.Constants
+@using TRM.Web.Models.Layouts
+
+@model Hephaestus.CMS.ViewModels.IPageViewModel<TRM.Web.Models.Pages.EcomPrototypePage, Hephaestus.CMS.ViewModels.ILayoutModel>
+@{
+    var myLayout = Model.Layout as TrmLayoutModel;
+    if (myLayout == null)
+    {
+        throw new InvalidCastException(StringConstants.Layout.InvalidLayout);
+    }
+}
+<div class="pageContainer">
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.TopContent)
+    @if (Model.CurrentPage.DisplayPageHeading)
+    {
+        <div class="page-header">
+            @Html.PropertyFor(m => m.CurrentPage.Heading)
+        </div>
+    }
+    @Html.PropertyFor(m => m.CurrentPage.MainBody)
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.MiddleContent)
+    @Html.PropertyFor(m => m.CurrentPage.ThreeContentAreas.BottomContent)
+
+
+    <!-- BULL-147 - Bullion Registration Step 1 - Account Details -->
+        <div class="container mb-4x mt-2x">
+            <!-- page header -->
+            <div class="page-header">
+                <h1 class="h2">Registration</h1>
+            </div>
+            <!-- / page header -->
+            <!-- Step bar -->
+            <ol class="nav nav-bar nav-progress-bar mb-2x">
+                <li class="active"><a href="#">1.&nbsp;<span>Account Details</span>&nbsp;</a></li>
+                <li>2. <span></span> </li>
+                <li>3. <span></span> </li>
+                <li>4. <span></span> </li>
+                <li>5. <span></span> </li>
+            </ol>
+            <!-- / Step bar -->
+            <!-- Sub Headline -->
+            <h3 class="mt-0">Account Details</h3>
+            <!-- / Sub Headline -->
+            <!-- Content Area
+    <div class="alert alert-warning text-center no-margins-v mb-0">Content Area</div> -->
+            <!-- / Content Area -->
+            <!-- Form -->
+            <main class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 mb-2x">
+                    <div class="form-group">
+                        <label class="control-label" for="checkoutEmail">
+                            E-mail
+                            <span class="text-danger">*</span>
+                            <!-- <span class="text-greyblue">(Please enter your email address)</span> -->
+                        </label>
+                        <input type="text" class="form-control" id="" placeholder="Please enter your email address" data-original-title="" title="">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="checkoutEmail">
+                            Password
+                            <span class="text-danger">*</span>
+                            <!-- <span class="text-greyblue">(Please enter a secure password that's unique to you)</span> -->
+                        </label>
+                        <input type="text" class="form-control" id="" placeholder="Please enter a secure password that's unique to you" data-original-title="" title="">
+                    </div>
+
+                    <p>
+                        We would like to keep you up to date with information about our competitions, products, services,
+                        offers and news that may interest you – if thats of please select the box below.
+                        By doing so you are acknoledging that you are above the age of 16 and consent to being contacted
+                        in the manner described.
+                    </p>
+                    <div class="mt-2x">
+                        <div class="pull-left">
+                            <!-- Due to from the second child checkbox gets a -5px margin I cannot override -->
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="" title="" class="" style="">
+                                <label class="" for="">
+                                    By email
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="" title="" class="" style="">
+                                <label class="" for="">
+                                    By post
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pull-left ml-2x">
+                            <div class="checkbox small fancy">
+                                <input type="checkbox" name="" value="" id="" title="" class="" style="">
+                                <label class="" for="">
+                                    By phone
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="checkbox small fancy">
+                            <input type="checkbox" name="" value="" id="" title="" class="" style="">
+                            <label class="" for="">
+                                Please tick to confirm you have read The Royal Mint's
+                                <a href="#" class="text-nowrap">Terms & Conditions</a>
+                                and
+                                <a href="#" class="text-nowrap">Privacy and Cookies Policy</a>.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-2x">
+                        <button type="" class="btn btn-default mb-1x">Back</button>
+                        <button type="" class="btn btn-secondary mb-1x ml-1x">Continue</button>
+                    </div>
+                </div>
+            </main>
+            <!-- / Form -->
+            <!-- Content Area
+            <div class="alert alert-warning text-center no-margins-v mb-0">Content Area</div> -->
+            <!-- / Content Area -->
+            <!-- / BULL-147 - Bullion Registration Step 1 - Account Details -->
+
+        </div>
+
+    </div>

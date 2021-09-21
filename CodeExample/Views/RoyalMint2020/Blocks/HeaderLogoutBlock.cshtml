@@ -1,0 +1,27 @@
+﻿@using TRM.Web.Models.ViewModels;
+@using TRM.Web.Models.Blocks;
+
+@model  HeaderLogoutModel<HeaderLogoutBlock>
+@{
+    var currentBlock = Model.CurrentBlock as HeaderLogoutBlock;
+    var viewModel = Model.HeaderLogoutViewModel;
+    var fundLink = string.Format("<a href='{0}'>{1}</a>", viewModel.ManageFundUrl, viewModel.AvailableToInvest);
+    var colLg10 = Model.CurrentBlock.AddCol10 ? "col-lg-10" : "";
+}
+
+<div class="welcome row justify-content-center">
+    <div class="message col-12 @colLg10">
+        <h2>
+            @currentBlock.HeaderTitle.Replace("[FirstName]", viewModel.FirstName)
+            @if (!string.IsNullOrWhiteSpace(currentBlock.HeaderTitleSecondLine))
+            {
+                <br />
+                @currentBlock.HeaderTitleSecondLine.Replace("[FirstName]", viewModel.FirstName)
+            }
+
+        </h2>
+        <div class="js-account-welcome">
+            <p class="mb-1" style="font-size: 20px"> @Html.Raw(currentBlock.FundMessage != null ? currentBlock.FundMessage.Replace("[FundAmount]", fundLink) : string.Empty)</p>
+       </div>
+    </div>
+</div>

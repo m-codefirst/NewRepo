@@ -1,0 +1,124 @@
+﻿@using TRM.Web.Extentions
+@using TRM.Web.Constants
+@using TRM.Shared.Extensions
+@model TRM.Web.Models.ViewModels.EntryPartialViewModel
+@{
+    var hasAltImage = !string.IsNullOrEmpty(Model.AltImageUrl);
+    var imageFlipClass = hasAltImage ? "image-flip" : string.Empty;
+}
+<a ng-href="@Model.EntryUrl" title="@Model.DisplayName" href="@Model.EntryUrl">
+    <figure class="@imageFlipClass" ng-class="@imageFlipClass">
+        <span class="frontImg">
+            <div class="promoTag__wrapper">
+                <div>
+                    @if (!string.IsNullOrWhiteSpace(Model.TagMessage))
+                    {
+                        <span class="promoTag">
+                            @Model.TagMessage
+                        </span>
+                    }
+                </div>
+
+
+                <!-- New - message personalize
+                ---------- ---------- ---------- ---------- ---------- -->
+                @if (Model.CanBePersonalised)
+                    {
+                        <div>
+                            <span class="promoTag promoTag--personalize">
+                                @Model.CanBePersonalisedMessage
+                            </span>
+                        </div>
+                    }
+                <!-- / message personalize
+                ---------- ---------- ---------- ---------- ---------- -->
+            </div>
+
+            @Html.GetMyPictureHtml(Model.DefaultImageUrl,
+                               new Dictionary<string, string> { { "alt", Model.DisplayName }, { "class", "img-responsive" } },
+                               Model.ImageDisplaySizes)
+        </span>
+        @if (hasAltImage)
+        {
+            <span class="backImg">
+                @Html.GetMyPictureHtml(Model.AltImageUrl,
+                                   new Dictionary<string, string> { { "alt", Model.DisplayName }, { "class", "img-responsive" } },
+                                   Model.ImageDisplaySizes)
+            </span>
+        }
+    </figure>
+</a>
+
+<h3 class="h5 item-title">
+    <a title="@Model.DisplayName" href="@Model.EntryUrl">
+        @Html.DisplayFor(r => Model.DisplayName)
+    </a>
+</h3>
+<div class="item-details">
+    @if (!string.IsNullOrEmpty(Model.SubDisplayName))
+    {
+        <p class="mb-0">@Html.DisplayFor(m => Model.SubDisplayName)</p>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.PriceString))
+{
+    <div class="item-price">
+        <div class="h5 mt-0 mb-0">
+            @Model.PriceString
+        </div>
+    </div>
+    //
+    if (Model.IsAgeRestricted)
+     {
+         <div class="item-extras badge__wrapper">
+
+             <!-- age restriction wrapper -->
+             <span>
+                 <!-- age restriction -->
+                 <span class="badge--age-restriction">
+                     <small>+18</small>
+                 </span>
+                 <!-- / age restriction -->
+                 <!-- age restriction tooltip -->
+                 <div class="badge__tooltip">
+                     <p class="small mb-0">@Model.AgeRestrictedMessage</p>
+                 </div>
+                 <!-- / age restriction tooltip -->
+             </span>
+             <!-- / age restriction wrapper -->
+
+         </div>
+     }
+    if (Model.StockSummary != null)
+    {
+        <div class="item-extras">
+            <p ng-class="@((int) Model.StockSummary.Status)| stockClass">@Model.StockSummary.StatusMessage</p>
+        </div>
+
+        if (Model.StockSummary.CanAddToBasket)
+        {
+            <a class="btn btn-primary btn-block mb-1x" id="item_@Model.Code" ng-click="addToBasket({id:'@Model.Code', isPl: '@Model.CanBePersonalised.ToString()'})">{{ product.myText || '@Html.TranslateFallback(StringResources.AddToBasket, "Add To Basket")'}}</a>
+        }
+    }
+}
+
+<div class="row ng-scope">
+    <div class="col-xs-5 hidden-xs">
+        @*<div class="input-group checkbox fancy mb-0 mb-md-1x">
+                <input type="checkbox" ng-checked="product.inCompare">
+                <label ng-click="toggleCompare($index, product, $event)" class="compare-checkbox">Compare</label>
+            </div>*@
+    </div>
+    @*<div class="col-xs-12 col-sm-7 col-md-12 col-lg-7 text-right-sm text-right-lg" ng-controller="rmFeefo" ng-model="reviews" ng-init="GetFeefoSummaryRatings('@Model.Code')">
+            <reviewstars class="ng-isolate-scope" ng-cloak rating="{{roundRatingNum}}" ng-if="reviewCount" ng-model="StarRating" reviewcount="{{reviewCount}}">
+                <meta itemprop="ratingValue" content="{{roundRatingNum}}" />
+                <meta itemprop="reviewCount" content="{{reviewCount}}" />
+                <span class="reviewStars" itemprop="reviewValue" ng-class="reviewCount === 0 ? 'text-gray-lighter': 'text-ochre'">
+                <span class="trmi trmi-star-full" ng-repeat="n in roundRating track by $index"></span><span ng-show="plusHalf === true" class="trmi trmi-star-half ng-hide" ng-cloak></span><span class="trmi trmi-star-empty" ng-repeat="x in remainder track by $index"></span></span>
+                <a href="@string.Concat(Url.ContentUrlExtension(Model.EntryUrl), "?scrollto=#tab3")" ng-model="reviewCount" ng-if="reviewCount > 0" itemprop="reviewCount" title="Read reviews" class="text-slateblue">({{reviewCount}})</a>
+            </reviewstars>
+
+        </div>*@
+
+</div>
