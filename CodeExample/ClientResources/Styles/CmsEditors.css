@@ -1,0 +1,156 @@
+﻿/* 
+Make Episerver editor properties show
+description text as well as tooltip.
+This css-file must be registerd in the Module.config
+*/
+
+.Sleek .epi-form-container__section__row>label[title]:after {
+    display: block;
+    content: attr(title);
+    font-size: 0.8em;
+    color: #6f73ec;
+    font-style: italic;
+
+    /* Cut longer texts and hide overflow */
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+.Sleek .dijitTextBox, .Sleek .dijitTextBox .dijitInputContainer {
+    min-width: 45%;
+}
+.Sleek .epi-previewableTextBox-text {
+    max-width: none;
+}
+
+/*
+Custom display options styling
+*/
+
+.Sleek .LayoutGrid {
+    height: 18px;
+    width: 36px;
+    margin: 0 3px;
+    vertical-align: middle !important;
+}
+
+.Sleek .LayoutGrid:before {
+    content: '';
+    display: block;
+    float: left;
+    background-color: silver;
+    margin: 0;
+    padding: 0;
+    height: 18px;
+}
+
+.Sleek .LayoutGrid:after {
+    content: '';
+    display: block;
+    float: left;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    height: 16px;
+    border: 1px dotted silver;
+    border-left-width: 0;
+}
+
+/* 12 cols */
+.Sleek .LayoutGrid.col12:before {
+    width: 36px;
+}
+.Sleek .LayoutGrid.col12:after {
+    width: 0;
+    display: none;
+}
+
+/* 11 cols */
+.Sleek .LayoutGrid.col11:before {
+    width: 33px;
+}
+.Sleek .LayoutGrid.col11:after {
+    width: 2px;
+}
+
+/* 10 cols */
+.Sleek .LayoutGrid.col10:before {
+    width: 30px;
+}
+.Sleek .LayoutGrid.col10:after {
+    width: 5px;
+}
+
+/* 9 cols */
+.Sleek .LayoutGrid.col9:before {
+    width: 27px;
+}
+.Sleek .LayoutGrid.col9:after {
+    width: 8px;
+}
+
+/* 8 cols */
+.Sleek .LayoutGrid.col8:before {
+    width: 24px;
+}
+.Sleek .LayoutGrid.col8:after {
+    width: 11px;
+}
+
+/* 7 cols */
+.Sleek .LayoutGrid.col7:before {
+    width: 21px;
+}
+.Sleek .LayoutGrid.col7:after {
+    width: 14px;
+}
+
+/* 6 cols */
+.Sleek .LayoutGrid.col6:before {
+    width: 18px;
+}
+.Sleek .LayoutGrid.col6:after {
+    width: 17px;
+}
+
+/* 5 cols */
+.Sleek .LayoutGrid.col5:before {
+    width: 15px;
+}
+.Sleek .LayoutGrid.col5:after {
+    width: 20px;
+}
+
+/* 4 cols */
+.Sleek .LayoutGrid.col4:before {
+    width: 12px;
+}
+.Sleek .LayoutGrid.col4:after {
+    width: 23px;
+}
+
+/* 3 cols */
+.Sleek .LayoutGrid.col3:before {
+    width: 9px;
+}
+.Sleek .LayoutGrid.col3:after {
+    width: 26px;
+}
+
+/* 2 cols */
+.Sleek .LayoutGrid.col2:before {
+    width: 6px;
+}
+.Sleek .LayoutGrid.col2:after {
+    width: 29px;
+}
+
+/* 1 col */
+.Sleek .LayoutGrid.col1:before {
+    width: 3px;
+}
+.Sleek .LayoutGrid.col1:after {
+    width: 32px;
+}

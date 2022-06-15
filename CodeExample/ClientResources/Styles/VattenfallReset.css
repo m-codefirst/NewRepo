@@ -1,0 +1,12 @@
+﻿*, *:before, *:after {
+    box-sizing: initial;
+}
+
+body {
+    line-height: normal;
+}
+
+h1 {
+    font-family: Helvetica,Arial,Sans-Serif;
+    font-size: 14px;
+}
